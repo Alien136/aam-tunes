@@ -1,0 +1,46 @@
+{
+ "format": "aam-index/1",
+ "owner": "aam",
+ "name": "Alex Attard Music",
+ "master": "0f87769b57e5c436af6d5e52e34f3e72864659b11d3e9d01d47b16686c2ef774",
+ "pdfs": [
+  {
+   "id": "gi-piano",
+   "title": "G.I. · Piano",
+   "hash": "5fdb7350bfce8063a16b113263bd35defd30557d153aa6b847036e24bc51bc9d",
+   "tunes": [
+    "gi-solo-piano"
+   ]
+  },
+  {
+   "id": "fblues-piano",
+   "title": "F Blues · Piano",
+   "hash": "d1d4fecfc935078e8e6194aa242b8f717161df3e901c478f5bf85c2969aa3dd4",
+   "tunes": [
+    "f-blues-piano"
+   ]
+  },
+  {
+   "id": "winter-wonderland-piano",
+   "title": "Winter Wonderland · Piano",
+   "hash": "8e55b7d2daab3021deb6bcfbaca68f83599b4d316fbc6fe88fd267484006fb67",
+   "tunes": [
+    "winter-wonderland-piano"
+   ]
+  }
+ ],
+ "tunes": {
+  "gi-solo-piano": {
+   "title": "G.I.",
+   "subtitle": "Solo section, bars 49–80 · Piano · by Matt Finders"
+  },
+  "f-blues-piano": {
+   "title": "F Blues",
+   "subtitle": "12-bar jazz blues · Piano"
+  },
+  "winter-wonderland-piano": {
+   "title": "Winter Wonderland",
+   "subtitle": "32-bar AABA · Piano · chords, arpeggios and ii–V–I licks"
+  }
+ }
+}
