@@ -199,7 +199,7 @@
   /* only whole lines of music show: a white cover hides any line that would be cut off at the bottom */
   #aam-play .score-mask { position: absolute; z-index: 2; background: #fff; pointer-events: none; border-radius: 0 0 7px 7px; }
   #aam-play .score-mask[hidden] { display: none; }
-  #aam-play.is-open .key { flex: none; font-size: 11px; gap: 3px 10px; }
+  #aam-play.is-open .key { flex: none; height: 30px; overflow: hidden; align-content: flex-start; font-size: 11px; line-height: 14px; gap: 2px 10px; }   /* fixed height: the music box is the same size on every tab */
   #aam-play.is-open .form[hidden], #aam-play.is-open .score[hidden], #aam-play.is-open .key[hidden], #aam-play.is-open .content[hidden] { display: none; }
   /* the chord chart reads like a lead sheet: four bars a line, bar lines instead of boxes, big friendly chord symbols,
      section letters in a narrow margin to the left of their bar */
