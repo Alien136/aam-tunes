@@ -136,7 +136,7 @@
 #aam-play .score .hl.is-now { fill: #bfe3fb; stroke: var(--accent); stroke-width: 1.5; }
 #aam-play .score .mk-g { color: #8a99a8; fill: #8a99a8; }
 #aam-play .score .mk-l { color: var(--accent-text); fill: var(--accent-text); }
-#aam-play .score .abcjs-chord { font-weight: 500; }
+#aam-play .score .ch-t { font: 500 13.5px "Inter", "Segoe UI Symbol", "Apple Symbols", sans-serif; fill: var(--ink); }
 #aam-play .key { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--muted); }
 #aam-play .key i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
 #aam-play button:focus-visible, #aam-play input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -610,15 +610,39 @@ function aamBoot(TUNE) {
   $("hear").onclick = function () { if (!isSection(state.view)) return; state.hear = !state.hear; syncDemo(); };
   if (!TUNE.sections.length) $("hear").hidden = true;
   function blankBar(bar) { return bar.map(function (c) { return '"' + c.sym + '"x' + c.beats * 2; }).join(" "); }
-  function abcFor(view, per) {
+  // Chord names are drawn by hand above the staff, lined up with the note each chord starts on. Left to abcjs, a chord name's
+  // width pushes the next note away and the notes come out unevenly spaced.
+  function chordNames(svg, view, lineY) {
+    var NS = "http://www.w3.org/2000/svg", g = document.createElementNS(NS, "g"); g.setAttribute("class", "ch-g"); svg.appendChild(g);
+    var sec = TUNE.sections.filter(function (s) { return s.id === view; })[0];
+    var rh = sec ? sec.abc.rh : null;
+    var xOf = function (sel) { var e = svg.querySelector(sel); return e ? e.getBBox().x : null; };
+    TUNE.bars.forEach(function (bar, i) {
+      var m = measures[i]; if (!m) return;
+      var left = +m.rect.getAttribute("x"), width = +m.rect.getAttribute("width"), beat = 0, starts = [];
+      if (rh) {                                             // which note of the bar each chord starts on
+        var re = /"[^"]*"|(?:\[[^\]]*\]|[=_^]*[A-Ga-gzx][,']*)[\d\/]*/g, tok, k = 0;
+        while ((tok = re.exec(rh[i]))) { if (tok[0].charAt(0) === '"') starts.push(k); else k++; }
+      }
+      bar.forEach(function (c, j) {
+        var x = xOf(".abcjs-v1.abcjs-mm" + i + ".abcjs-n" + j);                                     // the left-hand voicing under it
+        if (x === null && starts.length > j) x = xOf(".abcjs-v0.abcjs-mm" + i + ".abcjs-n" + starts[j]);   // or the right-hand note
+        if (x === null) x = left + 10 + (beat / 4) * (width - 10);                                  // or by the beat
+        var tx = document.createElementNS(NS, "text"); tx.setAttribute("class", "ch-t"); tx.setAttribute("x", x - 1); tx.setAttribute("y", lineY[m.line]);
+        tx.textContent = nice(c.sym); g.appendChild(tx);
+        beat += c.beats;
+      });
+    });
+  }
+  function abcFor(view, per, sp) {
     var sec = TUNE.sections.filter(function (s) { return s.id === view; })[0];
     var rh = sec ? sec.abc.rh : TUNE.bars.map(blankBar);
     var lh = sec ? sec.abc.lh : NOTA.lh;
-    var out = "X:1\nL:1/8\nM:4/4\nK:" + NOTA.key + "\n" + (lh ? "%%score {RH LH}\nV:RH clef=treble\nV:LH clef=bass\n" : "");
+    var out = "X:1\nL:1/8\nM:4/4\nK:" + NOTA.key + "\n" + (sp ? "%%staffsep " + sp.sep + "\n%%sysstaffsep " + sp.sys + "\n" : "") + (lh ? "%%score {RH LH}\nV:RH clef=treble\nV:LH clef=bass\n" : "");
     for (var s = 0; s < NB; s += per) {
       var idx = []; for (var i = s; i < Math.min(s + per, NB); i++) idx.push(i);
       var end = s + per >= NB ? " |]\n" : " |\n";
-      out += (lh ? "[V:RH] " : "") + idx.map(function (i) { return rh[i]; }).join(" | ") + end;
+      out += (lh ? "[V:RH] " : "") + idx.map(function (i) { return rh[i].replace(/"[^"]*"/g, ""); }).join(" | ") + end;   // chord names are drawn afterwards (chordNames)
       if (lh) out += "[V:LH] " + idx.map(function (i) { return lh[i]; }).join(" | ") + end;
     }
     return out;
@@ -634,29 +658,40 @@ function aamBoot(TUNE) {
       var s = document.createElement("i"); s.className = "snap"; s.style.top = (l === 0 ? 0 : Math.max(0, b.top - 6)) + "px"; box.appendChild(s);
     }
   }
-  function gloveScale() {                                  // shrink the music a touch (never below 84%) so one more whole line fits the box exactly
-    score.style.paddingLeft = score.style.paddingRight = "";
-    if (!mq.matches) return;
-    var b0 = lineBox(0), b1 = lineBox(1);
-    if (!b0 || !b1) return;
-    var P = b1.top - b0.top, lh = b0.bot - b0.top, vh = score.clientHeight, cw = score.clientWidth;
-    var need = function (n) { return (n - 1) * P + lh + 12; };
+  var staffTops = [], staffBot0 = 0;                       // top of each line's upper staff (and the bottom of the first line), in the drawing's own units
+  var TIGHT = { sep: 34, sys: 26 };                        // phones start from close-set lines
+  // Phones: make whole lines fill the box exactly. If one more line fits by shrinking the music a little (never below 86%),
+  // do that with a small margin either side. Otherwise keep it full size and spread the lines that fit to fill the box.
+  // Measured from the staves alone, so every tab of a tune comes out the same. Returns new line spacing to redraw with, or null.
+  function gloveDecide() {
+    var svg = score.querySelector("svg");
+    if (!svg || staffTops.length < 2) return null;
+    var k = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width, P = (staffTops[1] - staffTops[0]) * k, vh = score.clientHeight, cw = score.clientWidth;
+    var first = (staffBot0 + 8) * k;                        // the first line, from the top of the box to its bottom edge
+    var need = function (n) { return first + (n - 1) * P + 8; };
     var n = 1; while (need(n + 1) <= vh) n++;
     var s = vh / need(n + 1) * 0.985;
-    if (s < 0.84 || s >= 1) return;
-    score.style.paddingLeft = score.style.paddingRight = (Math.ceil(cw * (1 - s) / 2) + 2) + "px";
+    if (s >= 0.86 && s < 1) { score.style.paddingLeft = score.style.paddingRight = (Math.ceil(cw * (1 - s) / 2) + 2) + "px"; return null; }
+    if (n < 2) return null;
+    var want = (vh - 8 - first) / (n - 1) / k, sep = TIGHT.sep + (want - P / k) / 1.325;            // abcjs: +1 staffsep is about +1.325 between lines
+    return { sep: Math.round(Math.min(sep, TIGHT.sep + 60)), sys: TIGHT.sys };
   }
   function fitGlove() {
     if (!mq.matches || score.hidden || !measures.length) { mask.hidden = true; return; }
     var vt = score.scrollTop, vh = score.clientHeight, last = null;
-    for (var l = 0, b; (b = lineBox(l)); l++) if (b.top >= vt - 8 && b.bot <= vt + vh + 1) last = b;
+    var more = false;
+    for (var l = 0, b; (b = lineBox(l)); l++) { if (b.top >= vt - 8 && b.bot <= vt + vh + 1) { last = b; more = false; } else if (last) more = true; }
     if (!last) { mask.hidden = true; return; }
-    var y = Math.min(vh, last.bot - vt + 5);
+    var y = Math.min(vh, last.bot - vt + (more ? 0 : 5));   // right under the last whole line, so the next line's chord names don't peek in
     mask.style.top = (score.offsetTop + score.clientTop + y) + "px"; mask.style.left = (score.offsetLeft + score.clientLeft) + "px";
     mask.style.width = score.clientWidth + "px"; mask.style.height = Math.max(0, vh - y) + "px"; mask.hidden = false;
   }
   score.addEventListener("scroll", fitGlove);
-  window.addEventListener("resize", function () { setTimeout(function () { if (!score.hidden) gloveScale(); setSnaps(); fitGlove(); if (pager.on) { pagingStart(); markNow(curBar, true); } }, 60); });
+  var lastVH = 0;
+  window.addEventListener("resize", function () { setTimeout(function () {
+    if (mq.matches && !score.hidden && Math.abs(score.clientHeight - lastVH) > 40) { perShown = 0; drawScore(); return; }   // a different-sized box: fit the music to it again
+    setSnaps(); fitGlove(); if (pager.on) { pagingStart(); markNow(curBar, true); }
+  }, 60); });
   var staffWs = {};
   function staffW(per) {                                   // one staff width for every view, so the notes are the same size on all of them:
     if (staffWs[per]) return staffWs[per];                 // draw each view once off screen and keep the widest
@@ -677,20 +712,34 @@ function aamBoot(TUNE) {
     var chart = state.view === "chords" || !NOTA;
     $("form").hidden = !chart; score.hidden = chart; $("key").hidden = chart;
     if (chart) { fitGlove(); return; }
+    score.style.paddingLeft = score.style.paddingRight = "";
     var w = score.clientWidth;
     if (!w) return;
     var per = w < 560 ? 2 : 4;
     if (per === perShown) return;
     perShown = per;
-    ABCJS.renderAbc($("score-in"), abcFor(state.view, per), { add_classes: true, responsive: "resize", staffwidth: staffW(per),
-      paddingleft: 0, paddingright: 0, paddingtop: 4, paddingbottom: 8, selectTypes: false });
+    paint(per, mq.matches ? TIGHT : null);
+    if (mq.matches) { var sp = gloveDecide(); if (sp) paint(per, sp); }
+    lastVH = score.clientHeight;
+    fitPage();
+    showRange();
+    score.scrollTop = 0; setSnaps(); fitGlove();
+    if (state.playing) { pagingStart(); markNow(curBar, true); }
+  }
+  function paint(per, sp) {
+    ABCJS.renderAbc($("score-in"), abcFor(state.view, per, sp), { add_classes: true, responsive: "resize", staffwidth: staffW(per),
+      paddingleft: 0, paddingright: 0, paddingtop: 26, paddingbottom: 8, selectTypes: false });
     var svg = score.querySelector("svg"), q = function (sel) { return [].slice.call(svg.querySelectorAll(sel)); };
     // one box per bar (behind the notes) for the now-playing and loop highlights
     var g = document.createElementNS("http://www.w3.org/2000/svg", "g"); svg.insertBefore(g, svg.firstChild);
-    measures = [];
+    measures = []; var lineY = []; staffTops = [];
     for (var l = 0; q(".abcjs-staff.abcjs-l" + l).length; l++) {
       var st = q(".abcjs-staff.abcjs-l" + l).map(function (e) { return e.getBBox(); });
-      var top = Math.min.apply(null, st.map(function (b) { return b.y; })) - 34;
+      var staffTop = Math.min.apply(null, st.map(function (b) { return b.y; }));
+      var hi = Math.min.apply(null, q(".abcjs-note.abcjs-v0.abcjs-l" + l).map(function (e) { return e.getBBox().y; }).concat([staffTop]));
+      staffTops[l] = staffTop; if (l === 0) staffBot0 = Math.max.apply(null, st.map(function (b) { return b.y + b.height; }));
+      lineY[l] = Math.min(staffTop - 9, hi - 5);            // chord names: one baseline per line, clear of the highest note
+      var top = Math.min(staffTop - 34, lineY[l] - 16);
       var bot = Math.max.apply(null, st.map(function (b) { return b.y + b.height; })) + 8;
       var left = Math.max.apply(null, q(".abcjs-staff-extra.abcjs-l" + l + ".abcjs-v0").map(function (e) { var b = e.getBBox(); return b.x + b.width; })) + 4;
       q(".abcjs-bar.abcjs-l" + l + ".abcjs-v0").forEach(function (e) {
@@ -703,12 +752,13 @@ function aamBoot(TUNE) {
         var tag = TUNE.form.filter(function (f) { return f[1] === mm; })[0];
         if (tag) {
           var t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-          t.setAttribute("x", measures[mm - 1] && measures[mm - 1].line === l ? left + 2 : 0); t.setAttribute("y", top + 12);
+          t.setAttribute("x", measures[mm - 1] && measures[mm - 1].line === l ? left + 2 : 0); t.setAttribute("y", lineY[l]);   // on the chord-name line, clear of the staff above
           t.setAttribute("class", "tag-t"); t.textContent = tag[0]; g.appendChild(t);
         }
         left = b.x + b.width;
       });
     }
+    chordNames(svg, state.view, lineY);
     // grey passing tones and blue lick notes, as in the PDF
     var sec = TUNE.sections.filter(function (s) { return s.id === state.view; })[0];
     var marks = sec ? sec.abc.marks.join("") : "", notes = q(".abcjs-note.abcjs-v0");
@@ -717,10 +767,6 @@ function aamBoot(TUNE) {
     if (/g/.test(marks)) key.push('<i style="background:#8a99a8"></i>Passing tones in grey');
     if (/l/.test(marks)) key.push('<i style="background:var(--accent-text)"></i>The ii–V–I licks in blue');
     $("key").innerHTML = key.map(function (k) { return "<span>" + k + "</span>"; }).join("");
-    gloveScale(); fitPage();
-    showRange();
-    score.scrollTop = 0; setSnaps(); fitGlove();
-    if (state.playing) { pagingStart(); markNow(curBar, true); }
   }
   function measureAt(e) {
     var svg = score.querySelector("svg"), hit = -1; if (!svg) return -1;
