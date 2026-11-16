@@ -140,7 +140,7 @@
 #aam-play .key { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--muted); }
 #aam-play .key i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
 #aam-play button:focus-visible, #aam-play input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-#aam-play .sm, #aam-play .pbar, #aam-play .sheet, #aam-play .backdrop { display: none; }
+#aam-play .sm, #aam-play .pbar, #aam-play .sheet, #aam-play .backdrop, #aam-play .p-reps, #aam-play .p-reps-pop { display: none; }
 @media (max-width: 640px) {
   /* phones: the music fills the screen; play and tempo sit in a bar pinned to the bottom; the rest is in a settings sheet */
   #aam-play { padding: 14px 8px calc(92px + env(safe-area-inset-bottom)); gap: 14px; }
@@ -167,7 +167,16 @@
   #aam-play .p-chord { font: 700 22px/1.1 var(--display); min-height: 24px; white-space: nowrap; }
   #aam-play .p-tempo { display: flex; align-items: center; gap: 6px; flex: none; }
   #aam-play .p-tempo .step { width: 34px; height: 34px; }
-  #aam-play .p-bpm { font: 700 17px var(--display); min-width: 38px; text-align: center; font-variant-numeric: tabular-nums; }
+  #aam-play .p-bpm { font: 700 17px var(--display); min-width: 34px; text-align: center; font-variant-numeric: tabular-nums; }
+  #aam-play .pbar { gap: 8px; } #aam-play .p-tempo { gap: 4px; }
+  #aam-play .p-reps { display: grid; place-items: center; flex: none; min-width: 44px; height: 40px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--accent-text); font: 700 15px var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #aam-play .p-reps[aria-expanded="true"] { background: var(--now); color: var(--now-ink); border-color: var(--now); }
+  #aam-play .p-reps-pop:not([hidden]) { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; position: absolute; right: 8px; bottom: calc(100% + 8px); z-index: 2; width: min(300px, calc(100vw - 16px));
+    padding: 12px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 10px 30px rgba(20,23,26,.2); }
+  #aam-play .p-reps-pop b { grid-column: 1 / -1; font: 600 12px var(--body); color: var(--muted); }
+  #aam-play .p-reps-pop button { height: 40px; border-radius: 10px; display: grid; place-items: center; background: var(--tint); color: var(--ink); font: 700 15px var(--display); }
+  #aam-play .p-reps-pop button[aria-pressed="true"] { background: var(--now); color: var(--now-ink); }
   #aam-play .p-gear { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: var(--accent-text); background: var(--tint); flex: none; }
   #aam-play .p-gear svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
   #aam-play .backdrop.open { display: block; position: fixed; inset: 0; z-index: 99991; background: rgba(20,23,26,.35); }
@@ -225,6 +234,14 @@
   #aam-play .tempo { grid-template-columns: 1fr; } #aam-play .bpm { min-width: 84px; font-size: 20px; } }
 #aam-play .cell .a { font-style: normal; font-size: .74em; margin-left: .02em; font-family: "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols2", "Noto Music", sans-serif; }
 html.aam-full, html.aam-full body { overflow: hidden !important; }
+/* looping: press and hold a bar, then drag, to box the bars to loop; the round loop badge on the first bar clears it */
+#aam-play .form, #aam-play .score { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+#aam-play .cell { position: relative; }
+#aam-play .loop-badge { position: absolute; left: -9px; top: 0; z-index: 3; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--accent); color: #fff; box-shadow: 0 0 0 2px #fff, 0 2px 6px rgba(20,23,26,.25); cursor: pointer; }
+#aam-play .loop-badge svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+#aam-play .score .loop-g { cursor: pointer; } #aam-play .score .loop-g .bg { fill: var(--accent); stroke: #fff; stroke-width: 2; }
+#aam-play .score .loop-g .ic { fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 @media (prefers-reduced-motion: reduce) { #aam-play .cell { transition: none; } }
 </style>
 
@@ -324,7 +341,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
       <h2>How to practise with the band</h2>
       <ol class="tips">
         <li>Start slow (<span class="q">♩</span> = 80–100). Play Section 1, then Section 3, with the band. Switch on <b>Hear it played</b> first if you want to hear how it goes. Pianists: switch off <b>Piano chords</b> when you comp yourself.</li>
-        <li>Stuck on a spot? Choose <b>Loop bars</b>, tap the first and last bar of the tricky part, and set how many times to play it.</li>
+        <li>Stuck on a spot? Press and hold the first bar of the tricky part, slide to its last bar and let go: the band loops just those bars. Set how many times with the <b>×</b> button, and tap the round loop button to go back to the whole tune.</li>
         <li>Switch on <b>Speed up +5 each time</b>: the band gets a little faster every time through, up to the goal tempo.</li>
         <li>Second time through: improvise, using the arpeggios, scales, patterns and licks from your PDF.</li>
       </ol>
@@ -339,6 +356,8 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
         <span class="p-bpm" data-r="p-bpm"></span>
         <button class="step" data-r="p-faster" aria-label="Faster by 5">+</button>
       </div>
+      <button class="p-reps" data-r="p-reps" aria-haspopup="true" aria-label="How many times through">1×</button>
+      <div class="p-reps-pop" data-r="p-reps-pop" hidden></div>
       <button class="p-gear" data-r="p-gear" aria-label="Practice settings"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
     </div>
     <div class="backdrop" data-r="backdrop"></div>
@@ -406,18 +425,56 @@ function aamBoot(TUNE) {
   function tapBar(i) {
     if (suppressClick) return;
     if (state.mode === "whole") { state.from = i; applyRange(i); return; }
+    if (hasLoop()) { if (i >= state.a && i <= state.b) applyRange(i); return; }   // a loop is set: a tap inside it jumps there; the loop badge clears it
     if (!state.pending) { state.a = state.b = i; state.pending = true; showRange(); return; }
     state.a = Math.min(state.a, i); state.b = Math.max(state.b, i); state.pending = false;
     applyRange(state.a);
   }
+  function syncModes() { root.querySelectorAll("[data-mode]").forEach(function (x) { x.setAttribute("aria-pressed", x.dataset.mode === state.mode ? "true" : "false"); }); }
+  function clearLoop() { state.a = state.b = null; state.pending = false; state.mode = "whole"; state.from = 0; syncModes(); applyRange(null); }
+  var LOOP_IC = "M17 2l4 4-4 4M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 0 1-4 4H3";
+  function loopBadge() {                                   // the round loop button on the first bar of the loop
+    [].slice.call(root.querySelectorAll(".loop-badge, .loop-g")).forEach(function (e) { e.parentNode.removeChild(e); });
+    if (!(state.mode === "loop" && state.a !== null)) return;
+    var c = cells[state.a];
+    if (c) {
+      var b = document.createElement("span"); b.className = "loop-badge"; b.setAttribute("role", "button"); b.setAttribute("aria-label", "Clear the loop");
+      b.innerHTML = '<svg viewBox="0 0 24 24"><path d="' + LOOP_IC + '"/></svg>';
+      b.addEventListener("click", function (e) { e.stopPropagation(); e.preventDefault(); clearLoop(); });
+      c.appendChild(b);
+    }
+    var m = typeof measures !== "undefined" && measures[state.a], svg = m && score.querySelector("svg");
+    if (svg) {
+      var NS = "http://www.w3.org/2000/svg", g = document.createElementNS(NS, "g"); g.setAttribute("class", "loop-g");
+      var x = +m.rect.getAttribute("x") + 4, y = +m.rect.getAttribute("y") + 6;
+      g.setAttribute("transform", "translate(" + x + " " + y + ")");
+      g.innerHTML = '<circle r="22" fill="transparent"/><circle class="bg" r="13"/><path class="ic" transform="translate(-9 -9) scale(.75)" d="' + LOOP_IC + '"/>';
+      g.addEventListener("click", function (e) { e.stopPropagation(); clearLoop(); });
+      svg.appendChild(g);
+    }
+  }
   function setMode(m) {
     if (m === "whole" && state.mode === "whole") state.from = 0;          // tapping Whole form again goes back to the top
-    state.mode = m; state.pending = false;
-    root.querySelectorAll("[data-mode]").forEach(function (x) { x.setAttribute("aria-pressed", x.dataset.mode === m ? "true" : "false"); });
+    state.mode = m; state.pending = false; if (m === "whole") state.a = state.b = null;
+    syncModes();
     applyRange(state.playing ? startBar() : null);
   }
   root.querySelectorAll("[data-mode]").forEach(function (b) { b.onclick = function () { setMode(b.dataset.mode); }; });
   var repsName = function (n) { return n ? "Play " + n + "×" : "Keep looping"; };
+  var repsShort = function () { return state.reps ? state.reps + "×" : "∞"; };
+  // phones: the repeat count sits on the play bar; tapping it opens a small pad of choices
+  (function () {
+    var pop = $("p-reps-pop"), btn = $("p-reps");
+    pop.innerHTML = "<b>How many times through</b>";
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 20].forEach(function (n) {
+      var b = document.createElement("button"); b.dataset.n = n; b.textContent = n ? n + "×" : "∞"; if (!n) b.setAttribute("aria-label", "Keep looping");
+      b.onclick = function (e) { e.stopPropagation(); state.reps = n; open(false); applyRange(null); };
+      pop.appendChild(b);
+    });
+    function open(on) { pop.hidden = !on; btn.setAttribute("aria-expanded", on ? "true" : "false"); }
+    btn.onclick = function (e) { e.stopPropagation(); open(pop.hidden); };
+    document.addEventListener("click", function (e) { if (!pop.contains(e.target)) open(false); });
+  })();
   [0].concat(Array.apply(null, Array(20)).map(function (_, i) { return i + 1; })).forEach(function (n) {   // Keep looping first, then 1×–20×
     var li = document.createElement("li"); li.textContent = repsName(n); li.dataset.n = n; li.setAttribute("role", "option");
     if (n === 0) li.className = "sep";
@@ -441,21 +498,65 @@ function aamBoot(TUNE) {
       ? (state.from ? "From bar " + (state.from + fb) + " to the end" : "Bars " + fb + "–" + (fb + NB - 1))
       : state.pending ? "Bar " + (state.a + fb) + "… now tap the last bar"
       : !loop ? "" : state.a === state.b ? "Bar " + (state.a + fb) : "Bars " + (state.a + fb) + "–" + (state.b + fb);
+    var fine = window.matchMedia("(pointer: fine)").matches;
     $("hint").textContent = state.mode === "whole"
-      ? "Tap any bar to start there; the band keeps going to the end of the form. Tap Whole form again to start from the top."
-      : "Tap the first bar, then the last bar you want to loop" + (window.matchMedia("(pointer: fine)").matches ? ", or drag across them." : ".");
+      ? "Tap any bar to start there. To loop a section, " + (fine ? "drag across its bars." : "press and hold its first bar, then slide to its last bar.")
+      : loop ? "Looping these bars. Tap the round loop button on the first bar to go back to the whole tune."
+      : "Tap the first bar, then the last bar you want to loop" + (fine ? ", or drag across them." : ", or press and hold a bar and slide.");
+    loopBadge();
+    $("p-reps").textContent = repsShort();
+    [].forEach.call($("p-reps-pop").querySelectorAll("button"), function (b) { b.setAttribute("aria-pressed", +b.dataset.n === state.reps ? "true" : "false"); });
     $("form").classList.toggle("picking", state.mode === "loop"); if (typeof score !== "undefined") score.classList.toggle("picking", state.mode === "loop");
     $("reps").textContent = repsName(state.reps);
     [].forEach.call($("reps-list").children, function (li) { li.setAttribute("aria-selected", +li.dataset.n === state.reps ? "true" : "false"); });
   }
   // Mouse: drag across bars to pick a loop (touch screens scroll instead, and use two taps)
   var drag = null, suppressClick = false;
-  function dragDown(i, e) { if (e.pointerType !== "mouse" || state.mode !== "loop" || i < 0) return; drag = { i: i, cur: i, moved: false }; e.preventDefault(); }
+  function dragDown(i, e) { if (e.pointerType !== "mouse" || i < 0 || (e.target.closest && e.target.closest(".loop-badge, .loop-g"))) return; drag = { i: i, cur: i, moved: false }; e.preventDefault(); }
   function dragOver(i) {
     if (!drag || i < 0 || i === drag.cur) return;
     drag.cur = i; drag.moved = true;
+    state.mode = "loop"; syncModes();
     state.a = Math.min(drag.i, i); state.b = Math.max(drag.i, i); state.pending = false; showRange();
   }
+  // Touch: press and hold a bar (a third of a second), then slide to the last bar. Lifting the finger sets the loop.
+  var hold = null;
+  function barAt(x, y) {
+    var el = document.elementFromPoint(x, y), c = el && el.closest ? el.closest(".cell") : null;
+    if (c && root.contains(c)) return +c.dataset.i;
+    return typeof measureAt === "function" && !score.hidden ? measureAt({ clientX: x, clientY: y }) : -1;
+  }
+  function holdEnd(cancel) {
+    if (!hold) return;
+    clearTimeout(hold.timer);
+    if (hold.on && !cancel) { suppressClick = true; setTimeout(function () { suppressClick = false; }, 450); applyRange(state.playing ? state.a : null); }
+    hold = null;
+  }
+  [$("form"), $("score")].forEach(function (box) {
+    box.addEventListener("touchstart", function (e) {
+      if (e.touches.length !== 1 || (e.target.closest && e.target.closest(".loop-badge, .loop-g"))) { holdEnd(true); return; }
+      var p = e.touches[0], i = barAt(p.clientX, p.clientY);
+      if (i < 0) return;
+      hold = { i: i, x: p.clientX, y: p.clientY, on: false };
+      hold.timer = setTimeout(function () {
+        if (!hold) return;
+        hold.on = true; state.mode = "loop"; syncModes(); state.a = state.b = hold.i; state.pending = false; showRange();
+        if (navigator.vibrate) { try { navigator.vibrate(12); } catch (err) {} }
+      }, 330);
+    }, { passive: true });
+    box.addEventListener("touchmove", function (e) {
+      if (!hold) return;
+      var p = e.touches[0];
+      if (!hold.on) { if (Math.abs(p.clientX - hold.x) > 9 || Math.abs(p.clientY - hold.y) > 9) holdEnd(true); return; }   // moved first: it's a scroll
+      e.preventDefault();                                                                                                 // boxing bars: don't scroll
+      var i = barAt(p.clientX, p.clientY);
+      if (i < 0) return;
+      state.a = Math.min(hold.i, i); state.b = Math.max(hold.i, i); showRange();
+    }, { passive: false });
+    box.addEventListener("touchend", function () { holdEnd(false); });
+    box.addEventListener("touchcancel", function () { holdEnd(true); });
+    box.addEventListener("contextmenu", function (e) { if (hold) e.preventDefault(); });
+  });
   document.addEventListener("pointerup", function () {
     if (drag && drag.moved) { suppressClick = true; setTimeout(function () { suppressClick = false; }, 0); applyRange(state.a); }
     drag = null;
@@ -848,7 +949,7 @@ function aamBoot(TUNE) {
   }
   function stop() {
     Tone.Transport.stop(); clearOneShots(); state.playing = false; state.pass = 1; setIcon(false);
-    cells.forEach(function (c) { c.classList.remove("is-now"); }); curBar = -1; last = -1; markNow(-1); $("chord-now").textContent = ""; $("now-where").textContent = "Stopped. Press play to start again.";
+    cells.forEach(function (c) { c.classList.remove("is-now"); }); curBar = -1; last = -1; markNow(-1); $("chord-now").textContent = ""; $("now-where").textContent = "Stopped. Press play to start again."; $("p-reps").textContent = repsShort();
     $("p-chord").textContent = ""; $("p-where").textContent = "Stopped";
     applyRange(null);
   }
@@ -886,7 +987,8 @@ function aamBoot(TUNE) {
       curBar = t >= state.start ? k : -1; markNow(curBar);
     }
     $("now-where").textContent = where; $("chord-now").textContent = chord;
-    $("p-where").textContent = t < state.start ? where : "Bar " + (k + TUNE.first_bar) + " · " + (state.reps ? state.pass + "/" + state.reps : "×" + state.pass); $("p-chord").textContent = chord;
+    $("p-where").textContent = t < state.start ? where : "Bar " + (k + TUNE.first_bar); $("p-chord").textContent = chord;
+    $("p-reps").textContent = t < state.start ? repsShort() : state.reps ? state.pass + "/" + state.reps : "∞ " + state.pass;
     requestAnimationFrame(frame);
   }
 
