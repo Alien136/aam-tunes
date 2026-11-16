@@ -507,6 +507,22 @@ function aamBoot(TUNE) {
     }
     return out;
   }
+  var staffWs = {};
+  function staffW(per) {                                   // one staff width for every view, so the notes are the same size on all of them:
+    if (staffWs[per]) return staffWs[per];                 // draw each view once off screen and keep the widest
+    var base = per === 2 ? 390 : 820, widest = base;
+    var tmp = document.createElement("div"); tmp.style.cssText = "position:absolute;left:-9999px;top:0;width:" + base + "px;visibility:hidden";
+    root.appendChild(tmp);
+    ["solo"].concat(TUNE.sections.map(function (s) { return s.id; })).forEach(function (id) {
+      try {
+        ABCJS.renderAbc(tmp, abcFor(id, per), { staffwidth: base, paddingleft: 0, paddingright: 0 });
+        var s = tmp.querySelector("svg"), w = s && parseFloat(s.getAttribute("width"));
+        if (w > widest) widest = w;
+      } catch (e) {}
+    });
+    root.removeChild(tmp);
+    return (staffWs[per] = Math.ceil(widest));
+  }
   function drawScore() {
     var chart = state.view === "chords" || !NOTA;
     $("form").hidden = !chart; score.hidden = chart; $("key").hidden = chart;
@@ -516,7 +532,7 @@ function aamBoot(TUNE) {
     var per = w < 560 ? 2 : 4;
     if (per === perShown) return;
     perShown = per;
-    ABCJS.renderAbc($("score-in"), abcFor(state.view, per), { add_classes: true, responsive: "resize", staffwidth: per === 2 ? 390 : 820,
+    ABCJS.renderAbc($("score-in"), abcFor(state.view, per), { add_classes: true, responsive: "resize", staffwidth: staffW(per),
       paddingleft: 0, paddingright: 0, paddingtop: 4, paddingbottom: 8, selectTypes: false });
     var svg = score.querySelector("svg"), q = function (sel) { return [].slice.call(svg.querySelectorAll(sel)); };
     // one box per bar (behind the notes) for the now-playing and loop highlights
