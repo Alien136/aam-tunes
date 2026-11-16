@@ -446,7 +446,7 @@ function aamBoot(TUNE) {
     var m = typeof measures !== "undefined" && measures[state.a], svg = m && score.querySelector("svg");
     if (svg) {
       var NS = "http://www.w3.org/2000/svg", g = document.createElementNS(NS, "g"); g.setAttribute("class", "loop-g");
-      var x = +m.rect.getAttribute("x") + 4, y = +m.rect.getAttribute("y") + 6;
+      var x = +m.rect.getAttribute("x") + 1, y = +m.rect.getAttribute("y") + m.rect.getAttribute("height") / 2 + 12;   // on the bar line, in the gap between the two staves
       g.setAttribute("transform", "translate(" + x + " " + y + ")");
       g.innerHTML = '<circle r="22" fill="transparent"/><circle class="bg" r="13"/><path class="ic" transform="translate(-9 -9) scale(.75)" d="' + LOOP_IC + '"/>';
       g.addEventListener("click", function (e) { e.stopPropagation(); clearLoop(); });
