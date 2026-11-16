@@ -1370,6 +1370,7 @@ function aamLibrary() {
     }
     return next();
   }
+  var ready;                                             // settles once the tune folders have been read
   function loadSources() {
     [].forEach.call(document.querySelectorAll("script.aam-catalog"), function (el) {
       try { addCatalog(JSON.parse(el.textContent), "", null); } catch (e) {}
@@ -1394,7 +1395,8 @@ function aamLibrary() {
   }
   function check(code) {                                 // -> "all", a PDF, or null
     if (!norm(code)) return Promise.resolve(null);
-    return hash(code).then(function (h) {
+    return ready.then(function () { return CAT.pdfs.length ? null : (ready = loadSources()); })   // wait for the tune list; if it never arrived, try once more
+      .then(function () { return hash(code); }).then(function (h) {
       if (CAT.master && h === CAT.master) return "all";
       return CAT.pdfs.filter(function (p) { return p.hash === h; })[0] || null;
     });
@@ -1435,7 +1437,7 @@ function aamLibrary() {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       check(input.value).then(function (r) {
-        if (!r) { err.textContent = "That code didn't match. Check page 1 of your PDF, or ask Alex."; input.select(); return; }
+        if (!r) { err.textContent = CAT.pdfs.length ? "That code didn't match. Check page 1 of your PDF, or ask Alex." : "Couldn't reach the tune library. Check your internet connection and try again."; input.select(); return; }
         grant(r); onOk(r);
       });
     });
@@ -1490,8 +1492,9 @@ function aamLibrary() {
     });
   }
 
+  ready = loadSources();
   var q = new URLSearchParams(location.search), want = q.get("tune") || q.get("t"), code = q.get("code") || q.get("c");   // QR codes use the short t= and c=
-  loadSources().then(function () { return code ? check(code) : null; }).then(function (r) {
+  ready.then(function () { return code ? check(code) : null; }).then(function (r) {
     if (r) grant(r);
     if (!want && r && r !== "all") want = r.tunes[0];
     if (!want) want = lib.last && mine(lib.last) ? lib.last : (myPdfs()[0] || {}).tunes ? myPdfs()[0].tunes[0] : null;
