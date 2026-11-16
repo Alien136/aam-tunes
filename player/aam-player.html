@@ -234,6 +234,15 @@
   #aam-play .tempo { grid-template-columns: 1fr; } #aam-play .bpm { min-width: 84px; font-size: 20px; } }
 #aam-play .cell .a { font-style: normal; font-size: .74em; margin-left: .02em; font-family: "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols2", "Noto Music", sans-serif; }
 html.aam-full, html.aam-full body { overflow: hidden !important; }
+/* page turns while playing: scrolling locked; the top half of the next page arrives early, under a blue line */
+#aam-play .content > .panel:first-child { position: relative; }
+#aam-play .score.paging { overflow-y: hidden; scroll-snap-type: none !important; }
+#aam-play .score .pg-space { height: 0; }
+#aam-play .score-over { position: absolute; z-index: 2; overflow: hidden; background: #fff; pointer-events: none; border-bottom: 2px solid var(--accent);
+  border-radius: 8px 8px 0 0; box-shadow: 0 5px 10px -6px rgba(29,161,242,.55); animation: aam-over .22s ease-out; }
+#aam-play .score-over .over-tab { position: absolute; right: 0; bottom: 0; padding: 2px 8px; border-radius: 6px 0 0 0; background: var(--accent); color: #fff; font: 600 10px/14px var(--body); letter-spacing: .04em; }
+#aam-play .score-over .sc-clone { border: 0; padding: 0; margin: 0; overflow: visible; position: static; height: auto !important; max-height: none; background: transparent; flex: none; display: block; }
+@keyframes aam-over { from { opacity: 0; } to { opacity: 1; } }
 /* looping: press and hold a bar, then drag, to box the bars to loop; the round loop badge on the first bar clears it */
 #aam-play .form, #aam-play .score { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 #aam-play .cell { position: relative; }
@@ -647,7 +656,7 @@ function aamBoot(TUNE) {
     mask.style.width = score.clientWidth + "px"; mask.style.height = Math.max(0, vh - y) + "px"; mask.hidden = false;
   }
   score.addEventListener("scroll", fitGlove);
-  window.addEventListener("resize", function () { setTimeout(function () { if (!score.hidden) gloveScale(); setSnaps(); fitGlove(); }, 60); });
+  window.addEventListener("resize", function () { setTimeout(function () { if (!score.hidden) gloveScale(); setSnaps(); fitGlove(); if (pager.on) { pagingStart(); markNow(curBar, true); } }, 60); });
   var staffWs = {};
   function staffW(per) {                                   // one staff width for every view, so the notes are the same size on all of them:
     if (staffWs[per]) return staffWs[per];                 // draw each view once off screen and keep the widest
@@ -711,7 +720,7 @@ function aamBoot(TUNE) {
     gloveScale(); fitPage();
     showRange();
     score.scrollTop = 0; setSnaps(); fitGlove();
-    if (state.playing) markNow(curBar, true);
+    if (state.playing) { pagingStart(); markNow(curBar, true); }
   }
   function measureAt(e) {
     var svg = score.querySelector("svg"), hit = -1; if (!svg) return -1;
@@ -746,10 +755,67 @@ function aamBoot(TUNE) {
     score.style.maxHeight = "none";
     score.style.height = Math.min(boxes[boxes.length - 1].bot + 14, (n - 1) * pitch + lh + 26) + "px";
   }
+  // ---------- page turns while the band plays
+  // The music is cut into pages (as many whole lines as fit the box) and scrolling is locked. When the band reaches the
+  // bottom half of a page, the top half is replaced by the top of the NEXT page, under a blue line, so your eyes have
+  // somewhere to go. When the band finishes the page, the line goes and the rest of the next page appears.
+  // When the band stops, it is ordinary scrollable sheet music again.
+  var pager = { on: false, n: 0, page: -1, over: null };
+  var spacer = document.createElement("div"); spacer.className = "pg-space"; score.appendChild(spacer);
+  function lineCount() { var n = 0; while (lineBox(n)) n++; return n; }
+  function pageTop(p) { var b = lineBox(p * pager.n); return !b || p === 0 ? 0 : Math.max(0, b.top - 6); }
+  function dropOver() { if (pager.over) { pager.over.parentNode.removeChild(pager.over); pager.over = null; } }
+  function pagingStart() {
+    dropOver(); pager.on = true; pager.page = -1; pager.n = 0;
+    if (score.hidden || !measures.length) return;
+    var vh = score.clientHeight;
+    for (var l = 0, b; (b = lineBox(l)); l++) { if (b.bot <= vh + 2) pager.n = l + 1; else break; }
+    spacer.style.height = vh + "px"; score.classList.add("paging");       // room below the last page so it can sit at the top
+    var sb = measures[startBar()];
+    if (sb && pager.n) { pager.page = Math.floor(sb.line / pager.n); score.scrollTop = pageTop(pager.page); }
+    fitGlove();
+  }
+  function pagingStop() {
+    dropOver(); pager.on = false; pager.page = -1;
+    spacer.style.height = "0"; score.classList.remove("paging"); fitGlove();
+  }
+  function nextPage(p) {                                   // the page the band goes to after page p, or -1 if it stays or ends here
+    var r = rng(), n = pager.n, first = measures[r[0]], lastM = measures[r[1]];
+    if (!first || !lastM) return -1;
+    if (lastM.line > p * n + n - 1) return p + 1 < Math.ceil(lineCount() / n) ? p + 1 : -1;
+    var again = !state.reps || state.pass < state.reps, fp = Math.floor(first.line / n);
+    return again && fp !== p ? fp : -1;
+  }
+  function showOver(np, p, h) {                            // the top half of page np, laid over the top half of page p
+    var svg = score.querySelector("svg"), cut = lineBox(p * pager.n + h);
+    if (!svg || !cut) return;
+    var sr = score.getBoundingClientRect(), vr = svg.getBoundingClientRect();
+    var o = document.createElement("div"); o.className = "score-over";
+    o.style.top = (score.offsetTop + score.clientTop) + "px"; o.style.left = (score.offsetLeft + score.clientLeft) + "px";
+    o.style.width = score.clientWidth + "px"; o.style.height = Math.max(0, cut.top - 8 - pageTop(p)) + "px";
+    var c = svg.cloneNode(true);
+    [].slice.call(c.querySelectorAll(".is-now")).forEach(function (e) { e.classList.remove("is-now"); });
+    [].slice.call(c.querySelectorAll(".loop-g")).forEach(function (e) { e.parentNode.removeChild(e); });
+    c.removeAttribute("id");
+    c.style.cssText = "position:absolute;display:block;max-width:none;left:" + (vr.left - sr.left - score.clientLeft) + "px;top:" +
+      (vr.top - sr.top - score.clientTop + score.scrollTop - pageTop(np)) + "px;width:" + vr.width + "px;height:" + vr.height + "px";
+    var w = document.createElement("div"); w.className = "score sc-clone"; w.appendChild(c); o.appendChild(w);   // "score" so the music keeps its colours
+    var tab = document.createElement("span"); tab.className = "over-tab"; tab.textContent = "Next page"; o.appendChild(tab);
+    score.parentNode.insertBefore(o, score.nextSibling); pager.over = o;
+  }
   function markNow(k, force) {
+    if (state.playing && !pager.on) pagingStart();
+    if (!state.playing && pager.on) pagingStop();
     measures.forEach(function (m, i) { m.rect.classList.toggle("is-now", i === k); });
     var m = measures[k];
     if (!m || score.hidden) return;
+    if (pager.on && pager.n >= 2) {
+      var p = Math.floor(m.line / pager.n), idx = m.line - p * pager.n, h = Math.ceil(pager.n / 2);
+      if (p !== pager.page || force) { pager.page = p; dropOver(); score.scrollTop = pageTop(p); fitGlove(); }
+      if (idx >= h && !pager.over) { var np = nextPage(p); if (np >= 0) showOver(np, p, h); }
+      if (idx < h && pager.over) dropOver();               // jumped back up the page (a tapped bar, a loop)
+      return;
+    }
     var box = lineBox(m.line), next = lineBox(m.line + 1);
     var vt = score.scrollTop, vb = vt + score.clientHeight;
     var lastBar = !measures[k + 1] || measures[k + 1].line !== m.line;
