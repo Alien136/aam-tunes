@@ -9,3 +9,6 @@ Adding a tune = adding one file to `tunes/` and one entry to `index.json`. Nothi
 
 `tools/publish_tune.py` writes both from a lead-sheet study spec (copy it next to `gen_study.py` to run it).
 `player/aam-player.html` is the current Player block for the website's HTML widget.
+
+`tools/publish_exercise.py` publishes a booklet: a PDF with several exercises, grouped into chapters, each with its own
+backing (a drone, a click or the band) and an optional "through the keys" mode. Its header documents the input file.
