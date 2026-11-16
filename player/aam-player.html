@@ -180,7 +180,27 @@
   #aam-play .sheet-body .tips-panel { border: 0; padding: 0; background: transparent; gap: 10px; }
   #aam-play .sheet-body .tips-panel h2 { font-size: 16px; }
   #aam-play .sheet-body .tips { font-size: 14px; }
-  #aam-play .cells, #aam-play .cells.four { grid-template-columns: repeat(2, minmax(0, 1fr)); } #aam-play h1 { font-size: 34px; }
+  /* phones: the chord chart reads like a lead sheet: four bars a line, bar lines instead of boxes, big roots, no slashes */
+  #aam-play h1 { font-size: 22px !important; margin: 3px 0 0; } #aam-play .eyebrow { font-size: 9.5px; letter-spacing: .1em; } #aam-play .sub { font-size: 12px; line-height: 1.3; }
+  #aam-play .form { gap: 6px; }
+  #aam-play .form-row, #aam-play .form.no-tags .form-row { grid-template-columns: minmax(0, 1fr); position: relative; }
+  #aam-play .tag { position: absolute; left: 3px; top: 2px; z-index: 1; height: 13px; padding: 0 4px; border-radius: 3px; border: 0;
+    font: 700 9px/13px var(--body); background: var(--now); color: var(--now-ink); }
+  #aam-play .tag:empty { display: none; }
+  #aam-play .cells, #aam-play .cells.four { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+  #aam-play .cell { border: 0; border-left: 1.5px solid #8fa9bd; border-radius: 0; background: transparent; min-height: 46px; padding: 15px 2px 5px 5px;
+    position: relative; align-content: end; }
+  #aam-play .cell:last-child { border-right: 1.5px solid #8fa9bd; }
+  #aam-play .cell .n { position: absolute; left: 4px; top: 2px; font-size: 8.5px; line-height: 13px; opacity: .8; }
+  #aam-play .cell .sl { display: none; }
+  #aam-play .cell .ch { gap: 3px; align-items: baseline; }
+  #aam-play .cell .c b { display: inline-flex; align-items: baseline; letter-spacing: -.02em; }
+  #aam-play .cell .r { font: 700 19px/1 var(--display); }
+  #aam-play .cell .q { font: 600 11px/1 var(--display); margin-left: 1px; }
+  #aam-play .cell .two .r { font-size: 16px; } #aam-play .cell .two .q { font-size: 9.5px; margin-left: 0; }
+  #aam-play .cell.in-range { background: var(--range); }
+  #aam-play .cell.is-now { background: var(--now); color: var(--now-ink); border-radius: 6px; border-color: transparent; }
+  #aam-play .cell.is-start { box-shadow: inset 0 -3px 0 var(--accent); }
   #aam-play .tempo { grid-template-columns: 1fr; } #aam-play .bpm { min-width: 84px; font-size: 20px; } }
 @media (prefers-reduced-motion: reduce) { #aam-play .cell { transition: none; } }
 </style>
@@ -346,8 +366,8 @@ function aamBoot(TUNE) {
       row.innerHTML = '<div class="tag">' + (s === f[1] ? f[0] : "") + '</div><div class="cells' + (PER_ROW === 4 ? " four" : "") + '"></div>';
       for (var i = s; i < Math.min(s + PER_ROW, end); i++) {
         var c = document.createElement("button"); c.className = "cell"; c.dataset.i = i;
-        c.innerHTML = '<span class="n">' + (i + TUNE.first_bar) + '</span><span class="ch">' + TUNE.bars[i].map(function (x) {   // chords side by side, a slash per beat
-          return '<span class="c" style="flex-grow:' + x.beats + '"><b>' + nice(x.sym) + '</b><span class="sl">' + new Array(x.beats + 1).join("<i>/</i>") + "</span></span>";
+        c.innerHTML = '<span class="n">' + (i + TUNE.first_bar) + '</span><span class="ch' + (TUNE.bars[i].length > 1 ? " two" : "") + '">' + TUNE.bars[i].map(function (x) {   // chords side by side, a slash per beat
+          return '<span class="c" style="flex-grow:' + x.beats + '"><b>' + nice(x.sym).replace(/^([A-G][♭♯#]?)(.*)$/, '<span class="r">$1</span><span class="q">$2</span>') + '</b><span class="sl">' + new Array(x.beats + 1).join("<i>/</i>") + "</span></span>";
         }).join("") + "</span>";
         c.onclick = function () { tapBar(+this.dataset.i); };
         row.querySelector(".cells").appendChild(c); cells[i] = c;
