@@ -7,7 +7,7 @@
      Keep WordPress's own page password OFF: the player has its own code screen. -->
 <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/abcjs@6.4.4/dist/abcjs-basic-min.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
 <style>
 #aam-play { /* light Twitter-blue palette: #1DA1F2 for fills and controls, a deeper blue wherever white text sits on it */
   --bg: #e8f5fe; --surface: #ffffff; --ink: #14171a; --muted: #5b7083; --line: #d6e6f2;
@@ -180,28 +180,45 @@
   #aam-play .sheet-body .tips-panel { border: 0; padding: 0; background: transparent; gap: 10px; }
   #aam-play .sheet-body .tips-panel h2 { font-size: 16px; }
   #aam-play .sheet-body .tips { font-size: 14px; }
-  /* phones: the chord chart reads like a lead sheet: four bars a line, bar lines instead of boxes, big roots, no slashes */
-  #aam-play h1 { font-size: 22px !important; margin: 3px 0 0; } #aam-play .eyebrow { font-size: 9.5px; letter-spacing: .1em; } #aam-play .sub { font-size: 12px; line-height: 1.3; }
-  #aam-play .form { gap: 6px; }
-  #aam-play .form-row, #aam-play .form.no-tags .form-row { grid-template-columns: minmax(0, 1fr); position: relative; }
-  #aam-play .tag { position: absolute; left: 3px; top: 2px; z-index: 1; height: 13px; padding: 0 4px; border-radius: 3px; border: 0;
-    font: 700 9px/13px var(--body); background: var(--now); color: var(--now-ink); }
-  #aam-play .tag:empty { display: none; }
+  /* phones: once a tune is open the player takes the whole screen and stays put: title and tabs at the top, the play bar
+     at the bottom, and only the music in between scrolls (the page behind it is locked) */
+  #aam-play .eyebrow { display: none; }
+  #aam-play h1 { font-size: 20px !important; margin: 0; } #aam-play .head-text { min-width: 0; }
+  #aam-play .sub { font-size: 11.5px; line-height: 1.25; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #aam-play.is-open { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 99980; display: flex; flex-direction: column; gap: 8px; margin: 0; width: auto; max-width: none;
+    border-radius: 0; overflow: hidden; background: var(--bg); padding: calc(8px + env(safe-area-inset-top)) 8px calc(78px + env(safe-area-inset-bottom)); }
+  #aam-play.is-open .head { flex: none; align-items: center; }
+  #aam-play.is-open .content { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+  #aam-play.is-open .content > .panel:first-child { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+  #aam-play.is-open .music-row { flex: none; }
+  #aam-play.is-open .form { flex: 1 1 auto; min-height: 0; overflow-y: auto; align-content: start; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  #aam-play.is-open .score { flex: 1 1 auto; min-height: 0; height: auto !important; max-height: none !important; }
+  #aam-play.is-open .key { flex: none; font-size: 11px; gap: 3px 10px; }
+  #aam-play.is-open .form[hidden], #aam-play.is-open .score[hidden], #aam-play.is-open .key[hidden], #aam-play.is-open .content[hidden] { display: none; }
+  /* the chord chart reads like a lead sheet: four bars a line, bar lines instead of boxes, big friendly chord symbols,
+     section letters in a narrow margin to the left of their bar */
+  #aam-play .form { gap: 8px; }
+  #aam-play .form-row { grid-template-columns: 22px minmax(0, 1fr); gap: 3px; }
+  #aam-play .form.no-tags .form-row { grid-template-columns: minmax(0, 1fr); }
+  #aam-play .tag { display: block; align-self: start; justify-self: start; margin-top: 3px; min-width: 20px; height: 18px; padding: 0 3px; border: 0; border-radius: 4px;
+    font: 700 10.5px/18px var(--body); text-align: center; background: var(--ink); color: #fff; }
+  #aam-play .tag:empty { background: transparent; }
   #aam-play .cells, #aam-play .cells.four { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
-  #aam-play .cell { border: 0; border-left: 1.5px solid #8fa9bd; border-radius: 0; background: transparent; min-height: 46px; padding: 15px 2px 5px 5px;
-    position: relative; align-content: end; }
+  #aam-play .cell { border: 0; border-left: 1.5px solid #8fa9bd; border-radius: 0; background: transparent; min-height: 52px; padding: 6px 1px 6px 6px; align-content: center; }
   #aam-play .cell:last-child { border-right: 1.5px solid #8fa9bd; }
-  #aam-play .cell .n { position: absolute; left: 4px; top: 2px; font-size: 8.5px; line-height: 13px; opacity: .8; }
-  #aam-play .cell .sl { display: none; }
-  #aam-play .cell .ch { gap: 3px; align-items: baseline; }
-  #aam-play .cell .c b { display: inline-flex; align-items: baseline; letter-spacing: -.02em; }
-  #aam-play .cell .r { font: 700 19px/1 var(--display); }
-  #aam-play .cell .q { font: 600 11px/1 var(--display); margin-left: 1px; }
-  #aam-play .cell .two .r { font-size: 16px; } #aam-play .cell .two .q { font-size: 9.5px; margin-left: 0; }
+  #aam-play .cell .n, #aam-play .cell .sl { display: none; }
+  #aam-play .cell .ch { gap: 2px; align-items: baseline; }
+  #aam-play .cell .c b { display: inline-flex; align-items: baseline; letter-spacing: -.01em; }
+  #aam-play .cell .r { font: 600 25px/1 "Fredoka", var(--display); }
+  #aam-play .cell .q { font: 600 13px/1 "Fredoka", var(--display); margin-left: 1px; }
+  #aam-play .cell .two .r { font-size: 20px; } #aam-play .cell .two .q { font-size: 11px; margin-left: 0; }
+  #aam-play .cell.tight .r { font-size: 17px; } #aam-play .cell.tight .q { font-size: 9.5px; }
   #aam-play .cell.in-range { background: var(--range); }
   #aam-play .cell.is-now { background: var(--now); color: var(--now-ink); border-radius: 6px; border-color: transparent; }
   #aam-play .cell.is-start { box-shadow: inset 0 -3px 0 var(--accent); }
   #aam-play .tempo { grid-template-columns: 1fr; } #aam-play .bpm { min-width: 84px; font-size: 20px; } }
+#aam-play .cell .a { font-style: normal; font-size: .74em; margin-left: .02em; font-family: "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols2", "Noto Music", sans-serif; }
+html.aam-full, html.aam-full body { overflow: hidden !important; }
 @media (prefers-reduced-motion: reduce) { #aam-play .cell { transition: none; } }
 </style>
 
@@ -367,7 +384,7 @@ function aamBoot(TUNE) {
       for (var i = s; i < Math.min(s + PER_ROW, end); i++) {
         var c = document.createElement("button"); c.className = "cell"; c.dataset.i = i;
         c.innerHTML = '<span class="n">' + (i + TUNE.first_bar) + '</span><span class="ch' + (TUNE.bars[i].length > 1 ? " two" : "") + '">' + TUNE.bars[i].map(function (x) {   // chords side by side, a slash per beat
-          return '<span class="c" style="flex-grow:' + x.beats + '"><b>' + nice(x.sym).replace(/^([A-G][♭♯#]?)(.*)$/, '<span class="r">$1</span><span class="q">$2</span>') + '</b><span class="sl">' + new Array(x.beats + 1).join("<i>/</i>") + "</span></span>";
+          return '<span class="c" style="flex-grow:' + x.beats + '"><b>' + nice(x.sym).replace(/^([A-G])([♭♯#]?)(.*)$/, '<span class="r">$1<i class="a">$2</i></span><span class="q">$3</span>') + '</b><span class="sl">' + new Array(x.beats + 1).join("<i>/</i>") + "</span></span>";
         }).join("") + "</span>";
         c.onclick = function () { tapBar(+this.dataset.i); };
         row.querySelector(".cells").appendChild(c); cells[i] = c;
@@ -463,7 +480,7 @@ function aamBoot(TUNE) {
   function setView(id) {
     state.view = id;
     root.querySelectorAll("[data-view]").forEach(function (x) { x.setAttribute("aria-pressed", x.dataset.view === id ? "true" : "false"); });
-    syncDemo(); perShown = 0; drawScore();
+    syncDemo(); perShown = 0; drawScore(); if (typeof fitChords === "function") fitChords();
   }
   function isSection(id) { return TUNE.sections.some(function (s) { return s.id === id; }); }
   function syncDemo() {
@@ -808,7 +825,7 @@ function aamBoot(TUNE) {
       if (bar) { var half = (t % BAR) >= BAR / 2 && bar.length > 1 ? 1 : 0; chord = nice(bar[half].sym); }
     }
     if (k !== last) {
-      if (cells[last]) cells[last].classList.remove("is-now"); if (cells[k] && t >= state.start) cells[k].classList.add("is-now"); last = k;
+      if (cells[last]) cells[last].classList.remove("is-now"); if (cells[k] && t >= state.start) { cells[k].classList.add("is-now"); followCell(k); } last = k;
       curBar = t >= state.start ? k : -1; markNow(curBar);
     }
     $("now-where").textContent = where; $("chord-now").textContent = chord;
@@ -822,16 +839,31 @@ function aamBoot(TUNE) {
     var el = $(r), mark = document.createComment(r); el.parentNode.insertBefore(mark, el); return [el, mark];
   });
   function openSheet(on) { $("sheet").classList.toggle("open", on); $("backdrop").classList.toggle("open", on); }
+  function fitChords() {                                   // a bar whose chords don't fit gets the smaller size
+    if ($("form").hidden) return;
+    cells.forEach(function (c) {
+      c.classList.remove("tight");
+      if ([].some.call(c.querySelectorAll(".c"), function (x) { return x.scrollWidth > x.clientWidth + 1; })) c.classList.add("tight");
+    });
+  }
+  function followCell(k) {                                 // phones: keep the bar that's playing on screen in the chord chart
+    var f = $("form"), c = cells[k];
+    if (!mq.matches || f.hidden || !c) return;
+    var r = c.getBoundingClientRect(), fr = f.getBoundingClientRect();
+    if (r.top < fr.top || r.bottom > fr.bottom) f.scrollTop += r.top - fr.top - 4;
+  }
   function layout() {
+    root.classList.add("is-open"); document.documentElement.classList.toggle("aam-full", mq.matches);   // phones: full screen, page behind locked
     movable.forEach(function (m) { if (mq.matches) $("sheet-body").appendChild(m[0]); else m[1].parentNode.insertBefore(m[0], m[1].nextSibling); });
     if (!mq.matches) openSheet(false);
-    perShown = 0; drawScore();
+    perShown = 0; drawScore(); fitChords();
   }
+  window.addEventListener("resize", fitChords);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitChords);
   if (mq.addEventListener) mq.addEventListener("change", layout); else mq.addListener(layout);
   $("p-gear").onclick = function () { openSheet(true); };
   $("done").onclick = $("backdrop").onclick = function () { openSheet(false); };
   $("p-play").onclick = function () {
-    if (!state.playing) { var top = $("row-music").getBoundingClientRect().top + window.pageYOffset - 8; window.scrollTo(0, top); }   // music to the top of the screen
     $("play").onclick();
   };
   $("p-slower").onclick = function () { setTempo(state.tempo - 5); };
