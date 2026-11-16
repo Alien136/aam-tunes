@@ -417,7 +417,7 @@ function aamBoot(TUNE) {
       for (var i = s; i < Math.min(s + PER_ROW, end); i++) {
         var c = document.createElement("button"); c.className = "cell"; c.dataset.i = i;
         c.innerHTML = '<span class="n">' + (i + TUNE.first_bar) + '</span><span class="ch' + (TUNE.bars[i].length > 1 ? " two" : "") + '">' + TUNE.bars[i].map(function (x) {   // chords side by side, a slash per beat
-          return '<span class="c" style="flex-grow:' + x.beats + '"><b>' + nice(x.sym).replace(/^([A-G])([♭♯#]?)(.*)$/, '<span class="r">$1<i class="a">$2</i></span><span class="q">$3</span>') + '</b><span class="sl">' + new Array(x.beats + 1).join("<i>/</i>") + "</span></span>";
+          return '<span class="c" style="flex-grow:' + x.beats + '"><b>' + nice(x.show || x.sym).replace(/^([A-G])([♭♯#]?)(.*)$/, '<span class="r">$1<i class="a">$2</i></span><span class="q">$3</span>') + '</b><span class="sl">' + new Array(x.beats + 1).join("<i>/</i>") + "</span></span>";
         }).join("") + "</span>";
         c.onclick = function () { tapBar(+this.dataset.i); };
         row.querySelector(".cells").appendChild(c); cells[i] = c;
@@ -454,7 +454,7 @@ function aamBoot(TUNE) {
     var m = typeof measures !== "undefined" && measures[state.a], svg = m && score.querySelector("svg");
     if (svg) {
       var NS = "http://www.w3.org/2000/svg", g = document.createElementNS(NS, "g"); g.setAttribute("class", "loop-g");
-      var x = +m.rect.getAttribute("x") + 1, y = +m.rect.getAttribute("y") + m.rect.getAttribute("height") / 2 + 12;   // on the bar line, in the gap between the two staves
+      var x = +m.rect.getAttribute("x") + 1, y = +m.rect.getAttribute("y") + (NOTA && NOTA.lh ? m.rect.getAttribute("height") / 2 + 12 : 12);   // on the bar line: between the two staves (piano), or above the staff
       g.setAttribute("transform", "translate(" + x + " " + y + ")");
       g.innerHTML = '<circle r="22" fill="transparent"/><circle class="bg" r="13"/><path class="ic" transform="translate(-9 -9) scale(.75)" d="' + LOOP_IC + '"/>';
       g.addEventListener("click", function (e) { e.stopPropagation(); clearLoop(); });
@@ -626,7 +626,7 @@ function aamBoot(TUNE) {
         if (x === null && starts.length > j) x = xOf(".abcjs-v0.abcjs-mm" + i + ".abcjs-n" + starts[j]);   // or the right-hand note
         if (x === null) x = left + 10 + (beat / 4) * (width - 10);                                  // or by the beat
         var tx = document.createElementNS(NS, "text"); tx.setAttribute("class", "ch-t"); tx.setAttribute("x", x - 1); tx.setAttribute("y", lineY[m.line]);
-        tx.textContent = nice(c.sym); g.appendChild(tx);
+        tx.textContent = nice(c.show || c.sym); g.appendChild(tx);
         beat += c.beats;
       });
     });
@@ -656,7 +656,7 @@ function aamBoot(TUNE) {
     }
   }
   var staffTops = [], staffBot0 = 0;                       // top of each line's upper staff (and the bottom of the first line), in the drawing's own units
-  var TIGHT = { sep: 34, sys: 26 };                        // phones start from close-set lines
+  var TIGHT = NOTA && NOTA.lh ? { sep: 34, sys: 26 } : { sep: 66, sys: 26 };   // phones start from close-set lines (a single staff needs more air for its chord names)
   // Phones: make whole lines fill the box exactly. If one more line fits by shrinking the music a little (never below 86%),
   // do that with a small margin either side. Otherwise keep it full size and spread the lines that fit to fill the box.
   // Measured from the staves alone, so every tab of a tune comes out the same. Returns new line spacing to redraw with, or null.
@@ -668,7 +668,7 @@ function aamBoot(TUNE) {
     var need = function (n) { return first + (n - 1) * P + 8; };
     var n = 1; while (need(n + 1) <= vh) n++;
     var s = vh / need(n + 1) * 0.985;
-    if (s >= 0.86 && s < 1) { score.style.paddingLeft = score.style.paddingRight = (Math.ceil(cw * (1 - s) / 2) + 2) + "px"; return null; }
+    if (s >= 0.86 && s < 1) { score.style.paddingLeft = score.style.paddingRight = (Math.ceil((cw * (1 - s) / 2 + 2) / 3) * 3) + "px"; return null; }   // in 3px steps, so tabs that differ by a hair match
     if (n < 2) return null;
     var want = (vh - 8 - first) / (n - 1) / k, sep = TIGHT.sep + (want - P / k) / 1.325;            // abcjs: +1 staffsep is about +1.325 between lines
     return { sep: Math.round(Math.min(sep, TIGHT.sep + 60)), sys: TIGHT.sys };
@@ -1096,7 +1096,7 @@ function aamBoot(TUNE) {
       var times = state.reps ? state.pass + " of " + state.reps : state.pass;
       where = "Bar " + (k + TUNE.first_bar) + " · time " + times;
       var bar = TUNE.bars[k];
-      if (bar) { var half = (t % BAR) >= BAR / 2 && bar.length > 1 ? 1 : 0; chord = nice(bar[half].sym); }
+      if (bar) { var half = (t % BAR) >= BAR / 2 && bar.length > 1 ? 1 : 0; chord = nice(bar[half].show || bar[half].sym); }
     }
     if (k !== last) {
       if (cells[last]) cells[last].classList.remove("is-now"); if (cells[k] && t >= state.start) { cells[k].classList.add("is-now"); followCell(k); } last = k;

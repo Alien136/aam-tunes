@@ -27,6 +27,14 @@
    "tunes": [
     "winter-wonderland-piano"
    ]
+  },
+  {
+   "id": "winter-wonderland-alto",
+   "title": "Winter Wonderland · Alto Sax",
+   "hash": "f4eb838f53485e2daa6d2186f44cbf001f6c8e61ed11f811b44ab366e61d5033",
+   "tunes": [
+    "winter-wonderland-alto"
+   ]
   }
  ],
  "tunes": {
@@ -41,6 +49,10 @@
   "winter-wonderland-piano": {
    "title": "Winter Wonderland",
    "subtitle": "32-bar AABA · Piano · chords, arpeggios and ii–V–I licks"
+  },
+  "winter-wonderland-alto": {
+   "title": "Winter Wonderland",
+   "subtitle": "32-bar AABA · Alto Sax · chords, arpeggios and ii–V–I licks"
   }
  }
 }
