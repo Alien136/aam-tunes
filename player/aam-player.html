@@ -140,7 +140,7 @@
 #aam-play .key { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--muted); }
 #aam-play .key i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
 #aam-play button:focus-visible, #aam-play input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-#aam-play .sm, #aam-play .pbar, #aam-play .sheet, #aam-play .backdrop, #aam-play .p-reps, #aam-play .p-reps-pop { display: none; }
+#aam-play .sm, #aam-play .pbar, #aam-play .sheet, #aam-play .backdrop, #aam-play .p-reps, #aam-play .p-reps-pop, #aam-play .p-key { display: none; }
 @media (max-width: 640px) {
   /* phones: the music fills the screen; play and tempo sit in a bar pinned to the bottom; the rest is in a settings sheet */
   #aam-play { padding: 14px 8px calc(92px + env(safe-area-inset-bottom)); gap: 14px; }
@@ -169,6 +169,11 @@
   #aam-play .p-tempo .step { width: 34px; height: 34px; }
   #aam-play .p-bpm { font: 700 17px var(--display); min-width: 34px; text-align: center; font-variant-numeric: tabular-nums; }
   #aam-play .pbar { gap: 8px; } #aam-play .p-tempo { gap: 4px; }
+  #aam-play .p-now { display: none; }
+  #aam-play .p-key { display: grid; justify-items: start; align-content: center; flex: none; margin-right: auto; min-width: 62px; height: 44px; padding: 0 12px; border-radius: 14px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-align: left; }
+  #aam-play .p-key b { font: 600 17px/1.05 "Fredoka", var(--display); white-space: nowrap; } #aam-play .p-key small { font: 500 9.5px/1.1 var(--body); color: var(--muted); white-space: nowrap; }
+  #aam-play .cnt-dots i { width: 58px; height: 58px; }
   #aam-play .p-reps { display: grid; place-items: center; flex: none; min-width: 44px; height: 40px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--line);
     background: var(--surface); color: var(--accent-text); font: 700 15px var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
   #aam-play .p-reps[aria-expanded="true"] { background: var(--now); color: var(--now-ink); border-color: var(--now); }
@@ -235,6 +240,34 @@
   #aam-play .tempo { grid-template-columns: 1fr; } #aam-play .bpm { min-width: 84px; font-size: 20px; } }
 #aam-play .cell .a { font-style: normal; font-size: .74em; margin-left: .02em; font-family: "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols2", "Noto Music", sans-serif; }
 html.aam-full, html.aam-full body { overflow: hidden !important; }
+/* count-in circles and short messages, floating in the middle of the screen */
+#aam-play .cnt { position: fixed; left: 50%; top: 46%; transform: translate(-50%, -50%); z-index: 99994; pointer-events: none; display: grid; gap: 10px; justify-items: center;
+  padding: 18px 20px; border-radius: 22px; background: rgba(255,255,255,.94); box-shadow: 0 12px 40px rgba(20,23,26,.22); }
+#aam-play .cnt[hidden] { display: none; }
+#aam-play .cnt-dots { display: flex; gap: 12px; } #aam-play .cnt.msg .cnt-dots { display: none; }
+#aam-play .cnt-dots i { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; font: 700 24px var(--display); font-style: normal;
+  color: transparent; background: var(--tint); border: 3px solid var(--line); transition: transform .08s, background .08s; }
+#aam-play .cnt-dots i.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+#aam-play .cnt-dots i.hit { transform: scale(1.16); }
+#aam-play .cnt-dots i.off { opacity: .28; }
+#aam-play .cnt-msg { font: 600 14px var(--body); color: var(--ink); } #aam-play .cnt-msg:empty { display: none; }
+/* key and instrument */
+#aam-play .kdlg { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 99996; display: grid; place-items: center; padding: 16px; background: rgba(20,23,26,.42); }
+#aam-play .kdlg[hidden] { display: none; }
+#aam-play .kcard { width: min(380px, 100%); max-height: 100%; overflow: auto; display: grid; gap: 12px; padding: 18px; border-radius: 20px; background: var(--surface); box-shadow: 0 20px 60px rgba(20,23,26,.3); }
+#aam-play .khead { display: flex; align-items: center; justify-content: space-between; } #aam-play .khead h2 { margin: 0; font: 700 20px var(--display); }
+#aam-play .khead .btn-done { height: 38px; padding: 0 16px; border-radius: 999px; background: var(--now); color: var(--now-ink); font: 600 14px var(--body); }
+#aam-play .k-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+#aam-play .k-grid button { height: 48px; border-radius: 12px; background: var(--tint); color: var(--ink); font: 600 18px "Fredoka", var(--display); display: grid; place-items: center; }
+#aam-play .k-grid button[aria-pressed="true"] { background: var(--now); color: var(--now-ink); }
+#aam-play .k-grid button.home { box-shadow: inset 0 0 0 2px var(--accent); }
+#aam-play .k-note { margin: 0; font-size: 13px; color: var(--muted); }
+#aam-play .k-sub { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 14px; }
+#aam-play .sax { width: 24px; height: 24px; fill: none; stroke: var(--accent-text); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+#aam-play .k-insts { display: grid; gap: 8px; }
+#aam-play .k-insts button { display: flex; align-items: baseline; gap: 12px; padding: 11px 14px; border-radius: 12px; background: var(--tint); color: var(--ink); text-align: left; }
+#aam-play .k-insts button b { font: 600 18px "Fredoka", var(--display); min-width: 30px; } #aam-play .k-insts button small { font-size: 13px; color: var(--muted); }
+#aam-play .k-insts button[aria-pressed="true"] { background: var(--now); color: var(--now-ink); } #aam-play .k-insts button[aria-pressed="true"] small { color: var(--now-ink); opacity: .85; }
 /* page turns while playing: scrolling locked; the top half of the next page arrives early, under a blue line */
 #aam-play .content > .panel:first-child { position: relative; }
 #aam-play .score.paging { overflow-y: hidden; scroll-snap-type: none !important; }
@@ -332,6 +365,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
         <div class="row" style="gap:10px">
           <span class="lbl">Play</span>
           <span class="range-label" data-r="range-label"></span>
+          <button class="chip key-btn" data-r="key-btn" aria-haspopup="dialog">Key</button>
         </div>
         <div class="reps" data-r="reps-wrap">
           <button class="reps-btn" data-r="reps" aria-haspopup="listbox" aria-expanded="false" aria-label="How many times through">Play 1×</button>
@@ -359,6 +393,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
     <div class="pbar" data-r="pbar">
       <button class="play" data-r="p-play" aria-label="Play"><svg viewBox="0 0 24 24" data-r="p-play-ic"><path d="M7 4v16l13-8z"/></svg></button>
       <div class="p-now"><div class="p-where" data-r="p-where">Press play</div><div class="p-chord" data-r="p-chord"></div></div>
+      <button class="p-key" data-r="p-key" aria-haspopup="dialog" aria-label="Key and instrument"><b data-r="p-key-k">C</b><small data-r="p-key-i">Concert</small></button>
       <div class="p-tempo">
         <button class="step" data-r="p-slower" aria-label="Slower by 5">−</button>
         <span class="p-bpm" data-r="p-bpm"></span>
@@ -369,6 +404,22 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
       <button class="p-gear" data-r="p-gear" aria-label="Practice settings"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
     </div>
     <div class="backdrop" data-r="backdrop"></div>
+    <!-- key and instrument: what key the band plays in, and what key you read in -->
+    <div class="kdlg" data-r="kdlg" hidden role="dialog" aria-label="Key and instrument">
+      <div class="kcard">
+        <div class="khead"><h2>Key</h2><button class="btn-done" data-r="k-close">Done</button></div>
+        <div class="k-grid" data-r="k-keys"></div>
+        <p class="k-note" data-r="k-note"></p>
+        <div class="k-sub"><svg class="sax" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 2.5l2 1.2-1 1.7M16.5 5.4l-5.2 9.2a3.3 3.3 0 0 1-4.5 1.2l-.4-.2a2.6 2.6 0 0 1-1-3.5l.6-1.1M5.4 10.9l-2-1.1M5.4 10.9l2.3 1.3M10.2 9.3l1.6.9M11.6 6.9l1.6.9M8.8 11.7l1.6.9"/><path d="M6.9 16.1c-.9 1.6-.6 3.3.8 4.2 1.6 1 3.7.3 4.7-1.5"/></svg><b>My instrument reads in</b></div>
+        <div class="k-insts" data-r="k-insts">
+          <button data-inst="0"><b>C</b><small>Piano, flute, guitar, voice</small></button>
+          <button data-inst="2"><b>B♭</b><small>Tenor sax, clarinet, trumpet</small></button>
+          <button data-inst="9"><b>E♭</b><small>Alto sax, bari sax</small></button>
+        </div>
+      </div>
+    </div>
+    <!-- count-in: four circles in the middle of the screen -->
+    <div class="cnt" data-r="cnt" hidden aria-hidden="true"><div class="cnt-dots"><i></i><i></i><i></i><i></i></div><div class="cnt-msg" data-r="cnt-msg"></div></div>
     <div class="sheet" data-r="sheet" role="dialog" aria-label="Practice settings">
       <div class="sheet-head"><h2>Practice settings</h2><button class="done" data-r="done">Done</button></div>
       <div class="sheet-body" data-r="sheet-body"></div>
@@ -392,6 +443,31 @@ function aamBoot(TUNE) {
   var $ = function (r) { return root.querySelector('[data-r="' + r + '"]'); };
   var Q = '<span class="q">♩</span>';
   var nice = function (s) { return s.replace(/([A-G])b/g, "$1♭").replace(/m7b5/g, "m7♭5"); };
+  // ---------- key and instrument
+  // state.key: semitones the band is moved from the tune's own key. state.inst: what the reader's instrument is pitched in
+  // (0 = concert, 2 = B flat, 9 = E flat). Chord names and notation show key + inst; the band and "Hear it" sound key only.
+  var LET = "CDEFGAB", NATPC = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+  var MAJ = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"], MIN = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"],
+      SHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  var pcOf = function (n) { return (NATPC[n.charAt(0)] + (n.match(/#/g) || []).length - (n.match(/b/g) || []).length + 120) % 12; };
+  var NATIVE = TUNE.native != null ? TUNE.native : ({ alto: 9, bari: 9, tenor: 2, soprano: 2, clarinet: 2, trumpet: 2 }[TUNE.instrument] || 0);   // how the tune file's notation is written
+  var HOME = TUNE.concert_key || (function () {
+    var wk = (TUNE.notation && TUNE.notation.key) || "C", mi = /m$/.test(wk);
+    return (mi ? MIN : MAJ)[(pcOf(wk.replace(/m$/, "")) - NATIVE + 120) % 12] + (mi ? "m" : "");
+  })();
+  var MINOR = /m$/.test(HOME), HOMEROOT = HOME.replace(/m$/, "");
+  var keyState = { key: 0, inst: NATIVE };
+  try { var kv = JSON.parse(localStorage.getItem("aam-keys") || "{}")[TUNE.slug]; if (kv) { keyState.key = kv[0] | 0; keyState.inst = [0, 2, 9].indexOf(kv[1]) >= 0 ? kv[1] : NATIVE; } } catch (e) {}
+  function shownKey(inst) { return (MINOR ? MIN : MAJ)[(pcOf(HOMEROOT) + keyState.key + (inst == null ? keyState.inst : inst) + 120) % 12]; }
+  function spell(sym) {                                    // a concert chord name -> the name to show
+    var semis = ((keyState.key + keyState.inst) % 12 + 12) % 12, m = /^([A-G])([#b]*)(.*)$/.exec(sym);
+    if (!semis || !m) return sym;
+    var tk = shownKey(), steps = (LET.indexOf(tk.charAt(0)) - LET.indexOf(HOMEROOT.charAt(0)) + 7) % 7;
+    var L = LET.charAt((LET.indexOf(m[1]) + steps) % 7), pc = (pcOf(m[1] + m[2]) + semis) % 12, acc = ((pc - NATPC[L] + 18) % 12) - 6;
+    var name = L + (acc > 0 ? "#" : acc < 0 ? "b" : "");
+    if (Math.abs(acc) > 1 || /^(Cb|Fb|E#|B#)$/.test(name)) name = (/#/.test(tk) || "GDAEB".indexOf(tk) >= 0 ? SHARP : MAJ)[pc];   // no double sharps or C flats
+    return name + m[3];
+  }
   var NB = TUNE.bars.length, PPQ = 192, BAR = 4 * PPQ, LEAD = 2;      // music bar k starts at tick (k + LEAD) * BAR
   var SW = Math.round(PPQ / 6);                                         // swung eighth: off-beat moves 1/6 beat later (triplet feel)
   var state = { tempo: TUNE.tempo_presets[0] || 100, bass: true, drums: true, comp: true, countin: true, ramp: false, demo: "off",
@@ -409,6 +485,7 @@ function aamBoot(TUNE) {
   var form = TUNE.form.length ? TUNE.form : [["", 0]];
   var PER_ROW = 4;                                          // four bars a line, like a lead sheet (two a line on phones, in the CSS)
   if (!TUNE.form.length) $("form").classList.add("no-tags");
+  function chordHTML(x) { return nice(spell(x.sym)).replace(/^([A-G])([♭♯#]?)(.*)$/, '<span class="r">$1<i class="a">$2</i></span><span class="q">$3</span>'); }
   form.forEach(function (f, fi) {
     var end = fi + 1 < form.length ? form[fi + 1][1] : NB;
     for (var s = f[1]; s < end; s += PER_ROW) {
@@ -417,7 +494,7 @@ function aamBoot(TUNE) {
       for (var i = s; i < Math.min(s + PER_ROW, end); i++) {
         var c = document.createElement("button"); c.className = "cell"; c.dataset.i = i;
         c.innerHTML = '<span class="n">' + (i + TUNE.first_bar) + '</span><span class="ch' + (TUNE.bars[i].length > 1 ? " two" : "") + '">' + TUNE.bars[i].map(function (x) {   // chords side by side, a slash per beat
-          return '<span class="c" style="flex-grow:' + x.beats + '"><b>' + nice(x.show || x.sym).replace(/^([A-G])([♭♯#]?)(.*)$/, '<span class="r">$1<i class="a">$2</i></span><span class="q">$3</span>') + '</b><span class="sl">' + new Array(x.beats + 1).join("<i>/</i>") + "</span></span>";
+          return '<span class="c" style="flex-grow:' + x.beats + '"><b>' + chordHTML(x) + '</b><span class="sl">' + new Array(x.beats + 1).join("<i>/</i>") + "</span></span>";
         }).join("") + "</span>";
         c.onclick = function () { tapBar(+this.dataset.i); };
         row.querySelector(".cells").appendChild(c); cells[i] = c;
@@ -483,6 +560,53 @@ function aamBoot(TUNE) {
     btn.onclick = function (e) { e.stopPropagation(); open(pop.hidden); };
     document.addEventListener("click", function (e) { if (!pop.contains(e.target)) open(false); });
   })();
+  // ---------- key and instrument dialog
+  var keyLabels = function () {};
+  (function () {
+    var dlg = $("kdlg"), grid = $("k-keys"), names = MINOR ? MIN : MAJ, tail = MINOR ? "m" : "";
+    names.forEach(function (nm, pc) {
+      var b = document.createElement("button"); b.dataset.pc = pc; b.textContent = nice(nm) + tail;
+      b.onclick = function () { var k = ((pc - pcOf(HOMEROOT) - keyState.inst) % 12 + 12) % 12; keyState.key = k > 6 ? k - 12 : k; apply(); };
+      grid.appendChild(b);
+    });
+    [].forEach.call($("k-insts").children, function (b) { b.onclick = function () { keyState.inst = +b.dataset.inst; apply(); }; });
+    keyLabels = function () {
+      var k = nice(shownKey()) + tail, shown = pcOf(shownKey()), home = (pcOf(HOMEROOT) + keyState.inst) % 12;
+      $("p-key-k").textContent = k;
+      $("p-key-i").textContent = keyState.inst === 2 ? "B♭ instrument" : keyState.inst === 9 ? "E♭ instrument" : "Concert";
+      $("key-btn").textContent = "Key: " + k + (keyState.inst ? " (" + (keyState.inst === 2 ? "B♭" : "E♭") + " instrument)" : "");
+      [].forEach.call(grid.children, function (b) { b.setAttribute("aria-pressed", +b.dataset.pc === shown ? "true" : "false"); b.classList.toggle("home", +b.dataset.pc === home); });
+      [].forEach.call($("k-insts").children, function (b) { b.setAttribute("aria-pressed", +b.dataset.inst === keyState.inst ? "true" : "false"); });
+      var band = nice(shownKey(0)) + tail;
+      $("k-note").textContent = (keyState.key ? "The outlined key is the original. " : "This is the tune's original key. ") +
+        (keyState.inst ? "You read in " + k + " while the band plays in concert " + band + "." : "");
+    };
+    function apply() {
+      try { var all = JSON.parse(localStorage.getItem("aam-keys") || "{}"); all[TUNE.slug] = [keyState.key, keyState.inst]; localStorage.setItem("aam-keys", JSON.stringify(all)); } catch (e) {}
+      keyLabels();
+      cells.forEach(function (c, i) { [].forEach.call(c.querySelectorAll(".c > b"), function (b, j) { b.innerHTML = chordHTML(TUNE.bars[i][j]); }); });
+      fitChords(); perShown = 0; drawScore();
+    }
+    function open(on) { dlg.hidden = !on; }
+    $("p-key").onclick = $("key-btn").onclick = function (e) { e.stopPropagation(); keyLabels(); open(true); };
+    $("k-close").onclick = function () { open(false); };
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) open(false); });
+    keyLabels();
+  })();
+  // ---------- count-in circles (and short messages) in the middle of the screen
+  var cntBeat = -9, cntTimer = null;
+  function showCount(bi) {                                 // bi: 0-7 across the two count-in bars: "1 . 2 . | 1 2 3 4"
+    var box = $("cnt"), d = box.querySelectorAll("i");
+    clearTimeout(cntTimer); box.classList.remove("msg"); $("cnt-msg").textContent = ""; box.hidden = false;
+    var slow = bi < 4, n = slow ? (bi < 2 ? 1 : 2) : bi - 3;       // how many circles are lit
+    for (var x = 0; x < 4; x++) {
+      d[x].textContent = x + 1;
+      d[x].className = (x < n ? "on" : "") + (slow && x > 1 ? " off" : "");
+    }
+    if (bi !== cntBeat) { cntBeat = bi; var hot = d[n - 1]; if (hot && (!slow || bi % 2 === 0)) { hot.classList.add("hit"); setTimeout(function () { hot.classList.remove("hit"); }, 130); } }
+  }
+  function hideCount() { clearTimeout(cntTimer); $("cnt").hidden = true; cntBeat = -9; }
+  function flash(msg, ms) { var box = $("cnt"); clearTimeout(cntTimer); box.classList.add("msg"); $("cnt-msg").textContent = msg; box.hidden = false; if (ms) cntTimer = setTimeout(hideCount, ms); }
   [0].concat(Array.apply(null, Array(20)).map(function (_, i) { return i + 1; })).forEach(function (n) {   // Keep looping first, then 1×–20×
     var li = document.createElement("li"); li.textContent = repsName(n); li.dataset.n = n; li.setAttribute("role", "option");
     if (n === 0) li.className = "sep";
@@ -626,7 +750,7 @@ function aamBoot(TUNE) {
         if (x === null && starts.length > j) x = xOf(".abcjs-v0.abcjs-mm" + i + ".abcjs-n" + starts[j]);   // or the right-hand note
         if (x === null) x = left + 10 + (beat / 4) * (width - 10);                                  // or by the beat
         var tx = document.createElementNS(NS, "text"); tx.setAttribute("class", "ch-t"); tx.setAttribute("x", x - 1); tx.setAttribute("y", lineY[m.line]);
-        tx.textContent = nice(c.show || c.sym); g.appendChild(tx);
+        tx.textContent = nice(spell(c.sym)); g.appendChild(tx);
         beat += c.beats;
       });
     });
@@ -723,8 +847,9 @@ function aamBoot(TUNE) {
     score.scrollTop = 0; setSnaps(); fitGlove();
     if (state.playing) { pagingStart(); markNow(curBar, true); }
   }
+  function notationShift() { var v = ((keyState.key + keyState.inst - NATIVE) % 12 + 12) % 12; return v > 6 ? v - 12 : v; }   // semitones to move the written notes, kept near the staff
   function paint(per, sp) {
-    ABCJS.renderAbc($("score-in"), abcFor(state.view, per, sp), { add_classes: true, responsive: "resize", staffwidth: staffW(per),
+    ABCJS.renderAbc($("score-in"), abcFor(state.view, per, sp), { add_classes: true, responsive: "resize", staffwidth: staffW(per), visualTranspose: notationShift(),
       paddingleft: 0, paddingright: 0, paddingtop: 26, paddingbottom: 8, selectTypes: false });
     var svg = score.querySelector("svg"), q = function (sel) { return [].slice.call(svg.querySelectorAll(sel)); };
     // one box per bar (behind the notes) for the now-playing and loop highlights
@@ -974,7 +1099,7 @@ function aamBoot(TUNE) {
   function scheduleMusic() {
     var secPerBeat = function () { return 60 / Tone.Transport.bpm.value; };
     walkingBass().forEach(function (e) {
-      at((e.bar + LEAD) * BAR + e.beat * PPQ, function (time) { if (state.bass) bass.triggerAttackRelease(midiToNote(e.midi), secPerBeat() * 0.95, time, 0.85); });
+      at((e.bar + LEAD) * BAR + e.beat * PPQ, function (time) { if (state.bass) bass.triggerAttackRelease(midiToNote(e.midi + keyState.key), secPerBeat() * 0.95, time, 0.85); });
     });
     for (var k = 0; k < NB; k++) {
       var b0 = (k + LEAD) * BAR;
@@ -988,14 +1113,14 @@ function aamBoot(TUNE) {
       at((e.bar + LEAD) * BAR + swing(e.beat), function (time) {
         if (!state.comp) return;
         var d = Math.max(0.15, e.len * secPerBeat());
-        e.notes.forEach(function (n) { piano.triggerAttackRelease(midiToNote(n), d, time, 0.34); });
+        e.notes.forEach(function (n) { piano.triggerAttackRelease(midiToNote(n + keyState.key), d, time, 0.34); });
       });
     });
     TUNE.sections.forEach(function (s) {
       [["rh", 0.72], ["lh", 0.5]].forEach(function (h) {
         s[h[0]].forEach(function (e) {
           at(LEAD * BAR + swing(e[0]), function (time) {
-            if (state.demo === s.id) piano.triggerAttackRelease(midiToNote(e[1]), Math.max(0.12, e[2] * secPerBeat() * 0.95), time, h[1]);
+            if (state.demo === s.id) piano.triggerAttackRelease(midiToNote(e[1] + keyState.key), Math.max(0.12, e[2] * secPerBeat() * 0.95), time, h[1]);
           });
         });
       });
@@ -1066,16 +1191,16 @@ function aamBoot(TUNE) {
   function stop() {
     Tone.Transport.stop(); clearOneShots(); state.playing = false; state.pass = 1; setIcon(false);
     cells.forEach(function (c) { c.classList.remove("is-now"); }); curBar = -1; last = -1; markNow(-1); $("chord-now").textContent = ""; $("now-where").textContent = "Stopped. Press play to start again."; $("p-reps").textContent = repsShort();
-    $("p-chord").textContent = ""; $("p-where").textContent = "Stopped";
+    $("p-chord").textContent = ""; $("p-where").textContent = "Stopped"; hideCount();
     applyRange(null);
   }
   $("play").onclick = function () {
-    if (!window.Tone) { $("now-where").textContent = "The sound engine didn't load. Check your connection and reload."; return; }
+    if (!window.Tone) { $("now-where").textContent = "The sound engine didn't load. Check your connection and reload."; flash("The sound engine didn't load. Check your connection and reload.", 4500); return; }
     if (state.playing) { stop(); return; }
     iosUnmute();
     Tone.start().then(function () {
       if (!state.loaded) {
-        $("now-where").textContent = "Loading sounds…";
+        $("now-where").textContent = "Loading sounds…"; flash("Loading sounds…");
         Tone.Transport.PPQ = PPQ;
         buildInstruments();
         return Tone.loaded().then(function () { state.loaded = true; scheduleMusic(); });
@@ -1083,7 +1208,7 @@ function aamBoot(TUNE) {
     }).then(function () {
       setTempo(state.tempo); applyRange(null);
       state.playing = true; setIcon(true); startFrom(); requestAnimationFrame(frame);
-    }).catch(function () { $("now-where").textContent = "Couldn't load the sounds. Check your connection and try again."; });
+    }).catch(function () { $("now-where").textContent = "Couldn't load the sounds. Check your connection and try again."; flash("Couldn't load the sounds. Check your connection and try again.", 4500); });
   };
   var last = -1;
   function frame() {
@@ -1091,12 +1216,13 @@ function aamBoot(TUNE) {
     var t = Tone.Transport.ticks, k = Math.floor(t / BAR) - LEAD, where, chord = "";
     var endBar = rng()[1];
     if (k > endBar) { k = endBar; t = (endBar + LEAD) * BAR; }    // the instant between the last bar and the stop
-    if (t < state.start) where = "Count-in: " + Math.min(8, Math.floor((t - (state.start - LEAD * BAR)) / PPQ) + 1) + " of 8";
+    if (t < state.start) { var cb = Math.floor((t - (state.start - LEAD * BAR)) / PPQ); where = "Count-in: " + Math.min(8, cb + 1) + " of 8"; if (cb >= 0 && cb < 8) showCount(cb); }
     else {
+      if (!$("cnt").hidden) hideCount();
       var times = state.reps ? state.pass + " of " + state.reps : state.pass;
       where = "Bar " + (k + TUNE.first_bar) + " · time " + times;
       var bar = TUNE.bars[k];
-      if (bar) { var half = (t % BAR) >= BAR / 2 && bar.length > 1 ? 1 : 0; chord = nice(bar[half].show || bar[half].sym); }
+      if (bar) { var half = (t % BAR) >= BAR / 2 && bar.length > 1 ? 1 : 0; chord = nice(spell(bar[half].sym)); }
     }
     if (k !== last) {
       if (cells[last]) cells[last].classList.remove("is-now"); if (cells[k] && t >= state.start) { cells[k].classList.add("is-now"); followCell(k); } last = k;

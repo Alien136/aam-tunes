@@ -158,7 +158,8 @@ T = A.tempo
 notation = dict(key=ascii_name(wk) + ("m" if minor else ""), staves="piano" if PIANO else "treble")
 if PIANO: notation["lh"] = secs[0]["abc"]["lh"]
 tune = dict(format="aam-tune/1", slug=SLUG, title=spec["title"], subtitle=A.subtitle or f"{n}-bar form · {SHORT}",
-            instrument=INST, first_bar=A.first_bar, chart_tempo=T, tempo_presets=sorted({max(60, round(T * 0.68 / 5) * 5), max(70, round(T * 0.84 / 5) * 5), T}),
+            instrument=INST, concert_key=ck, native=SEMIS % 12, first_bar=A.first_bar,   # concert_key + native: the player's key and instrument switch works from these
+ chart_tempo=T, tempo_presets=sorted({max(60, round(T * 0.68 / 5) * 5), max(70, round(T * 0.84 / 5) * 5), T}),
             form=[[a, b - 1] for a, b in spec.get("form", [])], bars=bars, sections=secs, notation=notation)
 norm = re.sub(r"[^A-Z0-9]", "", A.code.upper())
 pdf = dict(id=SLUG, title=A.pdf_title or spec["title"] + " · " + SHORT, hash=hashlib.sha256(("aam:" + norm).encode()).hexdigest(), tunes=[SLUG])
