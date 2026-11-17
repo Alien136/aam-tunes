@@ -120,6 +120,7 @@
 #aam-play .lib-tune[aria-current="true"] { background: var(--now); }
 #aam-play .lib-tune[aria-current="true"] b, #aam-play .lib-tune[aria-current="true"] small { color: var(--now-ink); }
 #aam-play .lib-add { border-top: 1px solid var(--line); margin-top: 6px; padding: 10px 6px 2px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+#aam-play .lib-home { display: block; border-top: 1px solid var(--line); margin-top: 10px; padding: 12px 6px 6px; font: 600 14px var(--body); color: var(--accent-text); text-decoration: none; }
 #aam-play .lib-add-t { font: 600 13px var(--body); }
 #aam-play .lib-add form { display: flex; gap: 8px; margin: 0; }
 #aam-play .lib-add input[type=text] { flex: 1 1 0; width: 0; min-width: 0; height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; font: 500 15px var(--body); margin: 0; box-shadow: none; background: var(--surface); color: var(--ink); }
@@ -329,7 +330,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
       <h1 data-r="title">Play-Along</h1>
       <p class="sub" data-r="subtitle"></p>
     </div>
-    <a class="x-site" href="/" aria-label="Back to the Alex Attard Music website">← Website</a>
+    <a class="x-site" data-r="home-a" href="/">← Website</a>
     <div class="lib" data-r="lib" hidden>
       <button class="lib-btn" data-r="lib-btn" aria-haspopup="true" aria-expanded="false">My tunes</button>
       <div class="lib-menu" data-r="lib-menu" hidden>
@@ -342,6 +343,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
           </form>
           <div class="err" data-r="add-err" aria-live="polite"></div>
         </div>
+        <a class="lib-home" data-r="home-b" href="/">← Website</a>
       </div>
     </div>
   </header>
@@ -473,6 +475,8 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 
 <script>
 // >>> SETTINGS
+var STUDENT_HOME = "/";              // where the "back" link goes: put the address of your student login page here, e.g. "/student-login/"
+var STUDENT_HOME_LABEL = "";         // what the link says. Leave "" for "Student login" (or "Website" while the address above is "/")
 var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    // folder with p36.mp3 ... d-ride.mp3 (keep the final "/")
 // Tune folders. Each entry is one library: a list of addresses for the SAME folder, tried in order (the 2nd is a backup).
 // The first library is the home one. Tunes from any library added after it are filed under that library's "owner" name.
@@ -804,7 +808,7 @@ function aamBoot(TUNE) {
       });
     });
   }
-  function abcFor(view, per, sp) {
+  function abcFor(view, per, sp, skips) {
     var sec = TUNE.sections.filter(function (s) { return s.id === view; })[0];
     var rh = sec ? sec.abc.rh : TUNE.bars.map(blankBar);
     var lh = sec ? sec.abc.lh : NOTA.lh;
@@ -812,6 +816,7 @@ function aamBoot(TUNE) {
     for (var s = 0; s < NB; s += per) {
       var idx = []; for (var i = s; i < Math.min(s + per, NB); i++) idx.push(i);
       var end = s + per >= NB ? " |]\n" : " |\n";
+      if (skips && skips[s / per] > 0) out += "%%vskip " + skips[s / per] + "\n";   // extra space above this line, so every line is the same distance apart
       out += (lh ? "[V:RH] " : "") + idx.map(function (i) { return rh[i].replace(/"[^"]*"/g, ""); }).join(" | ") + end;   // chord names are drawn afterwards (chordNames)
       if (lh) out += "[V:LH] " + idx.map(function (i) { return lh[i]; }).join(" | ") + end;
     }
@@ -830,21 +835,57 @@ function aamBoot(TUNE) {
   }
   var staffTops = [], staffBot0 = 0;                       // top of each line's upper staff (and the bottom of the first line), in the drawing's own units
   var TIGHT = NOTA && NOTA.lh ? { sep: 34, sys: 26 } : { sep: 66, sys: 26 };   // phones start from close-set lines (a single staff needs more air for its chord names)
-  // Phones: make whole lines fill the box exactly. If one more line fits by shrinking the music a little (never below 86%),
+  // What one line of music really takes up, measured from the ink (low notes, beams and chord names), not just the staves.
+  function lineMetrics(svg) {
+    var q = function (sel) { return [].slice.call(svg.querySelectorAll(sel)); }, out = [];
+    for (var l = 0; q(".abcjs-staff.abcjs-l" + l).length; l++) {
+      var st = q(".abcjs-staff.abcjs-l" + l).map(function (e) { return e.getBBox(); });
+      var staffTop = Math.min.apply(null, st.map(function (b) { return b.y; })), staffBot = Math.max.apply(null, st.map(function (b) { return b.y + b.height; }));
+      var hi = Math.min.apply(null, q(".abcjs-note.abcjs-v0.abcjs-l" + l + ", .abcjs-beam-elem.abcjs-v0.abcjs-l" + l).map(function (e) { return e.getBBox().y; }).concat([staffTop]));
+      var names = Math.min(staffTop - 9, hi - 5);           // chord names: one baseline per line, clear of the highest note
+      var ink = Math.max.apply(null, q(".abcjs-l" + l).map(function (e) { var b = e.getBBox(); return b.y + b.height; }).concat([staffBot]));
+      out.push({ staffTop: staffTop, staffBot: staffBot, names: names, top: Math.min(staffTop - 34, names - 16), ink: ink });
+    }
+    return out;
+  }
+  // One spacing for every tab of a tune: every line the same distance apart (P), far enough that the lowest note or beam of
+  // one line never touches the chord names of the next, with room under each staff (tail) for the lowest note in the tune.
+  var bases = {};
+  function layoutBase(per) {
+    var key = per + ":" + notationShift();
+    if (bases[key]) return bases[key];
+    var w = staffW(per), all = [], tail = 8, P = 0;
+    var tmp = document.createElement("div"); tmp.style.cssText = "position:absolute;left:-9999px;top:0;width:" + w + "px;visibility:hidden";
+    root.appendChild(tmp);
+    ["solo"].concat(TUNE.sections.map(function (s) { return s.id; })).forEach(function (id) {
+      try {
+        ABCJS.renderAbc(tmp, abcFor(id, per, TIGHT), { add_classes: true, staffwidth: w, visualTranspose: notationShift(), paddingleft: 0, paddingright: 0 });
+        var m = lineMetrics(tmp.querySelector("svg")); all.push(m);
+        m.forEach(function (x) { tail = Math.max(tail, x.ink - x.staffBot + 5); });
+      } catch (e) {}
+    });
+    root.removeChild(tmp);
+    all.forEach(function (m) { for (var l = 0; l + 1 < m.length; l++) {
+      P = Math.max(P, m[l + 1].staffTop - m[l].staffTop, (m[l].staffBot - m[l].staffTop) + tail + (m[l + 1].staffTop - m[l + 1].top));
+    } });
+    return (bases[key] = { sep: TIGHT.sep, sys: TIGHT.sys, P: Math.ceil(P), tail: Math.ceil(tail) });
+  }
+  // Make whole lines fill the box exactly. If one more line fits by shrinking the music a little (never below 86% on a phone),
   // do that with a small margin either side. Otherwise keep it full size and spread the lines that fit to fill the box.
-  // Measured from the staves alone, so every tab of a tune comes out the same. Returns new line spacing to redraw with, or null.
-  function gloveDecide() {
+  // Returns new spacing to redraw with, or null.
+  function gloveDecide(base) {
     var svg = score.querySelector("svg");
     if (!svg || staffTops.length < 2) return null;
-    var k = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width, P = (staffTops[1] - staffTops[0]) * k, vh = score.clientHeight, cw = score.clientWidth;
-    var first = (staffBot0 + 8) * k;                        // the first line, from the top of the box to its bottom edge
+    var k = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width, P = base.P * k, vh = score.clientHeight, cw = score.clientWidth;
+    var first = (staffBot0 + base.tail) * k;                // the first line, from the top of the box to its bottom edge
     var need = function (n) { return first + (n - 1) * P + 8; };
     var n = 1; while (need(n + 1) <= vh) n++;
     var s = vh / need(n + 1) * 0.985;
-    if (s >= 0.86 && s < 1) { score.style.paddingLeft = score.style.paddingRight = (Math.ceil((cw * (1 - s) / 2 + 2) / 3) * 3) + "px"; return null; }   // in 3px steps, so tabs that differ by a hair match
+    var minS = Math.min(0.86, Math.max(0.72, 1 / k));       // big screens draw the music large, so there it may shrink further for one more line
+    if (s >= minS && s < 1) { score.style.paddingLeft = score.style.paddingRight = (Math.ceil((cw * (1 - s) / 2 + 2) / 3) * 3) + "px"; return null; }   // in 3px steps, so tabs that differ by a hair match
     if (n < 2) return null;
-    var want = (vh - 8 - first) / (n - 1) / k, sep = TIGHT.sep + (want - P / k) / 1.325;            // abcjs: +1 staffsep is about +1.325 between lines
-    return { sep: Math.round(Math.min(sep, TIGHT.sep + 60)), sys: TIGHT.sys };
+    var want = (vh - 8 - first) / (n - 1) / k;
+    return { sep: base.sep, sys: base.sys, P: Math.floor(Math.min(want, base.P * 1.3)), tail: base.tail };
   }
   function fitGlove() {
     if (!mq.matches || score.hidden || !measures.length) { mask.hidden = true; return; }
@@ -888,8 +929,9 @@ function aamBoot(TUNE) {
     var per = w < 560 ? 2 : 4;
     if (per === perShown) return;
     perShown = per;
-    paint(per, mq.matches ? TIGHT : null);
-    if (mq.matches) { var sp = gloveDecide(); if (sp) paint(per, sp); }
+    var base = layoutBase(per);
+    paint(per, base);
+    var sp = gloveDecide(base); if (sp && sp.P > base.P) paint(per, sp);
     lastVH = score.clientHeight;
     fitPage();
     showRange();
@@ -898,20 +940,23 @@ function aamBoot(TUNE) {
   }
   function notationShift() { var v = ((keyState.key + keyState.inst - NATIVE) % 12 + 12) % 12; return v > 6 ? v - 12 : v; }   // semitones to move the written notes, kept near the staff
   function paint(per, sp) {
-    ABCJS.renderAbc($("score-in"), abcFor(state.view, per, sp), { add_classes: true, responsive: "resize", staffwidth: staffW(per), visualTranspose: notationShift(),
-      paddingleft: 0, paddingright: 0, paddingtop: 26, paddingbottom: 8, selectTypes: false });
+    var opts = { add_classes: true, responsive: "resize", staffwidth: staffW(per), visualTranspose: notationShift(),
+      paddingleft: 0, paddingright: 0, paddingtop: 26, paddingbottom: sp.tail + 2, selectTypes: false };
+    ABCJS.renderAbc($("score-in"), abcFor(state.view, per, sp), opts);
+    var nat = lineMetrics(score.querySelector("svg")), skips = [0], any = false;
+    for (var i = 1; i < nat.length; i++) { skips[i] = Math.max(0, Math.round(sp.P - (nat[i].staffTop - nat[i - 1].staffTop))); if (skips[i]) any = true; }
+    if (any) ABCJS.renderAbc($("score-in"), abcFor(state.view, per, sp, skips), opts);   // drawn again with every line the same distance apart
     var svg = score.querySelector("svg"), q = function (sel) { return [].slice.call(svg.querySelectorAll(sel)); };
     // one box per bar (behind the notes) for the now-playing and loop highlights
     var g = document.createElementNS("http://www.w3.org/2000/svg", "g"); svg.insertBefore(g, svg.firstChild);
     measures = []; var lineY = []; staffTops = [];
-    for (var l = 0; q(".abcjs-staff.abcjs-l" + l).length; l++) {
-      var st = q(".abcjs-staff.abcjs-l" + l).map(function (e) { return e.getBBox(); });
-      var staffTop = Math.min.apply(null, st.map(function (b) { return b.y; }));
-      var hi = Math.min.apply(null, q(".abcjs-note.abcjs-v0.abcjs-l" + l).map(function (e) { return e.getBBox().y; }).concat([staffTop]));
-      staffTops[l] = staffTop; if (l === 0) staffBot0 = Math.max.apply(null, st.map(function (b) { return b.y + b.height; }));
-      lineY[l] = Math.min(staffTop - 9, hi - 5);            // chord names: one baseline per line, clear of the highest note
-      var top = Math.min(staffTop - 34, lineY[l] - 16);
-      var bot = Math.max.apply(null, st.map(function (b) { return b.y + b.height; })) + 8;
+    var lm = lineMetrics(svg);
+    for (var l = 0; l < lm.length; l++) {
+      var staffTop = lm[l].staffTop;
+      staffTops[l] = staffTop; if (l === 0) staffBot0 = lm[0].staffBot;
+      lineY[l] = lm[l].names;
+      var top = lm[l].top;
+      var bot = lm[l].staffBot + sp.tail;                   // room for the lowest note, the same on every line
       var left = Math.max.apply(null, q(".abcjs-staff-extra.abcjs-l" + l + ".abcjs-v0").map(function (e) { var b = e.getBBox(); return b.x + b.width; })) + 4;
       q(".abcjs-bar.abcjs-l" + l + ".abcjs-v0").forEach(function (e) {
         var mm = +(/abcjs-mm(\d+)/.exec(e.getAttribute("class")) || [0, -1])[1], b = e.getBBox();
@@ -1017,6 +1062,8 @@ function aamBoot(TUNE) {
     c.style.cssText = "position:absolute;display:block;max-width:none;left:" + (vr.left - sr.left - score.clientLeft) + "px;top:" +
       (vr.top - sr.top - score.clientTop + score.scrollTop - pageTop(np)) + "px;width:" + vr.width + "px;height:" + vr.height + "px";
     var w = document.createElement("div"); w.className = "score sc-clone"; w.appendChild(c); o.appendChild(w);   // "score" so the music keeps its colours
+    var nb = lineBox(np * pager.n + h);                     // hide the tips of the line after the ones shown
+    if (nb) { var cv = document.createElement("div"); cv.style.cssText = "position:absolute;left:0;right:0;bottom:0;background:#fff;top:" + Math.max(0, nb.top - pageTop(np) - 2) + "px"; o.appendChild(cv); }
     var tab = document.createElement("span"); tab.className = "over-tab"; tab.textContent = "Next page"; o.appendChild(tab);
     score.parentNode.insertBefore(o, score.nextSibling); pager.over = o;
   }
@@ -1375,6 +1422,10 @@ function aamBoot(TUNE) {
   setTempo(state.tempo); showRange(); label(); layout(); setView(state.view);
 }
 
+(function () {   // the way back out of the player: to the student login page (see SETTINGS)
+  var label = "\u2190 " + (STUDENT_HOME_LABEL || (STUDENT_HOME === "/" ? "Website" : "Student login"));
+  [].slice.call(document.querySelectorAll('#aam-play [data-r="home-a"], #aam-play [data-r="home-b"]')).forEach(function (a) { a.href = STUDENT_HOME; a.textContent = label; });
+})();
 // ---------- the library: which tunes this device has unlocked, the code screen, and the My tunes menu
 // (runs once the whole page has loaded, so the Catalog widget can sit above or below the Player widget)
 function aamLibrary() {
