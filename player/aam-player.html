@@ -483,7 +483,7 @@ var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    
 // The band's sounds (piano, upright bass, jazz drum kit). Addresses for the SAME folder, tried in order. If none can be
 // reached, the player falls back to the small classic sounds in SAMPLE_BASE. Add ?sound=classic to a link to hear those.
 var SOUND_CLASSIC = /[?&]sound=classic/.test(location.search);
-var SOUND_SOURCES = ["https://cdn.jsdelivr.net/gh/Alien136/aam-tunes@main/sounds/v2/", "https://raw.githubusercontent.com/Alien136/aam-tunes/main/sounds/v2/"];
+var SOUND_SOURCES = ["https://raw.githubusercontent.com/Alien136/aam-tunes/main/sounds/v2/", "https://cdn.jsdelivr.net/gh/Alien136/aam-tunes@main/sounds/v2/"];
 // Tune folders. Each entry is one library: a list of addresses for the SAME folder, tried in order (the 2nd is a backup).
 // The first library is the home one. Tunes from any library added after it are filed under that library's "owner" name.
 var TUNE_SOURCES = [
@@ -1238,7 +1238,7 @@ function aamBoot(TUNE) {
     if (dur) src.stop(time + dur);
   }
   var PCUT = [0.42, 0.7], PMID = [0.3, 0.56, 0.84], BCUT = [0.5, 0.8], BMID = [0.4, 0.68, 0.9];
-  function sndNote(inst, midi, dur, time, vel) {           // inst: "p" or "b"
+  function sndNote(inst, midi, dur, time, vel, boost) {           // inst: "p" or "b"
     var I = inst === "p" ? SND.piano : SND.bass, notes = I.notes, best = null;
     for (var d = 0; d <= 6 && !best; d++) {
       for (var sgn = -1; sgn <= 1 && !best; sgn += 2) {
@@ -1249,7 +1249,7 @@ function aamBoot(TUNE) {
     }
     if (!best) return;
     var mid = (inst === "p" ? PMID : BMID)[best.tk.layer - 1], g = Math.max(0.45, Math.min(1.7, Math.pow(vel / mid, 1.3)));
-    sndPlay(best.tk.buf, Math.pow(2, (midi - best.m) / 12), time, dur, g, inst === "p" ? 0.5 : 0.12, inst === "p" ? SND.pOut : SND.bOut);
+    sndPlay(best.tk.buf, Math.pow(2, (midi - best.m) / 12), time, dur, g * (boost || 1), inst === "p" ? 0.5 : 0.12, inst === "p" ? SND.pOut : SND.bOut);
   }
   var DCUT = { ride: [0.45, 0.75], hh: [0.55], kick: [0.5], snare: [0.35, 0.6], stick: [0.4, 0.62, 0.85] };
   var DMID = { ride: [0.3, 0.6, 0.9], hh: [0.4, 0.75], kick: [0.35, 0.65], snare: [0.25, 0.47, 0.7], stick: [0.3, 0.5, 0.73, 0.95] };
@@ -1260,7 +1260,7 @@ function aamBoot(TUNE) {
     sndPlay(tk.buf, 1, time, 0, DGAIN[name] * Math.max(0.4, Math.min(1.8, Math.pow(vel / DMID[name][tk.layer - 1], 1.5))), 0.1, SND.dOut);
   }
   // one front door for every sound the band makes, studio or classic
-  function pno(midi, dur, time, vel) { if (SND) sndNote("p", midi, dur, time, vel); else piano.triggerAttackRelease(midiToNote(midi), dur, time, Math.min(1, vel)); }
+  function pno(midi, dur, time, vel, boost) { if (SND) sndNote("p", midi, dur, time, vel, boost); else piano.triggerAttackRelease(midiToNote(midi), dur, time, Math.min(1, vel)); }
   function bs(midi, dur, time, vel) { if (SND) sndNote("b", midi, dur, time, vel); else if (vel > 0.5) bass.triggerAttackRelease(midiToNote(midi), dur, time, 0.85); }
   function drm(name, time, vel, classicDb) {
     if (SND) sndDrum(name, time, vel);
@@ -1386,7 +1386,7 @@ function aamBoot(TUNE) {
       [["rh", 0.72], ["lh", 0.5]].forEach(function (h) {
         s[h[0]].forEach(function (e) {
           at(LEAD * BAR + swing(e[0]), function (time) {
-            if (state.demo === s.id) pno(e[1] + keyState.key, Math.max(0.12, e[2] * secPerBeat() * 0.95), time, SND ? h[1] + 0.09 + jit(0.06) : h[1]);
+            if (state.demo === s.id) pno(e[1] + keyState.key, Math.max(0.12, e[2] * secPerBeat() * 0.95), time, SND ? h[1] + 0.09 + jit(0.06) : h[1], 1.4);   // the written part sits in front of the band
           });
         });
       });
