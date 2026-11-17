@@ -152,8 +152,13 @@ if L["pattern_mode"]:
     secs.append(section("patterns", "Section 3 · Pattern Chorus", "1-2-3-5 on the two-beat chords, scales on the long ones", L["sc"], lh, bars))
 else:
     secs.append(section("scales", "Section 3 · Scale Chorus", "Each chord's scale from the root", L["sc"], lh, bars))
-if L.get("lick_rh") and len(L["lick_bars"]) == n:          # a one-chorus Lick Chorus only (a 2-chorus blues one is longer than the form)
+if L.get("lick_rh") and len(L["lick_bars"]) == n:          # a one-chorus Lick Chorus
     secs.append(section("licks", "Section 5 · Lick Chorus", "The ii–V–I licks dropped into the form", L["lick_rh"], (L["lick_lh"] or lh) if PIANO else None, bars))
+elif L.get("lick_rh") and len(L["lick_rh"]) // n >= 2 and len(L["lick_rh"]) % n <= 1 and not PIANO:   # a 2-chorus (blues) Lick Chorus: one tab per chorus, each loops on its own
+    LR = [b.strip() for x in L["lick_rh"] for b in re.sub(r'\\bar "[^"]*"|\\mark \\markup \\box \\bold "[^"]*"', "", x).split("|") if b.strip()]   # the final bar is joined to the last one
+    for k in range(len(LR) // n):
+        s = section("licks" if k == 0 else "licks%d" % (k + 1), "Section 5 · Lick Chorus %d" % (k + 1), "The ii–V–I licks dropped into the form, chorus %d" % (k + 1), LR[k * n:(k + 1) * n], None, bars)
+        s["tab"] = "Licks %d" % (k + 1); secs.append(s)
 T = A.tempo
 notation = dict(key=ascii_name(wk) + ("m" if minor else ""), staves="piano" if PIANO else "treble")
 if PIANO: notation["lh"] = secs[0]["abc"]["lh"]
