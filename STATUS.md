@@ -11,6 +11,8 @@ Everything needed to carry on from any conversation is in this repository and in
   - Saxophone Welcome Booklet alto SWA-9426, tenor SWT-2764 (21 exercises each)
 - Codes are stored as hashes: sha256("aam:" + CODE without dash, upper case).
 
+- 17 Nov: the player uses the full-screen app layout on every screen (was phones only): wide screens get a centred 1180px column, full tab names, a tempo slider and bar/chord readout on the play bar, a centred settings card, a "← Website" link and space bar = play/stop. **Alex still has to paste this version into the Elementor Player widget.**
+
 ## Tools (`tools/`)
 - `gen_study.py`, `fit_study.py`, `add_qr.py`, `publish_tune.py`: lead-sheet study PDF -> tune + QR. `example_blues_alto_spec.json` is the standard 4-page blues build.
 - `build_book.py`, `book_player.py`, `publish_exercise.py`: Welcome Booklet PDF, its exercises and QR codes.

@@ -141,7 +141,7 @@
 #aam-play .key i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
 #aam-play button:focus-visible, #aam-play input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 #aam-play .sm, #aam-play .pbar, #aam-play .sheet, #aam-play .backdrop, #aam-play .p-reps, #aam-play .p-reps-pop, #aam-play .p-key { display: none; }
-@media (max-width: 640px) {
+@media (min-width: 0px) {   /* every screen uses the app layout; wide screens add the block further down */
   /* phones: the music fills the screen; play and tempo sit in a bar pinned to the bottom; the rest is in a settings sheet */
   #aam-play { padding: 14px 8px calc(92px + env(safe-area-inset-bottom)); gap: 14px; }
   #aam-play .eyebrow { font-size: 10.5px; } #aam-play .lib-btn { height: 36px; font-size: 13px; padding: 0 32px 0 12px; background-position: right 12px center; } #aam-play h1 { font-size: 28px !important; margin: 4px 0 2px; } #aam-play .sub { font-size: 13px; }
@@ -238,6 +238,35 @@
   #aam-play .cell.is-now { background: var(--now); color: var(--now-ink); border-radius: 6px; border-color: transparent; }
   #aam-play .cell.is-start { box-shadow: inset 0 -3px 0 var(--accent); }
   #aam-play .tempo { grid-template-columns: 1fr; } #aam-play .bpm { min-width: 84px; font-size: 20px; } }
+/* wide screens (a computer, or a tablet on its side): the same app, centred in a column, with a roomier play bar */
+#aam-play .p-range, #aam-play .x-site { display: none; }
+@media (min-width: 760px) {
+  #aam-play.is-open { padding: 14px max(16px, calc((100vw - 1180px) / 2)) 92px; gap: 10px; }
+  #aam-play h1 { font-size: 26px !important; } #aam-play .sub { font-size: 13px; }
+  #aam-play .lg { display: inline; } #aam-play .sm { display: none; }
+  #aam-play .music-row .seg button { padding: 9px 16px; font-size: 14px; }
+  #aam-play .content > .panel:first-child { padding: 14px 16px; }
+  #aam-play .pbar { padding: 10px max(16px, calc((100vw - 1180px) / 2)) 12px; gap: 14px; }
+  #aam-play .pbar .play { width: 56px; height: 56px; }
+  #aam-play .p-now { display: grid; flex: 0 0 150px; }
+  #aam-play .p-where { font-size: 12px; } #aam-play .p-chord { font-size: 24px; }
+  #aam-play .p-key { margin-right: 0; }
+  #aam-play .p-tempo { flex: 1 1 auto; gap: 10px; min-width: 0; }
+  #aam-play .p-range { display: block; flex: 1 1 auto; min-width: 80px; }
+  #aam-play .p-bpm { font-size: 20px; min-width: 44px; order: 4; }
+  #aam-play .p-bpm::after { content: " bpm"; font: 600 12px var(--body); color: var(--muted); }
+  #aam-play .p-bpm { min-width: 76px; }
+  #aam-play .p-reps { min-width: 56px; height: 44px; font-size: 16px; }
+  #aam-play .p-gear { width: 44px; height: 44px; }
+  #aam-play .p-reps-pop:not([hidden]) { right: max(16px, calc((100vw - 1180px) / 2)); }
+  #aam-play .sheet.open { left: 50%; right: auto; bottom: 96px; width: min(560px, calc(100vw - 32px)); transform: translateX(-50%); border-radius: 18px; max-height: calc(100vh - 140px); }
+  #aam-play .cell { min-height: 64px; } #aam-play .cell .r { font-size: 30px; } #aam-play .cell .q { font-size: 15px; }
+  #aam-play .cell .two .r { font-size: 25px; } #aam-play .cell .two .q { font-size: 13px; }
+  #aam-play.is-open .x-site { display: inline-flex; align-items: center; height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface);
+    color: var(--muted); font: 600 13px var(--body); text-decoration: none; white-space: nowrap; margin-left: auto; }
+  #aam-play.is-open .x-site:hover { color: var(--accent-text); }
+  #aam-play.is-open .head { gap: 10px; } #aam-play.is-open .head-text { flex: 0 1 auto; }
+}
 #aam-play .cell .a { font-style: normal; font-size: .74em; margin-left: .02em; font-family: "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols2", "Noto Music", sans-serif; }
 html.aam-full, html.aam-full body { overflow: hidden !important; }
 /* count-in circles and short messages, floating in the middle of the screen */
@@ -300,6 +329,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
       <h1 data-r="title">Play-Along</h1>
       <p class="sub" data-r="subtitle"></p>
     </div>
+    <a class="x-site" href="/" aria-label="Back to the Alex Attard Music website">← Website</a>
     <div class="lib" data-r="lib" hidden>
       <button class="lib-btn" data-r="lib-btn" aria-haspopup="true" aria-expanded="false">My tunes</button>
       <div class="lib-menu" data-r="lib-menu" hidden>
@@ -403,6 +433,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
       <div class="p-tempo">
         <button class="step" data-r="p-slower" aria-label="Slower by 5">−</button>
         <span class="p-bpm" data-r="p-bpm"></span>
+        <input class="p-range" type="range" data-r="p-range" min="40" max="240" step="1" aria-label="Tempo">
         <button class="step" data-r="p-faster" aria-label="Faster by 5">+</button>
       </div>
       <button class="p-reps" data-r="p-reps" aria-haspopup="true" aria-label="How many times through">1×</button>
@@ -1018,9 +1049,16 @@ function aamBoot(TUNE) {
     tempo.value = state.tempo;
     tempo.style.setProperty("--p", ((state.tempo - 40) / 2) + "%");
     $("bpm").innerHTML = Q + " = " + state.tempo; $("p-bpm").textContent = state.tempo;
+    $("p-range").value = state.tempo; $("p-range").style.setProperty("--p", ((state.tempo - 40) / 2) + "%");
     if (window.Tone && state.loaded) Tone.Transport.bpm.value = state.tempo;
   }
   tempo.oninput = function () { setTempo(+tempo.value); };
+  $("p-range").oninput = function () { setTempo(+this.value); };
+  document.addEventListener("keydown", function (e) {      // computer keyboard: space plays and stops
+    var t = e.target, typing = /^(TEXTAREA|SELECT)$/.test(t.tagName || "") || (t.tagName === "INPUT" && t.type !== "range");
+    if (e.code !== "Space" || typing || !root.classList.contains("is-open") || e.repeat) return;
+    e.preventDefault(); $("play").onclick();
+  });
   function holdRepeat(btn, fn) {                           // tap for one step; hold to keep going
     var t1 = null, t2 = null, stop = function () { clearTimeout(t1); clearInterval(t2); t1 = t2 = null; };
     btn.addEventListener("pointerdown", function (e) { if (e.button) return; stop(); fn(); t1 = setTimeout(function () { t2 = setInterval(fn, 110); }, 420); });
@@ -1299,7 +1337,7 @@ function aamBoot(TUNE) {
   }
 
   // ---------- phones: move tempo, band, loop and tips into the settings sheet; mirror play and tempo in the bottom bar
-  var mq = window.matchMedia("(max-width: 640px)");
+  var mq = window.matchMedia("(min-width: 0px)");   // the app layout on every screen (was phones only)
   var movable = ["row-tempo", "row-band", "row-loop", "hint", "tips"].map(function (r) {
     var el = $(r), mark = document.createComment(r); el.parentNode.insertBefore(mark, el); return [el, mark];
   });
