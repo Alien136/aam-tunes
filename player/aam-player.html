@@ -447,7 +447,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
     <!-- phones only: a play bar pinned to the bottom, and a settings sheet that slides up from it -->
     <div class="pbar" data-r="pbar">
       <button class="play" data-r="p-play" aria-label="Play"><svg viewBox="0 0 24 24" data-r="p-play-ic"><path d="M7 4v16l13-8z"/></svg></button>
-      <div class="p-now"><div class="p-where" data-r="p-where">Press play</div><div class="p-chord" data-r="p-chord"></div></div>
+      <div class="p-now"><div class="p-where" data-r="p-where"></div><div class="p-chord" data-r="p-chord"></div></div>
       <button class="p-key" data-r="p-key" aria-haspopup="dialog" aria-label="Key and instrument"><b data-r="p-key-k">C</b><small data-r="p-key-i">Concert</small></button>
       <div class="p-tempo">
         <button class="step" data-r="p-slower" aria-label="Slower by 5">−</button>
@@ -1513,7 +1513,7 @@ function aamBoot(TUNE) {
     if (keyAtStart !== null && keyState.key !== keyAtStart) { keyState.key = keyAtStart; keyApply(); }   // through the keys: back to where it started
     keyAtStart = null;
     cells.forEach(function (c) { c.classList.remove("is-now"); }); curBar = -1; last = -1; markNow(-1); $("chord-now").textContent = ""; $("now-where").textContent = "Stopped. Press play to start again."; $("p-reps").textContent = repsShort();
-    $("p-chord").textContent = ""; $("p-where").textContent = "Stopped"; hideCount();
+    $("p-chord").textContent = ""; $("p-where").textContent = ""; hideCount();
     applyRange(null);
   }
   $("play").onclick = function () {
@@ -1550,7 +1550,7 @@ function aamBoot(TUNE) {
       curBar = t >= state.start ? k : -1; markNow(curBar);
     }
     $("now-where").textContent = where; $("chord-now").textContent = chord;
-    $("p-where").textContent = t < state.start ? where : "Bar " + (k + TUNE.first_bar); $("p-chord").textContent = chord;
+    $("p-where").textContent = t < state.start ? "" : "Bar " + (k + TUNE.first_bar);   // the count-in shows in the middle of the screen $("p-chord").textContent = chord;
     $("p-reps").textContent = t < state.start ? repsShort() : state.reps ? state.pass + "/" + state.reps : "∞ " + state.pass;
     requestAnimationFrame(frame);
   }
