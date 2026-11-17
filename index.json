@@ -43,6 +43,188 @@
    "tunes": [
     "f-blues-alto"
    ]
+  },
+  {
+   "id": "sax-welcome-alto",
+   "title": "Saxophone Welcome Booklet · Alto",
+   "hash": "a8ecc8f2d8e6a831535eae91ff51ab002429b551a4efd0b0c897edd5cf4ce58d",
+   "tunes": [
+    "sax-welcome-alto-long-tones-down",
+    "sax-welcome-alto-long-tones-up",
+    "sax-welcome-alto-chromatic",
+    "sax-welcome-alto-major-chr",
+    "sax-welcome-alto-major-4ths",
+    "sax-welcome-alto-minor-chr",
+    "sax-welcome-alto-minor-4ths",
+    "sax-welcome-alto-thirds-major-chr",
+    "sax-welcome-alto-thirds-major-4ths",
+    "sax-welcome-alto-thirds-minor-chr",
+    "sax-welcome-alto-thirds-minor-4ths",
+    "sax-welcome-alto-arpeggios-chr",
+    "sax-welcome-alto-arpeggios-4ths",
+    "sax-welcome-alto-fours-chr",
+    "sax-welcome-alto-fours-4ths",
+    "sax-welcome-alto-lick-1",
+    "sax-welcome-alto-lick-2",
+    "sax-welcome-alto-lick-3",
+    "sax-welcome-alto-lick-4",
+    "sax-welcome-alto-lick-1-keys",
+    "sax-welcome-alto-blues"
+   ],
+   "contents": [
+    {
+     "title": "Part 1 · Long Tones",
+     "items": [
+      "sax-welcome-alto-long-tones-down",
+      "sax-welcome-alto-long-tones-up"
+     ]
+    },
+    {
+     "title": "Part 2 · Chromatic Scale",
+     "items": [
+      "sax-welcome-alto-chromatic"
+     ]
+    },
+    {
+     "title": "Part 3 · Scales",
+     "items": [
+      "sax-welcome-alto-major-chr",
+      "sax-welcome-alto-major-4ths",
+      "sax-welcome-alto-minor-chr",
+      "sax-welcome-alto-minor-4ths"
+     ]
+    },
+    {
+     "title": "Part 4 · Thirds",
+     "items": [
+      "sax-welcome-alto-thirds-major-chr",
+      "sax-welcome-alto-thirds-major-4ths",
+      "sax-welcome-alto-thirds-minor-chr",
+      "sax-welcome-alto-thirds-minor-4ths"
+     ]
+    },
+    {
+     "title": "Part 5 · Arpeggios",
+     "items": [
+      "sax-welcome-alto-arpeggios-chr",
+      "sax-welcome-alto-arpeggios-4ths"
+     ]
+    },
+    {
+     "title": "Part 6 · Four-Note Patterns",
+     "items": [
+      "sax-welcome-alto-fours-chr",
+      "sax-welcome-alto-fours-4ths"
+     ]
+    },
+    {
+     "title": "Part 7 · ii–V–I Licks",
+     "items": [
+      "sax-welcome-alto-lick-1",
+      "sax-welcome-alto-lick-2",
+      "sax-welcome-alto-lick-3",
+      "sax-welcome-alto-lick-4",
+      "sax-welcome-alto-lick-1-keys"
+     ]
+    },
+    {
+     "title": "Part 7 · Blues",
+     "items": [
+      "sax-welcome-alto-blues"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "sax-welcome-tenor",
+   "title": "Saxophone Welcome Booklet · Tenor",
+   "hash": "91f6b8eb03aeee843d41da57756c21f37e2cdc1b5916551339311ef6f67f3348",
+   "tunes": [
+    "sax-welcome-tenor-long-tones-down",
+    "sax-welcome-tenor-long-tones-up",
+    "sax-welcome-tenor-chromatic",
+    "sax-welcome-tenor-major-chr",
+    "sax-welcome-tenor-major-4ths",
+    "sax-welcome-tenor-minor-chr",
+    "sax-welcome-tenor-minor-4ths",
+    "sax-welcome-tenor-thirds-major-chr",
+    "sax-welcome-tenor-thirds-major-4ths",
+    "sax-welcome-tenor-thirds-minor-chr",
+    "sax-welcome-tenor-thirds-minor-4ths",
+    "sax-welcome-tenor-arpeggios-chr",
+    "sax-welcome-tenor-arpeggios-4ths",
+    "sax-welcome-tenor-fours-chr",
+    "sax-welcome-tenor-fours-4ths",
+    "sax-welcome-tenor-lick-1",
+    "sax-welcome-tenor-lick-2",
+    "sax-welcome-tenor-lick-3",
+    "sax-welcome-tenor-lick-4",
+    "sax-welcome-tenor-lick-1-keys",
+    "sax-welcome-tenor-blues"
+   ],
+   "contents": [
+    {
+     "title": "Part 1 · Long Tones",
+     "items": [
+      "sax-welcome-tenor-long-tones-down",
+      "sax-welcome-tenor-long-tones-up"
+     ]
+    },
+    {
+     "title": "Part 2 · Chromatic Scale",
+     "items": [
+      "sax-welcome-tenor-chromatic"
+     ]
+    },
+    {
+     "title": "Part 3 · Scales",
+     "items": [
+      "sax-welcome-tenor-major-chr",
+      "sax-welcome-tenor-major-4ths",
+      "sax-welcome-tenor-minor-chr",
+      "sax-welcome-tenor-minor-4ths"
+     ]
+    },
+    {
+     "title": "Part 4 · Thirds",
+     "items": [
+      "sax-welcome-tenor-thirds-major-chr",
+      "sax-welcome-tenor-thirds-major-4ths",
+      "sax-welcome-tenor-thirds-minor-chr",
+      "sax-welcome-tenor-thirds-minor-4ths"
+     ]
+    },
+    {
+     "title": "Part 5 · Arpeggios",
+     "items": [
+      "sax-welcome-tenor-arpeggios-chr",
+      "sax-welcome-tenor-arpeggios-4ths"
+     ]
+    },
+    {
+     "title": "Part 6 · Four-Note Patterns",
+     "items": [
+      "sax-welcome-tenor-fours-chr",
+      "sax-welcome-tenor-fours-4ths"
+     ]
+    },
+    {
+     "title": "Part 7 · ii–V–I Licks",
+     "items": [
+      "sax-welcome-tenor-lick-1",
+      "sax-welcome-tenor-lick-2",
+      "sax-welcome-tenor-lick-3",
+      "sax-welcome-tenor-lick-4",
+      "sax-welcome-tenor-lick-1-keys"
+     ]
+    },
+    {
+     "title": "Part 7 · Blues",
+     "items": [
+      "sax-welcome-tenor-blues"
+     ]
+    }
+   ]
   }
  ],
  "tunes": {
@@ -65,6 +247,174 @@
   "f-blues-alto": {
    "title": "F Blues",
    "subtitle": "12-bar jazz blues · Alto Sax · arpeggios, patterns and ii–V–I licks"
+  },
+  "sax-welcome-alto-blues": {
+   "title": "Blues",
+   "subtitle": "Saxophone Welcome Booklet · Alto · 12-bar jazz blues"
+  },
+  "sax-welcome-alto-long-tones-down": {
+   "title": "Long Tones · Down to the bottom",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 1 · Long Tones"
+  },
+  "sax-welcome-alto-long-tones-up": {
+   "title": "Long Tones · Up to the top",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 1 · Long Tones"
+  },
+  "sax-welcome-alto-chromatic": {
+   "title": "Chromatic Scale",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 2 · Chromatic Scale"
+  },
+  "sax-welcome-alto-major-chr": {
+   "title": "Major Scales · Chromatic order",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 3 · Scales"
+  },
+  "sax-welcome-alto-major-4ths": {
+   "title": "Major Scales · Circle of fourths",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 3 · Scales"
+  },
+  "sax-welcome-alto-minor-chr": {
+   "title": "Harmonic Minor Scales · Chromatic order",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 3 · Scales"
+  },
+  "sax-welcome-alto-minor-4ths": {
+   "title": "Harmonic Minor Scales · Circle of fourths",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 3 · Scales"
+  },
+  "sax-welcome-alto-thirds-major-chr": {
+   "title": "Major Scales in Thirds · Chromatic order",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 4 · Thirds"
+  },
+  "sax-welcome-alto-thirds-major-4ths": {
+   "title": "Major Scales in Thirds · Circle of fourths",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 4 · Thirds"
+  },
+  "sax-welcome-alto-thirds-minor-chr": {
+   "title": "Harmonic Minor in Thirds · Chromatic order",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 4 · Thirds"
+  },
+  "sax-welcome-alto-thirds-minor-4ths": {
+   "title": "Harmonic Minor in Thirds · Circle of fourths",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 4 · Thirds"
+  },
+  "sax-welcome-alto-arpeggios-chr": {
+   "title": "Arpeggios · Chromatic order",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 5 · Arpeggios"
+  },
+  "sax-welcome-alto-arpeggios-4ths": {
+   "title": "Arpeggios · Circle of fourths",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 5 · Arpeggios"
+  },
+  "sax-welcome-alto-fours-chr": {
+   "title": "Four-Note Patterns · Chromatic order",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 6 · Four-Note Patterns"
+  },
+  "sax-welcome-alto-fours-4ths": {
+   "title": "Four-Note Patterns · Circle of fourths",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 6 · Four-Note Patterns"
+  },
+  "sax-welcome-alto-lick-1": {
+   "title": "Lick 1 · Step-down line",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 7 · ii–V–I Licks"
+  },
+  "sax-welcome-alto-lick-2": {
+   "title": "Lick 2 · Arpeggio to the 9th",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 7 · ii–V–I Licks"
+  },
+  "sax-welcome-alto-lick-3": {
+   "title": "Lick 3 · Scale down, arpeggio up",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 7 · ii–V–I Licks"
+  },
+  "sax-welcome-alto-lick-4": {
+   "title": "Lick 4 · Enclosure and ♭9",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 7 · ii–V–I Licks"
+  },
+  "sax-welcome-alto-lick-1-keys": {
+   "title": "Transposing a Lick · Lick 1 through the keys",
+   "subtitle": "Saxophone Welcome Booklet · Alto · Part 7 · ii–V–I Licks"
+  },
+  "sax-welcome-tenor-blues": {
+   "title": "Blues",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · 12-bar jazz blues"
+  },
+  "sax-welcome-tenor-long-tones-down": {
+   "title": "Long Tones · Down to the bottom",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 1 · Long Tones"
+  },
+  "sax-welcome-tenor-long-tones-up": {
+   "title": "Long Tones · Up to the top",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 1 · Long Tones"
+  },
+  "sax-welcome-tenor-chromatic": {
+   "title": "Chromatic Scale",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 2 · Chromatic Scale"
+  },
+  "sax-welcome-tenor-major-chr": {
+   "title": "Major Scales · Chromatic order",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 3 · Scales"
+  },
+  "sax-welcome-tenor-major-4ths": {
+   "title": "Major Scales · Circle of fourths",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 3 · Scales"
+  },
+  "sax-welcome-tenor-minor-chr": {
+   "title": "Harmonic Minor Scales · Chromatic order",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 3 · Scales"
+  },
+  "sax-welcome-tenor-minor-4ths": {
+   "title": "Harmonic Minor Scales · Circle of fourths",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 3 · Scales"
+  },
+  "sax-welcome-tenor-thirds-major-chr": {
+   "title": "Major Scales in Thirds · Chromatic order",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 4 · Thirds"
+  },
+  "sax-welcome-tenor-thirds-major-4ths": {
+   "title": "Major Scales in Thirds · Circle of fourths",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 4 · Thirds"
+  },
+  "sax-welcome-tenor-thirds-minor-chr": {
+   "title": "Harmonic Minor in Thirds · Chromatic order",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 4 · Thirds"
+  },
+  "sax-welcome-tenor-thirds-minor-4ths": {
+   "title": "Harmonic Minor in Thirds · Circle of fourths",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 4 · Thirds"
+  },
+  "sax-welcome-tenor-arpeggios-chr": {
+   "title": "Arpeggios · Chromatic order",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 5 · Arpeggios"
+  },
+  "sax-welcome-tenor-arpeggios-4ths": {
+   "title": "Arpeggios · Circle of fourths",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 5 · Arpeggios"
+  },
+  "sax-welcome-tenor-fours-chr": {
+   "title": "Four-Note Patterns · Chromatic order",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 6 · Four-Note Patterns"
+  },
+  "sax-welcome-tenor-fours-4ths": {
+   "title": "Four-Note Patterns · Circle of fourths",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 6 · Four-Note Patterns"
+  },
+  "sax-welcome-tenor-lick-1": {
+   "title": "Lick 1 · Step-down line",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 7 · ii–V–I Licks"
+  },
+  "sax-welcome-tenor-lick-2": {
+   "title": "Lick 2 · Arpeggio to the 9th",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 7 · ii–V–I Licks"
+  },
+  "sax-welcome-tenor-lick-3": {
+   "title": "Lick 3 · Scale down, arpeggio up",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 7 · ii–V–I Licks"
+  },
+  "sax-welcome-tenor-lick-4": {
+   "title": "Lick 4 · Enclosure and ♭9",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 7 · ii–V–I Licks"
+  },
+  "sax-welcome-tenor-lick-1-keys": {
+   "title": "Transposing a Lick · Lick 1 through the keys",
+   "subtitle": "Saxophone Welcome Booklet · Tenor · Part 7 · ii–V–I Licks"
   }
  }
 }

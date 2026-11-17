@@ -469,7 +469,7 @@ function aamBoot(TUNE) {
     return (mi ? MIN : MAJ)[(pcOf(wk.replace(/m$/, "")) - NATIVE + 120) % 12] + (mi ? "m" : "");
   })();
   var MINOR = /m$/.test(HOME), HOMEROOT = HOME.replace(/m$/, "");
-  var keyState = { key: 0, inst: NATIVE };
+  var keyState = { key: Math.max(-5, Math.min(6, TUNE.start_key | 0)), inst: NATIVE };   // start_key: an exercise that begins away from its written key (the booklet starts on B♭ or C)
   try { var kv = JSON.parse(localStorage.getItem("aam-keys") || "{}")[TUNE.slug]; if (kv) { keyState.key = kv[0] | 0; keyState.inst = [0, 2, 9].indexOf(kv[1]) >= 0 ? kv[1] : NATIVE; } } catch (e) {}
   function shownKey(inst) { return (MINOR ? MIN : MAJ)[(pcOf(HOMEROOT) + keyState.key + (inst == null ? keyState.inst : inst) + 120) % 12]; }
   function spell(sym) {                                    // a concert chord name -> the name to show

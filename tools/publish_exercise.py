@@ -13,12 +13,13 @@ booklet.json:
       {"slug": "sax-welcome-alto-long-tones", "title": "Long Tones", "page": 3,
        "style": "drone",                     # "drone": held root + fifth and a click. "click": a click only. "swing": the band.
        "keys": "off",                        # "off" | "chromatic" (up a half step each time) | "fourths" (round the circle)
+       "start_key": -5,                      # optional: begin this many semitones from the written key (-5 .. 6), e.g. a booklet page that starts on B♭
        "tempo": 60, "concert_key": "D",       # add "written_key": "C" for an exercise that should have no key signature
        "hide": ["chords", "solo", "names"],  # what the exercise has no use for: the chord chart, the blank solo page, chord names over the notes
        "tab": "Notes",                       # name of the notation tab
        "bars": [["D"], ["D"]],               # CONCERT chords, one or two per bar (what the drone or band plays)
        "rh": ["b'1~", "b'2 r2"]}             # the WRITTEN notes on the student's page, one string per bar (LilyPond pitches:
-    ]}                                       #   c' = middle C; durations 1 2 4 8, dotted 2. 4.; r = rest; ~ = tie to the next note)
+    ]}                                       #   c' = middle C; durations 1 2 4 8, dotted 2. 4.; r = rest; ~ = tie to the next note; "(3" before three eighth notes = a triplet)
   ]
 }
 The QR on each page: https://alexattardmusic.com/play/?t=<slug>&c=<code without the dash>. One code unlocks the whole booklet.
@@ -29,9 +30,9 @@ import gen_study as g
 SOUNDS_BELOW = {"alto": 9, "bari": 21, "tenor": 14, "soprano": 2, "clarinet": 2, "trumpet": 2, "flute": 0, "concert": 0, "piano": 0}
 SHORT = {"alto": "Alto Sax", "bari": "Bari Sax", "tenor": "Tenor Sax", "soprano": "Soprano Sax", "clarinet": "Clarinet", "trumpet": "Trumpet",
          "flute": "Flute", "concert": "Concert Pitch", "piano": "Piano"}
-NOTE = re.compile(r"^([a-g])((?:is|es)*)([',]*)(\d+\.?)?(~)?$")
-DUR = {"8": .5, "4": 1.0, "4.": 1.5, "2": 2.0, "2.": 3.0, "1": 4.0}
-LEN = {0.5: "", 1.0: "2", 1.5: "3", 2.0: "4", 3.0: "6", 4.0: "8"}
+NOTE = re.compile(r"^([a-g])((?:is|es)*)([',]*)(\d+\.*)?(~)?$")
+DUR = {"8": .5, "4": 1.0, "4.": 1.5, "2": 2.0, "2.": 3.0, "2..": 3.5, "1": 4.0}
+LEN = {0.5: "", 1.0: "2", 1.5: "3", 2.0: "4", 3.0: "6", 3.5: "7", 4.0: "8"}
 ascii_name = lambda n: n.letter + ("#" * n.acc if n.acc > 0 else "b" * -n.acc)
 
 
@@ -77,8 +78,10 @@ def build_item(it, inst, pdf_title, chapter):
         bars.append(row)
     ev, abc, marks, held = [], [], [], None
     for bi, text in enumerate(it["rh"]):
-        sp.bar(); t, s, mk, dur = 0.0, "", "", None
+        sp.bar(); t, s, mk, dur, trip, fresh = 0.0, "", "", None, 0, False
         for tok in text.split():
+            if tok == "(3":                                              # the next three eighth notes are a triplet (one beat)
+                s += (" " if s and not s.endswith(" ") else "") + "(3"; trip, fresh = 3, True; continue
             m = re.match(r"^r(\d+\.?)$", tok)
             if m:
                 s += " z" + LEN[DUR[m.group(1)]] + " "; t += DUR[m.group(1)]; held = None; continue
@@ -86,14 +89,19 @@ def build_item(it, inst, pdf_title, chapter):
             if m.group(4): dur = m.group(4)
             acc = (len(m.group(2)) // 2) * (1 if "is" in m.group(2) else -1)
             n = g.Note(m.group(1).upper(), acc, 3 + m.group(3).count("'") - m.group(3).count(","))
-            d = DUR[dur]; sounding = n.midi - SOUNDS_BELOW[inst]
-            if s and not s.endswith(" ") and (d >= 1 or t == 2.0 or s[-1].isdigit() or s[-1] == "-"): s += " "   # eighths beam in pairs of beats; longer notes stand alone
-            s += sp.note(n) + LEN[d] + ("-" if m.group(5) else ""); mk += "."
+            d = DUR[dur]
+            if trip: assert d == 0.5, (it["slug"], "triplets are eighth notes"); d = 1 / 3
+            sounding = n.midi - SOUNDS_BELOW[inst]
+            if s and not s.endswith(" ") and not trip and (d >= 1 or t == 2.0 or s[-1].isdigit() or s[-1] == "-"): s += " "   # eighths beam in pairs of beats; longer notes stand alone
+            s += sp.note(n) + ("" if trip else LEN[d]) + ("-" if m.group(5) else ""); mk += "."
+            if trip:
+                trip -= 1
+                if not trip: s += " "
             if held and held[1] == sounding: held[2] += d                 # the second half of a tie: one long sound
             else: held = [bi * 4 + t, sounding, d, 90]; ev.append(held)
             if not m.group(5): held = None
-            t += d
-        assert abs(t - 4) < 1e-9, (it["slug"], "bar %d is %s beats long" % (bi + 1, t))
+            t = round(t + d, 6)
+        assert abs(t - 4) < 1e-5, (it["slug"], "bar %d is %s beats long" % (bi + 1, t))
         abc.append(" ".join(s.split())); marks.append(mk)
     tab = it.get("tab", "Notes")
     sec = dict(id="notes", title=tab, tab=tab, desc=it.get("desc", "").rstrip("."), rh=ev, lh=[], abc=dict(rh=abc, marks=marks))
@@ -103,6 +111,7 @@ def build_item(it, inst, pdf_title, chapter):
                 first_bar=1, chart_tempo=T, tempo_presets=[T, min(T + 20, 200), min(T + 40, 220)], form=[], bars=bars, sections=[sec],
                 notation=dict(key=ascii_name(wk) + ("m" if minor else ""), staves="treble"))
     if it.get("page"): tune["page"] = it["page"]
+    if it.get("start_key"): tune["start_key"] = it["start_key"]     # semitones from the written key where the exercise begins (-5 .. 6)
     return tune
 
 
