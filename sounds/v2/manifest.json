@@ -1,0 +1,107 @@
+{
+ "version": 2,
+ "piano": {
+  "notes": [
+   33,
+   36,
+   39,
+   42,
+   45,
+   48,
+   51,
+   54,
+   57,
+   60,
+   63,
+   66,
+   69,
+   72,
+   75,
+   78,
+   81,
+   84,
+   87,
+   90,
+   93,
+   96
+  ],
+  "layers": 3
+ },
+ "bass": {
+  "notes": [
+   24,
+   27,
+   30,
+   33,
+   36,
+   39,
+   42,
+   45,
+   48,
+   51,
+   54,
+   57,
+   60
+  ],
+  "layers": 3,
+  "rr": 2
+ },
+ "drums": {
+  "ride": {
+   "layers": 3,
+   "rr": 3
+  },
+  "bell": {
+   "layers": 1,
+   "rr": 2
+  },
+  "hh": {
+   "layers": 2,
+   "rr": 3
+  },
+  "hhc": {
+   "layers": 1,
+   "rr": 2
+  },
+  "kick": {
+   "layers": 2,
+   "rr": 2
+  },
+  "crash": {
+   "layers": 1,
+   "rr": 1
+  },
+  "stick": {
+   "layers": 4,
+   "rr": 1
+  },
+  "snare": {
+   "layers": 3,
+   "rr": 1
+  }
+ },
+ "credits": [
+  {
+   "what": "Piano",
+   "name": "Salamander Grand Piano V3",
+   "by": "Alexander Holm",
+   "licence": "CC BY 3.0",
+   "url": "https://archive.org/details/SalamanderGrandPianoV3",
+   "changes": "trimmed, three of sixteen layers, MP3"
+  },
+  {
+   "what": "Bass",
+   "name": "Meatbass",
+   "by": "Karoryfer Samples (Drogomir Smolken)",
+   "licence": "CC0 1.0",
+   "url": "https://github.com/sfzinstruments/karoryfer.meatbass"
+  },
+  {
+   "what": "Drums",
+   "name": "Virtuosity Drums",
+   "by": "Versilian Studios / Virtuosity Musical Instruments (Austin McMahon, drums)",
+   "licence": "CC0 1.0",
+   "url": "https://github.com/sfzinstruments/virtuosity_drums"
+  }
+ ]
+}

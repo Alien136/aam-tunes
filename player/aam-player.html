@@ -213,7 +213,8 @@
   #aam-play .score > div { position: relative; }
   #aam-play .score .snap { position: absolute; left: 0; width: 1px; height: 1px; scroll-snap-align: start; }
   /* only whole lines of music show: a white cover hides any line that would be cut off at the bottom */
-  #aam-play .score-mask { position: absolute; z-index: 2; background: #fff; pointer-events: none; border-radius: 0 0 7px 7px; }
+  #aam-play .snd-credit { margin: 14px 2px 2px; font: 400 11px/1.45 var(--body); color: var(--muted, #667); }
+#aam-play .score-mask { position: absolute; z-index: 2; background: #fff; pointer-events: none; border-radius: 0 0 7px 7px; }
   #aam-play .score-mask[hidden] { display: none; }
   #aam-play.is-open .key { flex: none; height: 30px; overflow: hidden; align-content: flex-start; font-size: 11px; line-height: 14px; gap: 2px 10px; }   /* fixed height: the music box is the same size on every tab */
   #aam-play.is-open .form[hidden], #aam-play.is-open .score[hidden], #aam-play.is-open .key[hidden], #aam-play.is-open .content[hidden] { display: none; }
@@ -469,6 +470,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
     <div class="sheet" data-r="sheet" role="dialog" aria-label="Practice settings">
       <div class="sheet-head"><h2>Practice settings</h2><button class="done" data-r="done">Done</button></div>
       <div class="sheet-body" data-r="sheet-body"></div>
+      <p class="snd-credit" data-r="snd-credit" hidden></p>
     </div>
   </div>
 </div>
@@ -478,6 +480,10 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 var STUDENT_HOME = "https://alexattardmusic.com/student-login/";              // where the "back" link goes: put the address of your student login page here, e.g. "/student-login/"
 var STUDENT_HOME_LABEL = "Student home";         // what the link says. Leave "" for "Student login" (or "Website" while the address above is "/")
 var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    // folder with p36.mp3 ... d-ride.mp3 (keep the final "/")
+// The band's sounds (piano, upright bass, jazz drum kit). Addresses for the SAME folder, tried in order. If none can be
+// reached, the player falls back to the small classic sounds in SAMPLE_BASE. Add ?sound=classic to a link to hear those.
+var SOUND_CLASSIC = /[?&]sound=classic/.test(location.search);
+var SOUND_SOURCES = ["https://cdn.jsdelivr.net/gh/Alien136/aam-tunes@main/sounds/v2/", "https://raw.githubusercontent.com/Alien136/aam-tunes/main/sounds/v2/"];
 // Tune folders. Each entry is one library: a list of addresses for the SAME folder, tried in order (the 2nd is a backup).
 // The first library is the home one. Tunes from any library added after it are filed under that library's "owner" name.
 var TUNE_SOURCES = [
@@ -1165,27 +1171,136 @@ function aamBoot(TUNE) {
       var last = line[line.length - 1];
       line.push(Math.abs(nr + 1 - last) < Math.abs(nr - 1 - last) ? nr + 1 : nr - 1);
       line.forEach(function (n, k) { out.push({ bar: x.bar, beat: x.beat + k, midi: n }); });
+      if (c.beats === 4 && i % 3 === 1) out.push({ bar: x.bar, beat: x.beat + 1.5, midi: line[1], ghost: true });   // now and then a skipped note between 2 and 3
       prev = r;
     });
     return out;
   }
   var piano, bass, kit, drone, ids = [];
   function midiToNote(m) { return Tone.Frequency(m, "midi").toNote(); }
-  function buildInstruments() {
+  function jit(x) { return (Math.random() * 2 - 1) * x; }
+  // ---------- the studio sounds: recorded piano, upright bass and jazz kit, each note in several loudness layers
+  // (a soft note is a softly PLAYED note, not a loud one turned down) and alternate takes, so repeats don't sound stamped out.
+  // The essentials load first so the band can start; the remaining layers arrive in the background.
+  var SND = null, sndBuf = {}, sndLast = {};
+  function sndFetch(file, json) {
+    var i = 0, src = window.SOUND_SOURCES || [];
+    function next() {
+      if (i >= src.length) return Promise.reject(new Error("unreachable"));
+      var url = src[i++] + file, ctl = window.AbortController ? new AbortController() : null, timer = setTimeout(function () { if (ctl) ctl.abort(); }, 12000);
+      return fetch(url, ctl ? { signal: ctl.signal } : {}).then(function (r) { if (!r.ok) throw new Error(r.status); return json ? r.json() : r.arrayBuffer(); })
+        .then(function (v) { clearTimeout(timer); return v; }, function () { clearTimeout(timer); return next(); });
+    }
+    return next();
+  }
+  function sndLoad(files) {                                // a few at a time; a file that fails is skipped (its neighbours cover for it)
+    var raw = Tone.getContext().rawContext, k = 0;
+    function one() {
+      if (k >= files.length) return Promise.resolve();
+      var f = files[k++];
+      if (sndBuf[f]) return one();
+      return sndFetch(f + ".mp3").then(function (ab) { return new Promise(function (ok) { raw.decodeAudioData(ab, function (buf) { sndBuf[f] = buf; ok(); }, function () { ok(); }); }); })
+        .catch(function () {}).then(one);
+    }
+    return Promise.all([one(), one(), one(), one(), one(), one()]);
+  }
+  function sndFiles(man, tier) {                           // tier 1: enough to play. tier 2: everything else this tune uses
+    var out = [], band = STYLE === "swing";
+    man.piano.notes.forEach(function (m) { (tier === 1 ? [2] : [1, 3]).forEach(function (l) { out.push("p-" + m + "-" + l); }); });
+    if (band) man.bass.notes.forEach(function (m) { (tier === 1 ? [[2, 1]] : [[2, 2], [3, 1], [3, 2], [1, 1], [1, 2]]).forEach(function (x) { out.push("b-" + m + "-" + x[0] + "-" + x[1]); }); });
+    (band ? ["ride", "hh", "kick", "snare", "stick"] : ["stick"]).forEach(function (d) {
+      var D = man.drums[d], mid = Math.ceil(D.layers / 2);
+      for (var l = 1; l <= D.layers; l++) for (var r = 1; r <= D.rr; r++) { var first = (l === mid && r === 1) || d === "stick"; if (first === (tier === 1)) out.push("d-" + d + "-" + l + "-" + r); }
+    });
+    return out;
+  }
+  function sndTake(prefix, layers, rr, vel, cuts) {        // the loaded take nearest the wanted loudness, never the same take twice running
+    var want = 1; while (want < layers && vel > cuts[want - 1]) want++;
+    for (var d = 0; d < layers; d++) {
+      var tries = [want - d, want + d];
+      for (var t = 0; t < 2; t++) {
+        var l = tries[t]; if (l < 1 || l > layers) continue;
+        var got = [];
+        for (var r = 1; r <= (rr || 1); r++) { var key = prefix + "-" + l + (rr ? "-" + r : ""); if (sndBuf[key]) got.push(key); }
+        if (!got.length) continue;
+        var pickd = got[Math.floor(Math.random() * got.length)];
+        if (got.length > 1 && pickd === sndLast[prefix]) pickd = got[(got.indexOf(pickd) + 1) % got.length];
+        sndLast[prefix] = pickd;
+        return { buf: sndBuf[pickd], layer: l };
+      }
+    }
+    return null;
+  }
+  function sndPlay(buf, rate, time, dur, gain, release, out) {
+    var src = new Tone.ToneBufferSource({ url: buf, playbackRate: rate, fadeOut: release, curve: "exponential" }).connect(out);
+    src.onended = function () { src.dispose(); };
+    src.start(time, 0, undefined, gain);
+    if (dur) src.stop(time + dur);
+  }
+  var PCUT = [0.42, 0.7], PMID = [0.3, 0.56, 0.84], BCUT = [0.5, 0.8], BMID = [0.4, 0.68, 0.9];
+  function sndNote(inst, midi, dur, time, vel) {           // inst: "p" or "b"
+    var I = inst === "p" ? SND.piano : SND.bass, notes = I.notes, best = null;
+    for (var d = 0; d <= 6 && !best; d++) {
+      for (var sgn = -1; sgn <= 1 && !best; sgn += 2) {
+        var m = midi + sgn * d; if (notes.indexOf(m) < 0) continue;
+        var tk = sndTake(inst + "-" + m, I.layers, I.rr, vel, inst === "p" ? PCUT : BCUT);
+        if (tk) best = { tk: tk, m: m };
+      }
+    }
+    if (!best) return;
+    var mid = (inst === "p" ? PMID : BMID)[best.tk.layer - 1], g = Math.max(0.45, Math.min(1.7, Math.pow(vel / mid, 1.3)));
+    sndPlay(best.tk.buf, Math.pow(2, (midi - best.m) / 12), time, dur, g, inst === "p" ? 0.5 : 0.12, inst === "p" ? SND.pOut : SND.bOut);
+  }
+  var DCUT = { ride: [0.45, 0.75], hh: [0.55], kick: [0.5], snare: [0.35, 0.6], stick: [0.4, 0.62, 0.85] };
+  var DMID = { ride: [0.3, 0.6, 0.9], hh: [0.4, 0.75], kick: [0.35, 0.65], snare: [0.25, 0.47, 0.7], stick: [0.3, 0.5, 0.73, 0.95] };
+  var DGAIN = { ride: 1, hh: 0.9, kick: 0.5, snare: 0.8, stick: 0.8 };
+  function sndDrum(name, time, vel) {
+    var D = SND.drums[name], tk = sndTake("d-" + name, D.layers, D.rr, vel, DCUT[name]);
+    if (!tk) return;
+    sndPlay(tk.buf, 1, time, 0, DGAIN[name] * Math.max(0.4, Math.min(1.8, Math.pow(vel / DMID[name][tk.layer - 1], 1.5))), 0.1, SND.dOut);
+  }
+  // one front door for every sound the band makes, studio or classic
+  function pno(midi, dur, time, vel) { if (SND) sndNote("p", midi, dur, time, vel); else piano.triggerAttackRelease(midiToNote(midi), dur, time, Math.min(1, vel)); }
+  function bs(midi, dur, time, vel) { if (SND) sndNote("b", midi, dur, time, vel); else if (vel > 0.5) bass.triggerAttackRelease(midiToNote(midi), dur, time, 0.85); }
+  function drm(name, time, vel, classicDb) {
+    if (SND) sndDrum(name, time, vel);
+    else if (classicDb !== null && kit.has(name)) { var p = kit.player(name); p.volume.value = classicDb; p.start(time); }
+  }
+  function buildClassic(master) {
     var pu = {}, bu = {};
     for (var m = 36; m <= 96; m += 3) pu[midiToNote(m)] = "p" + m + ".mp3";
     for (var n = 28; n <= 55; n += 3) bu[midiToNote(n)] = "b" + n + ".mp3";
-    var limiter = new Tone.Limiter(-2).toDestination();            // keeps phone speakers from distorting
-    var master = new Tone.Compressor(-18, 3).connect(limiter);
     piano = new Tone.Sampler({ urls: pu, baseUrl: SAMPLE_BASE, release: 0.6, volume: -8 }).connect(master);
     bass = new Tone.Sampler({ urls: bu, baseUrl: SAMPLE_BASE, release: 0.15, volume: -4 }).connect(master);
     kit = new Tone.Players({ urls: { ride: "d-ride.mp3", bell: "d-bell.mp3", hh: "d-hhpedal.mp3", kick: "d-kick.mp3", stick: "d-stick.mp3", crash: "d-crash.mp3" },
                              baseUrl: SAMPLE_BASE }).connect(master);
     kit.volume.value = -12;
+    return Tone.loaded();
+  }
+  function buildStudio(man, master) {                      // piano a touch left, drums a touch right, bass in the middle, all in one small room
+    var room = new Tone.Reverb({ decay: 1.6, preDelay: 0.012 }); room.wet.value = 1;
+    var roomOut = new Tone.Gain(0.9).connect(master); room.connect(roomOut);
+    function bus(db, pan, send) {
+      var g = new Tone.Gain(Tone.dbToGain(db)), pn = new Tone.Panner(pan).connect(master), sd = new Tone.Gain(send).connect(room);
+      g.connect(pn); g.connect(sd); return g;
+    }
+    var S = { piano: man.piano, bass: man.bass, drums: man.drums, pOut: bus(0, -0.14, 0.2), bOut: bus(4, 0, 0.04), dOut: bus(9, 0.14, 0.16) };
+    return Promise.all([room.ready, sndLoad(sndFiles(man, 1))]).then(function () {
+      if (!sndBuf["p-60-2"] && !sndBuf["p-57-2"]) throw new Error("no sounds");
+      SND = S;
+      var c = $("snd-credit");
+      if (c && man.credits) { c.hidden = false; c.textContent = "Sounds: " + man.credits.map(function (x) { return x.name + " (" + x.by + ", " + x.licence + ")"; }).join(" · "); }
+      sndLoad(sndFiles(man, 2));                            // the softer and louder layers, in the background
+    });
+  }
+  function buildInstruments() {
+    var limiter = new Tone.Limiter(-3).toDestination();            // keeps phone speakers from distorting
+    var master = new Tone.Compressor(-18, 3).connect(limiter);
     if (STYLE === "drone") drone = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "triangle" }, envelope: { attack: 0.18, decay: 0.2, sustain: 0.9, release: 0.7 }, volume: -15 }).connect(master);
+    if (window.SOUND_CLASSIC || !(window.SOUND_SOURCES || []).length) return buildClassic(master);
+    return sndFetch("manifest.json", true).then(function (man) { return buildStudio(man, master); }).catch(function () { SND = null; return buildClassic(master); });
   }
   function at(tick, fn) { ids.push(Tone.Transport.schedule(function (time) { if (tick >= state.start) fn(time); }, tick + "i")); }
-  function hit(name, time, db) { var p = kit.player(name); p.volume.value = db || 0; p.start(time); }
   // Piano comping: four-note rootless voicings (3-5-7-9 or 7-9-3-5, with the 13th on dominants), voice-led so the
   // hand moves as little as possible, kept between E3 and E5 so it never gets muddy, in Charleston-style rhythms.
   var VOICE = { "Mixolydian": [2, 5, 6, 1], "Phrygian dominant": [2, 5, 6, 1], "Melodic minor": [2, 4, 5, 1], "Locrian": [2, 4, 6, 0] };
@@ -1224,7 +1339,7 @@ function aamBoot(TUNE) {
     if (STYLE !== "swing") {                                   // a click on every beat (louder on beat 1), and for "drone" the root and fifth of each chord
       for (var kb = 0; kb < NB; kb++) {
         (function (b0, bar) {
-          [0, 1, 2, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums) hit("stick", time, bt === 0 ? 2 : -7); }); });
+          [0, 1, 2, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums) drm("stick", time, bt === 0 ? 0.9 : 0.5, bt === 0 ? 2 : -7); }); });
           if (STYLE !== "drone") return;
           var beat = 0;
           bar.forEach(function (c) {
@@ -1235,29 +1350,43 @@ function aamBoot(TUNE) {
         })((kb + LEAD) * BAR, TUNE.bars[kb]);
       }
     }
-    if (STYLE === "swing") walkingBass().forEach(function (e) {
-      at((e.bar + LEAD) * BAR + e.beat * PPQ, function (time) { if (state.bass) bass.triggerAttackRelease(midiToNote(e.midi + keyState.key), secPerBeat() * 0.95, time, 0.85); });
+    if (STYLE === "swing") walkingBass().forEach(function (e) {   // a player's touch: 2 and 4 lean in a little, no two notes quite alike
+      at((e.bar + LEAD) * BAR + (e.ghost ? swing(e.beat) : e.beat * PPQ), function (time) {
+        if (!state.bass) return;
+        if (e.ghost) { if (Math.random() < 0.6) bs(e.midi + keyState.key, secPerBeat() * 0.3, time, 0.36 + jit(0.05)); return; }
+        bs(e.midi + keyState.key, secPerBeat() * 0.95, time + Math.random() * 0.006, 0.74 + (e.beat % 2 === 1 ? 0.07 : 0) + jit(0.07));
+      });
     });
     for (var k = 0; k < (STYLE === "swing" ? NB : 0); k++) {
       var b0 = (k + LEAD) * BAR;
-      [[0, -2], [1, 0], [1.5, -6], [2, -2], [3, 0], [3.5, -6]].forEach(function (r) {
-        at(b0 + swing(r[0]), function (time) { if (state.drums) hit("ride", time, r[1]); });
-      });
-      [1, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums) hit("hh", time, -3); }); });
-      [0, 1, 2, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums) hit("kick", time, -16); }); });
+      (function (k) {
+        [[0, 0.56, -2], [1, 0.8, 0], [1.5, 0.42, -6], [2, 0.6, -2], [3, 0.8, 0], [3.5, 0.44, -6]].forEach(function (r) {   // ding, ding-a-ding: 2 and 4 the strongest
+          at(b0 + swing(r[0]), function (time) {
+            if (!state.drums) return;
+            var top = k === 0 && r[0] === 0;                   // the top of the form gets a clear downbeat
+            drm("ride", time + Math.random() * 0.005, top ? 0.92 : r[1] + jit(0.07), r[2]);
+          });
+        });
+        [1, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums) drm("hh", time, 0.72 + jit(0.06), -3); }); });
+        [0, 1, 2, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums) drm("kick", time, 0.34 + jit(0.05), -16); }); });   // feathered: felt more than heard
+        [[3.5, 0.3], [1.5, 0.12]].forEach(function (g) {      // the left hand: an occasional soft snare note
+          at(b0 + swing(g[0]), function (time) { if (state.drums && Math.random() < g[1]) drm("snare", time, 0.3 + jit(0.08), null); });
+        });
+      })(k);
     }
     if (STYLE === "swing") comping().forEach(function (e) {
       at((e.bar + LEAD) * BAR + swing(e.beat), function (time) {
         if (!state.comp) return;
         var d = Math.max(0.15, e.len * secPerBeat());
-        e.notes.forEach(function (n) { piano.triggerAttackRelease(midiToNote(n + keyState.key), d, time, 0.34); });
+        var push = Math.abs(e.beat - Math.round(e.beat)) > 0.1, v = 0.36 + (push ? 0.07 : 0) + jit(0.08);   // off-beat pushes speak a little more
+        e.notes.forEach(function (n, i) { pno(n + keyState.key, d, time + i * 0.005 + Math.random() * 0.004, SND ? v + (i === e.notes.length - 1 ? 0.06 : 0) : 0.34); });
       });
     });
     TUNE.sections.forEach(function (s) {
       [["rh", 0.72], ["lh", 0.5]].forEach(function (h) {
         s[h[0]].forEach(function (e) {
           at(LEAD * BAR + swing(e[0]), function (time) {
-            if (state.demo === s.id) piano.triggerAttackRelease(midiToNote(e[1] + keyState.key), Math.max(0.12, e[2] * secPerBeat() * 0.95), time, h[1]);
+            if (state.demo === s.id) pno(e[1] + keyState.key, Math.max(0.12, e[2] * secPerBeat() * 0.95), time, SND ? h[1] + 0.09 + jit(0.06) : h[1]);
           });
         });
       });
@@ -1299,7 +1428,7 @@ function aamBoot(TUNE) {
     state.start = ls; state.pass = 1; armEnd(); keyAtStart = keyState.key; armCycle();
     var from = state.countin ? ls - LEAD * BAR : ls;
     if (state.countin) {   // side-stick count-in: two on bar 1, four on bar 2
-      [0, 2, 4, 5, 6, 7].forEach(function (bt) { oneShots.push(T.schedule(function (time) { hit("stick", time, 9); }, (from + bt * PPQ) + "i")); });
+      [0, 2, 4, 5, 6, 7].forEach(function (bt) { oneShots.push(T.schedule(function (time) { drm("stick", time, 0.8, 9); }, (from + bt * PPQ) + "i")); });
     }
     T.ticks = Math.max(0, from);
     if (from < 0) { state.start = 0; }
@@ -1351,8 +1480,7 @@ function aamBoot(TUNE) {
       if (!state.loaded) {
         $("now-where").textContent = "Loading sounds…"; flash("Loading sounds…");
         Tone.Transport.PPQ = PPQ;
-        buildInstruments();
-        return Tone.loaded().then(function () { state.loaded = true; scheduleMusic(); });
+        return buildInstruments().then(function () { state.loaded = true; scheduleMusic(); });
       }
     }).then(function () {
       setTempo(state.tempo); applyRange(null);
