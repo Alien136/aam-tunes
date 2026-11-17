@@ -1366,7 +1366,10 @@ function aamLibrary() {
     function next() {
       if (i >= mirrors.length) return Promise.reject(new Error("unreachable"));
       var url = mirrors[i++] + path;
-      return fetch(url, { cache: "no-cache" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).catch(next);
+      var ctl = window.AbortController ? new AbortController() : null, timer = setTimeout(function () { if (ctl) ctl.abort(); }, 7000);   // a stalled address gives up, so the next gets a turn
+      return fetch(url, ctl ? { cache: "no-cache", signal: ctl.signal } : { cache: "no-cache" })
+        .then(function (r) { clearTimeout(timer); if (!r.ok) throw new Error(r.status); return r.json(); })
+        .catch(function (e) { clearTimeout(timer); return next(); });
     }
     return next();
   }
@@ -1395,10 +1398,12 @@ function aamLibrary() {
   }
   function check(code) {                                 // -> "all", a PDF, or null
     if (!norm(code)) return Promise.resolve(null);
-    return ready.then(function () { return CAT.pdfs.length ? null : (ready = loadSources()); })   // wait for the tune list; if it never arrived, try once more
-      .then(function () { return hash(code); }).then(function (h) {
-      if (CAT.master && h === CAT.master) return "all";
-      return CAT.pdfs.filter(function (p) { return p.hash === h; })[0] || null;
+    var find = function (h) { return CAT.master && h === CAT.master ? "all" : CAT.pdfs.filter(function (p) { return p.hash === h; })[0] || null; };
+    return hash(code).then(function (h) {
+      var now = find(h);
+      if (now) return now;                                // already known: no need to wait
+      return ready.then(function () { return CAT.pdfs.length ? null : (ready = loadSources()); })   // wait for the tune list; if it never arrived, try once more
+        .then(function () { return find(h); });
     });
   }
   function grant(r) {
@@ -1409,7 +1414,9 @@ function aamLibrary() {
   var myPdfs = function () { return CAT.pdfs.filter(function (p) { return lib.all || lib.pdfs.indexOf(p.id) >= 0; }); };
   var pdfOf = function (slug) { return CAT.pdfs.filter(function (p) { return p.tunes.indexOf(slug) >= 0; })[0]; };
   var mine = function (slug) { return !!CAT.tunes[slug] && myPdfs().some(function (p) { return p.tunes.indexOf(slug) >= 0; }); };
-  var go = function (slug) { location.href = location.pathname + "?tune=" + encodeURIComponent(slug); };
+  var sessionCode = "", canStore = (function () { try { localStorage.setItem("aam-t", "1"); localStorage.removeItem("aam-t"); return true; } catch (e) { return false; } })();
+  var urlFor = function (slug) { return location.pathname + "?tune=" + encodeURIComponent(slug) + (!canStore && sessionCode ? "&c=" + sessionCode : ""); };   // no storage: the code rides along
+  var go = function (slug) { location.href = urlFor(slug); };
 
   function menu(current) {
     $("lib").hidden = false;
@@ -1436,10 +1443,11 @@ function aamLibrary() {
   function codeForm(form, input, err, onOk) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
+      err.textContent = "Checking…";
       check(input.value).then(function (r) {
         if (!r) { err.textContent = CAT.pdfs.length ? "That code didn't match. Check page 1 of your PDF, or ask Alex." : "Couldn't reach the tune library. Check your internet connection and try again."; input.select(); return; }
-        grant(r); onOk(r);
-      });
+        err.textContent = ""; sessionCode = norm(input.value); grant(r); onOk(r);
+      }).catch(function (e2) { err.textContent = "Something went wrong (" + ((e2 && e2.message) || e2) + "). Reload the page and try again."; });
     });
   }
   codeForm($("add-form"), $("add-code"), $("add-err"), function (r) { go(r === "all" ? CAT.pdfs[0].tunes[0] : r.tunes[0]); });
@@ -1473,23 +1481,27 @@ function aamLibrary() {
     lib.last = slug; save(); menu(slug); contents(slug);
     var t = CAT.tunes[slug];
     if (t.bars) { aamBoot(t); return; }
-    getJSON(t._src, "tunes/" + t._file + ".json").then(function (full) { CAT.tunes[slug] = full; aamBoot(full); })
-      .catch(function () {
+    getJSON(t._src, "tunes/" + t._file + ".json").then(function (full) {
+      CAT.tunes[slug] = full;
+      try { aamBoot(full); } catch (e) { $("gate").hidden = false; $("err").textContent = "The player hit a problem opening this tune (" + ((e && e.message) || e) + "). Tell Alex."; }
+    }, function () {
         $("gate-h").textContent = "Couldn't load " + t.title;
         $("gate-p").textContent = "Check your internet connection and reload the page. If it keeps happening, tell Alex.";
         $("gate-form").hidden = true; $("gate").hidden = false;
       });
   }
+  var gateSlug = null;
+  codeForm($("gate-form"), $("pw"), $("err"), function (r) {   // wired up straight away, so the Open button always works
+    var slug = gateSlug;
+    var want = slug && mine(slug) ? slug : r === "all" ? (slug && CAT.tunes[slug] ? slug : CAT.pdfs[0].tunes[0]) : r.tunes[0];
+    try { history.replaceState(null, "", urlFor(want)); } catch (e) {}
+    start(want);
+  });
   function gate(slug) {
+    gateSlug = slug;
     var p = slug && pdfOf(slug);
     if (p) { $("gate-h").textContent = "Enter the code for " + p.title; $("gate-p").textContent = "It's printed under the QR code on page 1 of your PDF."; }
     if (myPdfs().length) menu(null);
-    codeForm($("gate-form"), $("pw"), $("err"), function (r) {
-      $("err").textContent = "";
-      var want = slug && mine(slug) ? slug : r === "all" ? (slug && CAT.tunes[slug] ? slug : CAT.pdfs[0].tunes[0]) : r.tunes[0];
-      history.replaceState(null, "", location.pathname + "?tune=" + encodeURIComponent(want));
-      start(want);
-    });
   }
 
   ready = loadSources();
@@ -1498,9 +1510,10 @@ function aamLibrary() {
     if (r) grant(r);
     if (!want && r && r !== "all") want = r.tunes[0];
     if (!want) want = lib.last && mine(lib.last) ? lib.last : (myPdfs()[0] || {}).tunes ? myPdfs()[0].tunes[0] : null;
-    if (code) history.replaceState(null, "", location.pathname + (want ? "?tune=" + encodeURIComponent(want) : ""));   // the code doesn't stay in the address bar
+    if (code && r) sessionCode = norm(code);
+    if (code && canStore) { try { history.replaceState(null, "", location.pathname + (want ? "?tune=" + encodeURIComponent(want) : "")); } catch (e) {} }   // the code doesn't stay in the address bar
     if (want && mine(want)) start(want); else gate(want);
-  });
+  }).catch(function (e) { $("err").textContent = "Something went wrong opening the player (" + ((e && e.message) || e) + "). Reload the page and try again."; });
 }
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", aamLibrary); else aamLibrary();
 </script>
