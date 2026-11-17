@@ -1,0 +1,257 @@
+{
+ "title": "F Blues",
+ "concert_key": "F",
+ "instrument": "alto",
+ "tempo_text": "Medium Swing",
+ "blues": true,
+ "bars": [
+  [
+   "F7"
+  ],
+  [
+   "Bb7"
+  ],
+  [
+   "F7"
+  ],
+  [
+   "Cm7",
+   "F7"
+  ],
+  [
+   "Bb7"
+  ],
+  [
+   "Bb7"
+  ],
+  [
+   "F7"
+  ],
+  [
+   "Am7",
+   "D7"
+  ],
+  [
+   "Gm7"
+  ],
+  [
+   "C7"
+  ],
+  [
+   "F7",
+   "D7"
+  ],
+  [
+   "Gm7",
+   "C7"
+  ]
+ ],
+ "original_tune": {
+  "similar_tune": "Now's the Time",
+  "why": "It is a 12-bar blues in the same key."
+ },
+ "listen_explainer": "This sheet is a 12-bar blues in concert F (your D), the most common blues key in jazz. Charlie Parker's \"Now's the Time\" is a blues in the same key, so these are recordings of it. Find them on YouTube, Spotify, Apple Music or any streaming service: search the artist's name plus \"Now's the Time\". Listen through once just for the feel, then play the Section 1 arpeggios along with the recording.",
+ "recordings": [
+  {
+   "artist": "Charlie Parker",
+   "album": "The Complete Savoy & Dial Master Takes",
+   "year": 1945,
+   "note": "The original, and the most famous alto blues on record. Listen to how relaxed and bluesy Bird sounds, and how his lines land on chord tones."
+  },
+  {
+   "artist": "Charlie Parker",
+   "album": "Now's the Time: The Quartet of Charlie Parker",
+   "year": 1953,
+   "note": "Bird again eight years later, with just a rhythm section. Compare it with the first version: faster, cleaner, same blues."
+  },
+  {
+   "artist": "Sonny Stitt",
+   "album": "Stitt Plays Bird",
+   "year": 1964,
+   "note": "A clear, strong alto sound. Listen for how every phrase outlines the chord it is over, like your arpeggios."
+  },
+  {
+   "artist": "Vi Redd",
+   "album": "Bird Call",
+   "year": 1962,
+   "note": "A warm, blues-soaked alto. Notice how much she says with simple ideas and space."
+  },
+  {
+   "artist": "Sonny Rollins",
+   "album": "Now's the Time!",
+   "year": 1964,
+   "note": "Tenor sax, not alto. Hear how he plays with the rhythm of one small idea across the whole chorus."
+  }
+ ],
+ "_pattern_mode": true,
+ "fill_pages": true,
+ "s3_mode": "pattern",
+ "lick_chorus_choruses": 2,
+ "target_pages": 4,
+ "licks_intro": "A ii-V-I (two-five-one) is the most common chord move in jazz, and the blues has it in two places: bar 4 (into the IV chord) and the turnaround at the end. Each lick lands on the 3rd of the chord it resolves to. Orange notes are the lick. Licks 1 and 2 are short (one bar); Lick 3 is the long turnaround over bars 9 and 10.",
+ "licks": [
+  {
+   "id": "L1Bb",
+   "label": "Lick 1 in {key}",
+   "bars": [
+    [
+     "Cm7",
+     "F7"
+    ],
+    [
+     "Bb7"
+    ]
+   ],
+   "rh": "ees''8 d'' c'' bes' a' c'' f'' ees''",
+   "res": "d''2"
+  },
+  {
+   "id": "L1F",
+   "label": "Lick 1 in {key}",
+   "bars": [
+    [
+     "Gm7",
+     "C7"
+    ],
+    [
+     "F7"
+    ]
+   ],
+   "rh": "bes'8 a' g' f' e' g' c'' bes'",
+   "res": "a'2"
+  },
+  {
+   "id": "L2Bb",
+   "label": "Lick 2 in {key}",
+   "bars": [
+    [
+     "Cm7",
+     "F7"
+    ],
+    [
+     "Bb7"
+    ]
+   ],
+   "rh": "c'8 ees' g' bes' a' ges' f' ees'",
+   "res": "d'2"
+  },
+  {
+   "id": "L2F",
+   "label": "Lick 2 in {key}",
+   "bars": [
+    [
+     "Gm7",
+     "C7"
+    ],
+    [
+     "F7"
+    ]
+   ],
+   "rh": "g'8 bes' d'' f'' e'' des'' c'' bes'",
+   "res": "a'2"
+  },
+  {
+   "id": "L3F",
+   "label": "Lick 3 in {key}",
+   "bars": [
+    [
+     "Gm7"
+    ],
+    [
+     "C7"
+    ],
+    [
+     "F7"
+    ]
+   ],
+   "rh": [
+    "g'8 bes' d'' f'' a''4 g''8 f''",
+    "e''8 d'' c'' bes' a' aes' g' bes'"
+   ],
+   "res": "a'2"
+  }
+ ],
+ "lick_groups": [
+  {
+   "title": "Lick 1 · Step down",
+   "items": [
+    "L1Bb",
+    "L1F"
+   ],
+   "note": "walk down the scale from the 3rd of the ii chord, then jump up through the V chord and fall onto the 3rd of the next chord. Use it in bar 4 (into the IV chord) and bar 12 (back to the top)."
+  },
+  {
+   "title": "Lick 2 · Arpeggio up, ♭9 down",
+   "items": [
+    "L2Bb",
+    "L2F"
+   ],
+   "note": "climb the ii chord 1-3-5-7, then come down the V chord through its ♭9, the spicy note that pulls into the next chord. Use it in bars 4 and 12."
+  },
+  {
+   "title": "Lick 3 · The long turnaround",
+   "items": [
+    "L3F"
+   ],
+   "note": "two bars, one chord each: climb the ii chord in bar 9 and hold the top, then run down the V chord in bar 10 and land on the 3rd of the I chord in bar 11."
+  }
+ ],
+ "licks_practice": [
+  [
+   "Sing it",
+   "sing the lick before you play it, so your ear knows where it is going."
+  ],
+  [
+   "Slow and clean",
+   "finger it silently, then play it slowly with long-short eighth notes."
+  ],
+  [
+   "Land on the 3rd",
+   "the last note is the 3rd of the next chord. Hold it with a full sound."
+  ],
+  [
+   "Drop it in",
+   "play the blues with arpeggios and put the lick in its bar every chorus."
+  ],
+  [
+   "Make it yours",
+   "change one or two notes, or the rhythm, and it becomes your own lick."
+  ]
+ ],
+ "lick_chorus": [
+  {
+   "bar": 4,
+   "lick": "L1Bb"
+  },
+  {
+   "bar": 9,
+   "lick": "L3F"
+  },
+  {
+   "bar": 12,
+   "lick": "L1F"
+  },
+  {
+   "bar": 16,
+   "lick": "L2Bb"
+  },
+  {
+   "bar": 21,
+   "lick": "L3F"
+  },
+  {
+   "bar": 24,
+   "lick": "L2F"
+  }
+ ],
+ "lick_chorus_note": "Two choruses with everything put together. Each chorus has short licks in bars 4 and 12 and the long turnaround lick in bars 9-10 (orange); the other bars swap between arpeggios, scales and patterns. Each bar is labelled.",
+ "practice_tip": "play Section 1 until the chord tones are automatic, then Section 3. Learn one lick at a time, play the Lick Chorus slowly, then write your own line here, aiming for a chord tone on beats 1 and 3.",
+ "text_size": 11.5,
+ "s2_text_size": 11.5,
+ "staff_size": 17.5,
+ "s4_staff_size": 23,
+ "licks_text_size": 12,
+ "listen_after_s3": true,
+ "s1_staff_size": 21,
+ "s3_staff_size": 21
+}
