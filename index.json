@@ -225,6 +225,14 @@
      ]
     }
    ]
+  },
+  {
+   "id": "fly-me-to-the-moon-piano",
+   "title": "Fly Me to the Moon · Piano",
+   "hash": "ea25ad679f59bfbad58e24c2a8ea28cbcd1dde76b140ae873087d6f9b1025e2d",
+   "tunes": [
+    "fly-me-to-the-moon-piano"
+   ]
   }
  ],
  "tunes": {
@@ -415,6 +423,10 @@
   "sax-welcome-tenor-lick-1-keys": {
    "title": "Transposing a Lick · Lick 1 through the keys",
    "subtitle": "Saxophone Welcome Booklet · Tenor · Part 7 · ii–V–I Licks"
+  },
+  "fly-me-to-the-moon-piano": {
+   "title": "Fly Me to the Moon",
+   "subtitle": "32 bars · Piano · arpeggios, scales, ii–V–I licks"
   }
  }
 }
