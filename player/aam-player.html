@@ -213,7 +213,12 @@
   #aam-play .score > div { position: relative; }
   #aam-play .score .snap { position: absolute; left: 0; width: 1px; height: 1px; scroll-snap-align: start; }
   /* only whole lines of music show: a white cover hides any line that would be cut off at the bottom */
-  #aam-play .snd-credit { margin: 14px 2px 2px; font: 400 11px/1.45 var(--body); color: var(--muted, #667); }
+  #aam-play .mix { display: grid; gap: 12px; width: 100%; }
+#aam-play .mix label { display: flex; align-items: center; gap: 12px; font: 500 14px var(--body); }
+#aam-play .mix label span { flex: 0 0 104px; }
+#aam-play .mix label[hidden] { display: none; }
+#aam-play .mix-reset { justify-self: start; font: 600 13px var(--body); color: var(--accent-text); padding: 4px 0; }
+#aam-play .snd-credit { margin: 14px 2px 2px; font: 400 11px/1.45 var(--body); color: var(--muted, #667); }
 #aam-play .score-mask { position: absolute; z-index: 2; background: #fff; pointer-events: none; border-radius: 0 0 7px 7px; }
   #aam-play .score-mask[hidden] { display: none; }
   #aam-play.is-open .key { flex: none; height: 30px; overflow: hidden; align-content: flex-start; font-size: 11px; line-height: 14px; gap: 2px 10px; }   /* fixed height: the music box is the same size on every tab */
@@ -379,6 +384,17 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
           <input type="range" data-r="tempo" min="40" max="240" step="1" aria-label="Tempo">
           <button class="step" data-r="faster" aria-label="Faster by 5">+</button>
           <span class="bpm" data-r="bpm"></span>
+        </div>
+      </div>
+
+      <div class="row" data-r="row-mix">
+        <span class="lbl">Mix</span>
+        <div class="mix">
+          <label data-mixrow="bass"><span data-r="mix-bass-l">Bass</span><input type="range" min="-12" max="6" step="1" value="0" data-mix="bass" aria-label="Bass level"></label>
+          <label data-mixrow="drums"><span data-r="mix-drums-l">Drums</span><input type="range" min="-12" max="6" step="1" value="0" data-mix="drums" aria-label="Drums level"></label>
+          <label data-mixrow="comp"><span>Piano chords</span><input type="range" min="-12" max="6" step="1" value="0" data-mix="comp" aria-label="Piano chords level"></label>
+          <label data-mixrow="lead"><span>Written part</span><input type="range" min="-12" max="6" step="1" value="0" data-mix="lead" aria-label="Written part level"></label>
+          <button class="mix-reset" data-r="mix-reset">Reset levels</button>
         </div>
       </div>
 
@@ -1293,6 +1309,34 @@ function aamBoot(TUNE) {
       sndLoad(sndFiles(man, 2));                            // the softer and louder layers, in the background
     });
   }
+  // Mix: each instrument's level, in dB either side of the balance the band ships with. Remembered on this device.
+  var mix = { bass: 0, drums: 0, comp: 0, lead: 0 };
+  try { var mv = JSON.parse(localStorage.getItem("aam-mix") || "{}"); Object.keys(mix).forEach(function (k) { if (typeof mv[k] === "number") mix[k] = Math.max(-12, Math.min(6, mv[k])); }); } catch (e) {}
+  function mixGain(k) { return Math.pow(10, mix[k] / 20); }
+  function applyMix() {
+    if (!window.Tone) return;
+    if (SND) { SND.bOut.gain.value = Tone.dbToGain(4 + mix.bass); SND.dOut.gain.value = Tone.dbToGain(9 + mix.drums); }
+    else { if (bass) bass.volume.value = -4 + mix.bass; if (kit) kit.volume.value = -12 + mix.drums; if (piano) piano.volume.value = -8 + mix.comp; }
+    if (drone) drone.volume.value = -15 + mix.bass;
+  }
+  function mixFill(el) { el.style.setProperty("--p", ((+el.value + 12) / 18 * 100) + "%"); }
+  [].slice.call(root.querySelectorAll("[data-mix]")).forEach(function (el) {
+    el.value = mix[el.getAttribute("data-mix")]; mixFill(el);
+    el.addEventListener("input", function () {
+      mix[el.getAttribute("data-mix")] = +el.value; mixFill(el); applyMix();
+      try { localStorage.setItem("aam-mix", JSON.stringify(mix)); } catch (e) {}
+    });
+  });
+  $("mix-reset").onclick = function () {
+    Object.keys(mix).forEach(function (k) { mix[k] = 0; });
+    [].slice.call(root.querySelectorAll("[data-mix]")).forEach(function (el) { el.value = 0; mixFill(el); });
+    applyMix(); try { localStorage.removeItem("aam-mix"); } catch (e) {}
+  };
+  if (STYLE !== "swing") {                                     // exercises: a click, and perhaps a drone
+    $("mix-drums-l").textContent = "Click"; $("mix-bass-l").textContent = "Drone";
+    root.querySelector('[data-mixrow="comp"]').hidden = true;
+    if (STYLE !== "drone") root.querySelector('[data-mixrow="bass"]').hidden = true;
+  }
   function buildInstruments() {
     var limiter = new Tone.Limiter(-3).toDestination();            // keeps phone speakers from distorting
     var master = new Tone.Compressor(-18, 3).connect(limiter);
@@ -1379,14 +1423,14 @@ function aamBoot(TUNE) {
         if (!state.comp) return;
         var d = Math.max(0.15, e.len * secPerBeat());
         var push = Math.abs(e.beat - Math.round(e.beat)) > 0.1, v = 0.36 + (push ? 0.07 : 0) + jit(0.08);   // off-beat pushes speak a little more
-        e.notes.forEach(function (n, i) { pno(n + keyState.key, d, time + i * 0.005 + Math.random() * 0.004, SND ? v + (i === e.notes.length - 1 ? 0.06 : 0) : 0.34); });
+        e.notes.forEach(function (n, i) { pno(n + keyState.key, d, time + i * 0.005 + Math.random() * 0.004, SND ? v + (i === e.notes.length - 1 ? 0.06 : 0) : 0.34, mixGain("comp")); });
       });
     });
     TUNE.sections.forEach(function (s) {
       [["rh", 0.72], ["lh", 0.5]].forEach(function (h) {
         s[h[0]].forEach(function (e) {
           at(LEAD * BAR + swing(e[0]), function (time) {
-            if (state.demo === s.id) pno(e[1] + keyState.key, Math.max(0.12, e[2] * secPerBeat() * 0.95), time, SND ? h[1] + 0.09 + jit(0.06) : h[1], 1.4);   // the written part sits in front of the band
+            if (state.demo === s.id) pno(e[1] + keyState.key, Math.max(0.12, e[2] * secPerBeat() * 0.95), time, SND ? h[1] + 0.09 + jit(0.06) : h[1], 1.4 * mixGain("lead"));   // the written part sits in front of the band
           });
         });
       });
@@ -1480,7 +1524,7 @@ function aamBoot(TUNE) {
       if (!state.loaded) {
         $("now-where").textContent = "Loading sounds…"; flash("Loading sounds…");
         Tone.Transport.PPQ = PPQ;
-        return buildInstruments().then(function () { state.loaded = true; scheduleMusic(); });
+        return buildInstruments().then(function () { state.loaded = true; applyMix(); scheduleMusic(); });
       }
     }).then(function () {
       setTempo(state.tempo); applyRange(null);
@@ -1513,7 +1557,7 @@ function aamBoot(TUNE) {
 
   // ---------- phones: move tempo, band, loop and tips into the settings sheet; mirror play and tempo in the bottom bar
   var mq = window.matchMedia("(min-width: 0px)");   // the app layout on every screen (was phones only)
-  var movable = ["row-tempo", "row-band", "row-loop", "hint", "tips"].map(function (r) {
+  var movable = ["row-tempo", "row-band", "row-mix", "row-loop", "hint", "tips"].map(function (r) {
     var el = $(r), mark = document.createComment(r); el.parentNode.insertBefore(mark, el); return [el, mark];
   });
   function openSheet(on) { $("sheet").classList.toggle("open", on); $("backdrop").classList.toggle("open", on); }
