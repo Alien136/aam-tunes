@@ -393,7 +393,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
           <label data-mixrow="bass"><span data-r="mix-bass-l">Bass</span><input type="range" min="-12" max="6" step="1" value="0" data-mix="bass" aria-label="Bass level"></label>
           <label data-mixrow="drums"><span data-r="mix-drums-l">Drums</span><input type="range" min="-12" max="6" step="1" value="0" data-mix="drums" aria-label="Drums level"></label>
           <label data-mixrow="comp"><span>Piano chords</span><input type="range" min="-12" max="6" step="1" value="0" data-mix="comp" aria-label="Piano chords level"></label>
-          <label data-mixrow="lead"><span>Written part</span><input type="range" min="-12" max="6" step="1" value="0" data-mix="lead" aria-label="Written part level"></label>
+          <label data-mixrow="lead"><span>Written piano</span><input type="range" min="-12" max="6" step="1" value="0" data-mix="lead" aria-label="Written piano level"></label>
           <button class="mix-reset" data-r="mix-reset">Reset levels</button>
         </div>
       </div>
@@ -1269,7 +1269,7 @@ function aamBoot(TUNE) {
   }
   var DCUT = { ride: [0.45, 0.75], hh: [0.55], kick: [0.5], snare: [0.35, 0.6], stick: [0.4, 0.62, 0.85] };
   var DMID = { ride: [0.3, 0.6, 0.9], hh: [0.4, 0.75], kick: [0.35, 0.65], snare: [0.25, 0.47, 0.7], stick: [0.3, 0.5, 0.73, 0.95] };
-  var DGAIN = { ride: 1, hh: 0.9, kick: 0.5, snare: 0.8, stick: 0.8 };
+  var DGAIN = { ride: 0.32, hh: 0.36, kick: 0.3, snare: 0.36, stick: 0.8 };   // cymbals well under the band (set by ear, Nov 2026); the click keeps its level
   function sndDrum(name, time, vel) {
     var D = SND.drums[name], tk = sndTake("d-" + name, D.layers, D.rr, vel, DCUT[name]);
     if (!tk) return;
