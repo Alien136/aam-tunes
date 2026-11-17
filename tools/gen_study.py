@@ -209,6 +209,12 @@ def shell_voicings(flat):
         prev = best
 
 
+LH_SHORT = {  # the left-hand line of the Section 1 note (one line)
+    "guide": "guide tones, the 3rd and 7th. They hold or move a half step.",
+    "root7": "the root and 7th. The right hand has the 3rd.",
+}
+GUIDE_RGB = "(rgb-color 0.05 0.47 0.73)"   # Your Chorus guide-tone line and the ii-V-I lesson (blue; licks are orange)
+
 LH_TEXT = {
     "guide": "Left hand: guide tones, the 3rd and 7th of each chord (the two notes that make it major, minor or dominant), held through the chord. They move by a half step or stay put from chord to chord. The bass player covers the root.",
     "root7": "Left hand: the root and 7th of each chord, held through the chord. The right hand supplies the 3rd.",
@@ -303,6 +309,103 @@ def ly_mean_midi(music):
     return sum(vals) / len(vals)
 
 
+def ii_v_i_lesson(kroot, minor, key_ly):
+    """'How the changes connect': the ii-V-I of the home key as two guide-tone voices (written pitch).
+    Upper voice 7 -> 3 -> 1: the ii's 7th falls to the V's 3rd, which climbs a half step to the root of I.
+    Lower voice 3 -> 7 -> 3: the ii's 3rd holds as the V's 7th, which falls a step to the 3rd of I."""
+    t = place_root(kroot)
+    ii, v = spell_degree(t, 2, 0), spell_degree(t, 5, 0)
+    if minor:
+        ii_alt, ii_sym, i_sym, i3 = SCALES["Locrian"][0], ":m7.5-", ":m6", -1
+    else:
+        ii_alt, ii_sym, i_sym, i3 = SCALES["Dorian"][0], ":m7", ":maj7", 0
+    dom = SCALES["Mixolydian"][0]
+    up = [spell_degree(ii, 7, ii_alt[6]), spell_degree(v, 3, dom[2]), Note(t.letter, t.acc, t.octave)]
+    lo = [spell_degree(ii, 3, ii_alt[2]), spell_degree(v, 7, dom[6]), spell_degree(t, 3, i3)]
+
+    def near(n, ref):
+        n = Note(n.letter, n.acc, n.octave)
+        while n.midi - ref > 6:
+            n.octave -= 1
+        while ref - n.midi > 6:
+            n.octave += 1
+        return n
+    u0 = Note(up[0].letter, up[0].acc, up[0].octave)
+    while u0.midi < 67:
+        u0.octave += 1
+    while u0.midi > 77:
+        u0.octave -= 1
+    ups = [u0]
+    for n in up[1:]:
+        ups.append(near(n, ups[-1].midi))
+    los = [near(lo[0], u0.midi - 5)]
+    for n in lo[1:]:
+        los.append(near(n, los[-1].midi))
+    for a, b in zip(ups, los):
+        while b.midi >= a.midi:
+            b.octave -= 1
+    lab = lambda txt, d: d + '\\markup \\abs-fontsize #9 \\bold \\with-color #' + GUIDE_RGB + ' "' + txt + '"'
+    upper = " ".join(n.ly() + "1" + lab(x, "^") for n, x in zip(ups, ["7", "3", "1"]))
+    lower = " ".join(n.ly() + "1" + lab(x, "_") for n, x in zip(los, ["3", "7", "3"]))
+    bare = lambda n: n.ly().rstrip("',")
+    chords = bare(ii) + "1" + ii_sym + " " + bare(v) + "1:7 " + bare(t) + "1" + i_sym
+    return ("\\score {\n  << \\new ChordNames \\chordmode { " + chords + " }\n"
+            "     \\new Staff { \\clef treble \\key " + key_ly + " \\omit Staff.TimeSignature \\override NoteHead.color = #" + GUIDE_RGB + "\n"
+            "       << { \\voiceOne " + upper + ' \\bar "||" } \\\\ { \\voiceTwo ' + lower + " } >> } >>\n"
+            "  \\layout { #(layout-set-staff-size 20) indent = 0 ragged-right = ##f \\context { \\Score \\omit BarNumber } }\n}")
+
+
+def guide_line(bars):
+    """Your Chorus guide-tone line: one note on beat 1 and one on beat 4 of every bar; the rest stays empty for the student.
+    Each change from beat 4 into beat 1 moves by voice leading: the 7th falls a step to the next chord's 3rd, or, on a V-I,
+    the 3rd climbs a half step to the root. Returns per-bar LilyPond (written pitch) with the degree printed above each note."""
+    def tones(c):
+        alters, ct = SCALES[c["scale"]]
+        r = c["root"]
+        return {"3": spell_degree(r, ct[1], alters[ct[1] - 1]), "7": spell_degree(r, ct[3], alters[ct[3] - 1]), "1": r}
+
+    def place(n, ref, lo=62, hi=77):
+        best = None
+        for o in range(2, 7):
+            m = Note(n.letter, n.acc, o)
+            if lo <= m.midi <= hi and (best is None or abs(m.midi - ref) < abs(best.midi - ref)):
+                best = m
+        return best
+
+    n = len(bars)
+    arrive, depart = [None] * n, [None] * n   # (note, degree) on beat 1 / beat 4 of each bar
+    for i in range(n):
+        A, B = bars[i][-1], bars[(i + 1) % n][0]
+        ta, tb = tones(A), tones(B)
+        v_i = A["kind"] == "dom7" and (B["root"].pc - A["root"].pc) % 12 == 5
+        here = arrive[i][0].midi if arrive[i] else 70
+        best = None
+        for da in ("3", "7"):
+            a = place(ta[da], here)
+            for db in ("3", "7") + (("1",) if v_i else ()):
+                b = place(tb[db], a.midi)
+                d = b.midi - a.midi
+                if da == "7" and db == "3" and d in (-1, -2):
+                    cost = 0            # 7 falls a step to the next 3rd
+                elif da == "3" and db == "1" and d == 1:
+                    cost = 0.05         # V-I: the 3rd climbs a half step to the root
+                elif d == 0:
+                    cost = 1.0          # common tone: allowed, but the lesson is the step
+                else:
+                    cost = 1 + 0.3 * abs(d)
+                cost += 0.05 * abs(a.midi - here)   # a leap inside the bar is fine
+                if best is None or cost < best[0]:
+                    best = (cost, (a, da), (b, db))
+        depart[i] = best[1]
+        arrive[(i + 1) % n] = best[2]
+    lab = lambda txt: '^\\markup \\abs-fontsize #8 \\bold \\with-color #' + GUIDE_RGB + ' "' + txt + '"'
+    out = []
+    for i in range(n):
+        (a1, l1), (a4, l4) = arrive[i], depart[i]
+        out.append("\\guideOn " + a1.ly() + "4" + lab(l1) + " s2 " + a4.ly() + "4" + lab(l4) + " \\guideOff |")
+    return out
+
+
 def build_licks(spec, bars, arp_c, sc_c, chord_ly, music, lines, marked, steps, semis, kroot, minor, section,
                 piano=True, lh=None, nums=("4", "5")):
     """ii-V-I licks in the tune's keys, then a Lick Chorus mixing arpeggios, scales/patterns and licks.
@@ -363,6 +466,13 @@ def build_licks(spec, bars, arp_c, sc_c, chord_ly, music, lines, marked, steps, 
     common = f"\\clef treble \\key {key_ly} \\time 4/4 {acc}"
     s4_size = spec.get("s4_staff_size") or 17
     out = ["\\pageBreak", section(nums[0], "ii–V–I Licks", spec.get("licks_intro", ""))]
+    if spec.get("voice_leading", True):   # how a ii-V-I connects: 7 -> 3 and 3 -> 1, shown on the home key's ii-V-I
+        rows_vl = [("How the changes connect:", "every chord has two guide tones, its 3rd and 7th."),
+                   ("7 → 3:", "the 7th of each chord falls a step to the 3rd of the next."),
+                   ("3 → 1:", "on the V–I, the 3rd of the V climbs a half step to the root of I."),
+                   ("Listen for it:", "land on these notes at each change and your line spells out the harmony. Lick 1 does exactly this.")]
+        out.append("\\markup \\column { " + " \\vspace #0.1 ".join(ww(b, t) for b, t in rows_vl) + " \\vspace #0.3 }")
+        out.append(ii_v_i_lesson(kroot, minor, key_ly))
     for g in spec["lick_groups"]:
         rows_syms, rh, dyn = [], [], []
         for lid in g["items"]:
@@ -610,12 +720,15 @@ def build(spec):
     tempo = spec.get("tempo_text", "Medium Swing")
 
     def section(num, head, note, pt=None):
+        """Section heading plus a short note: a string, or a list of (bold lead, text) lines, one per line."""
+        rows_ = note if isinstance(note, list) else [("", note)]
+        body = " \\vspace #0.1 ".join(ww(b, t, pt=pt) for b, t in rows_ if b or t)
         return f'''\\markup \\column {{
   \\vspace #1.2
   \\override #'(thickness . 1.5) \\draw-hline
   \\fill-line {{ \\line {{ {heading(f"{num}  {head}", pt)} }} \\null }}
-  \\vspace #0.2
-  {ww("", note, italic=True, pt=pt)}
+  \\vspace #0.25
+  {body}
   \\vspace #0.4
 }}'''
 
@@ -636,23 +749,26 @@ def build(spec):
             return f"\\new Staff {staff_with} {rh}"
         lhm = f"{{ \\clef bass \\key {key_ly} \\time 4/4 {acc_style}\n  {lines(lh_items or lh)}\n  \\bar \"|.\" }}"
         return f"\\new PianoStaff << \\new Staff {staff_with} {rh} \\new Staff {lhm} >>"
+    # Section notes: short, one idea per line (bold lead + a few words)
+    LH_SAME = ("Left hand:", "same as Section 1.")
+    guide = spec.get("yc_guide_tones", True)
+    yc_guide = ("Blue notes:", "guide tones, beat 4 into beat 1. The 7th falls to the next 3rd; on a V–I the 3rd climbs to the root.")
     if piano:
-        s1_note = ("Right hand: every chord from its root, up 1-3-5-7 (quarter notes on one-bar chords, eighths on two-beat chords). "
-                   + LH_TEXT[LH_VOICING])
-        s3_note = "Right hand: each chord's scale from the root up, in time (8 notes on one-bar chords, 4 on two-beat chords). Left hand: the same voicings as Section 1."
+        s1_note = [("Right hand:", "1-3-5-7 of every chord."), ("Left hand:", LH_SHORT[LH_VOICING])]
+        s3_note = [("Right hand:", "each chord's scale from the root, in time."), LH_SAME]
         if pattern_mode:
-            s3_note = PATTERN_TEXT + " Left hand: the same voicings as Section 1."
-        s4_note = "The left hand is written in. Write your own right-hand line: start each chord on a chord tone, then connect with notes from its scale."
+            s3_note = [("Right hand:", "1-2-3-5 on two-beat chords (no repeated notes), the full scale on one-bar chords."), LH_SAME]
+        s4_note = ([yc_guide] if guide else []) + [("Your line:", "fill the empty beats. The left hand is written in.")]
     else:
-        s1_note = "Every chord from its root, up 1-3-5-7. Quarter notes on one-bar chords, eighth notes on two-beat chords."
-        s3_note = "Each chord's scale from the root up, in time: 8 notes on one-bar chords, 4 notes on two-beat chords."
+        s1_note = [("Play:", "1-3-5-7 of every chord. Quarters on one-bar chords, eighths on two-beat chords.")]
+        s3_note = [("Play:", "each chord's scale from the root, in time.")]
         if pattern_mode:
-            s3_note = PATTERN_TEXT
-        s4_note = "Write your own line over the changes: start each chord on a chord tone, then connect with notes from its scale."
+            s3_note = [("Play:", "1-2-3-5 on two-beat chords (no repeated notes), the full scale on one-bar chords.")]
+        s4_note = ([yc_guide] if guide else []) + [("Your line:", "fill the empty beats with chord tones and scale notes, starting from the blue notes.")]
     s3_title = "Pattern Chorus" if pattern_mode else "Scale Chorus"
     if pattern_mode and two_beat_bars * 2 < len(bars):       # e.g. a blues: mostly one-bar chords
         s3_title = "Scale & Pattern Chorus"
-        s3_note = SCALE_PATTERN_TEXT + (" Left hand: the same voicings as Section 1." if piano else "")
+        s3_note = [("Right hand:" if piano else "Play:", "the full scale on one-bar chords, 1-2-3-5 on two-beat chords.")] + ([LH_SAME] if piano else [])
     spec["_pattern_mode"] = pattern_mode
     lick_sections, lick_sections_after, yc_num = "", "", "4"
     if spec.get("licks"):
@@ -699,6 +815,8 @@ def build(spec):
   ragged-bottom = {ragged}
 }}
 lickOn = {{ \\override NoteHead.color = #(rgb-color 0.78 0.42 0.05) \\override Stem.color = #(rgb-color 0.78 0.42 0.05) \\override Beam.color = #(rgb-color 0.78 0.42 0.05) \\override Accidental.color = #(rgb-color 0.78 0.42 0.05) \\override Dots.color = #(rgb-color 0.78 0.42 0.05) }}
+guideOn = {{ \\override NoteHead.color = #{GUIDE_RGB} \\override Stem.color = #{GUIDE_RGB} \\override Accidental.color = #{GUIDE_RGB} }}
+guideOff = {{ \\revert NoteHead.color \\revert Stem.color \\revert Accidental.color }}
 lickOff = {{ \\revert NoteHead.color \\revert Stem.color \\revert Beam.color \\revert Accidental.color \\revert Dots.color }}
 chExceptionMusic = {{ <c es ges bes>1-\\markup {{ "m" \\super "7♭5" }} }}
 \\layout {{ \\context {{ \\Score \\override BarNumber.font-size = #-2 \\override RehearsalMark.self-alignment-X = #LEFT \\override RehearsalMark.break-align-symbols = #'(left-edge) }} \\context {{ \\ChordNames \\override ChordName.font-size = #1.5 majorSevenSymbol = \\markup {{ "maj7" }} chordNameExceptions = #(append (sequential-music-to-chord-exceptions chExceptionMusic #t) ignatzekExceptions) }} }}
@@ -712,7 +830,7 @@ changes = \\chordmode {{ {changes} }}
   {s1_layout}
 }}
 
-{brk2}{section("2", "Scale Choices", "One scale per chord. Black notes are chord tones (from Section 1); grey notes are the passing tones in between.", S2_TEXT_PT)}
+{brk2}{section("2", "Scale Choices", [("One scale per chord.", "Black notes are chord tones, grey notes pass between them.")], S2_TEXT_PT)}
 \\markup \\column {{ {" \\vspace #0.25 ".join(expl)} }}
 \\markup \\vspace #0.6
 \\score {{
@@ -736,7 +854,7 @@ changes = \\chordmode {{ {changes} }}
 {brk}{section(yc_num, "Your Chorus", s4_note)}
 \\score {{
   << \\new ChordNames \\changes
-     {music(["s1 |"] * len(bars), staff_with="" if piano else "\\with { \\override VerticalAxisGroup.default-staff-staff-spacing.basic-distance = #16 }")} >>
+     {music(guide_line(bars) if guide else ["s1 |"] * len(bars), staff_with="" if piano else "\\with { \\override VerticalAxisGroup.default-staff-staff-spacing.basic-distance = #16 }")} >>
   \\layout {{ {yc_size} \\context {{ \\Score \\override BarNumber.break-visibility = ##(#f #f #t) }} }}
 }}
 \\markup \\column {{ \\vspace #1.2 {ww("Practice tip:", spec.get("practice_tip") or "play Section 1 until the chord tones are automatic, then Section 3. Then write your own line in Section 4 and improvise over the changes, aiming for a chord tone on beats 1 and 3.")} }}
