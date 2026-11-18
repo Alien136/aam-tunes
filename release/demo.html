@@ -1,28 +1,28 @@
 <!-- Alex Attard Music: the public DEMO card (test copy; the site loads release/demo.html through player/demo-loader.html).
      A light poster on the lessons page. The player and its sounds load only when someone taps it, inside a frame of its own,
      so the theme's styles and the player never touch each other. -->
-<div id="aam-demo">
+<div id="aam-demo" class="aam-demo">
   <style>
     /* every text property is set here, so the site's theme can't restyle the card */
-    #aam-demo, #aam-demo * { box-sizing: border-box; letter-spacing: normal; text-transform: none; word-spacing: normal; }
-    #aam-demo { max-width: 1100px; margin: 0 auto; font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; }
-    #aam-demo .poster { display: flex; gap: 16px; align-items: center; width: 100%; margin: 0; padding: 16px 18px; border: 1px solid #cfe6f7; border-radius: 16px;
+    div.aam-demo, div.aam-demo * { box-sizing: border-box; letter-spacing: normal; text-transform: none; word-spacing: normal; }
+    div.aam-demo { max-width: 1100px; margin: 0 auto; font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; }
+    div.aam-demo .poster { display: flex; gap: 16px; align-items: center; width: 100%; margin: 0; padding: 16px 18px; border: 1px solid #cfe6f7; border-radius: 16px;
       background: linear-gradient(135deg, #e8f5fe 0%, #f6fbff 100%); text-align: left; cursor: pointer; color: #0f1419; font: inherit; white-space: normal;
       box-shadow: none; transition: box-shadow .15s ease, transform .15s ease; }
-    #aam-demo .poster:hover, #aam-demo .poster:focus-visible { box-shadow: 0 8px 22px rgba(29, 155, 240, .2); transform: translateY(-1px); outline: none; background: linear-gradient(135deg, #e8f5fe 0%, #f6fbff 100%); color: #0f1419; }
-    #aam-demo .ic { flex: none; width: 54px; height: 54px; border-radius: 50%; background: #1d9bf0; display: grid; place-items: center; box-shadow: 0 5px 14px rgba(29, 155, 240, .35); }
-    #aam-demo .ic svg { width: 22px; height: 22px; margin-left: 4px; fill: #fff; }
-    #aam-demo .tx { min-width: 0; }
-    #aam-demo .k { display: block; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #0f6fb5; line-height: 1.3; margin-bottom: 2px; }
-    #aam-demo .t { display: block; font-size: 19px; font-weight: 700; line-height: 1.25; margin-bottom: 3px; }
-    #aam-demo .d { display: block; font-size: 14px; font-weight: 400; line-height: 1.45; color: #536471; }
-    #aam-demo iframe { display: block; width: 100%; height: min(700px, 86vh); border: 1px solid #cfe6f7; border-radius: 16px; background: #e8f5fe; }
+    div.aam-demo .poster:hover, div.aam-demo .poster:focus-visible { box-shadow: 0 8px 22px rgba(29, 155, 240, .2); transform: translateY(-1px); outline: none; background: linear-gradient(135deg, #e8f5fe 0%, #f6fbff 100%); color: #0f1419; }
+    div.aam-demo .ic { flex: none; width: 54px; height: 54px; border-radius: 50%; background: #1d9bf0; display: grid; place-items: center; box-shadow: 0 5px 14px rgba(29, 155, 240, .35); }
+    div.aam-demo .ic svg { width: 22px; height: 22px; margin-left: 4px; fill: #fff; }
+    div.aam-demo .tx { min-width: 0; }
+    div.aam-demo .k { display: block; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #0f6fb5; line-height: 1.3; margin-bottom: 2px; }
+    div.aam-demo .t { display: block; font-size: 19px; font-weight: 700; line-height: 1.25; margin-bottom: 3px; }
+    div.aam-demo .d { display: block; font-size: 14px; font-weight: 400; line-height: 1.45; color: #536471; }
+    div.aam-demo iframe { display: block; width: 100%; height: min(700px, 86vh); border: 1px solid #cfe6f7; border-radius: 16px; background: #e8f5fe; }
     /* in a narrow column on a big screen the band opens in a window over the page instead of squeezing in */
     #aam-demo-modal { position: fixed; inset: 0; z-index: 2147483000; display: grid; place-items: center; padding: 3vh 3vw; background: rgba(15, 20, 25, .6); }
     #aam-demo-modal .win { position: relative; width: min(1180px, 100%); height: min(760px, 100%); }
     #aam-demo-modal iframe { display: block; width: 100%; height: 100%; border: 0; border-radius: 16px; background: #e8f5fe; box-shadow: 0 24px 60px rgba(0, 0, 0, .4); }
     #aam-demo-modal .x { position: absolute; top: -14px; right: -14px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: #fff; color: #0f1419; font: 700 18px/36px system-ui, sans-serif; text-align: center; padding: 0; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, .3); }
-    @media (max-width: 620px) { #aam-demo iframe { height: min(640px, 88vh); border-radius: 14px; } }
+    @media (max-width: 620px) { div.aam-demo iframe { height: min(640px, 88vh); border-radius: 14px; } }
   </style>
   <button class="poster" type="button" aria-label="Try the play-along band">
     <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></span>
@@ -35,7 +35,7 @@
 </div>
 <script>
 (function () {
-  var box = document.getElementById("aam-demo"), set = window.AAM_DEMO_CFG || {};   // settings from the loader's data- attributes
+  var first = document.getElementById("aam-demo"), set = window.AAM_DEMO_CFG || {};   // settings from the loader's data- attributes
   var cfg = { cta: set.cta || "https://alexattardmusic.com/contact/", cta_label: set.ctaLabel || "Book a free trial lesson",
               test: /[?&]player=test/.test(location.search) };
   function track(name, p) { try { if (typeof window.gtag === "function") window.gtag("event", name, p || {}); else if (window.dataLayer) { p = p || {}; p.event = name; window.dataLayer.push(p); } } catch (e) {} }
@@ -45,7 +45,9 @@
     'function run(h){var t=document.createElement("template");t.innerHTML=h;var s=[].slice.call(t.content.querySelectorAll("script"));s.forEach(function(x){x.parentNode.removeChild(x)});b.parentNode.insertBefore(t.content,b);b.parentNode.removeChild(b);' +
     '(function n(i){if(i>=s.length)return;var e=document.createElement("script");if(s[i].src){e.src=s[i].src;e.onload=e.onerror=function(){n(i+1)};document.head.appendChild(e)}else{e.textContent=s[i].textContent;document.body.appendChild(e);n(i+1)}})(0)}' +
     'g(0).then(run,function(){b.textContent="The demo could not load. Check your connection and try again."})})();';
-  function frame(slug) {
+  var active = null;                                         // the card whose band is open
+  function frame(slug, box) {
+    box = box || active; if (!box) return; active = box;
     var c = { cta: cfg.cta, cta_label: cfg.cta_label, test: cfg.test, tune: slug || null };
     var doc = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base target="_top"></head><body style="margin:0;background:#e8f5fe">' +
       '<div id="aam-boot" style="height:100vh;display:grid;place-items:center;font:500 15px system-ui,sans-serif;color:#536471">Loading the band…</div>' +
@@ -66,9 +68,16 @@
     try { box.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) {}
   }
   window.aamDemoGo = function (slug) { track("aam_demo_tune", { tune: slug }); frame(slug); };   // the frame asks for another tune
-  box.querySelector(".poster").onclick = function () {
-    track("aam_demo_start", {});
-    frame(null);
-  };
+  // A page may hold the loader more than once (Elementor pages often keep one layout for computers and another for phones).
+  // Only the first loader can run, so every other placement still on the page gets its own copy of the card here.
+  var boxes = [first];
+  [].forEach.call(document.querySelectorAll('[id="aam-demo-boot"]'), function (b) {
+    var c = first.cloneNode(true); c.removeAttribute("id");
+    var st = c.querySelector("style"); if (st) st.parentNode.removeChild(st);
+    b.parentNode.replaceChild(c, b); boxes.push(c);
+  });
+  boxes.forEach(function (box) {
+    box.querySelector(".poster").onclick = function () { track("aam_demo_start", {}); frame(null, box); };
+  });
 })();
 </script>
