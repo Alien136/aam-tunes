@@ -245,7 +245,12 @@
     "gr1-petzold-minuet-in-g-minor",
     "gr1-minuet-in-g-anh116",
     "gr1-minuet-in-c-minor-anh121",
-    "gr1-musette-in-d-anh126"
+    "gr1-musette-in-d-anh126",
+    "gr1-haydn-surprise-theme",
+    "gr1-beethoven-ode-to-joy",
+    "gr1-mozart-theme-k265",
+    "gr1-handel-conquering-hero",
+    "gr1-haydn-emperor-hymn"
    ]
   },
   {
@@ -511,6 +516,26 @@
   "gr1-march-in-e-flat-anh127": {
    "title": "March in E-flat, BWV Anh. 127",
    "subtitle": "Anonymous, from the Notebook for Anna Magdalena Bach · Graded Repertoire · Level 1"
+  },
+  "gr1-haydn-surprise-theme": {
+   "title": "\"Surprise\" Symphony (opening theme)",
+   "subtitle": "Joseph Haydn, arr. Alex Attard Music · DRAFT, not yet checked · Graded Repertoire · Level 1"
+  },
+  "gr1-beethoven-ode-to-joy": {
+   "title": "Ode to Joy (theme)",
+   "subtitle": "Ludwig van Beethoven, arr. Alex Attard Music · DRAFT, not yet checked · Graded Repertoire · Level 1"
+  },
+  "gr1-mozart-theme-k265": {
+   "title": "Theme from \"Ah, vous dirai-je, Maman\", K. 265",
+   "subtitle": "W. A. Mozart · DRAFT, not yet checked · Graded Repertoire · Level 1"
+  },
+  "gr1-handel-conquering-hero": {
+   "title": "See, the Conquering Hero Comes (theme)",
+   "subtitle": "G. F. Handel, arr. Alex Attard Music · DRAFT, not yet checked · Graded Repertoire · Level 1"
+  },
+  "gr1-haydn-emperor-hymn": {
+   "title": "Emperor's Hymn (theme)",
+   "subtitle": "Joseph Haydn, arr. Alex Attard Music · DRAFT, not yet checked · Graded Repertoire · Level 1"
   }
  }
 }

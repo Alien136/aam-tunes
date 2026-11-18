@@ -10,6 +10,18 @@
   "petzold-minuet-in-g-minor",
   "minuet-in-g-anh116",
   "minuet-in-c-minor-anh121",
-  "musette-in-d-anh126"
+  "musette-in-d-anh126",
+  "haydn-surprise-theme",
+  "beethoven-ode-to-joy",
+  "mozart-theme-k265",
+  "handel-conquering-hero",
+  "haydn-emperor-hymn"
+ ],
+ "unchecked": [
+  "haydn-surprise-theme",
+  "beethoven-ode-to-joy",
+  "mozart-theme-k265",
+  "handel-conquering-hero",
+  "haydn-emperor-hymn"
  ]
 }
