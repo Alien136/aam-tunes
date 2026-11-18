@@ -28,14 +28,15 @@ def read(path):
         if notes: hands.append(sorted(notes))
     return hands
 
-def spell(midi, ks, tonic):
+def spell(midi, ks, tonic, minor=False):
     """Letter, accidental and octave for a pitch: in the key if it can be; otherwise the usual chromatic spelling for the key
-    (raised 1st, 4th and 5th degrees as sharps, lowered 3rd and 7th as flats, counted from the major key's tonic)."""
+    (major keys: raised 1st, 4th and 5th degrees as sharps, lowered 3rd and 7th as flats)."""
     pc = midi % 12
     for i, l in enumerate(LET):
         v = NAT[i] + ks.get(l, 0)
         if v % 12 == pc: return l, ks.get(l, 0), (midi - v) // 12 - 1
-    want = {1: 1, 3: -1, 6: 1, 8: 1, 10: -1}[(pc - tonic) % 12]
+    if minor: want = {1: -1, 4: 1, 6: 1, 9: 1, 11: 1}[(pc - tonic) % 12]     # counted from the minor tonic: raised 3rd, 4th, 6th, 7th
+    else: want = {1: 1, 3: -1, 6: 1, 8: 1, 10: -1}[(pc - tonic) % 12]
     for acc in (0, want, -want):                 # a natural that cancels the key signature comes first (B natural in F major)
         for i, l in enumerate(LET):
             if (NAT[i] + acc) % 12 == pc: return l, acc, (midi - NAT[i] - acc) // 12 - 1
@@ -53,7 +54,8 @@ def dur(d):                                   # d in twelfths of a beat; ABC uni
     raise ValueError("odd duration %d" % d)
 
 def bars_for(notes, key, bpb, nbars):
-    ks = keysig(key); tonic = (7 * KEYS[key]) % 12; L = bpb * G; out = []
+    minor = key.endswith("m"); tonic = (7 * KEYS[key] + (9 if minor else 0)) % 12
+    ks = keysig(key); tonic = (tonic, minor); L = bpb * G; out = []
     groups = {}                                # onset -> [pitches], shortest length wins (one rhythm per hand)
     for s, p, d in notes: groups.setdefault(s, []).append((p, d))
     onsets = sorted(groups)
@@ -94,7 +96,7 @@ def bars_for(notes, key, bpb, nbars):
 def tok(r, state, ks, tonic, dtxt):
     s, ps, d, tie = r
     if ps is None: return "z" + dtxt
-    names = [abc_note(*spell(p, ks, tonic), state, ks) for p in ps]
+    names = [abc_note(*spell(p, ks, tonic[0], tonic[1]), state, ks) for p in ps]
     return ("[" + "".join(names) + "]" if len(names) > 1 else names[0]) + dtxt + ("-" if tie else "")
 
 if __name__ == "__main__":

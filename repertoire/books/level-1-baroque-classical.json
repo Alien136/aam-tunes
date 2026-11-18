@@ -3,5 +3,12 @@
  "title": "Alex Attard Graded Repertoire · Level 1 · Baroque & Classical",
  "short": "Graded Repertoire · Level 1",
  "instrument": "piano",
- "pieces": ["mozart-minuet-k2", "petzold-minuet-in-g"]
+ "pieces": [
+  "mozart-minuet-k2",
+  "petzold-minuet-in-g",
+  "petzold-minuet-in-g-minor",
+  "minuet-in-g-anh116",
+  "minuet-in-c-minor-anh121",
+  "musette-in-d-anh126"
+ ]
 }
