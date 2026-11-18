@@ -235,6 +235,15 @@
    ]
   },
   {
+   "id": "graded-repertoire-1-baroque-classical",
+   "title": "Alex Attard Graded Repertoire · Level 1 · Baroque & Classical",
+   "hash": "11008cfb649c4b6dbd5047da2a219cbebb1bab00b172af7a4a210d3659ca1d89",
+   "tunes": [
+    "gr1-mozart-minuet-k2",
+    "gr1-petzold-minuet-in-g"
+   ]
+  },
+  {
    "id": "demo",
    "title": "Free demo",
    "free": true,
@@ -469,6 +478,14 @@
   "demo-blues-riff": {
    "title": "Blues Riff",
    "subtitle": "The first four bars of a B♭ blues · free demo"
+  },
+  "gr1-mozart-minuet-k2": {
+   "title": "Minuet in F, K. 2",
+   "subtitle": "W. A. Mozart (1756–1791) · Graded Repertoire · Level 1"
+  },
+  "gr1-petzold-minuet-in-g": {
+   "title": "Minuet in G, BWV Anh. 114",
+   "subtitle": "Christian Petzold (1677–1733), from the Notebook for Anna Magdalena Bach · Graded Repertoire · Level 1"
   }
  }
 }

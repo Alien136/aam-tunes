@@ -427,6 +427,8 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
           <button class="chip" data-r="bass" aria-pressed="true">Bass</button>
           <button class="chip" data-r="drums" aria-pressed="true">Drums</button>
           <button class="chip" data-r="comp" aria-pressed="true">Piano chords</button>
+          <button class="chip" data-r="hand-rh" aria-pressed="true" hidden>Right hand</button>
+          <button class="chip" data-r="hand-lh" aria-pressed="true" hidden>Left hand</button>
           <button class="chip" data-r="countin" aria-pressed="true">Count-in</button>
           <button class="chip" data-r="ramp" aria-pressed="false">Speed up +5 each time <small data-r="ramp-target"></small></button>
           <button class="chip" data-r="cycle" aria-pressed="false">Through the keys: off</button>
@@ -599,11 +601,13 @@ function aamBoot(TUNE) {
     return name + m[3];
   }
   var STYLE = TUNE.style || "swing";                           // "swing": the band. "drone": a held root and fifth with a click. "click": a click only.
-  var NB = TUNE.bars.length, PPQ = 192, BAR = 4 * PPQ, LEAD = 2;      // music bar k starts at tick (k + LEAD) * BAR
+  // Time signature: quarter-note beats in a bar (2, 3 or 4). The band styles are 4/4 only; "solo" pieces, clicks and drones can be 2/4 or 3/4.
+  var BPB = (TUNE.style && TUNE.style !== "swing" && TUNE.meter && [2, 3, 4].indexOf(+TUNE.meter[0]) >= 0 && +TUNE.meter[1] === 4) ? +TUNE.meter[0] : 4;
+  var NB = TUNE.bars.length, PPQ = 192, BAR = BPB * PPQ, LEAD = 2;      // music bar k starts at tick (k + LEAD) * BAR
   var SW = Math.round(PPQ / 6);                                         // swung eighth: off-beat moves 1/6 beat later (triplet feel)
   // The band's feel. "swing": walking bass, ride cymbal, swung eighths. "straight": even eighths, bass on 1 and 3, held chords,
   // a soft rim click on 2 and 4 (for classical, folk and pop tunes). A tune names its own ("feel" in the tune file); the player can switch.
-  var feel = TUNE.feel === "straight" ? "straight" : "swing";
+  var feel = TUNE.feel === "straight" || TUNE.style === "solo" ? "straight" : "swing";   // written classical pieces are never swung
   try { var fv = JSON.parse(localStorage.getItem("aam-feel") || "{}")[TUNE.slug]; if (fv === "swing" || fv === "straight") feel = fv; } catch (e) {}
   (function () {
     var b = $("feel"); if (!b) return;
@@ -741,15 +745,15 @@ function aamBoot(TUNE) {
   })();
   // ---------- count-in circles (and short messages) in the middle of the screen
   var cntBeat = -9, cntTimer = null;
-  function showCount(bi) {                                 // bi: 0-7 across the two count-in bars: "1 . 2 . | 1 2 3 4"
+  function showCount(bi) {                                 // bi: beats across the two count-in bars: "1 . 2 . | 1 2 3 4" (in 3/4: "1 . . | 1 2 3")
     var box = $("cnt"), d = box.querySelectorAll("i");
     clearTimeout(cntTimer); box.classList.remove("msg"); $("cnt-msg").textContent = ""; box.hidden = false;
-    var slow = bi < 4, n = slow ? (bi < 2 ? 1 : 2) : bi - 3;       // how many circles are lit
+    var slow = bi < BPB, b = bi % BPB, n = slow ? (BPB === 4 && b >= 2 ? 2 : 1) : b + 1;   // how many circles are lit
     for (var x = 0; x < 4; x++) {
-      d[x].textContent = x + 1;
-      d[x].className = (x < n ? "on" : "") + (slow && x > 1 ? " off" : "");
+      d[x].textContent = x + 1; d[x].style.display = x < BPB ? "" : "none";
+      d[x].className = (x < n ? "on" : "") + (slow && x >= (BPB === 4 ? 2 : 1) ? " off" : "");
     }
-    if (bi !== cntBeat) { cntBeat = bi; var hot = d[n - 1]; if (hot && (!slow || bi % 2 === 0)) { hot.classList.add("hit"); setTimeout(function () { hot.classList.remove("hit"); }, 130); } }
+    if (bi !== cntBeat) { cntBeat = bi; var hot = d[n - 1]; if (hot && (!slow || (BPB === 4 ? b % 2 === 0 : b === 0))) { hot.classList.add("hit"); setTimeout(function () { hot.classList.remove("hit"); }, 130); } }
   }
   function hideCount() { clearTimeout(cntTimer); $("cnt").hidden = true; cntBeat = -9; }
   function flash(msg, ms) { var box = $("cnt"); clearTimeout(cntTimer); box.classList.add("msg"); $("cnt-msg").textContent = msg; box.hidden = false; if (ms) cntTimer = setTimeout(hideCount, ms); }
@@ -856,7 +860,7 @@ function aamBoot(TUNE) {
   if (!views.length) views.push({ id: "chords", title: "Chord chart", sm: "Chords" });
   state.view = views[0].id;                                    // a tune opens on the chord chart; an exercise on its first page
   if (TUNE.open_on && views.some(function (v) { return v.id === TUNE.open_on; })) state.view = TUNE.open_on;   // unless the tune names its opening page
-  state.hear = !!window.AAM_DEMO;                              // the public demo plays the melody from the start
+  state.hear = !!window.AAM_DEMO || TUNE.style === "solo";     // the public demo and written piano pieces play the music from the start
   var score = $("score"), measures = [], perShown = 0;
   views.forEach(function (v) {
     var b = document.createElement("button"); b.innerHTML = '<span class="lg">' + v.title + '</span><span class="sm">' + v.sm + "</span>"; b.dataset.view = v.id;
@@ -898,7 +902,7 @@ function aamBoot(TUNE) {
       bar.forEach(function (c, j) {
         var x = xOf(".abcjs-v1.abcjs-mm" + i + ".abcjs-n" + j);                                     // the left-hand voicing under it
         if (x === null && starts.length > j) x = xOf(".abcjs-v0.abcjs-mm" + i + ".abcjs-n" + starts[j]);   // or the right-hand note
-        if (x === null) x = left + 10 + (beat / 4) * (width - 10);                                  // or by the beat
+        if (x === null) x = left + 10 + (beat / BPB) * (width - 10);                                  // or by the beat
         var tx = document.createElementNS(NS, "text"); tx.setAttribute("class", "ch-t"); tx.setAttribute("x", x - 1); tx.setAttribute("y", lineY[m.line]);
         tx.textContent = nice(spell(c.sym)); g.appendChild(tx);
         beat += c.beats;
@@ -909,7 +913,7 @@ function aamBoot(TUNE) {
     var sec = TUNE.sections.filter(function (s) { return s.id === view; })[0];
     var rh = sec ? sec.abc.rh : TUNE.bars.map(blankBar);
     var lh = sec ? sec.abc.lh : NOTA.lh;
-    var out = "X:1\nL:1/8\nM:4/4\nK:" + NOTA.key + "\n" + (sp ? "%%staffsep " + sp.sep + "\n%%sysstaffsep " + sp.sys + "\n" : "") + (lh ? "%%score {RH LH}\nV:RH clef=treble\nV:LH clef=bass\n" : "");
+    var out = "X:1\nL:1/8\nM:" + BPB + "/4\nK:" + NOTA.key + "\n" + (sp ? "%%staffsep " + sp.sep + "\n%%sysstaffsep " + sp.sys + "\n" : "") + (lh ? "%%score {RH LH}\nV:RH clef=treble\nV:LH clef=bass\n" : "");
     for (var s = 0; s < NB; s += per) {
       var idx = []; for (var i = s; i < Math.min(s + per, NB); i++) idx.push(i);
       var end = s + per >= NB ? " |]\n" : " |\n";
@@ -1227,6 +1231,14 @@ function aamBoot(TUNE) {
     $("comp").hidden = true; $("drums").textContent = "Click";
     if (STYLE === "drone") $("bass").textContent = "Drone"; else $("bass").hidden = true;
   }
+  // A piece written for two hands: hear either hand alone, or both ("solo" pieces play the written part from the start)
+  var hands = { rh: true, lh: true };
+  if (TUNE.sections.some(function (x) { return x.lh && x.lh.length; })) {
+    ["rh", "lh"].forEach(function (h) {
+      var b = $("hand-" + h); b.hidden = false;
+      b.onclick = function () { hands[h] = !hands[h]; b.setAttribute("aria-pressed", hands[h] ? "true" : "false"); };
+    });
+  }
   // Through the keys: each time through, the whole exercise moves up a half step, or round the circle of fourths
   var CYCLES = [[0, "Through the keys: off"], [1, "Through the keys: up a half step"], [5, "Through the keys: circle of 4ths"]];
   state.cycle = TUNE.keys === "chromatic" ? 1 : TUNE.keys === "fourths" ? 5 : 0;
@@ -1477,7 +1489,7 @@ function aamBoot(TUNE) {
     if (STYLE !== "swing") {                                   // a click on every beat (louder on beat 1), and for "drone" the root and fifth of each chord
       for (var kb = 0; kb < NB; kb++) {
         (function (b0, bar) {
-          [0, 1, 2, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums) drm("stick", time, bt === 0 ? 0.9 : 0.5, bt === 0 ? 2 : -7); }); });
+          for (var q = 0; q < BPB; q++) (function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums) drm("stick", time, bt === 0 ? 0.9 : 0.5, bt === 0 ? 2 : -7); }); })(q);
           if (STYLE !== "drone") return;
           var beat = 0;
           bar.forEach(function (c) {
@@ -1542,7 +1554,9 @@ function aamBoot(TUNE) {
           var off = Math.abs(e[0] - Math.floor(e[0]) - 0.5) < 0.01;      // an off-beat eighth: late when the band swings
           at(LEAD * BAR + Math.round(e[0] * PPQ), function (time) {
             if (off && feel === "swing") time += SW / PPQ * secPerBeat();
-            if (state.demo === s.id) pno(e[1] + keyState.key, Math.max(0.12, e[2] * secPerBeat() * 0.95), time, SND ? h[1] + 0.09 + jit(0.06) : h[1], 1.4 * mixGain("lead"));   // the written part sits in front of the band
+            if (state.demo !== s.id || !hands[h[0]]) return;
+            var dyn = e[3] ? e[3] / 90 : 1;                    // the note's own loudness (90 = plain), so p and f in the music are heard
+            pno(e[1] + keyState.key, Math.max(0.12, e[2] * secPerBeat() * 0.95), time, SND ? Math.max(0.2, Math.min(1, (h[1] + 0.09) * dyn + jit(0.05))) : Math.min(1, h[1] * dyn), 1.4 * mixGain("lead"));   // the written part sits in front of the band
           });
         });
       });
@@ -1584,7 +1598,8 @@ function aamBoot(TUNE) {
     state.start = ls; state.pass = 1; armEnd(); keyAtStart = keyState.key; armCycle();
     var from = state.countin ? ls - LEAD * BAR : ls;
     if (state.countin) {   // side-stick count-in: two on bar 1, four on bar 2
-      [0, 2, 4, 5, 6, 7].forEach(function (bt) { oneShots.push(T.schedule(function (time) { drm("stick", time, 0.8, 9); }, (from + bt * PPQ) + "i")); });
+      var cin = BPB === 4 ? [0, 2] : [0]; for (var q = 0; q < BPB; q++) cin.push(BPB + q);   // one bar spread out, one bar on every beat
+      cin.forEach(function (bt) { oneShots.push(T.schedule(function (time) { drm("stick", time, 0.8, 9); }, (from + bt * PPQ) + "i")); });
     }
     T.ticks = Math.max(0, from);
     if (from < 0) { state.start = 0; }
@@ -1651,7 +1666,7 @@ function aamBoot(TUNE) {
     var t = Tone.Transport.ticks, k = Math.floor(t / BAR) - LEAD, where, chord = "";
     var endBar = rng()[1];
     if (k > endBar) { k = endBar; t = (endBar + LEAD) * BAR; }    // the instant between the last bar and the stop
-    if (t < state.start) { var cb = Math.floor((t - (state.start - LEAD * BAR)) / PPQ); where = "Count-in: " + Math.min(8, cb + 1) + " of 8"; if (cb >= 0 && cb < 8) showCount(cb); }
+    if (t < state.start) { var cb = Math.floor((t - (state.start - LEAD * BAR)) / PPQ); where = "Count-in: " + Math.min(2 * BPB, cb + 1) + " of " + 2 * BPB; if (cb >= 0 && cb < 2 * BPB) showCount(cb); }
     else {
       if (!$("cnt").hidden) hideCount();
       var times = state.reps ? state.pass + " of " + state.reps : state.pass;
