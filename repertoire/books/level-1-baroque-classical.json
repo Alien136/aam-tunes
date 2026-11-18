@@ -4,17 +4,34 @@
  "short": "Graded Repertoire · Level 1",
  "instrument": "piano",
  "pieces": [
-  "mozart-minuet-k2",
-  "march-in-e-flat-anh127",
-  "petzold-minuet-in-g",
-  "petzold-minuet-in-g-minor",
-  "minuet-in-g-anh116",
-  "minuet-in-c-minor-anh121",
-  "musette-in-d-anh126",
   "haydn-surprise-theme",
   "beethoven-ode-to-joy",
   "mozart-theme-k265",
   "handel-conquering-hero",
-  "haydn-emperor-hymn"
- ]
+  "haydn-emperor-hymn",
+  "mozart-minuet-k2",
+  "petzold-minuet-in-g",
+  "petzold-minuet-in-g-minor",
+  "minuet-in-c-minor-anh121",
+  "musette-in-d-anh126",
+  "minuet-in-g-anh116",
+  "march-in-e-flat-anh127"
+ ],
+ "level": 1,
+ "strand": "Baroque & Classical",
+ "series": "Alex Attard Graded Repertoire",
+ "practice": {
+  "haydn-surprise-theme": "Light, short eighth notes over a steady left hand. Keep everything soft, so the last chord really is a surprise.",
+  "beethoven-ode-to-joy": "A melody that moves by step: keep it smooth and connected. Loop bars 9 to 12, then hold the tied note across into bar 13.",
+  "mozart-theme-k265": "Even quarter notes in both hands. The left hand moves while the right hand repeats, so learn the left hand alone first.",
+  "handel-conquering-hero": "Long notes that sing, and eighth-note runs that stay even. Loop bars 13 to 16, where the C sharps are.",
+  "haydn-emperor-hymn": "It starts halfway through the bar: count 1, 2 and come in on 3. Loop bars 15 and 16 until the quick notes are even.",
+  "mozart-minuet-k2": "Your first minuet: three beats in a bar, with a strong first beat. Play each hand alone before putting them together.",
+  "petzold-minuet-in-g": "Eighth notes that run evenly into a quarter note. Loop bars 1 and 2, then find every pair of bars like them.",
+  "petzold-minuet-in-g-minor": "The partner of the Minuet in G, now in a minor key. Name the two flats before you play, and watch for accidentals.",
+  "minuet-in-c-minor-anh121": "Three flats in the key signature: name them before you start. Learn it four bars at a time.",
+  "musette-in-d-anh126": "The left hand jumps an octave, like a bagpipe drone. Practise the left-hand jumps alone until you can play them without looking.",
+  "minuet-in-g-anh116": "The longest piece in the book. Learn it in four-bar sections, looping each one before moving on.",
+  "march-in-e-flat-anh127": "The hardest piece in the book: triplets over steady quarter notes. Clap the triplets with the metronome before you play them."
+ }
 }
