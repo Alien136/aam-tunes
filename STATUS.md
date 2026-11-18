@@ -19,6 +19,7 @@ Everything needed to carry on from any conversation is in this repository and in
 - To release: `AAM_CODE=<master code> python3 tools/release.py` (runs `tools/check_release.js`: every tune, every tab, phone / half window / laptop / wide, plus a play test of each kind of tune; refuses to release if anything is clipped, colliding, overflowing or erroring), then commit and push. Live within about five minutes. Never edit `release/player.html` by hand.
 - The check needs `tone` and `abcjs` locally: `npm install` in `tools/`, or set `AAM_NODE_MODULES`. The master code is never written in this repository.
 - Sounds: `sounds/v2/` (see `sounds/README.md`); Mix sliders and default levels are in the player.
+- Usage counts (18 Nov): the player sends anonymous Google Analytics events when the site has gtag / Tag Manager: `aam_open` (tune opened) and `aam_practice` (one stretch of playing of 10 s or more: tune, view, seconds, tempo, tempo_start, looped, heard, key_shift, who = student/teacher, value = minutes, content_id = slug). Nothing is sent without Analytics on the page.
 
 ## Tools (`tools/`)
 - `gen_study.py`, `fit_study.py`, `add_qr.py`, `publish_tune.py`: lead-sheet study PDF -> tune + QR. `example_blues_alto_spec.json` is the standard 4-page blues build.

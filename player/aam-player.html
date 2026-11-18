@@ -509,7 +509,38 @@ var TUNE_SOURCES = [
 ];
 
 // The player for one tune. The library code at the bottom picks the tune and calls this once.
+// ---------- usage counts: what gets practised, for how long and how fast. Anonymous: no names, codes or accounts.
+// Sent to the website's Google Analytics when it has one (gtag or Tag Manager); otherwise nothing is sent.
+var AAM_TRACK = (function () {
+  var cur = null;
+  function send(name, p) {
+    p.player_version = PLAYER_VERSION; p.who = T.who;
+    try {
+      if (typeof window.gtag === "function") window.gtag("event", name, p);
+      else if (window.dataLayer && window.dataLayer.push) { var o = { event: name }; Object.keys(p).forEach(function (k) { o[k] = p[k]; }); window.dataLayer.push(o); }
+    } catch (e) {}
+  }
+  var T = {
+    who: "student",                                           // "teacher" on a device unlocked with the master code
+    open: function (tune) { T.stop(); send("aam_open", { tune: tune.slug, tune_title: tune.title, instrument: tune.instrument || "" }); },
+    play: function (tune, get) { T.stop(); cur = { tune: tune, get: get, t0: Date.now(), first: get() }; },
+    stop: function () {                                       // one stretch of playing, from play to stop (or to leaving the page)
+      if (!cur) return;
+      var c = cur, secs = Math.round((Date.now() - c.t0) / 1000), now = c.get(); cur = null;
+      if (secs < 10) return;                                  // a false start is not practice
+      send("aam_practice", { tune: c.tune.slug, tune_title: c.tune.title, instrument: c.tune.instrument || "", view: now.view,
+        seconds: Math.min(secs, 3600), tempo: now.tempo, tempo_start: c.first.tempo,
+        looped: c.first.looped || now.looped ? "yes" : "no", heard: c.first.heard || now.heard ? "yes" : "no", key_shift: now.key,
+        // Analytics' own built-in fields, so reports work per tune without any setup: content ID / group / type, and value = minutes
+        content_type: "practice", content_id: c.tune.slug, content_group: c.tune.title + (c.tune.instrument ? " (" + c.tune.instrument + ")" : ""),
+        value: Math.round(Math.min(secs, 3600) / 6) / 10, transport_type: "beacon" });
+    }
+  };
+  window.addEventListener("pagehide", function () { T.stop(); });
+  return T;
+})();
 function aamBoot(TUNE) {
+  AAM_TRACK.open(TUNE);
   var GOAL = TUNE.tempo_presets[TUNE.tempo_presets.length - 1] || TUNE.chart_tempo;
   var root = document.getElementById("aam-play");
   var $ = function (r) { return root.querySelector('[data-r="' + r + '"]'); };
@@ -1509,6 +1540,7 @@ function aamBoot(TUNE) {
     $("play").setAttribute("aria-label", p ? "Stop" : "Play"); $("p-play").setAttribute("aria-label", p ? "Stop" : "Play");
   }
   function stop() {
+    AAM_TRACK.stop();
     Tone.Transport.stop(); clearOneShots(); state.playing = false; state.pass = 1; setIcon(false);
     if (drone) drone.releaseAll();
     if (cycleId !== null) { Tone.Transport.clear(cycleId); cycleId = null; }
@@ -1531,6 +1563,7 @@ function aamBoot(TUNE) {
     }).then(function () {
       setTempo(state.tempo); applyRange(null);
       state.playing = true; setIcon(true); startFrom(); requestAnimationFrame(frame);
+      AAM_TRACK.play(TUNE, function () { return { view: state.view, tempo: state.tempo, looped: state.a !== null && state.b !== null, heard: state.demo !== "off", key: keyState.key }; });
     }).catch(function () { $("now-where").textContent = "Couldn't load the sounds. Check your connection and try again."; flash("Couldn't load the sounds. Check your connection and try again.", 4500); });
   };
   var last = -1;
@@ -1761,6 +1794,7 @@ function aamLibrary() {
   function start(slug) {
     var pd = pdfOf(slug); if (pd && pd.contents) { lib.at = lib.at || {}; lib.at[pd.id] = slug; }   // remember the place in a booklet
     lib.last = slug; save(); menu(slug); contents(slug);
+    AAM_TRACK.who = lib.all ? "teacher" : "student";
     var t = CAT.tunes[slug];
     if (t.bars) { aamBoot(t); return; }
     getJSON(t._src, "tunes/" + t._file + ".json").then(function (full) {
