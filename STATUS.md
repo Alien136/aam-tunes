@@ -1,4 +1,4 @@
-# Alex Attard Music play-along: where things stand (16 Nov 2026)
+# Alex Attard Music play-along: where things stand (18 Nov 2026)
 
 Everything needed to carry on from any conversation is in this repository and in the saved skills (`lead-sheet`, `starter-book`).
 
@@ -13,6 +13,13 @@ Everything needed to carry on from any conversation is in this repository and in
 
 - 17 Nov: the player uses the full-screen app layout on every screen (was phones only): wide screens get a centred 1180px column, full tab names, a tempo slider and bar/chord readout on the play bar, a centred settings card, a "← Website" link and space bar = play/stop. **Alex still has to paste this version into the Elementor Player widget.**
 
+## How the player is released (since 18 Nov 2026)
+- The Elementor HTML widget on /play holds only `player/loader.html` (pasted once). It loads `release/player.html` from this repository, keeps a saved copy for when GitHub can't be reached, and shows a "could not load" message otherwise.
+- `player/aam-player.html` is the **test copy**: edit it, push, and try it on the live site with `?player=test` added to the address.
+- To release: `AAM_CODE=<master code> python3 tools/release.py` (runs `tools/check_release.js`: every tune, every tab, phone / half window / laptop / wide, plus a play test of each kind of tune; refuses to release if anything is clipped, colliding, overflowing or erroring), then commit and push. Live within about five minutes. Never edit `release/player.html` by hand.
+- The check needs `tone` and `abcjs` locally: `npm install` in `tools/`, or set `AAM_NODE_MODULES`. The master code is never written in this repository.
+- Sounds: `sounds/v2/` (see `sounds/README.md`); Mix sliders and default levels are in the player.
+
 ## Tools (`tools/`)
 - `gen_study.py`, `fit_study.py`, `add_qr.py`, `publish_tune.py`: lead-sheet study PDF -> tune + QR. `example_blues_alto_spec.json` is the standard 4-page blues build.
 - `build_book.py`, `book_player.py`, `publish_exercise.py`: Welcome Booklet PDF, its exercises and QR codes.
@@ -23,4 +30,4 @@ Everything needed to carry on from any conversation is in this repository and in
 2. /play page title still "Student Enrollment" (Yoast SEO title on the Play page).
 3. InMotion hosting returned intermittent 502s on /play on 16 Nov (about 9:26 pm and 9:43 pm Pacific).
 4. Access is per PDF code and per device; no per-student tracking. Student logins would be a separate build.
-5. Not built: self-updating player loader, tempo ladder (60->120 then double), tenor/clarinet/flute lead-sheet editions untested, audio never checked by Claude, "Hear it" uses a piano sound for every instrument.
+5. Not built: tempo ladder (60->120 then double), tenor/clarinet/flute lead-sheet editions untested, audio never checked by Claude, "Hear it" uses a piano sound for every instrument.

@@ -1,0 +1,1 @@
+{ "name": "aam-tunes-tools", "private": true, "description": "Local copies of the libraries the player loads from the CDN, for tools/check_release.js", "dependencies": { "tone": "14.8.49", "abcjs": "6.4.4" } }

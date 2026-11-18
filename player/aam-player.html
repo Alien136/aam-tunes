@@ -1,4 +1,4 @@
-<!-- Alex Attard Music · Play-Along LIBRARY PLAYER (v4). Paste this whole block into the "Player" HTML widget on alexattardmusic.com/play.
+<!-- Alex Attard Music · Play-Along LIBRARY PLAYER (v4). This is the TEST COPY: the website loads release/player.html through player/loader.html (see STATUS.md); do not paste this file into the site.
      It loads tunes on demand from the online tune folders listed in TUNE_SOURCES (one small file per tune), so adding a tune
      never means editing this page. The "Catalog" widget is no longer needed (if one is still on the page, its tunes still work). Students open a tune by scanning the QR code on their PDF
      (the code is built into the link) or by typing the code printed under it. Each device remembers its tunes under "My tunes".
@@ -487,12 +487,14 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
       <div class="sheet-head"><h2>Practice settings</h2><button class="done" data-r="done">Done</button></div>
       <div class="sheet-body" data-r="sheet-body"></div>
       <p class="snd-credit" data-r="snd-credit" hidden></p>
+      <p class="snd-credit" data-r="ver"></p>
     </div>
   </div>
 </div>
 
 <script>
 // >>> SETTINGS
+var PLAYER_VERSION = "test copy";    // stamped by tools/release.py when a version is released
 var STUDENT_HOME = "https://alexattardmusic.com/student-login/";              // where the "back" link goes: put the address of your student login page here, e.g. "/student-login/"
 var STUDENT_HOME_LABEL = "Student home";         // what the link says. Leave "" for "Student login" (or "Website" while the address above is "/")
 var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    // folder with p36.mp3 ... d-ride.mp3 (keep the final "/")
@@ -1594,6 +1596,7 @@ function aamBoot(TUNE) {
   setTempo(state.tempo); showRange(); label(); layout(); setView(state.view);
 }
 
+(function () { var v = document.querySelector('#aam-play [data-r="ver"]'); if (v) v.textContent = "Player version: " + PLAYER_VERSION; })();
 (function () {   // the way back out of the player: to the student login page (see SETTINGS)
   var label = "\u2190 " + (STUDENT_HOME_LABEL || (STUDENT_HOME === "/" ? "Website" : "Student login"));
   [].slice.call(document.querySelectorAll('#aam-play [data-r="home-a"], #aam-play [data-r="home-b"]')).forEach(function (a) { a.href = STUDENT_HOME; a.textContent = label; });
