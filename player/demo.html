@@ -29,14 +29,15 @@
     <span class="tx">
       <span class="k">Try it now · free</span>
       <span class="t">Play along with the band</span>
-      <span class="d">Ode to Joy, Jingle Bells and five more, at any tempo, written for your instrument.</span>
+      <span class="d">Jingle Bells, Ode to Joy and five more, at any tempo, written for your instrument.</span>
     </span>
   </button>
 </div>
 <script>
 (function () {
   var first = document.getElementById("aam-demo"), set = window.AAM_DEMO_CFG || {};   // settings from the loader's data- attributes
-  var cfg = { cta: set.cta || "https://alexattardmusic.com/contact/", cta_label: set.ctaLabel || "Book a free trial lesson",
+  if (set.cta && /\/contact\/?(#fluentform_3)?$/.test(set.cta)) set.cta = "https://alexattardmusic.com/contact/#book";   // the booking page's own anchor (the form's built-in one does not scroll)
+  var cfg = { cta: set.cta || "https://alexattardmusic.com/contact/#book", cta_label: set.ctaLabel || "Book a free trial lesson",
               test: /[?&]player=test/.test(location.search) };
   function track(name, p) { try { if (typeof window.gtag === "function") window.gtag("event", name, p || {}); else if (window.dataLayer) { p = p || {}; p.event = name; window.dataLayer.push(p); } } catch (e) {} }
   // what runs inside the frame: fetch the player from the repository (the same one /play uses) and start it

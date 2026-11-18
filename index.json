@@ -239,9 +239,9 @@
    "title": "Free demo",
    "free": true,
    "tunes": [
+    "demo-jingle-bells",
     "demo-ode-to-joy",
     "demo-when-the-saints",
-    "demo-jingle-bells",
     "demo-twinkle",
     "demo-auld-lang-syne",
     "demo-major-scale",

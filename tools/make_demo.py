@@ -33,7 +33,7 @@ def notes(bar, key, at):
     assert abs(t - 4) < 1e-9, ("bar is not 4 beats", bar, t)
     return out
 
-def tune(slug, title, sub, key, tempos, bars, chords, desc, style=None, hide=None, reps=None, tab="Melody"):
+def tune(slug, title, sub, key, tempos, bars, chords, desc, style=None, hide=None, reps=None, tab="Melody", feel=None):
     assert len(bars) == len(chords), (slug, len(bars), len(chords))
     rh = []
     for i, b in enumerate(bars): rh += notes(b, key, 4 * i)
@@ -48,6 +48,7 @@ def tune(slug, title, sub, key, tempos, bars, chords, desc, style=None, hide=Non
     if style: t["style"] = style
     if hide: t["hide"] = hide
     if reps: t["reps"] = reps
+    if feel: t["feel"] = feel
     json.dump(t, open(os.path.join(ROOT, "tunes", slug + ".json"), "w"), ensure_ascii=False)
     return slug
 
@@ -73,11 +74,11 @@ auld = ["z6 F2",
 auld_ch = ["F7"] + ["Bb6", "F7", "Bb6/Bb7", "Eb6", "Bb6", "F7", "Cm7/F7", "Bb6"] * 2
 
 made = [
-  tune("demo-ode-to-joy", "Ode to Joy", "Beethoven · free demo", "Bb", [96, 72, 120], ode, ode_ch, "The melody everyone knows, with a swing trio behind you"),
+  tune("demo-jingle-bells", "Jingle Bells", "James Pierpont, 1857 · free demo", "F", [140, 100, 176], jingle, jingle_ch, "The chorus, with a band behind you", feel="straight"),
+  tune("demo-ode-to-joy", "Ode to Joy", "Beethoven · free demo", "Bb", [96, 72, 120], ode, ode_ch, "The melody everyone knows, with a band behind you", feel="straight"),
   tune("demo-when-the-saints", "When the Saints Go Marching In", "Traditional · free demo", "F", [132, 100, 160], saints, saints_ch, "A New Orleans classic: three notes up and hold"),
-  tune("demo-jingle-bells", "Jingle Bells", "James Pierpont, 1857 · free demo", "F", [140, 100, 176], jingle, jingle_ch, "The chorus, swung"),
-  tune("demo-twinkle", "Twinkle, Twinkle, Little Star", "Traditional · free demo", "F", [100, 72, 132], twinkle, twinkle_ch, "A first tune, with a real band"),
-  tune("demo-auld-lang-syne", "Auld Lang Syne", "Traditional · free demo", "Bb", [88, 66, 112], auld, auld_ch, "Verse and chorus. The first bar is the pick-up note"),
+  tune("demo-twinkle", "Twinkle, Twinkle, Little Star", "Traditional · free demo", "F", [100, 72, 132], twinkle, twinkle_ch, "A first tune, with a real band", feel="straight"),
+  tune("demo-auld-lang-syne", "Auld Lang Syne", "Traditional · free demo", "Bb", [88, 66, 112], auld, auld_ch, "Verse and chorus. The first bar is the pick-up note", feel="straight"),
   tune("demo-major-scale", "Major Scale", "Warm-up · free demo", "F", [72, 60, 100], ["F2 G2 A2 B2", "c2 d2 e2 f2", "f2 e2 d2 c2", "B2 A2 G2 F2"], ["F"] * 4,
        "Up and down, one note to a beat, over a drone", style="drone", hide=["chords", "solo", "names"], reps=2, tab="Scale"),
   tune("demo-blues-riff", "Blues Riff", "The first four bars of a B♭ blues · free demo", "Bb", [100, 80, 126], ["z2 df g2 f2", "z2 _de g2 e2", "z2 df g2 b2", "_a2 f2 d2 B2"],

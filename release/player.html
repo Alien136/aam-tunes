@@ -430,6 +430,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
           <button class="chip" data-r="countin" aria-pressed="true">Count-in</button>
           <button class="chip" data-r="ramp" aria-pressed="false">Speed up +5 each time <small data-r="ramp-target"></small></button>
           <button class="chip" data-r="cycle" aria-pressed="false">Through the keys: off</button>
+          <button class="chip" data-r="feel" aria-pressed="false">Band: swing</button>
         </div>
       </div>
 
@@ -517,7 +518,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 
 <script>
 // >>> SETTINGS
-var PLAYER_VERSION = "2026-11-18 09:47 UTC (after 566e236)";    // stamped by tools/release.py when a version is released
+var PLAYER_VERSION = "2026-11-18 11:49 UTC (after f17e80a)";    // stamped by tools/release.py when a version is released
 var STUDENT_HOME = "https://alexattardmusic.com/student-login/";              // where the "back" link goes: put the address of your student login page here, e.g. "/student-login/"
 var STUDENT_HOME_LABEL = "Student home";         // what the link says. Leave "" for "Student login" (or "Website" while the address above is "/")
 var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    // folder with p36.mp3 ... d-ride.mp3 (keep the final "/")
@@ -532,7 +533,7 @@ var TUNE_SOURCES = [
 ];
 
 // The player for one tune. The library code at the bottom picks the tune and calls this once.
-// ---------- usage counts: what gets practised, for how long and how fast. Anonymous: no names, codes or accounts.
+// ---------- usage counts: what gets practiced, for how long and how fast. Anonymous: no names, codes or accounts.
 // Sent to the website's Google Analytics when it has one (gtag or Tag Manager); otherwise nothing is sent.
 var AAM_TRACK = (function () {
   var cur = null;
@@ -600,6 +601,20 @@ function aamBoot(TUNE) {
   var STYLE = TUNE.style || "swing";                           // "swing": the band. "drone": a held root and fifth with a click. "click": a click only.
   var NB = TUNE.bars.length, PPQ = 192, BAR = 4 * PPQ, LEAD = 2;      // music bar k starts at tick (k + LEAD) * BAR
   var SW = Math.round(PPQ / 6);                                         // swung eighth: off-beat moves 1/6 beat later (triplet feel)
+  // The band's feel. "swing": walking bass, ride cymbal, swung eighths. "straight": even eighths, bass on 1 and 3, held chords,
+  // a soft rim click on 2 and 4 (for classical, folk and pop tunes). A tune names its own ("feel" in the tune file); the player can switch.
+  var feel = TUNE.feel === "straight" ? "straight" : "swing";
+  try { var fv = JSON.parse(localStorage.getItem("aam-feel") || "{}")[TUNE.slug]; if (fv === "swing" || fv === "straight") feel = fv; } catch (e) {}
+  (function () {
+    var b = $("feel"); if (!b) return;
+    if ((TUNE.style || "swing") !== "swing") { b.hidden = true; return; }
+    var show = function () { b.textContent = "Band: " + feel; b.setAttribute("aria-pressed", feel === "straight" ? "true" : "false"); };
+    b.onclick = function () {
+      feel = feel === "swing" ? "straight" : "swing"; show();
+      try { var all = JSON.parse(localStorage.getItem("aam-feel") || "{}"); all[TUNE.slug] = feel; localStorage.setItem("aam-feel", JSON.stringify(all)); } catch (e) {}
+    };
+    show();
+  })();
   var state = { tempo: TUNE.tempo_presets[0] || 100, bass: true, drums: true, comp: true, countin: true, ramp: false, demo: "off",
                 mode: "whole", from: 0, a: null, b: null, pending: false, reps: TUNE.reps || 1,
                 playing: false, loaded: false, pass: 1, start: 0 };
@@ -1234,6 +1249,25 @@ function aamBoot(TUNE) {
 
   // ---------- music: walking bass and drums from the chords, piano from the tune file
   function swing(beat) { var f = beat - Math.floor(beat); return Math.round(beat * PPQ) + (Math.abs(f - 0.5) < 0.01 ? SW : 0); }
+  function straightBand() {                                    // per chord: bass root (then the fifth, if the chord lasts the bar) and a held piano chord
+    var out = [], prev = null, pv = null;
+    TUNE.bars.forEach(function (bar, bi) {
+      var beat = 0;
+      bar.forEach(function (c) {
+        var r = 33 + ((c.root - 33) % 12 + 12) % 12;
+        if (prev !== null && Math.abs(r + 12 - prev) < Math.abs(r - prev) && r + 12 <= 47) r += 12;
+        prev = r;
+        var v = voicings(c, pv); pv = v;
+        for (var b = 0; b < c.beats; b += 2) {
+          var len = Math.min(2, c.beats - b), fifth = r + c.degs[4] <= 50 ? r + c.degs[4] : r + c.degs[4] - 12;
+          out.push({ bar: bi, beat: beat + b, len: len, bass: b === 0 ? r : fifth });
+          out.push({ bar: bi, beat: beat + b, len: len, notes: v });
+        }
+        beat += c.beats;
+      });
+    });
+    return out;
+  }
   function walkingBass() {
     var flat = []; TUNE.bars.forEach(function (bar, bi) { var beat = 0; bar.forEach(function (c) { flat.push({ c: c, bar: bi, beat: beat }); beat += c.beats; }); });
     var pats = [[1, 3, 5], [1, 2, 3], [1, 5, 3], [1, 3, 2]], out = [], prev = null;
@@ -1456,7 +1490,7 @@ function aamBoot(TUNE) {
     }
     if (STYLE === "swing") walkingBass().forEach(function (e) {   // a player's touch: 2 and 4 lean in a little, no two notes quite alike
       at((e.bar + LEAD) * BAR + (e.ghost ? swing(e.beat) : e.beat * PPQ), function (time) {
-        if (!state.bass) return;
+        if (!state.bass || feel !== "swing") return;
         if (e.ghost) { if (Math.random() < 0.6) bs(e.midi + keyState.key, secPerBeat() * 0.3, time, 0.36 + jit(0.05)); return; }
         bs(e.midi + keyState.key, secPerBeat() * 0.95, time + Math.random() * 0.006, 0.74 + (e.beat % 2 === 1 ? 0.07 : 0) + jit(0.07));
       });
@@ -1466,21 +1500,37 @@ function aamBoot(TUNE) {
       (function (k) {
         [[0, 0.56, -2], [1, 0.8, 0], [1.5, 0.42, -6], [2, 0.6, -2], [3, 0.8, 0], [3.5, 0.44, -6]].forEach(function (r) {   // ding, ding-a-ding: 2 and 4 the strongest
           at(b0 + swing(r[0]), function (time) {
-            if (!state.drums) return;
+            if (!state.drums || feel !== "swing") return;
             var top = k === 0 && r[0] === 0;                   // the top of the form gets a clear downbeat
             drm("ride", time + Math.random() * 0.005, top ? 0.92 : r[1] + jit(0.07), r[2]);
           });
         });
-        [1, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums) drm("hh", time, 0.72 + jit(0.06), -3); }); });
-        [0, 1, 2, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums) drm("kick", time, 0.34 + jit(0.05), -16); }); });   // feathered: felt more than heard
+        [1, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums && feel === "swing") drm("hh", time, 0.72 + jit(0.06), -3); }); });
+        [0, 1, 2, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums && feel === "swing") drm("kick", time, 0.34 + jit(0.05), -16); }); });   // feathered: felt more than heard
         [[3.5, 0.3], [1.5, 0.12]].forEach(function (g) {      // the left hand: an occasional soft snare note
-          at(b0 + swing(g[0]), function (time) { if (state.drums && Math.random() < g[1]) drm("snare", time, 0.3 + jit(0.08), null); });
+          at(b0 + swing(g[0]), function (time) { if (state.drums && feel === "swing" && Math.random() < g[1]) drm("snare", time, 0.3 + jit(0.08), null); });
+        });
+        // the straight band's drums: a quiet ride on every beat, kick on 1 and 3, a rim click on 2 and 4
+        [0, 1, 2, 3].forEach(function (bt) {
+          at(b0 + bt * PPQ, function (time) {
+            if (!state.drums || feel !== "straight") return;
+            drm("ride", time + Math.random() * 0.004, 0.36 + jit(0.05), -8);
+            if (bt % 2 === 0) drm("kick", time, bt === 0 ? 0.6 : 0.48, -10); else drm("stick", time, 0.34 + jit(0.04), -9);
+          });
         });
       })(k);
     }
+    if (STYLE === "swing") straightBand().forEach(function (e) {   // bass on 1 and 3, the chord held under the tune
+      at((e.bar + LEAD) * BAR + e.beat * PPQ, function (time) {
+        if (feel !== "straight") return;
+        var d = e.len * secPerBeat();
+        if (e.bass != null) { if (state.bass) bs(e.bass + keyState.key, d * 0.97, time + Math.random() * 0.005, 0.72 + jit(0.06)); return; }
+        if (state.comp) e.notes.forEach(function (n, i) { pno(n + keyState.key, d * 0.96, time + i * 0.012 + Math.random() * 0.004, SND ? 0.36 + jit(0.05) + (i === e.notes.length - 1 ? 0.05 : 0) : 0.32, mixGain("comp")); });
+      });
+    });
     if (STYLE === "swing") comping().forEach(function (e) {
       at((e.bar + LEAD) * BAR + swing(e.beat), function (time) {
-        if (!state.comp) return;
+        if (!state.comp || feel !== "swing") return;
         var d = Math.max(0.15, e.len * secPerBeat());
         var push = Math.abs(e.beat - Math.round(e.beat)) > 0.1, v = 0.36 + (push ? 0.07 : 0) + jit(0.08);   // off-beat pushes speak a little more
         e.notes.forEach(function (n, i) { pno(n + keyState.key, d, time + i * 0.005 + Math.random() * 0.004, SND ? v + (i === e.notes.length - 1 ? 0.06 : 0) : 0.34, mixGain("comp")); });
@@ -1489,7 +1539,9 @@ function aamBoot(TUNE) {
     TUNE.sections.forEach(function (s) {
       [["rh", 0.72], ["lh", 0.5]].forEach(function (h) {
         s[h[0]].forEach(function (e) {
-          at(LEAD * BAR + swing(e[0]), function (time) {
+          var off = Math.abs(e[0] - Math.floor(e[0]) - 0.5) < 0.01;      // an off-beat eighth: late when the band swings
+          at(LEAD * BAR + Math.round(e[0] * PPQ), function (time) {
+            if (off && feel === "swing") time += SW / PPQ * secPerBeat();
             if (state.demo === s.id) pno(e[1] + keyState.key, Math.max(0.12, e[2] * secPerBeat() * 0.95), time, SND ? h[1] + 0.09 + jit(0.06) : h[1], 1.4 * mixGain("lead"));   // the written part sits in front of the band
           });
         });
@@ -1852,7 +1904,7 @@ function aamLibrary() {
     var cur = p.tunes.indexOf(slug), nx = p.tunes[(cur + 1) % p.tunes.length];
     window.AAM_DEMO_END = function () {                    // the tune has finished: this is the moment to ask
       var o = document.createElement("div"); o.className = "demo-end";
-      o.innerHTML = '<div class="demo-end-card"><h2>' + esc(DEMO.end_title || "This is how my students practise.") + "</h2><p>" + esc(DEMO.end_text || "Every lesson comes with music written for your instrument and a band to play it with, at any tempo. Your first lesson is free.") +
+      o.innerHTML = '<div class="demo-end-card"><h2>' + esc(DEMO.end_title || "This is how my students practice.") + "</h2><p>" + esc(DEMO.end_text || "Every lesson comes with a custom lesson plan and PDFs written for you that work with this player. Stuck on something mid-week? Open the player and it plays the exercise for you, so you keep moving until the next class. Your first lesson is free.") +
         '</p><a class="demo-end-cta" target="_top" href="' + esc(DEMO.cta || "/contact/") + '">' + esc(DEMO.cta_label || "Book a free trial lesson") + '</a><div class="demo-end-more"><button data-a="again">Play it again</button>' +
         (nx && CAT.tunes[nx] ? '<button data-a="next">Next: ' + esc(short(CAT.tunes[nx])) + " →</button>" : "") + "</div></div>";
       root.appendChild(o);
