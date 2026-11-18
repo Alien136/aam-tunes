@@ -1,0 +1,42 @@
+<!-- Alex Attard Music play-along DEMO: LOADER. Paste this once into an HTML widget on the lessons page; it never needs changing.
+     It shows the "Play along with the band" card, loaded from the GitHub repository (release/demo.html).
+     data-cta below is where the "Book a free trial lesson" buttons go: change that address if your booking page is different.
+     Add ?player=test to the page address to load the test copies instead. -->
+<div id="aam-demo-boot" data-cta="https://alexattardmusic.com/contact/" style="min-height:140px;display:grid;place-items:center;text-align:center;font:500 15px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif;color:#536471">Loading…</div>
+<script>
+(function () {
+  var REPO = ["https://raw.githubusercontent.com/Alien136/aam-tunes/main/", "https://cdn.jsdelivr.net/gh/Alien136/aam-tunes@main/"];
+  var test = /[?&]player=test/.test(location.search), file = test ? "player/demo.html" : "release/demo.html";
+  var boot = document.getElementById("aam-demo-boot"), KEY = "aam-demo-copy";
+  function get(i) {                                         // each address in turn, 8 seconds each
+    if (i >= REPO.length) return Promise.reject(new Error("unreachable"));
+    var ctl = window.AbortController ? new AbortController() : null, timer = setTimeout(function () { if (ctl) ctl.abort(); }, 8000);
+    return fetch(REPO[i] + file, ctl ? { cache: "no-cache", signal: ctl.signal } : { cache: "no-cache" })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+      .then(function (t) { clearTimeout(timer); if (t.indexOf('id="aam-demo"') < 0) throw new Error("not the player"); return t; })
+      .catch(function () { clearTimeout(timer); return get(i + 1); });
+  }
+  function run(html) {                                      // put the card on the page, then start its script
+    var t = document.createElement("template"); t.innerHTML = html;
+    var scripts = [].slice.call(t.content.querySelectorAll("script"));
+    scripts.forEach(function (s) { s.parentNode.removeChild(s); });
+    var cfg = {}; for (var k in boot.dataset) cfg[k] = boot.dataset[k];
+    window.AAM_DEMO_CFG = cfg;                              // data-cta, data-cta-label: read by the demo card
+    boot.parentNode.insertBefore(t.content, boot); boot.parentNode.removeChild(boot);
+    (function next(i) {
+      if (i >= scripts.length) return;
+      var s = document.createElement("script");
+      if (scripts[i].src) { s.src = scripts[i].src; s.onload = s.onerror = function () { next(i + 1); }; document.head.appendChild(s); }
+      else { s.textContent = scripts[i].textContent; document.body.appendChild(s); next(i + 1); }
+    })(0);
+  }
+  get(0).then(function (html) {
+    if (!test) { try { localStorage.setItem(KEY, html); } catch (e) {} }   // keep a copy for a day the repository can't be reached
+    run(html);
+  }, function () {
+    var saved = null; try { saved = test ? null : localStorage.getItem(KEY); } catch (e) {}
+    if (saved) run(saved);
+    else boot.style.display = "none";                       // a sales page shows nothing rather than an error
+  });
+})();
+</script>

@@ -20,11 +20,14 @@ async function wire(ctx) {
   await ctx.route("**/*", route => {
     const u = new URL(route.request().url());
     const file = f => fs.existsSync(f) ? route.fulfill({ body: fs.readFileSync(f), contentType: TYPES[path.extname(f)] || "application/octet-stream", headers: { "access-control-allow-origin": "*" } }) : route.abort();
+    if (u.hostname === "alexattardmusic.com" && u.pathname.startsWith("/lessons"))                      // a stand-in lessons page holding the demo card
+      return route.fulfill({ contentType: "text/html", body: "<!doctype html><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><body style='margin:0'><div style='padding:24px 12px'>" + fs.readFileSync(path.join(ROOT, "player/demo-loader.html"), "utf8") + "</div>" });
     if (u.hostname === "alexattardmusic.com" && u.pathname.startsWith("/play"))
       return route.fulfill({ contentType: "text/html", body: "<!doctype html><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><body style='margin:0'>" + fs.readFileSync(path.join(ROOT, "player/loader.html"), "utf8") });
     if (u.hostname === "raw.githubusercontent.com") {
       const rel = u.pathname.replace(/^\/[^/]+\/[^/]+\/[^/]+\//, "");
-      return file(rel === "release/player.html" ? FILE : path.join(ROOT, rel));       // the candidate stands in for the released copy
+      if (rel === "release/demo.html") return file(path.join(ROOT, "player/demo.html"));
+      return file(rel === "release/player.html" ? FILE : path.join(ROOT, rel));       // the candidates stand in for the released copies
     }
     if (u.hostname === "cdn.jsdelivr.net" && u.pathname.startsWith("/npm/")) return file(path.join(NM, u.pathname.replace(/^\/npm\/([^@/]+)@[^/]+/, "$1")));
     return route.abort();
@@ -107,6 +110,29 @@ function inspect() {
       states++; await page.close();
     }
     await ctx.close();
+  }
+  // the public demo card: tap the poster, the framed player opens with its tune buttons, nothing clipped, and it plays
+  if (!ONLY) {
+    for (const [size, opts] of [SIZES[0], SIZES[2]]) {
+      const ctx = await browser.newContext(opts); await wire(ctx);
+      const page = await ctx.newPage(), errs = []; page.on("pageerror", e => errs.push(e.message));
+      const note = w => problems.push(`${size.padEnd(6)} demo card: ${w}`);
+      try {
+        await page.goto("https://alexattardmusic.com/lessons/");
+        await page.click("#aam-demo .poster", { timeout: 15000 });
+        const frame = async () => { await page.waitForSelector("#aam-demo iframe"); const f = page.frames().find(x => x !== page.mainFrame()); await f.waitForSelector("#aam-play.is-open .demo-chips", { timeout: 20000 }); await page.waitForTimeout(500); return f; };
+        let f = await frame();
+        if (await f.$$eval(".demo-chips button", b => b.length) < 5) note("tune buttons missing");
+        (await f.evaluate(inspect)).forEach(note);
+        await f.click(".demo-chips button:last-child").catch(() => {}); await page.waitForTimeout(800); f = await frame();
+        (await f.evaluate(inspect)).forEach(note);
+        await f.click('[data-r="p-play"]');
+        await f.waitForFunction(() => /Bar/.test(document.querySelector('#aam-play [data-r="p-where"]').textContent), null, { timeout: 40000 });
+        if (await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1)) note("page is wider than the screen");
+      } catch (e) { note("did not work: " + String(e.message).split("\n")[0]); }
+      errs.forEach(e => note("script error: " + e));
+      states++; await ctx.close();
+    }
   }
   await browser.close();
   console.log(`${slugs.length} tunes x ${SIZES.length} screen sizes, ${states} views checked in ${Math.round((Date.now() - t0) / 1000)}s`);

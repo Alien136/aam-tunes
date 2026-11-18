@@ -18,4 +18,6 @@ ver = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M") + 
 out = src.replace('var PLAYER_VERSION = "test copy";', 'var PLAYER_VERSION = "%s";' % ver)
 os.makedirs(os.path.join(ROOT, "release"), exist_ok=True)
 open(os.path.join(ROOT, "release", "player.html"), "w", encoding="utf-8").write(out)
-print("Released:", ver, "-> release/player.html  (commit and push to make it live)")
+demo = open(os.path.join(ROOT, "player", "demo.html"), encoding="utf-8").read()                 # the public demo card goes out with it
+open(os.path.join(ROOT, "release", "demo.html"), "w", encoding="utf-8").write(demo)
+print("Released:", ver, "-> release/player.html and release/demo.html  (commit and push to make it live)")

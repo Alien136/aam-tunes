@@ -1,0 +1,63 @@
+<!-- Alex Attard Music: the public DEMO card (test copy; the site loads release/demo.html through player/demo-loader.html).
+     A light poster on the lessons page. The player and its sounds load only when someone taps it, inside a frame of its own,
+     so the theme's styles and the player never touch each other. -->
+<div id="aam-demo">
+  <style>
+    #aam-demo { max-width: 1100px; margin: 0 auto; font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; }
+    #aam-demo * { box-sizing: border-box; }
+    #aam-demo .poster { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: center; width: 100%; padding: 26px 28px; border: 1px solid #cfe6f7; border-radius: 18px;
+      background: linear-gradient(135deg, #e8f5fe 0%, #f6fbff 100%); text-align: left; cursor: pointer; color: #0f1419; font: inherit; transition: box-shadow .15s ease, transform .15s ease; }
+    #aam-demo .poster:hover, #aam-demo .poster:focus-visible { box-shadow: 0 10px 28px rgba(29, 155, 240, .2); transform: translateY(-1px); outline: none; }
+    #aam-demo .ic { width: 76px; height: 76px; border-radius: 50%; background: #1d9bf0; display: grid; place-items: center; box-shadow: 0 6px 16px rgba(29, 155, 240, .35); }
+    #aam-demo .ic svg { width: 30px; height: 30px; margin-left: 5px; fill: #fff; }
+    #aam-demo .k { display: block; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #0f6fb5; margin-bottom: 4px; }
+    #aam-demo .t { display: block; font-size: 24px; font-weight: 700; line-height: 1.2; margin-bottom: 6px; }
+    #aam-demo .d { display: block; font-size: 15.5px; line-height: 1.5; color: #536471; }
+    #aam-demo .tunes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    #aam-demo .tunes span { font-size: 12.5px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: #fff; border: 1px solid #cfe6f7; color: #0f1419; }
+    #aam-demo iframe { display: block; width: 100%; height: min(700px, 86vh); border: 1px solid #cfe6f7; border-radius: 18px; background: #e8f5fe; }
+    @media (max-width: 620px) {
+      #aam-demo .poster { grid-template-columns: 1fr; gap: 14px; padding: 20px 18px; }
+      #aam-demo .ic { width: 60px; height: 60px; } #aam-demo .t { font-size: 20px; }
+      #aam-demo iframe { height: min(640px, 88vh); border-radius: 14px; }
+    }
+  </style>
+  <button class="poster" type="button" aria-label="Try the play-along band">
+    <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></span>
+    <span>
+      <span class="k">Try it now · free, no sign-up</span>
+      <span class="t">Play along with the band</span>
+      <span class="d">Pick a tune, choose your instrument, press play and set your own tempo. This is how my students practise between lessons.</span>
+      <span class="tunes"><span>Ode to Joy</span><span>When the Saints</span><span>Jingle Bells</span><span>Twinkle, Twinkle</span><span>Auld Lang Syne</span><span>Major scale</span><span>Blues riff</span></span>
+    </span>
+  </button>
+</div>
+<script>
+(function () {
+  var box = document.getElementById("aam-demo"), set = window.AAM_DEMO_CFG || {};   // settings from the loader's data- attributes
+  var cfg = { cta: set.cta || "https://alexattardmusic.com/contact/", cta_label: set.ctaLabel || "Book a free trial lesson",
+              test: /[?&]player=test/.test(location.search) };
+  function track(name, p) { try { if (typeof window.gtag === "function") window.gtag("event", name, p || {}); else if (window.dataLayer) { p = p || {}; p.event = name; window.dataLayer.push(p); } } catch (e) {} }
+  // what runs inside the frame: fetch the player from the repository (the same one /play uses) and start it
+  var LOADER = '(function(){var R=["https://raw.githubusercontent.com/Alien136/aam-tunes/main/","https://cdn.jsdelivr.net/gh/Alien136/aam-tunes@main/"],f=window.AAM_DEMO.test?"player/aam-player.html":"release/player.html",b=document.getElementById("aam-boot");' +
+    'function g(i){if(i>=R.length)return Promise.reject();return fetch(R[i]+f,{cache:"no-cache"}).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(t){if(t.indexOf(\'id="aam-play"\')<0)throw 0;return t}).catch(function(){return g(i+1)})}' +
+    'function run(h){var t=document.createElement("template");t.innerHTML=h;var s=[].slice.call(t.content.querySelectorAll("script"));s.forEach(function(x){x.parentNode.removeChild(x)});b.parentNode.insertBefore(t.content,b);b.parentNode.removeChild(b);' +
+    '(function n(i){if(i>=s.length)return;var e=document.createElement("script");if(s[i].src){e.src=s[i].src;e.onload=e.onerror=function(){n(i+1)};document.head.appendChild(e)}else{e.textContent=s[i].textContent;document.body.appendChild(e);n(i+1)}})(0)}' +
+    'g(0).then(run,function(){b.textContent="The demo could not load. Check your connection and try again."})})();';
+  function frame(slug) {
+    var c = { cta: cfg.cta, cta_label: cfg.cta_label, test: cfg.test, tune: slug || null };
+    var doc = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base target="_top"></head><body style="margin:0;background:#e8f5fe">' +
+      '<div id="aam-boot" style="height:100vh;display:grid;place-items:center;font:500 15px system-ui,sans-serif;color:#536471">Loading the band…</div>' +
+      "<script>window.AAM_DEMO=" + JSON.stringify(c).replace(/</g, "\\u003c") + ";<\/script><script>" + LOADER + "<\/script></body></html>";
+    var old = box.querySelector("iframe"), f = document.createElement("iframe");
+    f.title = "Play-along demo"; f.setAttribute("allow", "autoplay"); f.srcdoc = doc;
+    if (old) box.replaceChild(f, old); else { var p = box.querySelector(".poster"); box.replaceChild(f, p); }
+  }
+  window.aamDemoGo = function (slug) { track("aam_demo_tune", { tune: slug }); frame(slug); };   // the frame asks for another tune
+  box.querySelector(".poster").onclick = function () {
+    track("aam_demo_start", {});
+    frame(null);
+    try { box.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) {}
+  };
+})();
+</script>

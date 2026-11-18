@@ -233,6 +233,20 @@
    "tunes": [
     "fly-me-to-the-moon-piano"
    ]
+  },
+  {
+   "id": "demo",
+   "title": "Free demo",
+   "free": true,
+   "tunes": [
+    "demo-ode-to-joy",
+    "demo-when-the-saints",
+    "demo-jingle-bells",
+    "demo-twinkle",
+    "demo-auld-lang-syne",
+    "demo-major-scale",
+    "demo-blues-riff"
+   ]
   }
  ],
  "tunes": {
@@ -427,6 +441,34 @@
   "fly-me-to-the-moon-piano": {
    "title": "Fly Me to the Moon",
    "subtitle": "32 bars · Piano · arpeggios, scales, ii–V–I licks"
+  },
+  "demo-ode-to-joy": {
+   "title": "Ode to Joy",
+   "subtitle": "Beethoven · free demo"
+  },
+  "demo-when-the-saints": {
+   "title": "When the Saints Go Marching In",
+   "subtitle": "Traditional · free demo"
+  },
+  "demo-jingle-bells": {
+   "title": "Jingle Bells",
+   "subtitle": "James Pierpont, 1857 · free demo"
+  },
+  "demo-twinkle": {
+   "title": "Twinkle, Twinkle, Little Star",
+   "subtitle": "Traditional · free demo"
+  },
+  "demo-auld-lang-syne": {
+   "title": "Auld Lang Syne",
+   "subtitle": "Traditional · free demo"
+  },
+  "demo-major-scale": {
+   "title": "Major Scale",
+   "subtitle": "Warm-up · free demo"
+  },
+  "demo-blues-riff": {
+   "title": "Blues Riff",
+   "subtitle": "The first four bars of a B♭ blues · free demo"
   }
  }
 }
