@@ -3,32 +3,33 @@
      so the theme's styles and the player never touch each other. -->
 <div id="aam-demo">
   <style>
+    /* every text property is set here, so the site's theme can't restyle the card */
+    #aam-demo, #aam-demo * { box-sizing: border-box; letter-spacing: normal; text-transform: none; word-spacing: normal; }
     #aam-demo { max-width: 1100px; margin: 0 auto; font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; }
-    #aam-demo * { box-sizing: border-box; }
-    #aam-demo .poster { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: center; width: 100%; padding: 26px 28px; border: 1px solid #cfe6f7; border-radius: 18px;
-      background: linear-gradient(135deg, #e8f5fe 0%, #f6fbff 100%); text-align: left; cursor: pointer; color: #0f1419; font: inherit; transition: box-shadow .15s ease, transform .15s ease; }
-    #aam-demo .poster:hover, #aam-demo .poster:focus-visible { box-shadow: 0 10px 28px rgba(29, 155, 240, .2); transform: translateY(-1px); outline: none; }
-    #aam-demo .ic { width: 76px; height: 76px; border-radius: 50%; background: #1d9bf0; display: grid; place-items: center; box-shadow: 0 6px 16px rgba(29, 155, 240, .35); }
-    #aam-demo .ic svg { width: 30px; height: 30px; margin-left: 5px; fill: #fff; }
-    #aam-demo .k { display: block; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #0f6fb5; margin-bottom: 4px; }
-    #aam-demo .t { display: block; font-size: 24px; font-weight: 700; line-height: 1.2; margin-bottom: 6px; }
-    #aam-demo .d { display: block; font-size: 15.5px; line-height: 1.5; color: #536471; }
-    #aam-demo .tunes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-    #aam-demo .tunes span { font-size: 12.5px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: #fff; border: 1px solid #cfe6f7; color: #0f1419; }
-    #aam-demo iframe { display: block; width: 100%; height: min(700px, 86vh); border: 1px solid #cfe6f7; border-radius: 18px; background: #e8f5fe; }
-    @media (max-width: 620px) {
-      #aam-demo .poster { grid-template-columns: 1fr; gap: 14px; padding: 20px 18px; }
-      #aam-demo .ic { width: 60px; height: 60px; } #aam-demo .t { font-size: 20px; }
-      #aam-demo iframe { height: min(640px, 88vh); border-radius: 14px; }
-    }
+    #aam-demo .poster { display: flex; gap: 16px; align-items: center; width: 100%; margin: 0; padding: 16px 18px; border: 1px solid #cfe6f7; border-radius: 16px;
+      background: linear-gradient(135deg, #e8f5fe 0%, #f6fbff 100%); text-align: left; cursor: pointer; color: #0f1419; font: inherit; white-space: normal;
+      box-shadow: none; transition: box-shadow .15s ease, transform .15s ease; }
+    #aam-demo .poster:hover, #aam-demo .poster:focus-visible { box-shadow: 0 8px 22px rgba(29, 155, 240, .2); transform: translateY(-1px); outline: none; background: linear-gradient(135deg, #e8f5fe 0%, #f6fbff 100%); color: #0f1419; }
+    #aam-demo .ic { flex: none; width: 54px; height: 54px; border-radius: 50%; background: #1d9bf0; display: grid; place-items: center; box-shadow: 0 5px 14px rgba(29, 155, 240, .35); }
+    #aam-demo .ic svg { width: 22px; height: 22px; margin-left: 4px; fill: #fff; }
+    #aam-demo .tx { min-width: 0; }
+    #aam-demo .k { display: block; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #0f6fb5; line-height: 1.3; margin-bottom: 2px; }
+    #aam-demo .t { display: block; font-size: 19px; font-weight: 700; line-height: 1.25; margin-bottom: 3px; }
+    #aam-demo .d { display: block; font-size: 14px; font-weight: 400; line-height: 1.45; color: #536471; }
+    #aam-demo iframe { display: block; width: 100%; height: min(700px, 86vh); border: 1px solid #cfe6f7; border-radius: 16px; background: #e8f5fe; }
+    /* in a narrow column on a big screen the band opens in a window over the page instead of squeezing in */
+    #aam-demo-modal { position: fixed; inset: 0; z-index: 2147483000; display: grid; place-items: center; padding: 3vh 3vw; background: rgba(15, 20, 25, .6); }
+    #aam-demo-modal .win { position: relative; width: min(1180px, 100%); height: min(760px, 100%); }
+    #aam-demo-modal iframe { display: block; width: 100%; height: 100%; border: 0; border-radius: 16px; background: #e8f5fe; box-shadow: 0 24px 60px rgba(0, 0, 0, .4); }
+    #aam-demo-modal .x { position: absolute; top: -14px; right: -14px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: #fff; color: #0f1419; font: 700 18px/36px system-ui, sans-serif; text-align: center; padding: 0; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, .3); }
+    @media (max-width: 620px) { #aam-demo iframe { height: min(640px, 88vh); border-radius: 14px; } }
   </style>
   <button class="poster" type="button" aria-label="Try the play-along band">
     <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></span>
-    <span>
-      <span class="k">Try it now · free, no sign-up</span>
+    <span class="tx">
+      <span class="k">Try it now · free</span>
       <span class="t">Play along with the band</span>
-      <span class="d">Pick a tune, choose your instrument, press play and set your own tempo. This is how my students practise between lessons.</span>
-      <span class="tunes"><span>Ode to Joy</span><span>When the Saints</span><span>Jingle Bells</span><span>Twinkle, Twinkle</span><span>Auld Lang Syne</span><span>Major scale</span><span>Blues riff</span></span>
+      <span class="d">Ode to Joy, Jingle Bells and five more, at any tempo, written for your instrument.</span>
     </span>
   </button>
 </div>
@@ -49,15 +50,25 @@
     var doc = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base target="_top"></head><body style="margin:0;background:#e8f5fe">' +
       '<div id="aam-boot" style="height:100vh;display:grid;place-items:center;font:500 15px system-ui,sans-serif;color:#536471">Loading the band…</div>' +
       "<script>window.AAM_DEMO=" + JSON.stringify(c).replace(/</g, "\\u003c") + ";<\/script><script>" + LOADER + "<\/script></body></html>";
-    var old = box.querySelector("iframe"), f = document.createElement("iframe");
-    f.title = "Play-along demo"; f.setAttribute("allow", "autoplay"); f.srcdoc = doc;
-    if (old) box.replaceChild(f, old); else { var p = box.querySelector(".poster"); box.replaceChild(f, p); }
+    var f = document.createElement("iframe"); f.title = "Play-along demo"; f.setAttribute("allow", "autoplay"); f.srcdoc = doc;
+    var modal = document.getElementById("aam-demo-modal"), old = (modal || box).querySelector("iframe");
+    if (old) { old.parentNode.replaceChild(f, old); return; }                 // another tune: same place
+    if (window.innerWidth >= 900 && box.clientWidth < 720) {                  // a narrow column on a big screen: open over the page
+      modal = document.createElement("div"); modal.id = "aam-demo-modal";
+      modal.innerHTML = '<div class="win"><button class="x" type="button" aria-label="Close the demo">×</button></div>';
+      document.body.appendChild(modal); modal.querySelector(".win").appendChild(f);   // on the page itself, so no column can clip it
+      var close = function () { if (modal.parentNode) modal.parentNode.removeChild(modal); document.removeEventListener("keydown", esc); };
+      var esc = function (e) { if (e.key === "Escape") close(); };
+      modal.querySelector(".x").onclick = close; modal.addEventListener("click", function (e) { if (e.target === modal) close(); }); document.addEventListener("keydown", esc);
+      return;
+    }
+    box.replaceChild(f, box.querySelector(".poster"));
+    try { box.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) {}
   }
   window.aamDemoGo = function (slug) { track("aam_demo_tune", { tune: slug }); frame(slug); };   // the frame asks for another tune
   box.querySelector(".poster").onclick = function () {
     track("aam_demo_start", {});
     frame(null);
-    try { box.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) {}
   };
 })();
 </script>
