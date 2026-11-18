@@ -550,7 +550,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 
 <script>
 // >>> SETTINGS
-var PLAYER_VERSION = "2026-11-18 13:01 UTC (after 5db422b)";    // stamped by tools/release.py when a version is released
+var PLAYER_VERSION = "2026-11-18 13:09 UTC (after 820d6ec)";    // stamped by tools/release.py when a version is released
 var STUDENT_HOME = "https://alexattardmusic.com/student-login/";              // where the "back" link goes: put the address of your student login page here, e.g. "/student-login/"
 var STUDENT_HOME_LABEL = "Student home";         // what the link says. Leave "" for "Student login" (or "Website" while the address above is "/")
 var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    // folder with p36.mp3 ... d-ride.mp3 (keep the final "/")
@@ -1258,7 +1258,7 @@ function aamBoot(TUNE) {
   }
   toggle("bass", "bass"); toggle("drums", "drums"); toggle("comp", "comp"); toggle("countin", "countin"); toggle("ramp", "ramp");
   if (STYLE !== "swing") {                                     // exercises: a click, with or without a drone, in place of the band
-    $("comp").hidden = true; $("drums").textContent = "Click";
+    $("comp").hidden = true; $("drums").hidden = true;   // the beat comes from the metronome button on the play bar
     if (STYLE === "drone") $("bass").textContent = "Drone"; else $("bass").hidden = true;
   }
   // A piece written for two hands: hear either hand alone, or both ("solo" pieces play the written part from the start)
@@ -1469,13 +1469,14 @@ function aamBoot(TUNE) {
     applyMix(); try { localStorage.removeItem("aam-mix"); } catch (e) {}
   };
   if (STYLE !== "swing") {                                     // exercises: a click, and perhaps a drone
-    $("mix-drums-l").textContent = "Click"; $("mix-bass-l").textContent = "Drone";
+    root.querySelector('[data-mixrow="drums"]').hidden = true; $("mix-bass-l").textContent = "Drone";
     root.querySelector('[data-mixrow="comp"]').hidden = true;
     if (STYLE !== "drone") root.querySelector('[data-mixrow="bass"]').hidden = true;
   }
   // ---------- metronome: its own button on the play bar. A click on every beat while the player runs, with the music or on its own
-  var met = { on: false, accent: true, sound: "click", vol: 0, only: false }, musicGate = null, metOut = null, metSyn = null;
-  try { var mm = JSON.parse(localStorage.getItem("aam-met") || "{}"); met.on = !!mm.on; met.accent = mm.accent !== false; if (["click", "wood", "beep"].indexOf(mm.sound) >= 0) met.sound = mm.sound; if (typeof mm.vol === "number") met.vol = Math.max(-12, Math.min(6, mm.vol)); } catch (e) {}
+  var MET_KEY = STYLE === "swing" ? "on" : "on1";               // on by default where there is no band (pieces, exercises); off by default with the band. Each remembers its own choice
+  var met = { on: STYLE !== "swing", accent: true, sound: "click", vol: 0, only: false }, musicGate = null, metOut = null, metSyn = null;
+  try { var mm = JSON.parse(localStorage.getItem("aam-met") || "{}"); if (typeof mm[MET_KEY] === "boolean") met.on = mm[MET_KEY]; met.accent = mm.accent !== false; if (["click", "wood", "beep"].indexOf(mm.sound) >= 0) met.sound = mm.sound; if (typeof mm.vol === "number") met.vol = Math.max(-12, Math.min(6, mm.vol)); } catch (e) {}
   function metBuild() {
     if (metSyn || !window.Tone) return;
     metOut = new Tone.Gain(Tone.dbToGain(met.vol)).connect(new Tone.Limiter(-2).toDestination());
@@ -1502,7 +1503,7 @@ function aamBoot(TUNE) {
       : "Press play: the click runs along with the music, at the tempo on the slider.";
     if (metOut) metOut.gain.rampTo(Tone.dbToGain(met.vol), 0.03);
     if (musicGate) musicGate.gain.rampTo(met.on && met.only ? 0 : 1, 0.04);
-    if (save) { try { localStorage.setItem("aam-met", JSON.stringify({ on: met.on, accent: met.accent, sound: met.sound, vol: met.vol })); } catch (e) {} }
+    if (save) { try { var keep = {}; try { keep = JSON.parse(localStorage.getItem("aam-met") || "{}"); } catch (e) {} keep[MET_KEY] = met.on; keep.accent = met.accent; keep.sound = met.sound; keep.vol = met.vol; localStorage.setItem("aam-met", JSON.stringify(keep)); } catch (e) {} }
   }
   (function () {
     var dlg = $("mdlg"), vol = $("m-vol"), pv = 0;
@@ -1569,7 +1570,6 @@ function aamBoot(TUNE) {
     if (STYLE !== "swing") {                                   // a click on every beat (louder on beat 1), and for "drone" the root and fifth of each chord
       for (var kb = 0; kb < NB; kb++) {
         (function (b0, bar) {
-          for (var q = 0; q < BPB; q++) (function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums) drm("stick", time, bt === 0 ? 0.9 : 0.5, bt === 0 ? 2 : -7); }); })(q);
           if (STYLE !== "drone") return;
           var beat = 0;
           bar.forEach(function (c) {
