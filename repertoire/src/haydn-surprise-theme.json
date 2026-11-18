@@ -1,13 +1,12 @@
 {
  "slug": "gr1-haydn-surprise-theme",
  "title": "\"Surprise\" Symphony (opening theme)",
- "composer": "Joseph Haydn, arr. Alex Attard Music · DRAFT, not yet checked",
+ "composer": "Joseph Haydn, arr. Alex Attard Music",
  "key": "C",
  "meter": "2/4",
  "tempo": 84,
- "source": "UNCHECKED. The first eight bars of the Andante melody (Symphony No. 94) written from memory, played twice with the surprise chord; the left hand is our own simple setting.",
- "unchecked": true,
- "note": "DRAFT: written from memory on 18 Nov 2026 and not yet checked against a printed score. Proofread before printing or selling",
+ "source": "Melody checked on 18 Nov 2026 against the notation in the Wikipedia article on Haydn's Symphony No. 94 (the first sixteen bars of the Andante, with the surprise chord). The left hand is our own simple setting.",
+ "note": "",
  "rh": [
   "!p!.C.C .E.E",
   ".G.G E2",
@@ -16,7 +15,7 @@
   ".C.C .E.E",
   ".G.G E2",
   ".c.c .^F.F",
-  "G2 z2",
+  "G2 G,z",
   "!pp!.C.C .E.E",
   ".G.G E2",
   ".F.F .D.D",
@@ -24,7 +23,7 @@
   ".C.C .E.E",
   ".G.G E2",
   ".c.c .^F.F",
-  "!ff![GBd]2 z2"
+  "Gz !ff![DBg]2"
  ],
  "lh": [
   "!p!C,2 C,2",
@@ -42,6 +41,6 @@
   "C,2 C,2",
   "C,2 C,2",
   "C,2 D,2",
-  "!ff![G,,G,]2 z2"
+  "G,,z !ff![G,,D,G,]2"
  ]
 }

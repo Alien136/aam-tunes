@@ -1,13 +1,12 @@
 {
  "slug": "gr1-beethoven-ode-to-joy",
  "title": "Ode to Joy (theme)",
- "composer": "Ludwig van Beethoven, arr. Alex Attard Music · DRAFT, not yet checked",
+ "composer": "Ludwig van Beethoven, arr. Alex Attard Music",
  "key": "G",
  "meter": "4/4",
  "tempo": 104,
- "source": "UNCHECKED. The melody (from the Ninth Symphony, here in G) written from memory; the left hand is our own simple setting.",
- "unchecked": true,
- "note": "DRAFT: written from memory on 18 Nov 2026 and not yet checked against a printed score. Proofread before printing or selling",
+ "source": "Melody checked on 18 Nov 2026 against the notation in the Wikipedia article \"Ode to Joy\" (in G). The left hand is our own simple setting.",
+ "note": "",
  "rh": [
   "!mf!B2B2 c2d2",
   "d2c2 B2A2",
@@ -20,8 +19,8 @@
   "A2A2 B2G2",
   "A2 Bc B2G2",
   "A2 Bc B2A2",
-  "G2A2 D4",
-  "!f!B2B2 c2d2",
+  "G2A2 D2!f!B2-",
+  "B2B2 c2d2",
   "d2c2 B2A2",
   "G2G2 A2B2",
   "A3G G4"
