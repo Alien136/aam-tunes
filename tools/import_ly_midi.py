@@ -7,6 +7,7 @@ fingering, phrasing and dynamics are then added by hand in the ABC.
 """
 import argparse, json, mido
 G = 12                                   # grid: twelfths of a beat (sixteenths = 3, triplet eighths = 4, eighths = 6)
+NEXT = {}
 LET = "CDEFGAB"; NAT = [0, 2, 4, 5, 7, 9, 11]
 SHARPS, FLATS = "FCGDAEB", "BEADGCF"
 KEYS = {"C": 0, "G": 1, "D": 2, "A": 3, "E": 4, "F": -1, "Bb": -2, "Eb": -3, "Ab": -4,
@@ -28,14 +29,15 @@ def read(path):
         if notes: hands.append(sorted(notes))
     return hands
 
-def spell(midi, ks, tonic, minor=False):
+def spell(midi, ks, tonic, minor=False, rises=False):
     """Letter, accidental and octave for a pitch: in the key if it can be; otherwise the usual chromatic spelling for the key
     (major keys: raised 1st, 4th and 5th degrees as sharps, lowered 3rd and 7th as flats)."""
     pc = midi % 12
     for i, l in enumerate(LET):
         v = NAT[i] + ks.get(l, 0)
         if v % 12 == pc: return l, ks.get(l, 0), (midi - v) // 12 - 1
-    if minor: want = {1: -1, 4: 1, 6: 1, 9: 1, 11: 1}[(pc - tonic) % 12]     # counted from the minor tonic: raised 3rd, 4th, 6th, 7th
+    if rises: want = 1                           # a chromatic note that steps up a half step is written as a sharp
+    elif minor: want = {1: -1, 4: 1, 6: 1, 9: 1, 11: 1}[(pc - tonic) % 12]     # counted from the minor tonic: raised 3rd, 4th, 6th, 7th
     else: want = {1: 1, 3: -1, 6: 1, 8: 1, 10: -1}[(pc - tonic) % 12]
     for acc in (0, want, -want):                 # a natural that cancels the key signature comes first (B natural in F major)
         for i, l in enumerate(LET):
@@ -66,6 +68,7 @@ def bars_for(notes, key, bpb, nbars):
         if nxt is not None: d = min(d, nxt - s)
         if d in (5, 11, 17, 23): d += 1        # a note LilyPond's MIDI shortened slightly
         seq.append((s, sorted(p for p, _ in groups[s]), d))
+    global NEXT; NEXT = {seq[i][0]: seq[i + 1][1] for i in range(len(seq) - 1)}   # onset -> the pitches that follow
     pos = 0; items = []                        # (start, pitches or None, length), rests filled in, split at barlines with ties
     for s, ps, d in seq:
         if s > pos: items.append((pos, None, s - pos, False))
@@ -96,7 +99,7 @@ def bars_for(notes, key, bpb, nbars):
 def tok(r, state, ks, tonic, dtxt):
     s, ps, d, tie = r
     if ps is None: return "z" + dtxt
-    names = [abc_note(*spell(p, ks, tonic[0], tonic[1]), state, ks) for p in ps]
+    names = [abc_note(*spell(p, ks, tonic[0], tonic[1], (p + 1) in NEXT.get(s, [])), state, ks) for p in ps]
     return ("[" + "".join(names) + "]" if len(names) > 1 else names[0]) + dtxt + ("-" if tie else "")
 
 if __name__ == "__main__":
