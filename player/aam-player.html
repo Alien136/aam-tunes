@@ -313,6 +313,9 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 /* contents of a booklet */
 #aam-play h1.has-toc { cursor: pointer; padding-right: 22px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%231A91DA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 4px center; display: inline-block; max-width: 100%; }
 #aam-play .toc-list { display: grid; gap: 2px; }
+#aam-play .toc-dl { display: grid; gap: 4px; margin-bottom: 10px; padding: 12px; border-radius: 14px; background: var(--tint); }
+#aam-play .toc-dl button { width: 100%; text-align: center; height: 44px; border-radius: 12px; background: var(--accent); color: var(--accent-ink); font: 600 15px var(--body); } #aam-play .toc-dl button:disabled { opacity: .5; }
+#aam-play .toc-dl small { font: 500 12px var(--body); color: var(--ink); opacity: .75; text-align: center; } #aam-play .toc-dl-msg:empty { display: none; }
 #aam-play .toc-nav { display: flex; gap: 8px; margin-top: 6px; } #aam-play .toc-nav button { flex: 1; height: 42px; border-radius: 12px; background: var(--tint); color: var(--ink); font: 600 14px var(--body); }
 #aam-play .toc-nav button:disabled { opacity: .4; }
 /* key and instrument */
@@ -1830,6 +1833,7 @@ function aamLibrary() {
       if (CAT.pdfs.some(function (x) { return x.id === id; })) return;
       var pd = { id: id, title: p.title, hash: p.hash, free: !!p.free, tunes: p.tunes.map(function (s) { return prefix + s; }) };
       if (p.contents) pd.contents = p.contents.map(function (g) { return { title: g.title, items: g.items.map(function (s) { return prefix + s; }) }; });   // a booklet's chapters
+      if (p.file) { pd.file = p.file; pd._src = src; }   // the booklet itself, locked to its code
       CAT.pdfs.push(pd);
     });
   }
@@ -1896,6 +1900,33 @@ function aamLibrary() {
         .then(function () { return find(h); });
     });
   }
+  // ---- the booklet's PDF: always the newest edition, stored locked; the code that opens the booklet opens the file
+  function keep(code, r) {                               // remember the file key that belongs to this code (not the code itself)
+    var t = "aam-pdf:" + norm(code), bytes = [];
+    for (var i = 0; i < t.length; i++) bytes.push(t.charCodeAt(i) & 255);
+    lib.keys = lib.keys || {}; lib.keys[r === "all" ? "all" : r.id] = sha256(bytes); save();
+  }
+  var unhex = function (h) { var a = new Uint8Array(h.length / 2); for (var i = 0; i < a.length; i++) a[i] = parseInt(h.substr(2 * i, 2), 16); return a; };
+  function openGcm(keyBytes, iv, data) {
+    return crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, ["decrypt"]).then(function (k) { return crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, k, data); });
+  }
+  function getPdf(p) {                                   // -> a Blob of the PDF
+    var keys = [(lib.keys || {})[p.id], (lib.keys || {}).all].filter(Boolean);
+    if (!keys.length) return Promise.reject(new Error("nokey"));
+    if (!(window.crypto && crypto.subtle)) return Promise.reject(new Error("old"));
+    var f = p.file, tries = [];
+    keys.forEach(function (k) { f.keys.forEach(function (w) { tries.push([k, w]); }); });
+    var unwrap = function (i) {
+      if (i >= tries.length) return Promise.reject(new Error("nokey"));
+      return openGcm(unhex(tries[i][0]), unhex(tries[i][1].iv), unhex(tries[i][1].ct)).catch(function () { return unwrap(i + 1); });
+    };
+    var fetchBin = function (i) {
+      if (i >= p._src.length) return Promise.reject(new Error("unreachable"));
+      return fetch(p._src[i] + f.path, { cache: "no-cache" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).catch(function () { return fetchBin(i + 1); });
+    };
+    return unwrap(0).then(function (K) { return fetchBin(0).then(function (buf) { return openGcm(new Uint8Array(K), unhex(f.iv), buf); }); })
+      .then(function (pdf) { return new Blob([pdf], { type: "application/pdf" }); });
+  }
   function grant(r) {
     if (r === "all") lib.all = true;
     else if (lib.pdfs.indexOf(r.id) < 0) lib.pdfs.push(r.id);
@@ -1937,7 +1968,7 @@ function aamLibrary() {
       err.textContent = "Checking…";
       check(input.value).then(function (r) {
         if (!r) { err.textContent = CAT.pdfs.length ? "That code didn't match. Check page 1 of your PDF, or ask Alex." : "Couldn't reach the tune library. Check your internet connection and try again."; input.select(); return; }
-        err.textContent = ""; sessionCode = norm(input.value); grant(r); onOk(r);
+        err.textContent = ""; sessionCode = norm(input.value); grant(r); keep(input.value, r); onOk(r);
       }).catch(function (e2) { err.textContent = "Something went wrong (" + ((e2 && e2.message) || e2) + "). Reload the page and try again."; });
     });
   }
@@ -1948,6 +1979,7 @@ function aamLibrary() {
     if (!p || p.tunes.length < 2) return;
     var groups = p.contents || [{ title: "", items: p.tunes }], order = [];
     var html = "";
+    if (p.file && !DEMO) html += '<div class="toc-dl"><button data-dl="1">Download the latest PDF</button><small>' + esc(p.file.edition + " · " + (p.file.size / 1048576).toFixed(1) + " MB") + '</small><small class="toc-dl-msg" aria-live="polite"></small></div>';
     groups.forEach(function (g) {
       if (g.title) html += '<div class="lib-pdf">' + esc(g.title) + "</div>";
       g.items.forEach(function (s) {
@@ -1962,6 +1994,18 @@ function aamLibrary() {
     [].forEach.call($("toc-list").querySelectorAll("[data-slug], [data-go]"), function (b) {
       b.onclick = function () { var to = b.dataset.slug || b.dataset.go; if (to && to !== slug) go(to); else $("toc").hidden = true; };
     });
+    var dl = $("toc-list").querySelector("[data-dl]");
+    if (dl) dl.onclick = function () {
+      var msg = $("toc-list").querySelector(".toc-dl-msg"); msg.textContent = "Getting the PDF…"; dl.disabled = true;
+      getPdf(p).then(function (blob) {
+        var a = document.createElement("a"), url = URL.createObjectURL(blob); a.href = url; a.download = p.file.name; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 60000); msg.textContent = "Downloaded: " + p.file.name; dl.disabled = false;
+      }).catch(function (e) {
+        dl.disabled = false;
+        msg.textContent = e.message === "nokey" ? "Scan a QR code in your booklet once (or type your code again under \"Add another PDF\"), then download."
+          : e.message === "old" ? "This browser can't open the file. Try a newer browser." : "Couldn't get the file. Check your internet connection and try again.";
+      });
+    };
     h1.classList.add("has-toc"); h1.setAttribute("role", "button"); h1.setAttribute("aria-haspopup", "dialog");
     h1.onclick = function () { $("toc").hidden = false; };
     $("toc-close").onclick = function () { $("toc").hidden = true; };
@@ -2030,7 +2074,7 @@ function aamLibrary() {
   ready = loadSources();
   var q = new URLSearchParams(location.search), want = (DEMO && DEMO.tune) || q.get("tune") || q.get("t"), code = DEMO ? null : q.get("code") || q.get("c");   // QR codes use the short t= and c=
   ready.then(function () { return code ? check(code) : null; }).then(function (r) {
-    if (r) grant(r);
+    if (r) { grant(r); keep(code, r); }
     if (!want && r && r !== "all") want = r.tunes[0];
     if (!want) want = lib.last && mine(lib.last) ? lib.last : (myPdfs()[0] || {}).tunes ? myPdfs()[0].tunes[0] : null;
     if (code && r) sessionCode = norm(code);

@@ -133,7 +133,24 @@
       "sax-welcome-alto-blues"
      ]
     }
-   ]
+   ],
+   "file": {
+    "path": "pdf/sax-welcome-alto.bin",
+    "name": "Sax_Welcome_Booklet_Alto.pdf",
+    "edition": "November 2026",
+    "size": 5233717,
+    "iv": "68d6f30ec6e622e32a0b9926",
+    "keys": [
+     {
+      "iv": "96f7b249790e1326e784ca99",
+      "ct": "fafffb80ddc21178ad2061eb35cc5f1a74f643e7ffc4701d8582670eabd398d68b8feaa5b2e50df2946c751b4bb5f058"
+     },
+     {
+      "iv": "0e1f0712401e67f7943ac767",
+      "ct": "a78cc2235ee12c960306888c61dcaa72df5d8ff50a60f71caa1a85c1bb7c7b7fbc9db94d641e5d59fdfd543d5202c9a0"
+     }
+    ]
+   }
   },
   {
    "id": "sax-welcome-tenor",
@@ -224,7 +241,24 @@
       "sax-welcome-tenor-blues"
      ]
     }
-   ]
+   ],
+   "file": {
+    "path": "pdf/sax-welcome-tenor.bin",
+    "name": "Sax_Welcome_Booklet_Tenor.pdf",
+    "edition": "November 2026",
+    "size": 5235010,
+    "iv": "54978403d7c5b173acc00d51",
+    "keys": [
+     {
+      "iv": "78cdfd437ec25b690ae868d9",
+      "ct": "2c174aa0d2c8fedbd9f72dd59ac650f145d20a9cbe23d30bb54ef5f253ffc64fa92c74c643a0def0e142cda3c20c6868"
+     },
+     {
+      "iv": "367f5f017383d913e5d0606b",
+      "ct": "d38df87976e4f3c22de610352c5b0cf7ace35d1518699956a393fc465c2800508eac1bce67707ba9dca915a359fd2316"
+     }
+    ]
+   }
   },
   {
    "id": "fly-me-to-the-moon-piano",
@@ -251,7 +285,24 @@
     "gr1-musette-in-d-anh126",
     "gr1-minuet-in-g-anh116",
     "gr1-march-in-e-flat-anh127"
-   ]
+   ],
+   "file": {
+    "path": "pdf/graded-repertoire-1-baroque-classical.bin",
+    "name": "Graded_Repertoire_Level_1.pdf",
+    "edition": "November 2026",
+    "size": 2811518,
+    "iv": "9c18a98f3b0b97f615e82474",
+    "keys": [
+     {
+      "iv": "f69caf28a937c612549970d6",
+      "ct": "fdf220a2eb0c077047a21b6a72a5b7ebee08dc8be27c97853d3215a67823090a7319572bd7924ca92a2cbab608b3c0a9"
+     },
+     {
+      "iv": "1b9400038511f0e69bce84dd",
+      "ct": "17a7aa49ac5b2298fd6da9a25d2bf279637c7683e5bb2f9b49bb5f74dc825a428ddae0d15ee7214859887bb3aa3d33db"
+     }
+    ]
+   }
   },
   {
    "id": "sax-beginner-alto",
@@ -576,7 +627,24 @@
       "sax-beginner-alto-d-major-scale-and-arpeggio"
      ]
     }
-   ]
+   ],
+   "file": {
+    "path": "pdf/sax-beginner-alto.bin",
+    "name": "Sax_Beginner_Booklet_Alto.pdf",
+    "edition": "Edition 4 · November 2026",
+    "size": 4063229,
+    "iv": "f174b8e5bc0ff567d5208dda",
+    "keys": [
+     {
+      "iv": "aae1548015ea72ecf21a8f91",
+      "ct": "f7d80927232836656d0d5b56e79dfa09ee2998d4af0f36a279bae229c6a271e510da55f176a4abc673cf40a29ee14e7b"
+     },
+     {
+      "iv": "4793c5b0947bfb2de099ae1c",
+      "ct": "827aae5f71b4bd6a6179f63fe71819fcd79e412e46655e72992430769f848fd38eb1e5e71e87e7b082f33ba8e97fec32"
+     }
+    ]
+   }
   },
   {
    "id": "sax-beginner-tenor",
@@ -901,7 +969,24 @@
       "sax-beginner-tenor-d-major-scale-and-arpeggio"
      ]
     }
-   ]
+   ],
+   "file": {
+    "path": "pdf/sax-beginner-tenor.bin",
+    "name": "Sax_Beginner_Booklet_Tenor.pdf",
+    "edition": "Edition 4 · November 2026",
+    "size": 4065676,
+    "iv": "7461f5854efa60abc9250a2d",
+    "keys": [
+     {
+      "iv": "33468bb4f6bd8c1377926506",
+      "ct": "7e33871198fc0ef295baabc8b8b9f1a43a0dcdfeba490760c310b79c4db003e5f302bee465facc8e7bf83f10e0bc7a2d"
+     },
+     {
+      "iv": "c2ac0ad1e77b807f430a7f71",
+      "ct": "dbb50b51f2adc76aa573b76c234698cf7d30c4d1b537879b5953e7e94f6348b0fe19f0a6db34897c3b7a8ddea5b68296"
+     }
+    ]
+   }
   },
   {
    "id": "demo",

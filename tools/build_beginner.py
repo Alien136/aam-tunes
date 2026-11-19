@@ -42,6 +42,7 @@ KIND = {"note": (AMBER, "#FBF1E1", "NEW NOTE"), "rhythm": ("#4A78B0", "#EAF1F8",
         "symbol": ("#7A5AA6", "#F0EBF7", "NEW SYMBOL"), "skill": ("#2E8C9E", "#E4F2F5", "SAX SKILL")}
 PILL = {"CLAP": "#4A78B0", "WRITE": "#B5533C", "DUET": "#7A5AA6", "SCALE": "#3E8E7E", "ROUND": "#7A5AA6"}
 CACHE = os.path.join(B.OUT, "beg"); os.makedirs(CACHE, exist_ok=True)
+EDITION = "Edition 4 · November 2026"                               # printed in the footer and shown beside the download in the player
 STAFF = 18
 LINE_MM = 176.0
 HALF_MM = 85.0                                                      # two short lines share a row
@@ -596,7 +597,7 @@ class Book:
     def footer(self):
         c = self.c
         c.setStrokeColor(HexColor(RULE)); c.setLineWidth(0.6); c.line(M, 40, W - M, 40)
-        c.setFont("Pop-M", 8.5); c.setFillColor(HexColor(SLATE)); c.drawString(M, 28, "Alex Attard Music  ·  Saxophone Beginner Booklet")
+        c.setFont("Pop-M", 8.5); c.setFillColor(HexColor(SLATE)); c.drawString(M, 28, "Alex Attard Music  ·  Saxophone Beginner Booklet"); c.setFont("Pop", 7.5); c.setFillColor(HexColor(MUTED)); c.drawString(M + 232, 28, EDITION)
         c.setFont("Pop-B", 9); c.setFillColor(HexColor(AMBER)); c.drawRightString(W - M, 28, str(self.n)); self.n += 1
 
 def note_card(c, x0, ytop, w, h, ly, name, tip, tint=TINT):
@@ -1158,7 +1159,11 @@ def main():
     print(out, book.n - 1, "pages,", book.line_no, "numbered lines")
     if "--fill" in ARGS:
         for kicker, k, pct in book.fill: print("  page %2d  %-9s %3d%%" % (k, kicker, pct))
-    if REPO: publish(REPO)
+    if REPO:
+        publish(REPO)
+        if os.environ.get("AAM_CODE"):
+            import publish_pdf; publish_pdf.publish_pdf(out, "sax-beginner-" + ED, CODE, EDITION, repo=REPO)
+        else: print("AAM_CODE not set: the PDF in the player was NOT updated")
     if "--sources" in ARGS:
         for t, s in sources_text(): print("  %-34s %s" % (t, s))
 

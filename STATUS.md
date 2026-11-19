@@ -71,3 +71,15 @@ Everything needed to carry on from any conversation is in this repository and in
   leap, length, eighth notes, dotted quarters); drills and written work stay put, a duet stays behind its tune, `review=True` tunes go last.
 - 37 pages, 128 numbered lines. Same codes and unit QR links. Check `--fill` after any content change: every unit must start at the top
   of a page and end on a full one (staff paper takes up to four lines of slack).
+
+## 2026-11-19 (night) · The newest PDF of every booklet, inside the player
+- `tools/publish_pdf.py` encrypts a booklet PDF (AES-256-GCM, random key) to `pdf/<id>.bin` and stores the key in the booklet's
+  `file` entry in index.json, wrapped once with a key made from the booklet code and once with one made from the master code
+  (`sha256("aam-pdf:" + CODE)`). Needs `AAM_CODE`. Publishing again overwrites the file: only the newest edition exists.
+- Player: the contents dialog (tap the title) shows "Download the latest PDF" with the edition and size. The file key is remembered
+  when a code is entered or a QR code scanned (`lib.keys`); a student who unlocked before this feature is asked to scan once.
+- `build_beginner.py --publish` calls it when `AAM_CODE` is set; `EDITION` is printed in the footer. For the Welcome Booklets and
+  Graded Repertoire run `publish_pdf.py` after a rebuild. Any tool that rewrites a booklet's entry in index.json drops `file`:
+  run `publish_pdf.py` again afterwards.
+- Not real protection for paid material: the repository is public and the codes are short. Single-tune lead sheets have no
+  contents dialog yet, so no download button.
