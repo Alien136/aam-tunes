@@ -42,18 +42,21 @@ KIND = {"note": (AMBER, "#FBF1E1", "NEW NOTE"), "rhythm": ("#4A78B0", "#EAF1F8",
         "symbol": ("#7A5AA6", "#F0EBF7", "NEW SYMBOL"), "skill": ("#2E8C9E", "#E4F2F5", "SAX SKILL")}
 PILL = {"CLAP": "#4A78B0", "WRITE": "#B5533C", "DUET": "#7A5AA6", "SCALE": "#3E8E7E", "ROUND": "#7A5AA6"}
 CACHE = os.path.join(B.OUT, "beg"); os.makedirs(CACHE, exist_ok=True)
-STAFF = 21
+STAFF = 18
 LINE_MM = 176.0
+HALF_MM = 85.0                                                      # two short lines share a row
+DUET_IN = 7.0                                                       # mm: the A / B labels hang in the margin
 
 # ---------------------------------------------------------------- the curriculum
 # music: LilyPond, absolute pitch, bars separated by "|".  names: print letter names under the notes.
 # hl: notes to print in amber (the new notes, where they first appear).  bpl: bars per line.  src: where the tune was checked.
-def L(title, music, sub="", key="c", time="4/4", names=False, hl=(), bpl=4, partial=None, lyr=None, src=None, tempo=None, slug=None,
-      b=None, rhythm=False, quiz=None, badge=None, pill=None, repeat=False, about=None, tempo_word=None):
+def L(title, music, sub="", key="c", time="4/4", names=False, hl=(), bpl=None, partial=None, lyr=None, src=None, tempo=None, slug=None,
+      b=None, rhythm=False, quiz=None, badge=None, pill=None, repeat=False, about=None, tempo_word=None, rep=None):
     # slug: give the OLD title here when you rename a line, so QR codes on copies already printed keep working
     # b: a second part (duet).  rhythm: a line to clap, on a one-line staff.  quiz: "names" | "counts" | "bars" (a written exercise).
     # badge: "CLAP" / "WRITE" lines carry a badge instead of a number and are not in the player.  pill: a small label after the number.
-    return dict(slug=slug, b=b, rhythm=rhythm, quiz=quiz, badge=badge, pill=pill, repeat=repeat, about=about, tempo_word=tempo_word, type="line", title=title, music=music, sub=sub, key=key, time=time, names=names, hl=set(hl), bpl=bpl, partial=partial, lyr=lyr, src=src, tempo=tempo)
+    # bpl: bars per line; leave it out and the line picks 8, 6 or 4 by how busy its bars are.  rep: repeat the first `rep` bars.
+    return dict(rep=rep, slug=slug, b=b, rhythm=rhythm, quiz=quiz, badge=badge, pill=pill, repeat=repeat, about=about, tempo_word=tempo_word, type="line", title=title, music=music, sub=sub, key=key, time=time, names=names, hl=set(hl), bpl=bpl, partial=partial, lyr=lyr, src=src, tempo=tempo)
 
 WIKI = "checked against the notation in Wikipedia"
 MEM = "written from memory: check"
@@ -62,9 +65,7 @@ UNITS = [
   boxes=[("rhythm", "Whole, half and quarter notes", "A <b>whole note</b> lasts 4 beats, a <b>half note</b> 2 beats and a <b>quarter note</b> 1 beat. A <b>rest</b> is silence: count it just as carefully."),
          ("word", "Long tone", "One note held as long and as steady as you can. Long tones build your sound, so every unit starts with them.")],
   lines=[L("Count, then play", "b'1 | b'2 b'2 | b'4 b' b' b' | b'1", "Say the counts out loud first.", lyr=["1-2-3-4", "1-2", "3-4", "1", "2", "3", "4", "1-2-3-4"]),
-         L("Long tone: B", "b'1 | r1 | b'1 | r1", "Start with your tongue: \"too\". Keep the sound still.", names=True, hl=["b'"]),
-         L("Long tone: A", "a'1 | r1 | a'1 | r1", names=True, hl=["a'"]),
-         L("Long tone: G", "g'1 | r1 | g'1 | r1", names=True, hl=["g'"]),
+         L("Long tones: B, A and G", "b'1 | r1 | a'1 | r1 | g'1 | r1", "Start with your tongue: \"too\". Keep the sound still.", names=True, hl=["b'", "a'", "g'"]),
          L("Stepping down, stepping up", "b'2 a'2 | g'1 | g'2 a'2 | b'1", names=True),
          L("Quarter notes", "b'4 b' b' b' | a' a' a' a' | g' g' g' g' | g'1", "Tongue every note."),
          L("Hot Cross Buns", "b'4 a' g'2 | b'4 a' g'2 | g'4 g' a' a' | b'4 a' g'2", "English traditional", src=WIKI + " (\"Hot Cross Buns\", simple version; bar 3 in quarter notes)"),
@@ -75,9 +76,8 @@ UNITS = [
  dict(title="C and D: five notes", notes=[("c''", "C", "Middle finger only. Lift the index finger."), ("d''", "D", "All six fingers down, plus the octave key under your left thumb.")],
   boxes=[("word", "Octave key", "The key under your left thumb. Press it and the same fingering sounds one octave higher. D is your first note that uses it."),
          ("word", "Breath mark", "A comma above the staff shows a good place to breathe. Breathe quickly through the corners of your mouth.")],
-  lines=[L("Long tone: C", "c''1 | r1 | c''1 | r1", names=True, hl=["c''"]),
+  lines=[L("Long tones: C and D", "c''1 | r1 | d''1 | r1", "Thumb on the octave key for D.", names=True, hl=["c''", "d''"], slug="Long tone: C"),
          L("B to C", "b'2 c''2 | b'2 c''2 | b'4 c'' b' c'' | b'1", "Two fingers swap places. Go slowly.", names=True),
-         L("Long tone: D", "d''1 | r1 | d''1 | r1", "Thumb on the octave key.", names=True, hl=["d''"]),
          L("Over the break", "c''2 d''2 | c''2 d''2 | c''4 d'' c'' d'' | d''1", "All the fingers land together."),
          L("Five notes up and down", "g'4 a' b' c'' | d''1 | d''4 c'' b' a' | g'1"),
          L("Mary Had a Little Lamb", "b'4 a' g' a' | b' b' b'2 | a'4 a' a'2 | b'4 d'' d''2 | b'4 a' g' a' | b' b' b' b' | a' a' b' a' | g'1", "American traditional", src=MEM),
@@ -88,8 +88,7 @@ UNITS = [
  dict(title="The right hand: F, E and D", notes=[("f'", "F", "Left hand stays down. Add your right index finger."), ("e'", "E", "Add your right middle finger."), ("d'", "Low D", "Add your right ring finger. Six fingers, no octave key.")],
   boxes=[("rhythm", "Dotted half note", "A dot adds half of the note's length. A half note is 2 beats, so a <b>dotted half note</b> is 3 beats."),
          ("word", "Pick-up notes", "Notes before the first full bar. Count the missing beats, then come in.")],
-  lines=[L("Long tones: F and E", "f'1 | r1 | e'1 | r1", "Use warm, slow air for low notes.", names=True, hl=["f'", "e'"]),
-         L("Long tone: low D", "d'1 | r1 | d'1 | r1", "Keep your jaw loose.", names=True, hl=["d'"]),
+  lines=[L("Long tones: F, E and low D", "f'1 | r1 | e'1 | r1 | d'1 | r1", "Warm, slow air and a loose jaw for low notes.", names=True, hl=["f'", "e'", "d'"], slug="Long tones: F and E"),
          L("Right-hand walk", "g'2 f'2 | e'2 d'2 | d'4 e' f' g' | g'1", names=True),
          L("Two Ds", "d'2 d''2 | d'2 d''2 | d'1 | d''1", "Same fingers. Only your thumb moves."),
          L("Three beats", "g'2. g'4 | f'2. f'4 | e'2. e'4 | d'1", lyr=["1-2-3", "4", "1-2-3", "4", "1-2-3", "4", "1-2-3-4"]),
@@ -117,14 +116,14 @@ UNITS = [
          L("G major scale", "g'4 a' b' c'' | d'' e'' fis'' g'' | g'' fis'' e'' d'' | c'' b' a' g'", "Your first scale.", key="g"),
          L("One and two and", "g'4 g'8 g' a'4 a'8 a' | b'4 b'8 b' c''4 c''8 c'' | d''8 d'' d'' d'' d''4 r4 | g'1", key="g", lyr=["1", "2", "and", "3", "4", "and", "1", "2", "and", "3", "4", "and", "1", "and", "2", "and", "3", "1-2-3-4"]),
          L("Frère Jacques", "g'4 a' b' g' | g' a' b' g' | b' c'' d''2 | b'4 c'' d''2 | d''8 e'' d'' c'' b'4 g' | d''8 e'' d'' c'' b'4 g' | g' d' g'2 | g'4 d' g'2", "French traditional", key="g", src=WIKI),
-         L("All My Little Ducklings", "g'8 a' b' c'' d''4 d'' | e''8 e'' e'' e'' d''2 | e''8 e'' e'' e'' d''2 | c''8 c'' c'' c'' b'4 b' | a'8 a' a' a' g'2", "German traditional", key="g", bpl=3, src=WIKI + " (German article \"Alle meine Entchen\")"),
+         L("All My Little Ducklings", "g'8 a' b' c'' d''4 d'' | e''8 e'' e'' e'' d''2 | e''8 e'' e'' e'' d''2 | c''8 c'' c'' c'' b'4 b' | a'8 a' a' a' g'2", "German traditional", key="g", src=WIKI + " (German article \"Alle meine Entchen\")"),
          L("Twinkle, up high", "g'4 g' d'' d'' | e'' e'' d''2 | c''4 c'' b' b' | a' a' g'2 | d''4 d'' c'' c'' | b' b' a'2 | d''4 d'' c'' c'' | b' b' a'2 | g'4 g' d'' d'' | e'' e'' d''2 | c''4 c'' b' b' | a' a' g'2", "The tune you know, in a new key.", key="g", src=WIKI),
          dict(type="create", title="Your turn", sub="Write four bars that use eighth notes and at least one high note."),
          dict(type="check", items=["My high notes start cleanly, without biting.", "I can play the G major scale up and down.", "I can count eighth notes out loud."])]),
  dict(title="B flat and the key of F", notes=[("bes'", "B♭", "Left index finger presses B and the small bis key just below it, together."), ("f''", "Upper F", "Low F plus the octave key.")],
   boxes=[("key", "Flats and the key of F", "A <b>flat</b> (♭) lowers a note by a half step. One flat in the key signature means every B is B♭."),
          ("rhythm", "Three-four time", "The top number changes to 3: three beats in every bar. A dotted half note fills a whole bar.")],
-  lines=[L("Long tone: B flat", "bes'1 | r1 | bes'1 | r1", "One finger covers two keys.", names=True, hl=["bes'"]),
+  lines=[L("Long tones: B flat and upper F", "bes'1 | r1 | f''1 | r1", "One finger covers two keys for B flat.", names=True, hl=["bes'", "f''"], slug="Long tone: B flat"),
          L("A, B flat, C", "a'2 bes'2 | c''1 | c''2 bes'2 | a'1", "Now with the key signature.", key="f"),
          L("F major scale", "f'4 g' a' bes' | c'' d'' e'' f'' | f'' e'' d'' c'' | bes' a' g' f'", key="f", hl=["f''"]),
          L("Three in a bar", "f'2. | a'2. | c''4 c'' c'' | f'2.", key="f", time="3/4", lyr=["1-2-3", "1-2-3", "1", "2", "3", "1-2-3"]),
@@ -167,8 +166,8 @@ def _breathe(k, title, bars):
     it = _line(k, title); bs = [b.strip() for b in it["music"].split("|")]
     for n in bars: bs[n - 1] += " \\breathe"
     it["music"] = " | ".join(bs)
-def CLAP(music, lyr, time="4/4", bpl=4): return L("Clap and count", music, "Clap the notes. Stay silent on the rests.", time=time, rhythm=True, badge="CLAP", lyr=lyr, bpl=bpl)
-def WRITE(title, sub, music, quiz, key="c", time="4/4", bpl=4): return L(title, music, sub, key=key, time=time, quiz=quiz, badge="WRITE", bpl=bpl)
+def CLAP(music, lyr, time="4/4", bpl=None): return L("Clap and count", music, "Clap the notes. Stay silent on the rests.", time=time, rhythm=True, badge="CLAP", lyr=lyr, bpl=bpl)
+def WRITE(title, sub, music, quiz, key="c", time="4/4", bpl=None): return L(title, music, sub, key=key, time=time, quiz=quiz, badge="WRITE", bpl=bpl)
 def EAR(text): return dict(type="ear", text=text)
 DUET = "Learn both parts, then swap with a partner or the player."
 
@@ -258,6 +257,80 @@ _line(8, "Auld Lang Syne")["about"] = "A Scottish song with words by Robert Burn
 _before_check(8, WRITE("Draw the bar lines", "Three beats in every bar this time.", "d'4 fis' a' | d''2 a'4 | b'4 a' g' | fis'2.", "bars", key="d", time="3/4"),
               EAR("Pick any tune you love and find it without music. Then write its first four bars on the staff paper your teacher gives you."))
 
+# ---------------------------------------------------------------- third edition: more tunes, each with only the notes learned so far
+EX = "Exercise"
+_after(1, "Au Clair de la Lune",
+       L("Stepping Stones", "g'4 a' b'2 | b'4 a' g'2 | g'4 a' b' a' | g'1 | b'2 a'2 | g'4 g' a'2 | b'4 a' g' a' | g'1", EX),
+       L("Sunrise", "g'2 a'2 | b'1 | b'2 a'2 | g'1 \\breathe | g'4 g' a' a' | b'2 b'2 | a'4 a' g' a' | g'1", EX + ". One breath for each half."),
+       L("Echo Song", "b'4 a' g' r | b'4 a' g' r | g'4 a' b' r | g'4 a' b' r | b'2 a'2 | g'2 r2 | b'4 a' g' a' | g'1", EX + ". Count the rests: the echo answers in the silence."))
+_after(2, "Lightly Row",
+       L("Dansons la Capucine", "g'2 a'4 a' | d'' d'' b' b' | g'2 a'4 a' | d'' d'' b'2 \\breathe | g'2 a'4 a' | d'' d'' b' b' | g'2 a'4 a' | d'' d'' g'2", "French traditional",
+         src=WIKI + " (French article; note lengths doubled, the shouted ending left out)", about="A French circle dance for children. The title means \"Let's dance the capucine\"."))
+_after(3, "Low Tide",
+       L("Morning Bells", "d''2.\\f a'4 | f'2. d'4 | e'4 f' g' a' | d'1 \\breathe | d''2.\\p a'4 | f'2. d'4 | g'4 f' e' e' | d'1", EX + ". Both Ds, dotted half notes, loud then soft."))
+_after(4, "Aura Lee",
+       L("Old Hundredth", "g'2 g'4 fis' | e' d' g'2 | a'2 b'2 \\breathe | b'2 b'4 b' | a' g' c''2 | b'2 a'2 \\breathe | g'2 a'4 b' | a' g' e'2 | fis'2 g'2 \\breathe | d''2 b'2 | g'2 a'4 c'' | b'2 a'2 | g'1",
+         "Louis Bourgeois", key="g", src=WIKI + " (\"Old 100th\")", tempo_word="Andante", about="A hymn tune from the Genevan Psalter of 1551, still sung all over the world."),
+       L("All My Clothes Are Green", "g'2 g'2 | a'2 a'2 | fis'4 fis' e' fis' | g'2 d'2 | g'2 g'2 | a'2 a'2 | fis'4 fis' e' fis' | g'2 r2 | b'2 b'4 d'' | c''2 c''2 | a'4 a' a' c'' | b'2 b'2 | g'2 g'2 | a'2 a'2 | fis'2 e'4 fis' | g'2 r2",
+         "German folk song", key="g", src=WIKI + " (German article \"Grün, grün, grün sind alle meine Kleider\"; note lengths doubled)"))
+_after(4, "Au Clair de la Lune (complete)",
+       L("Fox, You Stole the Goose", "d'4 e' fis' g' | a' a' a' a' | b' g' d'' b' | a'1 | b'4 g' d'' b' | a'1 | a'4 g' g' g' | g' fis' fis' fis' | fis' e' fis' e' | d'( fis' a'2) | a'4 g' g' g' | g' fis' fis' fis' | fis' e' fis' e' | d'1",
+         "German folk song", key="g", src=WIKI + " (German article \"Fuchs, du hast die Gans gestohlen\")", tempo_word="Allegro", about="A German children's song from 1824. The fox is told to bring the goose back."),
+       L("Ode to Joy, from F sharp", "fis'4 fis' g' a' | a' g' fis' e' | d' d' e' fis' | fis'2 e'2 | fis'4 fis' g' a' | a' g' fis' e' | d' d' e' fis' | e'2 d'2", "L. van Beethoven (easy rhythm). The Unit 2 tune, now starting on F sharp.", key="g",
+         src=WIKI + " (German article \"Freude, schöner Götterfunken\"; easy rhythm)"))
+_after(5, "All My Little Ducklings",
+       L("Rain, Rain, Go Away", "d''4 b' d''8 d'' b'4 | d''8 d'' b' e'' d'' d'' b'4 | c''8 c'' a' a' c'' c'' a'4 | d''8( c'') b'( a') b' g' g'4", "English traditional", key="g", src=WIKI + " (moved to G)"),
+       L("Bake, Bake a Cake", "d''4 d'' e'' e'' | d''2 b'4 g' | d'' d'' e'' e'' | d''2 b'2 | d''4 d'' e'' e'' | d'' d'' b' g' | d'' d'' e'' e'' | d'' d'' b' b' | d''8 d'' d''4 b'2 | d''8 d'' d''4 b'2 | d''4 d'' b'2 | d''4 d'' e'' e'' | d'' d'' b'2 | g''2 d''4 c'' | b' a' g'2",
+         "German traditional", key="g", bpl=8, src=WIKI + " (German article \"Backe, backe Kuchen\", moved to G)"),
+       L("À la Claire Fontaine", "g'2 g'4 b' | b' a' b' a' | g'2 g'4 b' | b' a' b'2 \\breathe | b'2 b'4 a' | g' b' d'' b' | d''2 d''4 b' | g' b' a'2 \\breathe | g'2 g'4 b' | b' a'8 g' b'4 g' | b'2 b'4 a'8 g' | b'4 a' g'2",
+         "French traditional", key="g", bpl=6, slug="A la Claire Fontaine", src=WIKI + " (French article; note lengths doubled, moved to G)", tempo_word="Andante", about="A French song about a clear spring, more than 300 years old. It is loved in Canada too."))
+_after(5, "G major arpeggio",
+       L("Taler, Taler", "g'4 g' b' b' | a' a' g' d' | b' b' d'' d'' | c'' c'' b' g' | d'' d'' e''2 | c''4 e'' d''2 | b'4 b' c'' c'' | a' a' g'2", "German game song", key="g", hl=["e''"],
+         src=WIKI + " (German article \"Taler, Taler, du musst wandern\"; moved to G, written in 4/4 instead of 2/4)"))
+_after(5, "Twinkle, up high",
+       L("Let Us Be Glad and Cheerful", "d''4 d'' d''8 e'' d'' c'' | b'4 b' b' r | c''4 c'' c''8 d'' c'' b' | a'4 a' a' r | g'4 a' b' c'' | d''8 e'' d'' e'' d''4 r | g''4 d'' d''8 e'' d'' c'' | b'4 a' d'' r | g''4 d'' d''8 e'' d'' c'' | b'4 a' g' r",
+         "German traditional", key="g", src=WIKI + " (German article \"Lasst uns froh und munter sein\", moved to G)", about="A German song for St. Nicholas Day, the sixth of December."),
+       L("O Come, Little Children", "d''4 | d''2 b'4 d'' | d''2 b'4 d'' | c''2 a'4 c'' | b'2 r4 d'' | d''2 b'4 d'' | d''2 b'4 d'' | c''2 a'4 c'' | b'2 r4 b' | a'2 a'4 a' | c''2 c''4 c'' | b'2 b'4 b' | e''2 r4 e'' | d''2 d''4 d'' | g''2 d''4 b' | c''2 a'4 fis' | g'2.",
+         "J. A. P. Schulz", key="g", partial="4", src=WIKI + " (German article \"Ihr Kinderlein, kommet\"; note lengths doubled, moved to G)", about="A German Christmas carol. Schulz wrote the tune in 1794."))
+_after(6, "Cuckoo duet",
+       L("A Bird Comes Flying", "a'8 bes' | c''4 a' a' | a' g' g'8 a' | bes'4 g' g'8 d'' | c''4 r a'8 bes' | c''4 a' a' | a' g' g'8 a' | bes'4 e' e' | f'4 r", "German folk song", key="f", time="3/4", partial="4",
+         src=WIKI + " (German article \"Kommt ein Vogel geflogen\")"),
+       L("Holy God, We Praise Thy Name", "f'2 f'4 | f'( e') f' | g'( a') g' | f'2. | a'2 a'4 | a'( g') f' | c''( bes') a' | a' g' r | g'2 a'4 | bes'( a') g' | a'2 bes'4 | c''2. | d''2 d''4 | c''( bes') a' | bes'( a') g' | f'2.",
+         "Vienna, about 1774", key="f", time="3/4", rep=8, src=WIKI + " (German article \"Großer Gott, wir loben dich\")", tempo_word="Moderato", about="A hymn first printed in Vienna. Play the first line twice: there is a repeat sign."),
+       L("Oranges and Lemons", "d''4 b' d'' | b' g' a'8 b' | c''4 a' d'' | b' g'2 | d''8 d'' b'4 d'' | b' g' a'8 b' | c''4 a' d'' | b' g'2", "English traditional. Back to the key of G: check the key signature.", key="g", time="3/4",
+         src=WIKI + " (moved to G)", about="An English nursery rhyme about the church bells of London."))
+_after(6, "Lightly Row in F",
+       L("A Mother Had Four Children", "d'4 | g' g' a' | b' b' g' | a' a' fis' | g' g' d' | g' g' a' | b' b' g' | a' a' fis' | g' g'", "German folk song. The key of G again.", key="g", time="3/4", partial="4",
+         src=WIKI + " (German article \"Es war eine Mutter\")", about="The four children are spring, summer, autumn and winter."),
+       L("On the Wall", "f'8 f' f' g' a' a' a' a' | g' f' g' a' f'4 f' | a'8 a' a' bes' c'' c'' c'' c'' | bes' a' bes' c'' a'4 a' | c''8 c'' c'' c'' d'' d'' d''4 | bes'8 bes' bes' bes' c'' c'' c''4 | f'8 f' f' g' a' a' a' a' | g' f' g' a' f'4 f'",
+         "German traditional", key="f", src=WIKI + " (German article \"Auf der Mauer, auf der Lauer\"; written in 4/4 instead of 2/4)"))
+_after(7, "London Bridge duet",
+       L("All the Birds Are Here", "c'4. e'8 g'4 c'' | a' c''8( a') g'2 | f'4. g'8 e'4 c' | d'2 c'4 r | g'4 g' f' f' | e' g'8( e') d'2 | g'4 g' f' f' | e' g'8( e') d'2 | c'4. e'8 g'4 c'' | a' c''8( a') g'2 | f'4. g'8 e'4 c' | d'2 c'4 r",
+         "German folk song", bpl=4, src=WIKI + " (German article \"Alle Vögel sind schon da\", moved to C)", tempo_word="Allegro", about="A German song that welcomes the birds back in spring."),
+       L("O Sanctissima", "g'2 a'2 | g'4. f'8 e'4( f') | g'2 a'2 | g'4. f'8 e'4( f') | g'2 g'2 | a'2 b'4 c'' | b'2 a'2 | g'1 \\breathe | d'4.( e'8) d'4 e' | f'4.( g'8) f'2 | e'4.( f'8) e'4 f' | g'4.( a'8) g'2 | c''4( b') a'( g') | c'' a' g' f' | e'2 d'2 | c'1",
+         "Sicilian traditional", bpl=8, src=WIKI + " (German article \"O du fröhliche\")", tempo_word="Andante", about="Also called the Sicilian Mariners' Hymn. It was first printed in London in 1792."))
+_after(7, "Michael, Row the Boat Ashore",
+       L("Little Snowflake", "e'8 f' | g'4 g' a' | d' d' d'8 e' | f'4 f' g' | e'2 e'8 f' | g'4 g' c'' | b' a' g'8 f' | e'4 f' d' | c'2", "German traditional", time="3/4", partial="4", src=WIKI + " (German article \"Schneeflöckchen, Weißröckchen\")"),
+       L("My Bonnie Lies over the Ocean", "g'4 | e'' d'' c'' | d'' c'' a' | g' e'2 ~ | e'2 g'4 | e'' d'' c'' | c'' b' c'' | d''2. ~ | d''2 g'4 | a' d'' c'' | b' a' b' | c''2. ~ | c''2", "Scottish traditional (the verse)", time="3/4", partial="4",
+         src=WIKI + " (moved to C)", about="Three tied notes. Count every beat of each one before you move on."),
+       L("Away in a Manger", "c''4 | c''4. bes'8 a'4 | a'4. g'8 f'4 | f' e' d' | c'2 c'4 | c'4. d'8 c'4 | c' g' e' | d' c' f' | a'2 c''4 | c''4. bes'8 a'4 | a'4.( g'8) f'4 | f' e' d' | c'2 c'4 | bes'4. a'8 g'4 | a' g' f' | g' d' e' | f'2",
+         "James R. Murray", key="f", time="3/4", partial="4", src=WIKI, tempo_word="Andante", about="An American Christmas carol. Murray published this tune in 1887."),
+       L("Thoughts Are Free", "g'8 g' | c''4 c'' e''8 c'' | g'2 g'4 | f' d' g' | e' c' g' | c'' c'' e''8 c'' | g'2 g'4 | f' d' g' | e' c' c'' | b' d'' d'' | c'' e'' e'' | b' d'' d'' | c'' e'' c'' | a' a' c''8 a' | g'2 g'8 e'' | e''( d'') c''4 b' | c''2",
+         "German folk song", time="3/4", partial="4", src=WIKI + " (German article \"Die Gedanken sind frei\")"))
+_after(8, "Slur two, tongue two",
+       L("Every Year Again", "a'4. b'8 a'4 g' | fis'2 e'2 | d'4 e'8 fis' g'4 fis' | e'2. r4 | fis'4 a' b' a' | d''2 cis''4( b') | a' g'8 fis' g'4 a' | fis'2. r4", "Friedrich Silcher", key="d", bpl=8,
+         src=WIKI + " (German article \"Alle Jahre wieder\")", tempo_word="Andante", about="A German Christmas song from 1842."),
+       L("Surprise Symphony", "g'8\\p g' b' b' d'' d'' b'4 | c''8 c'' a' a' fis' fis' d'4 | g'8 g' b' b' d'' d'' b'4 | g''8 g'' cis'' cis'' d''4 r | g'8 g' b' b' d'' d'' b'4 | c''8 c'' a' a' fis' fis' d'4 | g'8 g' b' b' d'' d'' b'4 | g''8 g'' cis'' cis'' d''4 d''->\\f",
+         "Joseph Haydn (easy version)", key="g", src=WIKI + " (\"Symphony No. 94\", second movement; moved to G, written in 4/4, the loud chord as one note)", tempo_word="Andante",
+         about="From Symphony No. 94 (1791). Haydn hid one sudden loud chord in a quiet tune. Play softly, then accent the last note."))
+_after(8, "Happy Birthday to You",
+       L("Now Thank We All Our God", "d''4 | d'' d'' e'' e'' | d''2. b'4 | c'' b' a' b'8 c'' | a'2 g'4 d'' | d'' d'' e'' e'' | d''2. b'4 | c'' b' a' b'8 c'' | a'2 g'4 a' | a' a' b' b' | a'2. a'4 | b'8 cis'' d''4 d'' cis'' | d''2. d''4 | e'' d'' c'' b' | c''2. b'4 | a' b'8 c'' a'4. g'8 | g'2.",
+         "Johann Crüger", key="g", partial="4", bpl=8, src=WIKI, tempo_word="Moderato", about="A German hymn from 1647. Watch for the C sharps: they are not in the key signature."),
+       L("Praise to the Lord, the Almighty", "f'4 f' c'' | a'4. g'8 f'4 | e' d' c' | d' e' f' | g'2. | f'2. \\breathe | c''4 c'' c'' | d''2. | a'4 bes' c'' | c''4. bes'8 a'4 | g'2. \\breathe | c'4 d' e' | f' g' a' | g'2. | f'2.",
+         "German hymn tune", key="f", time="3/4", rep=6, src=WIKI + " (German article \"Lobe den Herren, den mächtigen König der Ehren\")", about="A hymn tune first printed in 1665. Play the first six bars twice."),
+       L("O Come, All Ye Faithful", "g'4 | g'2 d'4 g' | a'2 d'2 | b'4 a' b' c'' | b'2 a'4 g' | g'2 fis'4 e' | fis'( g') a' b' | fis'2( e'4.) d'8 | d'1 \\breathe | d''2 c''4 b' | c''2 b'2 | a'4 b' g' a' | fis'2 d'4 g' | g' fis' g' a' | g'2 d'4 b' | b' a' b' c'' | b'2 a'4 b' | c'' b' a' g' | fis'2 g'4( c'') | b'2( a'4.) g'8 | g'2.",
+         "J. F. Wade", key="g", partial="4", src=WIKI, tempo_word="Moderato", about="A Christmas hymn from the 1740s. Its Latin name is \"Adeste Fideles\"."))
+
 # ---------------------------------------------------------------- the finale: a solo with piano accompaniment
 # Sax part in written pitch; piano part written in the same frame (as if the sax were in C) and transposed for each edition.
 FINALE = dict(title="Jupiter", sub="Gustav Holst, from The Planets (easy rhythm)", key="c", time="3/4", tempo=76, tempo_word="Andante maestoso",
@@ -293,8 +366,20 @@ def note_name(tok):
 def pitch_of(tok):
     m = TOK.match(tok); return m and m.group(1) + (m.group(2) or "") + m.group(3)
 
+def dens(it):
+    return max(sum(1 for t in b.split() if pitch_of(t) or re.match(r"^r\d*\.?$", t)) for m in (it["music"], it.get("b") or "") if m for b in m.split("|"))
+def nbars(it): return len(it["music"].split("|")) - (1 if it.get("partial") else 0)
+def bpl_of(it):
+    """Bars per line: 8 when the bars are simple, 6 when they are busier, 4 for the busiest (and for busy duets); lines come out even."""
+    if it.get("_w") == HALF_MM: return 99
+    if it.get("bpl"): return it["bpl"]
+    d = dens(it); m = 4 if d > 6 or (it.get("b") and d > 4) else 6 if d > 4 else 8; n = nbars(it); lines = -(-n // m)
+    return -(-n // lines)
+def half_ok(it):
+    return it["type"] == "line" and not it.get("b") and not it.get("partial") and not it.get("bpl") and nbars(it) <= 4 and dens(it) <= 4
+
 def _part(music, it, breaks=True, hl=True):
-    bars = [b.strip() for b in music.split("|")]; npick = 1 if it.get("partial") else 0
+    bars = [b.strip() for b in music.split("|")]; npick = 1 if it.get("partial") else 0; bpl = bpl_of(it)
     out, names, tied = [], [], False
     for i, b in enumerate(bars):
         toks = []
@@ -307,7 +392,7 @@ def _part(music, it, breaks=True, hl=True):
             elif t == "~": tied = True
             toks.append(t)
         out.append(" ".join(toks)); n = i + 1 - npick
-        if i < len(bars) - 1: out.append("\\break" if breaks and n > 0 and n % it.get("bpl", 4) == 0 else "|")
+        if i < len(bars) - 1: out.append(('\\bar ":|." ' if n == it.get("rep") else "") + ("\\break" if breaks and n > 0 and n % bpl == 0 else "|"))
     return " ".join(out), names
 
 def ly_line(it, blank=False):
@@ -331,16 +416,17 @@ def ly_line(it, blank=False):
                   '\\new Staff \\with { instrumentName = \\markup \\bold "B" shortInstrumentName = \\markup \\bold "B" } { %s %s %s } >>' % (head, music, end, head, second, end))
     else:
         staves = '\\new Staff { \\new Voice = "m" { %s %s %s } } %s' % (head, music, end, lyrics)
-    indent = "indent = 7\\mm short-indent = 7\\mm" if it.get("b") else "indent = 0"
+    indent = ("indent = %.1f\\mm short-indent = %.1f\\mm" % (DUET_IN, DUET_IN)) if it.get("b") else "indent = 0"
+    width = it.get("_w", LINE_MM) + (DUET_IN if it.get("b") else 0)
     return r"""\version "2.24.0"
 #(set-global-staff-size %d)
 #(define hi (rgb-color 0.78 0.48 0.05))
 \header { tagline = ##f }
 \paper { %s line-width = %.1f\mm ragged-right = ##f ragged-last = ##f system-system-spacing.basic-distance = #%d system-system-spacing.padding = #2.5 }
-\layout { \context { \Score \remove "Bar_number_engraver" %s \override MetronomeMark.font-size = #-1 }
+\layout { \context { \Score \remove "Bar_number_engraver" %s \override MetronomeMark.font-size = #-1 \override InstrumentName.self-alignment-X = #LEFT }
   \context { \Lyrics \override LyricText.font-name = "DejaVu Sans Bold" \override LyricText.font-size = #-1.5 \override LyricText.color = #(rgb-color 0.42 0.47 0.52) } }
 \score { << %s >> }
-""" % (STAFF, indent, LINE_MM, 15 if lyr else 13, "\\override TimeSignature.stencil = ##f" if blank else "", staves)
+""" % (STAFF, indent, width, 15 if lyr else 13, "\\override TimeSignature.stencil = ##f" if blank else "", staves)
 
 def render(src, tag, transparent=False):
     h = hashlib.md5((src + tag).encode()).hexdigest()[:14]; base = os.path.join(CACHE, h); png = base + ".png"
@@ -370,44 +456,54 @@ P_BODY = ParagraphStyle("pb", parent=B.body, fontSize=9.6, leading=13.4, spaceAf
 def para_h(text, w, style=P_BODY):
     p = Paragraph(text, style); return p, p.wrap(w, 2000)[1]
 
+GAP = 9                                                             # the same space under every line of music, on every page
+HEAD_H, RUN_H, FOOT = 62, 26, 58
 class Page:
-    """Collects blocks (height, draw) for one unit and flows them over pages, spreading spare room between blocks."""
-    def __init__(self, c, book): self.c, self.book, self.blocks = c, book, []
-    def add(self, h, draw, gap=10, it=None): self.blocks.append((h, draw, gap, it))
-    def flush(self, kicker, title, qr=None):
-        """Fewest pages that fit (gaps may shrink a little), blocks shared out evenly, spare room spread between blocks."""
-        import itertools
-        c, hs, gs = self.c, [b[0] for b in self.blocks], [b[2] for b in self.blocks]
-        R = (H - M - 70 + 8) - 58; n = len(hs); MINF = 0.45
-        def need(i, j, f=1.0): return sum(hs[i:j]) + f * sum(gs[i + 1:j])
-        pages, i = 1, 0
-        for j in range(1, n + 1):
-            if need(i, j, MINF) > R: pages += 1; i = j - 1
-        best = None
-        for cuts in itertools.combinations(range(1, n), pages - 1):
-            edges = [0] + list(cuts) + [n]
-            if any(need(a, b, MINF) > R for a, b in zip(edges, edges[1:])): continue
-            score = max(need(a, b) for a, b in zip(edges, edges[1:]))
-            if best is None or score < best[0]: best = (score, edges)
-        edges = best[1]
-        for k, (a, b) in enumerate(zip(edges, edges[1:])):
-            ytop = B.header(c, kicker, title if k == 0 else title + " (continued)") + 8
-            if k == 0 and qr: qr(c)
-            nat = need(a, b); f, extra = 1.0, 0.0
-            if nat > R: f = (R - sum(hs[a:b])) / max(1e-9, sum(gs[a + 1:b]))
-            elif b - a > 1: extra = min(26, (R - nat) / (b - a - 1))
-            y = ytop
-            for q in range(a, b):
-                h, draw, gap, it = self.blocks[q]
-                if q > a: y -= gap * f + extra
-                if it is not None: it["_page"] = self.book.n
-                draw(c, y); y -= h
+    """Collects blocks (height, draw) and flows them down the pages with fixed gaps. A section starts with head(): its big title
+    sits wherever the last section ended, so no page is left half empty; a page that starts mid-section gets a one-line running head."""
+    def __init__(self, c, book): self.c, self.book, self.blocks, self.cur = c, book, [], None
+    def add(self, h, draw, gap=GAP, it=None, keep=False):
+        self.blocks.append(dict(h=h, draw=draw, gap=gap, its=it if isinstance(it, (list, tuple)) else [it] if it else [], keep=keep, sec=self.cur, head=False))
+    def head(self, kicker, title, qr=None, toc=None):
+        self.cur = (kicker, title)
+        def draw(c, y):
+            B.header(c, kicker, title, y)
+            if qr: qr(c, y)
+            if toc: self.book.toc.append((toc, title, self.book.n))
+        self.add(HEAD_H, draw, gap=30, keep=True); self.blocks[-1]["head"] = True
+    def flush(self, filler=None):
+        c, bl = self.c, self.blocks; top = H - M; pages, cur, used, q = [], [], 0.0, 0
+        while q < len(bl):
+            g = q                                                    # a block marked keep stays on the page of the block after it
+            while bl[g]["keep"] and g < len(bl) - 1: g += 1
+            grp = bl[q:g + 1]; room = top - FOOT - (0 if (cur and bl[cur[0]]["head"]) or (not cur and grp[0]["head"]) else RUN_H)
+            need = sum(b["h"] for b in grp) + sum(b["gap"] for b in grp[1:]) + (grp[0]["gap"] if cur else 0)
+            if cur and used + need > room: pages.append((cur, used, room)); cur, used = [], 0.0; continue
+            cur += range(q, g + 1); used += need; q = g + 1
+        pages.append((cur, used, top - FOOT - (0 if bl[cur[0]]["head"] else RUN_H)))
+        for k, (qs, used, room) in enumerate(pages):
+            y = top; first = bl[qs[0]]
+            if not first["head"]:
+                kicker, title = first["sec"]
+                c.setFillColor(HexColor(AMBER)); c.setFont("Pop-B", 8); c.drawString(M, y - 9, " ".join(kicker.upper()))
+                kw = pdfmetrics.stringWidth(" ".join(kicker.upper()), "Pop-B", 8)
+                c.setFillColor(HexColor(SLATE)); B.draw_mixed(c, M + kw + 10, y - 9, title, "Pop-M", 9)
+                c.setStrokeColor(HexColor(RULE)); c.setLineWidth(0.6); c.line(M, y - 16, W - M, y - 16); y -= RUN_H
+            spare = room - used; last = k == len(pages) - 1
+            extra = 0.0 if last or len(qs) < 2 else min(8.0, spare / (len(qs) - 1))     # a few points at most, never on the last page
+            for i, q in enumerate(qs):
+                b = bl[q]
+                if i: y -= b["gap"] + extra
+                for it in b["its"]: it["_page"] = self.book.n
+                b["draw"](c, y); y -= b["h"]
+            if filler and last and spare >= 96: filler(c, y - GAP - 4, spare - GAP - 4)
+            self.book.fill.append((first["sec"][0], self.book.n, round(100 * used / room)))
             self.book.footer(); c.showPage()
         self.blocks = []
 
 class Book:
     def __init__(self, path):
-        self.c = canvas.Canvas(path, pagesize=letter); self.n = 1; self.line_no = 0; self.toc = []
+        self.c = canvas.Canvas(path, pagesize=letter); self.n = 1; self.line_no = 0; self.toc = []; self.fill = []
         self.c.setTitle("Saxophone Beginner Booklet"); self.c.setAuthor("Alex Attard Music")
     def footer(self):
         c = self.c
@@ -418,13 +514,14 @@ class Book:
 def note_card(c, x0, ytop, w, h, ly, name, tip, tint=TINT):
     c.setFillColor(HexColor(tint)); c.roundRect(x0, ytop - h, w, h, 8, fill=1, stroke=0)
     c.setFillColor(HexColor(AMBER)); c.setFont("Pop-B", 6.8); c.drawString(x0 + 10, ytop - 14, " ".join("NEW NOTE"))
-    c.setFillColor(HexColor(SLATE)); B.draw_mixed(c, x0 + 10, ytop - 33, name, "Pop-B", 17)
-    top, bot = ytop - 12, ytop - h + (30 if tip else 10)
+    c.setFillColor(HexColor(SLATE)); B.draw_mixed(c, x0 + 10, ytop - 31, name, "Pop-B", 15)
+    top, bot = ytop - 10, ytop - h + (30 if tip else 10)
     u = (top - bot) / (B.KY_MAX - B.KY_MIN); dw = (B.KX_MAX - B.KX_MIN) * u
     right = x0 + w - 12
     B.draw_keys(c, right - dw - B.KX_MIN * u, top, u, FING[ly])
-    im = ImageReader(note_png(ly)); iw, ih = im.getSize(); tw = min(64, right - dw - 12 - (x0 + 8)); th = tw * ih / iw
-    c.drawImage(im, x0 + 8, (top + bot) / 2 - th / 2 - 8, tw, th, mask="auto")
+    im = ImageReader(note_png(ly)); iw, ih = im.getSize(); tw = 58; th = tw * ih / iw; room = (ytop - 36) - (bot + 2)
+    if th > room: th = room; tw = th * iw / ih
+    c.drawImage(im, x0 + 8, bot + 2 + (room - th) / 2, tw, th, mask="auto")
     if tip:
         p, ph = para_h(tip, w - 20, ParagraphStyle("tip", parent=P_BODY, fontSize=7.9, leading=10.2)); p.drawOn(c, x0 + 10, ytop - h + 7 + max(0, (20 - ph) / 2))
 
@@ -443,28 +540,52 @@ def _pill(c, x, y, text, col):
     w = pdfmetrics.stringWidth(text, "Pop-B", 7.2) + 12
     c.setFillColor(HexColor(col)); c.roundRect(x, y - 14, w, 14, 4, fill=1, stroke=0)
     c.setFillColor(white); c.setFont("Pop-B", 7.2); c.drawString(x + 6, y - 10.3, text); return w
-def music_block(book, pg, it, png):
+P_SUB = ParagraphStyle("sub", parent=P_BODY, fontName="DJ", fontSize=8.2, leading=10.4, textColor=HexColor(MUTED))
+P_ABOUT = ParagraphStyle("ab", parent=P_BODY, fontName="DJ-I", fontSize=8.2, leading=10.6, textColor=HexColor(MUTED))
+MM = 72 / 25.4
+def cell(book, it, png, cw):
+    """One line of music with its heading, cw points wide (the full width, or half of it). Returns (heading height, music height, draw)."""
     im = ImageReader(png); iw, ih = im.getSize(); w = iw * 72 / 300; h = ih * 72 / 300
-    badge = it.get("badge"); no = None
+    badge = it.get("badge"); no = None; half = cw < CW - 1
     if not badge: book.line_no += 1; no = book.line_no; it["_no"] = no
-    ap = para_h(it["about"], CW - 27, ParagraphStyle("ab", parent=P_BODY, fontName="DJ-I", fontSize=8.2, leading=10.6, textColor=HexColor(MUTED))) if it.get("about") else None
-    top = 18 + (ap[1] + 3 if ap else 0)
-    def draw(c, y, no=no):
-        x = M
+    fix = lambda t: t.replace("♯", "<font name='DJ'>♯</font>").replace("♭", "<font name='DJ'>♭</font>")
+    tw = 27 + sum(pdfmetrics.stringWidth(ch, "DJ-B" if ch in "♭♯" else "Pop-B", 10.6) for ch in it["title"]) + 8 + (pdfmetrics.stringWidth(it.get("pill") or "", "Pop-B", 7.2) + 20 if it.get("pill") else 0)
+    under = half or tw + pdfmetrics.stringWidth(it.get("sub") or "", "DJ", 8.2) > cw - 18
+    sp = para_h(fix(it["sub"]), cw - 27 - 16, P_SUB) if under and it.get("sub") else None
+    ap = para_h(fix(it["about"]), cw - 27, P_ABOUT) if it.get("about") else None
+    top = 18 + (sp[1] + 1 if sp else 0) + (ap[1] + 3 if ap else 0)
+    def draw(c, x0, y, top_all, no=no):
+        x = x0
         if badge: x += _pill(c, x, y, badge, PILL[badge]) + 7
         else:
-            c.setFillColor(HexColor(SLATE)); c.roundRect(M, y - 14, 20, 14, 4, fill=1, stroke=0)
-            c.setFillColor(white); c.setFont("Pop-B", 8.4); c.drawCentredString(M + 10, y - 10.6, str(no)); x += 27
-        c.setFillColor(HexColor(SLATE)); B.draw_mixed(c, x, y - 11, it["title"], "Pop-B", 11)
-        x += sum(pdfmetrics.stringWidth(ch, "DJ-B" if ch in "♭♯" else "Pop-B", 11) for ch in it["title"]) + 8
+            c.setFillColor(HexColor(SLATE)); c.roundRect(x0, y - 14, 20, 14, 4, fill=1, stroke=0)
+            c.setFillColor(white); c.setFont("Pop-B", 8.4); c.drawCentredString(x0 + 10, y - 10.6, str(no)); x += 27
+        c.setFillColor(HexColor(SLATE)); B.draw_mixed(c, x, y - 11, it["title"], "Pop-B", 10.6)
+        x += sum(pdfmetrics.stringWidth(ch, "DJ-B" if ch in "♭♯" else "Pop-B", 10.6) for ch in it["title"]) + 8
         if it.get("pill"): x += _pill(c, x, y, it["pill"], PILL[it["pill"]]) + 8
-        if it.get("sub"):
-            c.setFillColor(HexColor(MUTED)); B.draw_mixed(c, x, y - 11, it["sub"], "DJ", 8.4)
+        yy = y - 16
+        if sp: sp[0].drawOn(c, x0 + 27, yy - sp[1]); yy -= sp[1] + 1
+        elif it.get("sub"):
+            c.setFillColor(HexColor(MUTED)); B.draw_mixed(c, x, y - 11, it["sub"], "DJ", 8.2)
         if badge != "WRITE":
-            c.setStrokeColor(HexColor("#B9C2CB")); c.setLineWidth(0.9); c.roundRect(W - M - 12, y - 13.5, 12, 12, 2.5, fill=0, stroke=1)   # tick it when you can play it
-        if ap: ap[0].drawOn(c, M + 27, y - 16 - ap[1])
-        c.drawImage(im, M - 1, y - top - h, w, h)
-    pg.add(top + h, draw, gap=9, it=it)
+            c.setStrokeColor(HexColor("#B9C2CB")); c.setLineWidth(0.9); c.roundRect(x0 + cw - 12, y - 13.5, 12, 12, 2.5, fill=0, stroke=1)   # tick it when you can play it
+        if ap: ap[0].drawOn(c, x0 + 27, yy - ap[1])
+        c.drawImage(im, x0 - 1 - (DUET_IN * MM if it.get("b") else 0), y - top_all - h, w, h)
+    return top, h, draw
+def music_block(book, pg, it, png):
+    top, h, draw = cell(book, it, png, CW)
+    pg.add(top + h, lambda c, y: draw(c, M, y, top), it=it)
+def pair_block(book, pg, a, b):
+    cw = HALF_MM * MM; x2 = W - M - cw
+    ta, ha, da = cell(book, a, PNGS[id(a)], cw); tb, hb, db = cell(book, b, PNGS[id(b)], cw); top = max(ta, tb)
+    pg.add(top + max(ha, hb), lambda c, y: (da(c, M, y, top), db(c, x2, y, top)), it=[a, b])
+def plan_pairs(lines):
+    """Short drills go two to a row: mark each pair of neighbours that both fit in half the width."""
+    i = 0
+    while i < len(lines) - 1:
+        a, b = lines[i], lines[i + 1]
+        if half_ok(a) and half_ok(b): a["_w"] = b["_w"] = HALF_MM; a["_mate"] = b; b["_second"] = True; i += 2
+        else: i += 1
 
 def ear_block(pg, it):
     p, ph = para_h(it["text"], CW - 110); hh = max(ph + 14, 28)
@@ -472,28 +593,33 @@ def ear_block(pg, it):
         col, tint, _ = KIND["skill"]
         c.setFillColor(HexColor(tint)); c.roundRect(M, y - hh, CW, hh, 7, fill=1, stroke=0)
         _pill(c, M + 10, y - (hh - 14) / 2, "PLAY BY EAR", col); p.drawOn(c, M + 96, y - hh + (hh - ph) / 2)
-    pg.add(hh, draw, gap=12)
+    pg.add(hh, draw)
 
 def blank_staff_png():
     return render(ly_line(dict(music="", key="c", time="4/4"), blank=True), "blank")
 
+NOTE_H = 110
 def build_unit(book, k, u):
-    c = book.c; pg = Page(c, book); book.toc.append(("Unit %d" % (k + 1), u["title"], book.n))
+    c = book.c; pg = book.pg
+    first = next(it for it in u["lines"] if it["type"] == "line" and not it.get("badge"))
+    pg.head("Unit %d" % (k + 1), u["title"], qr=(lambda c, y: unit_qr(c, first, y)) if CODE else None, toc="Unit %d" % (k + 1))
     notes = u["notes"]; gap = 10; nw = (CW - gap * (len(notes) - 1)) / len(notes) if len(notes) >= 2 else (CW - gap * 2) / 3
     one = len(notes) == 1; bw1 = CW - nw - gap; beside = u["boxes"][:2] if one else []; below = u["boxes"][2:] if one else u["boxes"]
-    nh = max(122, sum(concept_h(bw1, b[2]) for b in beside) + 8 * (len(beside) - 1)) if one else 122
+    nh = max(NOTE_H, sum(concept_h(bw1, b[2]) for b in beside) + 8 * (len(beside) - 1)) if one else NOTE_H
     def draw_notes(c, y):
         x = M
         for i, (ly, name, tip) in enumerate(notes):
             note_card(c, x, y, nw, nh, ly, name, tip, TINT); x += nw + gap
         yy = y
         for kind, title, text in beside: yy -= concept(c, x, yy, bw1, kind, title, text) + 8     # the room beside a single note card holds two idea boxes
-    pg.add(nh, draw_notes, gap=10)
+    pg.add(nh, draw_notes, gap=8, keep=True)
     for r in range(0, len(below), 2):                        # the other idea boxes, two to a row
         row = below[r:r + 2]; bw = (CW - gap) / 2 if len(row) == 2 else CW; bh = max(concept_h(bw, b[2]) for b in row)
-        pg.add(bh, lambda c, y, row=row, bw=bw: [concept(c, M + i * (bw + gap), y, bw, *b) for i, b in enumerate(row)], gap=10)
+        pg.add(bh, lambda c, y, row=row, bw=bw: [concept(c, M + i * (bw + gap), y, bw, *b) for i, b in enumerate(row)])
     for it in u["lines"]:
-        if it["type"] == "line": music_block(book, pg, it, PNGS[id(it)])
+        if it.get("_second"): continue
+        if it.get("_mate"): pair_block(book, pg, it, it["_mate"])
+        elif it["type"] == "line": music_block(book, pg, it, PNGS[id(it)])
         elif it["type"] == "ear": ear_block(pg, it)
         elif it["type"] == "create":
             im = ImageReader(blank_staff_png()); iw, ih = im.getSize(); w = iw * 72 / 300; h = ih * 72 / 300
@@ -504,7 +630,7 @@ def build_unit(book, k, u):
                 c.setFillColor(HexColor(SLATE)); c.setFont("Pop-B", 11); c.drawString(M + 51, y - 11, it["title"])
                 c.setFillColor(HexColor(MUTED)); c.setFont("DJ", 8.4); c.drawString(M + 51 + pdfmetrics.stringWidth(it["title"], "Pop-B", 11) + 9, y - 11, it["sub"])
                 c.drawImage(im, M - 1, y - 20 - h, w, h)
-            pg.add(20 + h, draw, gap=10)
+            pg.add(20 + h, draw)
         else:
             items = it["items"]; hh = 26 + 15 * len(items)
             def draw(c, y, items=items, hh=hh):
@@ -515,9 +641,16 @@ def build_unit(book, k, u):
                     yy = y - 33 - 15 * i
                     c.setStrokeColor(HexColor(SLATE)); c.setLineWidth(0.9); c.setFillColor(white); c.roundRect(M + 14, yy - 2, 10, 10, 2, fill=1, stroke=1)
                     c.setFillColor(HexColor(SLATE)); B.draw_mixed(c, M + 31, yy, t, "DJ", 9.4)
-            pg.add(hh, draw, gap=12)
-    first = next(it for it in u["lines"] if it["type"] == "line" and not it.get("badge"))
-    pg.flush("Unit %d" % (k + 1), u["title"], qr=(lambda c: unit_qr(c, first)) if CODE else None)
+            pg.add(hh, draw)
+
+def manuscript(c, y, room):
+    """Room left at the end of a unit becomes staff paper, so no page ends half empty."""
+    im = ImageReader(render(ly_line(dict(music="", key="c", time="4/4"), blank=True).replace("s1 | s1 | s1 | s1", "\\override Staff.BarLine.stencil = ##f s1 s1 s1 s1 \\revert Staff.BarLine.stencil"), "paper"))
+    iw, ih = im.getSize(); w = iw * 72 / 300; h = ih * 72 / 300; step = h + 15; n = min(6, int((room - 20) // step))
+    if n < 2: return
+    _pill(c, M, y, "STAFF PAPER", "#3E8E7E")
+    c.setFillColor(HexColor(MUTED)); c.setFont("DJ", 8.2); c.drawString(M + 78, y - 11, "For your own tunes, or for exercises your teacher writes for you.")
+    for i in range(n): c.drawImage(im, M - 1, y - 20 - h - i * step, w, h)
 
 # ---------------------------------------------------------------- the player: one tune per numbered line
 PLAY = "https://alexattardmusic.com/play/"
@@ -536,8 +669,8 @@ def qr_img(slug):
     q = qrcode.QRCode(border=2, box_size=10, error_correction=qrcode.constants.ERROR_CORRECT_M)
     q.add_data(PLAY + "?t=" + slug + "&c=" + re.sub(r"[^A-Z0-9]", "", CODE.upper())); q.make(fit=True)
     buf = io.BytesIO(); q.make_image(fill_color=SLATE, back_color="white").save(buf, format="PNG"); buf.seek(0); return ImageReader(buf)
-def unit_qr(c, first):
-    qs = 62; qx = W - M - qs + 3; qy = H - 30 - qs
+def unit_qr(c, first, y=H - M):
+    qs = 56; qx = W - M - qs + 3; qy = y - qs + 4
     c.drawImage(qr_img(slug_of(first)), qx, qy, qs, qs)
     c.setFillColor(HexColor(AMBER)); c.setFont("Pop-B", 5.6); c.drawCentredString(qx + qs / 2, qy - 5, " ".join("PLAY ALONG") + "  ·  " + CODE)
 
@@ -608,6 +741,7 @@ def to_tune(it, chapter):
     bpb = int(it["time"][0]); wkey = it["key"].upper(); below = BELOW[ED]; wk = g.parse_note(wkey)
     drone = it["title"].lower().startswith("long tone"); tune_like = bool(it.get("src")) or bool(it.get("b"))
     music = it["music"] + (" | " + it["music"] if it.get("repeat") else "")
+    if it.get("rep"): bs = music.split("|"); music = "|".join(bs[:it["rep"]] + bs)
     ev, abc, marks, roots = parse_part(it, music, bpb, wk, below)
     chords, last = [], (wk.pc - below) % 12
     for r in roots:
@@ -785,7 +919,7 @@ def reading_page(book):
     book.footer(); c.showPage()
 
 def scales_page(book):
-    c = book.c; pg = Page(c, book); book.toc.append(("Finish", "Four scales, and what comes next", book.n))
+    c = book.c; pg = Page(c, book); pg.head("Finish", "Four scales, and what comes next", toc="Finish")
     p, ph = para_h("You now know every note in four major scales. Play one each day as part of your warm-up: the scale up and down, then its <b>arpeggio</b> (notes 1, 3, 5 and 8). "
                    "When all four are easy at ♩ = 80, you are ready for the <b>Saxophone Welcome Booklet</b>: every key, faster fingers and your first jazz.", CW, ParagraphStyle("sb", parent=B.body, fontSize=10.4, leading=15))
     pg.add(ph, lambda c, y: p.drawOn(c, M, y - ph), gap=14)
@@ -796,10 +930,10 @@ def scales_page(book):
         c.setFont("DJ", 10); c.drawString(M + 24, y - 56, "Student: ______________________________      Date: ________________")
         c.drawString(M + 24, y - 78, "Teacher: ______________________________")
     pg.add(96, cert, gap=18)
-    pg.flush("Finish", "Four scales, and what comes next")
+    pg.flush()
 
 def finale_pages(book):
-    c = book.c; pg = Page(c, book); book.toc.append(("Finale", "A solo with piano", book.n))
+    c = book.c; pg = Page(c, book); pg.head("Finale", "A solo with piano", qr=(lambda c, y: unit_qr(c, FINALE_LINE, y)) if CODE else None, toc="Finale")
     p, ph = para_h("The last piece in the book is a <b>solo with piano</b>. A pianist, your teacher or the player plays the accompaniment while you play the tune. "
                    "The piano plays two bars on its own first: count them, and come in on beat 3 of the second bar. The whole tune comes twice. Make the second time bigger than the first.",
                    CW, ParagraphStyle("fb", parent=B.body, fontSize=10.4, leading=15))
@@ -819,7 +953,7 @@ def finale_pages(book):
             c.setStrokeColor(HexColor(SLATE)); c.setLineWidth(0.9); c.setFillColor(white); c.roundRect(M + 14, yy - 2, 10, 10, 2, fill=1, stroke=1)
             c.setFillColor(HexColor(SLATE)); B.draw_mixed(c, M + 31, yy, t, "DJ", 9.4)
     pg.add(hh, draw, gap=16)
-    pg.flush("Finale", "A solo with piano", qr=(lambda c: unit_qr(c, FINALE_LINE)) if CODE else None)
+    pg.flush()
     # the pianist's score
     y = B.header(c, "For the pianist", FINALE["title"] + ": piano accompaniment")
     ed = {"alto": "E♭ alto saxophone", "tenor": "B♭ tenor saxophone", None: "E♭ alto saxophone"}[ED]
@@ -846,7 +980,7 @@ def piano_score_ly():
 """ % (FINALE["tempo_word"], FINALE["tempo"], sax, tr, " | ".join(FINALE["rh"]), tr, " | ".join(FINALE["lh"]))
 
 def rhythm_page(book):
-    c = book.c; pg = Page(c, book); book.toc.append(("Practice", "Rhythm gym", book.n))
+    c = book.c; pg = Page(c, book); pg.head("Practice", "Rhythm gym", toc="Practice")
     p, ph = para_h("Rhythm is half of music. Use these lines at any point in the book: set the metronome to ♩ = 60, count out loud and clap. "
                    "Then play each line on one note you know. When a level is easy, raise the tempo.", CW, ParagraphStyle("rg", parent=B.body, fontSize=10.4, leading=15))
     pg.add(ph, lambda c, y: p.drawOn(c, M, y - ph), gap=14)
@@ -860,7 +994,7 @@ def rhythm_page(book):
         for i, t in enumerate(steps):
             pp, ph = para_h("%d.  %s" % (i + 1, t), CW - 32); pp.drawOn(c, M + 16, y - 26 - 16 * i - ph)
     pg.add(hh, tips, gap=18)
-    pg.flush("Practice", "Rhythm gym")
+    pg.flush()
 
 def glossary_page(book):
     c = book.c; y = B.header(c, "Reference", "Glossary"); book.toc.append(("Reference", "Glossary", book.n))
@@ -916,6 +1050,7 @@ def sources_text():
 
 PNGS = {}
 def main():
+    for u in UNITS: plan_pairs(u["lines"])
     items = [it for u in UNITS for it in u["lines"] if it["type"] == "line"]
     with ThreadPoolExecutor(8) as ex:
         for it, png in zip(items, ex.map(lambda it: render(ly_line(it), "line"), items)): PNGS[id(it)] = png
@@ -927,11 +1062,15 @@ def main():
         book = Book(out if final else os.path.join(CACHE, "pass1.pdf")); cover(book)
         book.toc = list(toc); how_page(book); book.toc = []
         start_page(book); reading_page(book)
+        book.pg = Page(book.c, book)
         for k, u in enumerate(UNITS): build_unit(book, k, u)
+        book.pg.flush(filler=manuscript)
         finale_pages(book); scales_page(book); rhythm_page(book); glossary_page(book); book.c.save()
         if final: full_chart(out, book)
         toc = [t for t in book.toc if t[0].startswith("Unit") or t[0] == "Finale"]
     print(out, book.n - 1, "pages,", book.line_no, "numbered lines")
+    if "--fill" in ARGS:
+        for kicker, k, pct in book.fill: print("  page %2d  %-9s %3d%%" % (k, kicker, pct))
     if REPO: publish(REPO)
     if "--sources" in ARGS:
         for t, s in sources_text(): print("  %-34s %s" % (t, s))
