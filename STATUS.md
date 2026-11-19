@@ -115,3 +115,9 @@ Everything needed to carry on from any conversation is in this repository and in
 - Learn mode: a pink vertical line (`.lr-line`, an SVG rect inside the music) sits on the current note and slides to the next one;
   the note itself is pink, finished notes green.
 - "Too loud for the microphone" now needs a quarter of a second of distorted AND unreadable sound, and it clears itself.
+
+## 2026-11-19 · Play in the middle; the Learn line fitted to the stem
+- Play bar is a three-column grid: `.p-left` (bar/chord readout on screens 1100 px and wider, tempo, metronome), Play in the exact
+  middle, `.p-right` (key, repeats, settings).
+- Learn line: an SVG group `.lr-line` (rect + circle) on top of the music. It lies on the note's stem and runs a little past the
+  staff, with a dot where the stem meets the head; a whole note gets the line and dot through the middle of the head.

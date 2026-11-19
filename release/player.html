@@ -137,7 +137,7 @@
 #aam-play .score .hl.is-now { fill: #bfe3fb; stroke: var(--accent); stroke-width: 1.5; }
 #aam-play .score .mk-g { color: #8a99a8; fill: #8a99a8; }
 /* Learn mode and the tuner */
-#aam-play .score .lr-ok { color: #1a9b5a; fill: #1a9b5a; } #aam-play .score .lr-now { color: #e6398b; fill: #e6398b; } #aam-play .score .lr-line { fill: #ff4fa3; stroke: none; opacity: .9; transition: transform .16s ease-out; pointer-events: none; } #aam-play .score .lr-miss { color: #d0443a; fill: #d0443a; }
+#aam-play .score .lr-ok { color: #1a9b5a; fill: #1a9b5a; } #aam-play .score .lr-now { color: #e6398b; fill: #e6398b; } #aam-play .score .lr-line { fill: #ff4fa3; stroke: none; transition: transform .16s ease-out; pointer-events: none; } #aam-play .score .lr-line rect { opacity: .85; } #aam-play .score .lr-line circle { stroke: #fff; stroke-width: .7; } #aam-play .score .lr-miss { color: #d0443a; fill: #d0443a; }
 #aam-play .chip[aria-pressed="true"] { background: var(--now); color: var(--now-ink); border-color: var(--now); }
 #aam-play .learn-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 14px; background: var(--tint); border: 1px solid var(--line); }
 #aam-play .learn-bar[hidden] { display: none; }
@@ -173,10 +173,11 @@
   #aam-play .music-row .chip { flex: none; padding: 8px 11px; }
   #aam-play .score { padding: 2px 2px 6px; border-radius: 8px; }
   #aam-play .key { font-size: 12px; }
-  #aam-play .pbar { display: flex; align-items: center; gap: 10px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 99990;
+  #aam-play .pbar { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 10px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 99990;
     background: var(--surface); border-top: 1px solid var(--line); box-shadow: 0 -6px 20px rgba(20,23,26,.08);
     padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); }
-  #aam-play .pbar .play { width: 52px; height: 52px; }
+  #aam-play .pbar .play { width: 56px; height: 56px; }
+  #aam-play .p-left, #aam-play .p-right { display: flex; align-items: center; gap: inherit; min-width: 0; } #aam-play .p-right { justify-content: flex-end; }   /* play sits in the middle: time on its left, key and settings on its right */
   #aam-play .p-now { flex: 1 1 auto; min-width: 0; display: grid; gap: 1px; }
   #aam-play .p-where { font: 500 11px var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #aam-play .p-chord { font: 700 22px/1.1 var(--display); min-height: 24px; white-space: nowrap; }
@@ -185,7 +186,7 @@
   #aam-play .p-bpm { font: 700 17px var(--display); min-width: 34px; text-align: center; font-variant-numeric: tabular-nums; }
   #aam-play .pbar { gap: 8px; } #aam-play .p-tempo { gap: 4px; }
   #aam-play .p-now { display: none; }
-  #aam-play .p-key { display: grid; justify-items: start; align-content: center; flex: none; margin-right: auto; min-width: 62px; height: 44px; padding: 0 12px; border-radius: 14px;
+  #aam-play .p-key { display: grid; justify-items: start; align-content: center; flex: none; min-width: 62px; height: 44px; padding: 0 12px; border-radius: 14px;
     border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-align: left; }
   #aam-play .p-key b { font: 600 17px/1.05 "Fredoka", var(--display); white-space: nowrap; } #aam-play .p-key small { font: 500 9.5px/1.1 var(--body); color: var(--muted); white-space: nowrap; }
   #aam-play .cnt-dots i { width: 58px; height: 58px; }
@@ -291,7 +292,7 @@
   #aam-play .music-row .seg button { padding: 9px 16px; font-size: 14px; }
   #aam-play .content > .panel:first-child { padding: 14px 16px; }
   #aam-play .pbar { padding: 10px max(16px, calc((100vw - 1180px) / 2)) 12px; gap: 14px; }
-  #aam-play .pbar .play { width: 56px; height: 56px; }
+  #aam-play .pbar .play { width: 60px; height: 60px; }
   #aam-play .p-now { display: grid; flex: 0 0 150px; }
   #aam-play .p-where { font-size: 12px; } #aam-play .p-chord { font-size: 24px; }
   #aam-play .p-key { margin-right: 0; }
@@ -355,10 +356,11 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 #aam-play .p-bpm { background: none; border: 0; padding: 0; color: var(--ink); cursor: pointer; }
 @media (max-width: 620px) {                               /* phones: no plus and minus, the number is a button that opens the tempo wheel */
   #aam-play .p-tempo .step { display: none; }
-  #aam-play .p-tempo { flex: 1 1 auto; justify-content: center; }
-  #aam-play .p-bpm { display: inline-flex; align-items: center; justify-content: center; gap: 5px; height: 44px; line-height: 1; min-width: 84px; padding: 0 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); font-size: 20px; }
+  #aam-play .p-tempo { flex: 0 1 auto; }
+  #aam-play .p-bpm { display: inline-flex; align-items: center; justify-content: center; gap: 5px; height: 44px; line-height: 1; min-width: 78px; padding: 0 10px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); font-size: 20px; }
   #aam-play .p-bpm::after { content: "bpm"; font: 600 11px/1 var(--body); color: var(--muted); padding-top: 5px; }
 }
+@media (max-width: 1099px) { #aam-play .p-left .p-now { display: none; } }   /* with Play in the middle there is only room for the bar-and-chord readout on wide screens */
 #aam-play .tp-chips { display: flex; gap: 6px; flex-wrap: wrap; } #aam-play .tp-chips:empty { display: none; }
 #aam-play .tp-chips button { flex: 1 1 0; height: 38px; padding: 0 10px; border-radius: 999px; background: var(--tint); color: var(--ink); font: 600 13px var(--body); white-space: nowrap; text-align: center; }
 #aam-play .tp-wheel { position: relative; height: 220px; border-radius: 16px; background: var(--tint); overflow: hidden; }
@@ -537,19 +539,23 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 
     <!-- phones only: a play bar pinned to the bottom, and a settings sheet that slides up from it -->
     <div class="pbar" data-r="pbar">
-      <button class="play" data-r="p-play" aria-label="Play"><svg viewBox="0 0 24 24" data-r="p-play-ic"><path d="M7 4v16l13-8z"/></svg></button>
-      <div class="p-now"><div class="p-where" data-r="p-where"></div><div class="p-chord" data-r="p-chord"></div></div>
-      <button class="p-met" data-r="p-met" aria-haspopup="dialog" aria-pressed="false" aria-label="Metronome"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l4 18H5z"/><path d="M12 16.5L17.5 6"/><circle cx="16.4" cy="8.1" r="1.5"/><path d="M7.2 16.5h9.6"/></svg></button>
-      <button class="p-key" data-r="p-key" aria-haspopup="dialog" aria-label="Key and instrument"><b data-r="p-key-k">C</b><small data-r="p-key-i">Concert</small></button>
-      <div class="p-tempo">
+      <div class="p-left">
+        <div class="p-now"><div class="p-where" data-r="p-where"></div><div class="p-chord" data-r="p-chord"></div></div>
+        <div class="p-tempo">
         <button class="step" data-r="p-slower" aria-label="Slower by 5">−</button>
         <button class="p-bpm" data-r="p-bpm" aria-haspopup="dialog" aria-label="Tempo"></button>
         <input class="p-range" type="range" data-r="p-range" min="40" max="240" step="1" aria-label="Tempo">
         <button class="step" data-r="p-faster" aria-label="Faster by 5">+</button>
       </div>
-      <button class="p-reps" data-r="p-reps" aria-haspopup="true" aria-label="How many times through">1×</button>
-      <div class="p-reps-pop" data-r="p-reps-pop" hidden></div>
-      <button class="p-gear" data-r="p-gear" aria-label="Practice settings"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
+        <button class="p-met" data-r="p-met" aria-haspopup="dialog" aria-pressed="false" aria-label="Metronome"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l4 18H5z"/><path d="M12 16.5L17.5 6"/><circle cx="16.4" cy="8.1" r="1.5"/><path d="M7.2 16.5h9.6"/></svg></button>
+      </div>
+      <button class="play" data-r="p-play" aria-label="Play"><svg viewBox="0 0 24 24" data-r="p-play-ic"><path d="M7 4v16l13-8z"/></svg></button>
+      <div class="p-right">
+        <button class="p-key" data-r="p-key" aria-haspopup="dialog" aria-label="Key and instrument"><b data-r="p-key-k">C</b><small data-r="p-key-i">Concert</small></button>
+        <button class="p-reps" data-r="p-reps" aria-haspopup="true" aria-label="How many times through">1×</button>
+        <div class="p-reps-pop" data-r="p-reps-pop" hidden></div>
+        <button class="p-gear" data-r="p-gear" aria-label="Practice settings"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
+      </div>
     </div>
     <div class="backdrop" data-r="backdrop"></div>
     <!-- key and instrument: what key the band plays in, and what key you read in -->
@@ -629,7 +635,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 
 <script>
 // >>> SETTINGS
-var PLAYER_VERSION = "2026-11-19 09:35 UTC (after 0cb5b2b)";    // stamped by tools/release.py when a version is released
+var PLAYER_VERSION = "2026-11-19 09:48 UTC (after 5fbebe1)";    // stamped by tools/release.py when a version is released
 var STUDENT_HOME = "https://alexattardmusic.com/student-login/";              // where the "back" link goes: put the address of your student login page here, e.g. "/student-login/"
 var STUDENT_HOME_LABEL = "Student home";         // what the link says. Leave "" for "Student login" (or "Website" while the address above is "/")
 var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    // folder with p36.mp3 ... d-ride.mp3 (keep the final "/")
@@ -1144,12 +1150,20 @@ function aamBoot(TUNE) {
     els.forEach(function (e, k) { e.classList.toggle("lr-ok", k < learn.i); e.classList.toggle("lr-now", k === learn.i); });
     var el = els[learn.i], svg = score.querySelector("svg"), line = svg && svg.querySelector(".lr-line");
     if (!el) { if (line) line.remove(); return; }
-    try {                                                 // the pink line: straight through the note head, a little taller than the staff
-      var head = el.querySelector("path") || el, hb = head.getBBox(), ln = (/abcjs-l(\d+)/.exec(el.getAttribute("class")) || [0, 0])[1];
-      var staff = svg.querySelector(".abcjs-staff.abcjs-l" + ln), sb = staff ? staff.getBBox() : el.getBBox(), pad = sb.height * 0.55;
-      if (!line) { line = document.createElementNS("http://www.w3.org/2000/svg", "rect"); line.setAttribute("class", "lr-line"); line.setAttribute("width", 2.6); line.setAttribute("rx", 1.3); line.setAttribute("x", -1.3); line.setAttribute("y", 0); svg.insertBefore(line, svg.firstChild); }
-      line.setAttribute("height", sb.height + 2 * pad);
-      line.style.transform = "translate(" + (hb.x + hb.width / 2).toFixed(1) + "px," + (sb.y - pad).toFixed(1) + "px)";
+    try {                                                 // the pink line runs along the note's stem and on past the staff, with a dot where the stem meets the head
+      var NS = "http://www.w3.org/2000/svg", head = el.querySelector(".abcjs-notehead") || el.querySelector("path") || el, hb = head.getBBox(), stem = el.querySelector(".abcjs-stem");
+      var ln = (/abcjs-l(\d+)/.exec(el.getAttribute("class")) || [0, 0])[1], staff = svg.querySelector(".abcjs-staff.abcjs-l" + ln), sb = staff ? staff.getBBox() : el.getBBox(), pad = sb.height * 0.38;
+      var x = hb.x + hb.width / 2, jy = hb.y + hb.height / 2;                    // no stem (a whole note): through the middle of the head
+      if (stem) { var tb = stem.getBBox(), up = tb.y < hb.y; x = tb.x + tb.width / 2; jy = up ? tb.y + tb.height : tb.y; }
+      var top = Math.min(sb.y - pad, stem ? tb.y - 4 : hb.y - 8), bot = Math.max(sb.y + sb.height + pad, stem ? tb.y + tb.height + 4 : hb.y + hb.height + 8);
+      if (!line) {
+        line = document.createElementNS(NS, "g"); line.setAttribute("class", "lr-line");
+        var r = document.createElementNS(NS, "rect"), d = document.createElementNS(NS, "circle");
+        r.setAttribute("x", -0.9); r.setAttribute("width", 1.8); r.setAttribute("rx", 0.9); d.setAttribute("r", 2.5); d.setAttribute("cx", 0);
+        line.appendChild(r); line.appendChild(d); svg.appendChild(line);                                  // on top of the music, so the dot shows on the note head
+      }
+      line.firstChild.setAttribute("y", 0); line.firstChild.setAttribute("height", bot - top); line.lastChild.setAttribute("cy", jy - top);
+      line.style.transform = "translate(" + x.toFixed(2) + "px," + top.toFixed(2) + "px)";
     } catch (e) {}
     var a = el.getBoundingClientRect(), b = score.getBoundingClientRect(); if (a.bottom > b.bottom - 8 || a.top < b.top + 8) score.scrollTop += a.top - b.top - 40;
   }
