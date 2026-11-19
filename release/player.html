@@ -635,7 +635,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 
 <script>
 // >>> SETTINGS
-var PLAYER_VERSION = "2026-11-19 11:58 UTC (after 1d56bb7)";    // stamped by tools/release.py when a version is released
+var PLAYER_VERSION = "2026-11-19 12:54 UTC (after b91603a)";    // stamped by tools/release.py when a version is released
 var STUDENT_HOME = "https://alexattardmusic.com/student-login/";              // where the "back" link goes: put the address of your student login page here, e.g. "/student-login/"
 var STUDENT_HOME_LABEL = "Student home";         // what the link says. Leave "" for "Student login" (or "Website" while the address above is "/")
 var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    // folder with p36.mp3 ... d-ride.mp3 (keep the final "/")
@@ -2295,7 +2295,8 @@ function aamLibrary() {
     };
     var fetchBin = function (i) {
       if (i >= p._src.length) return Promise.reject(new Error("unreachable"));
-      return fetch(p._src[i] + f.path, { cache: "no-cache" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).catch(function () { return fetchBin(i + 1); });
+      var base = f.branch ? p._src[i].replace("/main/", "/" + f.branch + "/").replace("@main/", "@" + f.branch + "/") : p._src[i];   // the PDFs live on their own branch, which keeps no old editions
+      return fetch(base + f.path, { cache: "no-cache" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).catch(function () { return fetchBin(i + 1); });
     };
     return unwrap(0).then(function (K) { return fetchBin(0).then(function (buf) { return openGcm(new Uint8Array(K), unhex(f.iv), buf); }); })
       .then(function (pdf) { return new Blob([pdf], { type: "application/pdf" }); });

@@ -135,19 +135,20 @@
     }
    ],
    "file": {
-    "path": "pdf/sax-welcome-alto.bin",
+    "branch": "pdf",
+    "path": "sax-welcome-alto-20261119124556.bin",
     "name": "Sax_Welcome_Booklet_Alto.pdf",
     "edition": "November 2026",
     "size": 5233717,
-    "iv": "68d6f30ec6e622e32a0b9926",
+    "iv": "0c6de62687c966395da5eb50",
     "keys": [
      {
-      "iv": "96f7b249790e1326e784ca99",
-      "ct": "fafffb80ddc21178ad2061eb35cc5f1a74f643e7ffc4701d8582670eabd398d68b8feaa5b2e50df2946c751b4bb5f058"
+      "iv": "ae5ca4558eb60a4030ad46f4",
+      "ct": "84b6497c3e5d829994f0acf4ab117c40565e770594cbe8fcd5e14370ce85f959c5d27815f41729e6732bb57249039318"
      },
      {
-      "iv": "0e1f0712401e67f7943ac767",
-      "ct": "a78cc2235ee12c960306888c61dcaa72df5d8ff50a60f71caa1a85c1bb7c7b7fbc9db94d641e5d59fdfd543d5202c9a0"
+      "iv": "8b37dd282064bee3a1791805",
+      "ct": "05d7f618dec3649e3da291ed1355bf09f6546b410e93a3eef52d9a9529d164a6fd2341ba5b655d2b520bc67cdb243426"
      }
     ]
    }
@@ -243,19 +244,20 @@
     }
    ],
    "file": {
-    "path": "pdf/sax-welcome-tenor.bin",
+    "branch": "pdf",
+    "path": "sax-welcome-tenor-20261119124600.bin",
     "name": "Sax_Welcome_Booklet_Tenor.pdf",
     "edition": "November 2026",
     "size": 5235010,
-    "iv": "54978403d7c5b173acc00d51",
+    "iv": "eebb95aa010c93b58f27dfad",
     "keys": [
      {
-      "iv": "78cdfd437ec25b690ae868d9",
-      "ct": "2c174aa0d2c8fedbd9f72dd59ac650f145d20a9cbe23d30bb54ef5f253ffc64fa92c74c643a0def0e142cda3c20c6868"
+      "iv": "65495b8ff44970967923286d",
+      "ct": "628d17617f338318a16f033d98555d5673c7966c267545f4f1965bc4da7b8b17e079d0b13b76689aecaeedc67e592558"
      },
      {
-      "iv": "367f5f017383d913e5d0606b",
-      "ct": "d38df87976e4f3c22de610352c5b0cf7ace35d1518699956a393fc465c2800508eac1bce67707ba9dca915a359fd2316"
+      "iv": "d8c1203436a21a088587130a",
+      "ct": "d85ce174fc334e7d0496c92529cd8e5ff968f255321b0a3611efb3ee33e44bb45fe9651f973e02b0ebac5d8016c93732"
      }
     ]
    }
@@ -287,19 +289,20 @@
     "gr1-march-in-e-flat-anh127"
    ],
    "file": {
-    "path": "pdf/graded-repertoire-1-baroque-classical.bin",
+    "branch": "pdf",
+    "path": "graded-repertoire-1-baroque-classical-20261119124614.bin",
     "name": "Graded_Repertoire_Level_1.pdf",
     "edition": "November 2026",
     "size": 2811518,
-    "iv": "9c18a98f3b0b97f615e82474",
+    "iv": "208e8c093e401cbe9fb16bae",
     "keys": [
      {
-      "iv": "f69caf28a937c612549970d6",
-      "ct": "fdf220a2eb0c077047a21b6a72a5b7ebee08dc8be27c97853d3215a67823090a7319572bd7924ca92a2cbab608b3c0a9"
+      "iv": "fb2164d385505faa256c92bf",
+      "ct": "bc916ee8c4426a9e2c7f87cbf9095e3dcb440c5652c3989adf7623591c31f6f625c1e5d4570b3ec12a256485072e8a0e"
      },
      {
-      "iv": "1b9400038511f0e69bce84dd",
-      "ct": "17a7aa49ac5b2298fd6da9a25d2bf279637c7683e5bb2f9b49bb5f74dc825a428ddae0d15ee7214859887bb3aa3d33db"
+      "iv": "10f51d12cc524dc6a67f2aa6",
+      "ct": "1dbae5c2d0b93a7ff0bb7b4d627121f08c2f718bbc52df296ac6b1328a65ceff8fa82b2e1d73f09f5ffeb914da98cd5a"
      }
     ]
    }
@@ -629,19 +632,20 @@
     }
    ],
    "file": {
-    "path": "pdf/sax-beginner-alto.bin",
+    "branch": "pdf",
+    "path": "sax-beginner-alto-20261119124547.bin",
     "name": "Sax_Beginner_Booklet_Alto.pdf",
     "edition": "Edition 4 · November 2026",
     "size": 4063229,
-    "iv": "62ba5b5c953f8cad318dea6b",
+    "iv": "739798bcb7934b3904919008",
     "keys": [
      {
-      "iv": "0f49b1694a658d1094236e76",
-      "ct": "f5784710370e0902d9baec9bf502192c0b322931874e057b8632bdac5f681e19e6f47b4ffd0573f6c0de5ef6e99dbe96"
+      "iv": "8c64fcc3fcc23f900a89d687",
+      "ct": "839ebf3b0d437f9c1d6d87c45731ff7459e7fce157154706df5cb6ec0569e1afebd420ff280481b7d4aebf13ab9464fd"
      },
      {
-      "iv": "b9b27d442a8f98022cb2fa46",
-      "ct": "324a6bdffee444bcd71a7a9296d59775929f9a7b50d3df0740cbe55a8756b115cebb176ff173eac20d0da26b1bbfab28"
+      "iv": "6948c4a1c38f5f7a33d55245",
+      "ct": "22e0f3748420becbb9c6e928b17a5ccef43eec38247b494ca8cd3c0e189d962c5c386c4d573b578eba0db66ea23041ec"
      }
     ]
    }
@@ -971,19 +975,20 @@
     }
    ],
    "file": {
-    "path": "pdf/sax-beginner-tenor.bin",
+    "branch": "pdf",
+    "path": "sax-beginner-tenor-20261119124551.bin",
     "name": "Sax_Beginner_Booklet_Tenor.pdf",
     "edition": "Edition 4 · November 2026",
     "size": 4065676,
-    "iv": "c2fc407899b4570230b1f9b5",
+    "iv": "cd46b21f71028bbd8185affd",
     "keys": [
      {
-      "iv": "a1c4a93d79e13624d18f4234",
-      "ct": "a8dee0daf86e7ce526e78f1885253f0169e596175bb944515c27d0dbfb2cb67555c7be5f8298b3b7b717a3ec3e249f87"
+      "iv": "b5aecf4b0fa1aa4034265c54",
+      "ct": "a0ca69b69303c883412b49d30a697a5c124843a772734f00d8cf083a2cfdb66a42a2c0a262f733abe72e63647d20a0e3"
      },
      {
-      "iv": "14f46f2aa548efeef7378e76",
-      "ct": "232bea8472bed3b267848ae131c7e099df610fd3696f8b9ee952409de57928befa025b4a625a90921294e7bc0a805748"
+      "iv": "02361a000cf4aff6ed9d1554",
+      "ct": "b3b00331ca6c765f81df552998b6374f9888294ae762ee426e1b3f2583daa4917d5ce7cd3e7595afa6424e9bc59cd588"
      }
     ]
    }

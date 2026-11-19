@@ -139,3 +139,17 @@ Everything needed to carry on from any conversation is in this repository and in
 - **Rule for every generator from now on:** a single-line part must be published as `sections[].rh` events with matching
   `abc.rh` (one written note per sounding note, ties written as ties). Then the Tuner, Learn mode and the cloud work with no
   extra step. Check after publishing: the tune shows the "Learn the notes" button on its notation tabs.
+
+## 2026-11-19 · Checks in the repository; booklet PDFs on a branch with no history
+- `tools/check_features.js` (run by `tools/release.py` after `check_release.js`): tuner, Learn mode (clean, weak noisy microphone,
+  tenor low notes, a shifted key, a sung concert pitch), the playback cloud, contents search and chips, every booklet's PDF download,
+  the play bar at four sizes and the phone tempo wheel. Its microphone is generated sound fed to Chromium as a fake microphone.
+  `--only tuner|learn|cloud|contents|pdf|bar` runs one group. `tools/wire.js` is the shared stand-in for the network.
+  `tools/package.json` lists the two packages the checks load (`npm install` in tools/, or set `AAM_NODE_MODULES`).
+- Booklet PDFs are no longer in `main`. `tools/publish_pdf.py` encrypts the PDF and rebuilds the branch **`pdf`** as ONE commit
+  (no history) holding the newest two files per booklet, force-pushes it, and writes `file: {branch: "pdf", path: "<id>-<time>.bin", ...}`
+  into index.json. The player swaps `main` for the branch name in its two mirrors. A copy is staged in `tools/out/pdf-branch/` for
+  the checks; in a fresh clone the checks read `origin/pdf` instead (fetch it with
+  `git fetch origin +refs/heads/pdf:refs/remotes/origin/pdf`).
+- Never commit a PDF or a `.bin` to `main`. The old `pdf/` folder's files remain in main's history (about 40 MB); removing them
+  would mean rewriting history, which was not done.

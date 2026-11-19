@@ -1,1 +1,6 @@
-{ "name": "aam-tunes-tools", "private": true, "description": "Local copies of the libraries the player loads from the CDN, for tools/check_release.js", "dependencies": { "tone": "14.8.49", "abcjs": "6.4.4" } }
+{
+  "name": "aam-tunes-checks",
+  "private": true,
+  "description": "Packages the release checks load in place of the CDN copies. Playwright itself must be installed too (it is preinstalled in Claude's workspace).",
+  "dependencies": { "abcjs": "6.4.4", "tone": "14.8.49" }
+}

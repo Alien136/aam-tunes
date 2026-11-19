@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Release the player: run the full check on the test copy (player/aam-player.html) and, only if it is all clear,
+"""Release the player: run the page-by-page check and the feature check on the test copy (player/aam-player.html) and, only if it is all clear,
 stamp a version and copy it to release/player.html, which is what the website loads.
 
   AAM_CODE=<master code> python3 tools/release.py          then: git add -A && git commit && git push
@@ -10,6 +10,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 r = subprocess.run(["node", os.path.join(ROOT, "tools", "check_release.js")], cwd=ROOT)
 if r.returncode != 0:
     sys.exit("NOT released: the check found problems (above).")
+r = subprocess.run(["node", os.path.join(ROOT, "tools", "check_features.js")], cwd=ROOT)      # tuner, Learn mode, cloud, contents search, PDF download, play bar
+if r.returncode != 0:
+    sys.exit("NOT released: a feature check failed (above).")
 src = open(os.path.join(ROOT, "player", "aam-player.html"), encoding="utf-8").read()
 n = len(re.findall(r'var PLAYER_VERSION = "test copy";', src))
 assert n == 1, "PLAYER_VERSION line not found"
