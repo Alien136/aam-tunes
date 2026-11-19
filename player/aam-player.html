@@ -603,7 +603,7 @@ function aamBoot(TUNE) {
   var root = document.getElementById("aam-play");
   var $ = function (r) { return root.querySelector('[data-r="' + r + '"]'); };
   var Q = '<span class="q">♩</span>';
-  var nice = function (s) { return s.replace(/([A-G])b/g, "$1♭").replace(/m7b5/g, "m7♭5"); };
+  var nice = function (s) { return s.replace(/([A-G])b/g, "$1♭").replace(/m7b5/g, "m7♭5").replace(/7b9/g, "7♭9"); };
   // ---------- key and instrument
   // state.key: semitones the band is moved from the tune's own key. state.inst: what the reader's instrument is pitched in
   // (0 = concert, 2 = B flat, 9 = E flat). Chord names and notation show key + inst; the band and "Hear it" sound key only.

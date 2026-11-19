@@ -143,7 +143,7 @@ def main():
     # the blues pages: the same study the booklet prints, published as a tune and listed as the last chapter
     blues_slug = PRE + "blues"
     bspec = {"title": "Blues", "concert_key": "F", "instrument": ED, "tempo_text": "Medium Swing", "blues": True,
-             "bars": [["F7"], ["Bb7"], ["F7"], ["Cm7", "F7"], ["Bb7"], ["Bb7"], ["F7"], ["Am7", "D7"], ["Gm7"], ["C7"], ["F7", "D7"], ["Gm7", "C7"]]}
+             "bars": [["F7"], ["Bb7"], ["F7"], ["Cm7", "F7"], ["Bb7"], ["Bb7"], ["F7"], ["Am7b5", "D7b9"], ["Gm7"], ["C7"], ["F7", "D7b9"], ["Gm7", "C7"]]}
     bpath = os.path.join(HERE, "out", "blues_spec_%s.json" % ED)
     json.dump(bspec, open(bpath, "w"))
     subprocess.run([sys.executable, os.path.join(HERE, "publish_tune.py"), bpath, REPO, "--slug", blues_slug, "--code", "TMP-" + CODE,

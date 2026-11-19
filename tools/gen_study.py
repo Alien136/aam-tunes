@@ -23,7 +23,7 @@ Spec keys:
   practice_tip: optional replacement for the closing practice tip.
   fill_pages: true spreads every page's systems to the bottom margin (use with the lick pages).
   s3_mode: "auto" (default: pattern chorus when half or more of the bars hold two chords) | "scale" | "pattern".
-Chord qualities: maj7 6 7 9 13 m7 m9 m6 m7b5 (also M7 ^7 -7 ø, and m = minor 7th).
+Chord qualities: maj7 6 7 9 13 7b9 m7 m9 m6 m7b5 (also M7 ^7 -7 ø, and m = minor 7th).
 """
 import json, re, sys
 
@@ -91,7 +91,7 @@ def spell_degree(root, degree, alter):
 # quality -> (lily chordmode suffix, kind)
 QUALITIES = {
     "maj7": (":maj7", "maj7"), "M7": (":maj7", "maj7"), "^7": (":maj7", "maj7"), "6": (":6", "maj6"), "": ("", "maj7"),
-    "7": (":7", "dom7"), "9": (":9", "dom7"), "13": (":13", "dom7"),
+    "7": (":7", "dom7"), "9": (":9", "dom7"), "13": (":13", "dom7"), "7b9": (":7.9-", "dom7"),
     "m7": (":m7", "min7"), "-7": (":m7", "min7"), "m9": (":m9", "min7"), "m": (":m", "min7"),
     "m6": (":m6", "min6"), "m7b5": (":m7.5-", "half"), "ø": (":m7.5-", "half"),
 }

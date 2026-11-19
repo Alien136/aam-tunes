@@ -172,7 +172,7 @@ os.makedirs(os.path.join(A.repo, "tunes"), exist_ok=True)
 json.dump(tune, open(os.path.join(A.repo, "tunes", SLUG + ".json"), "w"), ensure_ascii=False, separators=(",", ":"))
 ip = os.path.join(A.repo, "index.json")
 idx = json.load(open(ip))
-clash = [p["id"] for p in idx["pdfs"] if p["hash"] == pdf["hash"] and p["id"] != pdf["id"]]
+clash = [p["id"] for p in idx["pdfs"] if p.get("hash") == pdf["hash"] and p["id"] != pdf["id"]]
 assert not clash, "that code is already used by " + clash[0] + ": pick another"
 idx["pdfs"] = [p for p in idx["pdfs"] if p["id"] != pdf["id"]] + [pdf]
 idx["tunes"][SLUG] = dict(title=tune["title"], subtitle=tune["subtitle"])

@@ -760,8 +760,8 @@ def blues_pages():
     import json, re
     import gen_study
     spec = {"title": "Blues", "concert_key": "F", "instrument": EDITION, "tempo_text": "Medium Swing", "blues": True,
-            "bars": [["F7"], ["Bb7"], ["F7"], ["Cm7", "F7"], ["Bb7"], ["Bb7"], ["F7"], ["Am7", "D7"],
-                     ["Gm7"], ["C7"], ["F7", "D7"], ["Gm7", "C7"]]}
+            "bars": [["F7"], ["Bb7"], ["F7"], ["Cm7", "F7"], ["Bb7"], ["Bb7"], ["F7"], ["Am7b5", "D7b9"],
+                     ["Gm7"], ["C7"], ["F7", "D7b9"], ["Gm7", "C7"]]}
     ly = gen_study.build(spec)
     ly = re.sub(r"\\header \{.*?\n\}\n", "\\\\header { tagline = ##f }\n", ly, count=1, flags=re.S)
     ly = ly.replace("#(set-global-staff-size 19)", "#(set-global-staff-size 18)")
@@ -822,11 +822,11 @@ FINGERINGS = [
 
 # notes with a second (chromatic) fingering: card shows both diagrams, labelled
 ALTERNATES = {
-    "F♯ / G♭": [("Standard", LH3 | {"R5"}), ("Alternate", LH3 | {"R6"})],
-    "A♯ / B♭": [("Bis key", {"L1", "bis"}), ("Side B♭", {"L1", "sBb"})],
+    "F♯ / G♭": [("Standard", LH3 | {"R5"}), ("Chromatic", LH3 | {"R4", "fs"})],
+    "A♯ / B♭": [("Bis key", {"L1", "bis"}), ("Side B♭", {"L1", "L2", "sBb"})],
     "C": [("Standard", {"L2"}), ("Side C", {"L1", "sC"})],
-    "Upper F♯ / G♭": [("Standard", O | LH3 | {"R5"}), ("Alternate", O | LH3 | {"R6"})],
-    "Upper A♯ / B♭": [("Bis key", O | {"L1", "bis"}), ("Side B♭", O | {"L1", "sBb"})],
+    "Upper F♯ / G♭": [("Standard", O | LH3 | {"R5"}), ("Chromatic", O | LH3 | {"R4", "fs"})],
+    "Upper A♯ / B♭": [("Bis key", O | {"L1", "bis"}), ("Side B♭", O | {"L1", "L2", "sBb"})],
     "Upper C": [("Standard", O | {"L2"}), ("Side C", O | {"L1", "sC"})],
 }
 
@@ -852,6 +852,8 @@ KEYS = [
     ("sBb", "e", -1.75, 8.8, 0.3, 0.4, False),
     ("R4", "c", 0, 7.8, 0.66, 0, True),
     ("R5", "c", 0, 9.7, 0.66, 0, True),
+    # chromatic F♯ key: the small key between E and D, pressed by the right ring finger (with the F fingering)
+    ("fs", "e", -0.98, 10.65, 0.27, 0.37, False),
     ("R6", "c", 0, 11.6, 0.66, 0, True),
     ("Eb", "r", -1.6, 12.4, 1.0, 0.5, False),
     ("C", "r", -1.6, 13.1, 1.0, 0.5, False),
@@ -893,7 +895,7 @@ KEY_LABELS_RIGHT = [("oct", -0.55, "Octave key (left thumb)"), ("pEb", 0.55, "Pa
                    ("R6", 11.6, "6 · D (RH ring)")]
 KEY_LABELS_LEFT = [("L1", 1.2, "1 · B (LH index)"), ("bis", 2.35, "Bis key (B♭)"), ("L2", 3.5, "2 · A (LH middle)"),
                     ("L3", 5.4, "3 · G (LH ring)"), ("sE", 7.0, "Side E (high E)"), ("sC", 7.9, "Side C"),
-                    ("sBb", 8.8, "Side B♭"), ("Eb", 12.3, "Low E♭ (RH pinky)"), ("C", 13.25, "Low C (RH pinky)")]
+                    ("sBb", 8.8, "Side B♭"), ("fs", 10.65, "Chromatic F♯ (RH ring)"), ("Eb", 12.3, "Low E♭ (RH pinky)"), ("C", 13.25, "Low C (RH pinky)")]
 
 
 def key_map(c, x0, ytop, w, h):
@@ -989,10 +991,9 @@ def fingering_pages(path):
                 # closing tip card
                 c.setFillColor(HexColor(SLATE)); c.setFont("Pop-B", 11); c.drawString(x0 + 10, y1 - 18, "Chromatic fingerings")
                 st = ParagraphStyle("tip", parent=body, fontSize=8.6, leading=11.8, spaceAfter=4)
-                tip = [Paragraph("B♭, F♯ and C each have two fingerings. Pick the one that moves the fewest fingers "
-                                 "from the note before and after.", st),
-                       Paragraph("<b>Bis B♭</b> suits flat keys and B♭–A–G lines. <b>Side B♭</b> and <b>side C</b> "
-                                 "keep chromatic runs and B–C–B moves smooth.", st)]
+                tip = [Paragraph("B♭, F♯ and C each have two fingerings. Pick the one that moves the fewest fingers.", st),
+                       Paragraph("<b>Side B♭</b>: finger A, add the side key. <b>Chromatic F♯</b>: finger F, add the small F♯ key "
+                                 "with your right ring finger.", st)]
                 f = Frame(x0 + 10, y1 - gh + 8, gw - 20, gh - 34, leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
                 f.addFromList(tip, c)
                 idx += 1
