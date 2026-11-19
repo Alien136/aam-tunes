@@ -1,3 +1,4 @@
+import os
 import asyncio, subprocess, sys, time, json
 from playwright.async_api import async_playwright
 async def run(b, stall, nostore):
@@ -13,7 +14,7 @@ async def run(b, stall, nostore):
     # switch tune through My tunes (a page reload)
     r2 = None
     if r["gate"]:
-        await pg.tap('[data-r="lib-btn"]'); await pg.fill('[data-r="add-code"]', "WA-5627"); await pg.tap('[data-r="add-form"] button'); await pg.wait_for_timeout(3000)
+        await pg.tap('[data-r="lib-btn"]'); await pg.fill('[data-r="add-code"]', os.environ["AAM_TEST_CODE"]); await pg.tap('[data-r="add-form"] button'); await pg.wait_for_timeout(3000)
         r2 = await pg.evaluate("""() => { const q = s => document.querySelector('[data-r="'+s+'"]'); return { url: location.search, gate: q('gate').hidden, sub: q('subtitle').textContent.slice(0, 24), err: q('err').textContent }; }""")
     await ctx.close(); return {"stall": stall, "nostore": nostore, "typed": r, "then_alto": r2, "errs": errs}
 async def main():

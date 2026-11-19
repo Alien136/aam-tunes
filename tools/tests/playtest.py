@@ -1,3 +1,4 @@
+import os
 import asyncio, json, subprocess, sys, time
 from playwright.async_api import async_playwright
 W, H, mobile = int(sys.argv[1]), int(sys.argv[2]), sys.argv[3] == "m"
@@ -12,7 +13,7 @@ async def main():
             b = await p.chromium.launch(executable_path="/usr/bin/google-chrome", args=["--no-sandbox", "--autoplay-policy=no-user-gesture-required"])
             ctx = await b.new_context(viewport={"width": W, "height": H}, has_touch=mobile, is_mobile=mobile, device_scale_factor=2 if mobile else 1)
             pg = await ctx.new_page(); errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
-            await pg.goto("http://localhost:8765/index.html?t=winter-wonderland-piano&c=WW2193"); await pg.wait_for_selector("#aam-play .cell", timeout=15000); await pg.wait_for_timeout(800)
+            await pg.goto("http://localhost:8765/index.html?t=winter-wonderland-piano&c=" + os.environ["AAM_TEST_CODE"] + ""); await pg.wait_for_selector("#aam-play .cell", timeout=15000); await pg.wait_for_timeout(800)
             await pg.click('[data-view="arpeggios"]'); await pg.wait_for_timeout(900)
             # fastest tempo so the test is quick
             for _ in range(40): await pg.click('[data-r="p-faster"]' if mobile else '[data-r="faster"]') if await pg.query_selector('[data-r="p-faster"]' if mobile else '[data-r="faster"]') else None

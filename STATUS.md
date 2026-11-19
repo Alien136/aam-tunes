@@ -6,9 +6,10 @@ Everything needed to carry on from any conversation is in this repository and in
 - Player: `player/aam-player.html` is the block pasted into the Elementor HTML widget on alexattardmusic.com/play. The site has the latest version (start_key, http/https fix, booklets, key change, page turn).
 - Library: `index.json` + `tunes/`. PDFs and codes:
   - G.I. piano, F Blues piano (earlier codes, see index.json ids `gi-piano`, `fblues-piano`)
-  - Winter Wonderland piano WW-2193, Winter Wonderland alto WA-5627
-  - F Blues alto FBA-9872 (4 pages: arpeggios, scales, patterns, licks)
-  - Saxophone Welcome Booklet alto SWA-9426, tenor SWT-2764 (21 exercises each)
+  - Winter Wonderland piano, Winter Wonderland alto
+  - F Blues alto (4 pages: arpeggios, scales, patterns, licks)
+  - Saxophone Welcome Booklet alto and tenor (21 exercises each)
+  - Codes are never written in this repository: they are in the private project doc "Alex Attard Music knowledge base".
 - Codes are stored as hashes: sha256("aam:" + CODE without dash, upper case).
 
 - 17 Nov: the player uses the full-screen app layout on every screen (was phones only): wide screens get a centred 1180px column, full tab names, a tempo slider and bar/chord readout on the play bar, a centred settings card, a "← Website" link and space bar = play/stop. **Alex still has to paste this version into the Elementor Player widget.**

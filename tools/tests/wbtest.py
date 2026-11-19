@@ -1,3 +1,4 @@
+import os
 import asyncio, subprocess, sys, time, json
 from playwright.async_api import async_playwright
 KEY = "() => document.querySelector('[data-r=p-key-k]').textContent"
@@ -25,5 +26,5 @@ async def main():
             await pg.tap('[data-r="title"]'); await pg.wait_for_timeout(400); await pg.screenshot(path="/home/claude/ww/wb_toc.png")
             out["errs"] = errs; print(json.dumps(out, ensure_ascii=False)); await b.close()
     finally: srv.terminate()
-CODE = sys.argv[1] == "alto" and "SWA9426" or "SWT2764"
+CODE = os.environ["AAM_TEST_CODE"]                     # the booklet code for this edition, without the dash
 asyncio.run(main())
