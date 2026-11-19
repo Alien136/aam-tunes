@@ -331,6 +331,20 @@ _after(8, "Happy Birthday to You",
        L("O Come, All Ye Faithful", "g'4 | g'2 d'4 g' | a'2 d'2 | b'4 a' b' c'' | b'2 a'4 g' | g'2 fis'4 e' | fis'( g') a' b' | fis'2( e'4.) d'8 | d'1 \\breathe | d''2 c''4 b' | c''2 b'2 | a'4 b' g' a' | fis'2 d'4 g' | g' fis' g' a' | g'2 d'4 b' | b' a' b' c'' | b'2 a'4 b' | c'' b' a' g' | fis'2 g'4( c'') | b'2( a'4.) g'8 | g'2.",
          "J. F. Wade", key="g", partial="4", src=WIKI, tempo_word="Moderato", about="A Christmas hymn from the 1740s. Its Latin name is \"Adeste Fideles\"."))
 
+# ---------------------------------------------------------------- every unit fills whole pages: a few tunes move to later units as review, a few lines are added
+def _move(kf, title, kt, after): it = _line(kf, title); _u(kf)["lines"].remove(it); _after(kt, after, it)
+_move(5, "À la Claire Fontaine", 6, "Oranges and Lemons"); _line(6, "À la Claire Fontaine")["sub"] = "French traditional. The key of G."
+_move(5, "Let Us Be Glad and Cheerful", 7, "Thoughts Are Free")
+_move(5, "O Come, Little Children", 8, "Surprise Symphony")
+_before_check(1, EAR("Find the start of \"Mary Had a Little Lamb\" without any music. It begins on B and its first seven notes use only B, A and G."))
+_after(4, "Smooth pairs",
+       L("F sharp ladder", "d'4 fis' a' fis' | d' fis' a'2 | g'4 fis' e' fis' | d'1", "Middle finger every time.", key="g"),
+       L("Skips", "g'4 b' fis' a' | e' g' fis'2 | d'4 fis' g' b' | g'1", "Look one note ahead.", key="g"))
+_after(4, "Aura Lee",
+       L("Aura Lee duet", "d'4 g' fis' g' | a' e' a'2 | g'4 fis' e' fis' | g'1 | d'4 g' fis' g' | a' e' a'2 | g'4 fis' e' fis' | g'1", DUET, key="g",
+         b="b'4 b' a' b' | c'' c'' c''2 | b'4 a' g' a' | b'1 | b'4 b' a' b' | c'' c'' c''2 | b'4 a' g' a' | b'1", pill="DUET"))
+_u(2)["lines"] = [it for it in _u(2)["lines"] if not (it.get("badge") == "WRITE")]      # unit 2 is exactly two pages without it
+
 # ---------------------------------------------------------------- the finale: a solo with piano accompaniment
 # Sax part in written pitch; piano part written in the same frame (as if the sax were in C) and transposed for each edition.
 FINALE = dict(title="Jupiter", sub="Gustav Holst, from The Planets (easy rhythm)", key="c", time="3/4", tempo=76, tempo_word="Andante maestoso",
@@ -496,7 +510,7 @@ class Page:
                 if i: y -= b["gap"] + extra
                 for it in b["its"]: it["_page"] = self.book.n
                 b["draw"](c, y); y -= b["h"]
-            if filler and last and spare >= 96: filler(c, y - GAP - 4, spare - GAP - 4)
+            if filler and last and spare >= 70: filler(c, y - GAP - 4, spare - GAP - 4)
             self.book.fill.append((first["sec"][0], self.book.n, round(100 * used / room)))
             self.book.footer(); c.showPage()
         self.blocks = []
@@ -600,7 +614,7 @@ def blank_staff_png():
 
 NOTE_H = 110
 def build_unit(book, k, u):
-    c = book.c; pg = book.pg
+    c = book.c; pg = Page(c, book)
     first = next(it for it in u["lines"] if it["type"] == "line" and not it.get("badge"))
     pg.head("Unit %d" % (k + 1), u["title"], qr=(lambda c, y: unit_qr(c, first, y)) if CODE else None, toc="Unit %d" % (k + 1))
     notes = u["notes"]; gap = 10; nw = (CW - gap * (len(notes) - 1)) / len(notes) if len(notes) >= 2 else (CW - gap * 2) / 3
@@ -642,12 +656,13 @@ def build_unit(book, k, u):
                     c.setStrokeColor(HexColor(SLATE)); c.setLineWidth(0.9); c.setFillColor(white); c.roundRect(M + 14, yy - 2, 10, 10, 2, fill=1, stroke=1)
                     c.setFillColor(HexColor(SLATE)); B.draw_mixed(c, M + 31, yy, t, "DJ", 9.4)
             pg.add(hh, draw)
+    pg.flush(filler=manuscript)
 
 def manuscript(c, y, room):
     """Room left at the end of a unit becomes staff paper, so no page ends half empty."""
     im = ImageReader(render(ly_line(dict(music="", key="c", time="4/4"), blank=True).replace("s1 | s1 | s1 | s1", "\\override Staff.BarLine.stencil = ##f s1 s1 s1 s1 \\revert Staff.BarLine.stencil"), "paper"))
-    iw, ih = im.getSize(); w = iw * 72 / 300; h = ih * 72 / 300; step = h + 15; n = min(6, int((room - 20) // step))
-    if n < 2: return
+    iw, ih = im.getSize(); w = iw * 72 / 300; h = ih * 72 / 300; step = h + 15; n = min(4, int((room - 20) // step))
+    if n < 1: return
     _pill(c, M, y, "STAFF PAPER", "#3E8E7E")
     c.setFillColor(HexColor(MUTED)); c.setFont("DJ", 8.2); c.drawString(M + 78, y - 11, "For your own tunes, or for exercises your teacher writes for you.")
     for i in range(n): c.drawImage(im, M - 1, y - 20 - h - i * step, w, h)
@@ -1062,9 +1077,7 @@ def main():
         book = Book(out if final else os.path.join(CACHE, "pass1.pdf")); cover(book)
         book.toc = list(toc); how_page(book); book.toc = []
         start_page(book); reading_page(book)
-        book.pg = Page(book.c, book)
         for k, u in enumerate(UNITS): build_unit(book, k, u)
-        book.pg.flush(filler=manuscript)
         finale_pages(book); scales_page(book); rhythm_page(book); glossary_page(book); book.c.save()
         if final: full_chart(out, book)
         toc = [t for t in book.toc if t[0].startswith("Unit") or t[0] == "Finale"]

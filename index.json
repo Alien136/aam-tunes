@@ -292,9 +292,12 @@
     "sax-beginner-alto-f-or-f-sharp",
     "sax-beginner-alto-five-notes-from-d",
     "sax-beginner-alto-smooth-pairs",
+    "sax-beginner-alto-f-sharp-ladder",
+    "sax-beginner-alto-skips",
     "sax-beginner-alto-twinkle-twinkle-little-star",
     "sax-beginner-alto-twinkle-duet",
     "sax-beginner-alto-aura-lee",
+    "sax-beginner-alto-aura-lee-duet",
     "sax-beginner-alto-old-hundredth",
     "sax-beginner-alto-all-my-clothes-are-green",
     "sax-beginner-alto-au-clair-de-la-lune-complete",
@@ -311,10 +314,7 @@
     "sax-beginner-alto-all-my-little-ducklings",
     "sax-beginner-alto-rain-rain-go-away",
     "sax-beginner-alto-bake-bake-a-cake",
-    "sax-beginner-alto-a-la-claire-fontaine",
     "sax-beginner-alto-twinkle-up-high",
-    "sax-beginner-alto-let-us-be-glad-and-cheerful",
-    "sax-beginner-alto-o-come-little-children",
     "sax-beginner-alto-long-tone-b-flat",
     "sax-beginner-alto-a-b-flat-c",
     "sax-beginner-alto-f-major-scale",
@@ -325,6 +325,7 @@
     "sax-beginner-alto-a-bird-comes-flying",
     "sax-beginner-alto-holy-god-we-praise-thy-name",
     "sax-beginner-alto-oranges-and-lemons",
+    "sax-beginner-alto-a-la-claire-fontaine",
     "sax-beginner-alto-mary-moves-to-f",
     "sax-beginner-alto-lightly-row-in-f",
     "sax-beginner-alto-a-mother-had-four-children",
@@ -343,6 +344,7 @@
     "sax-beginner-alto-my-bonnie-lies-over-the-ocean",
     "sax-beginner-alto-away-in-a-manger",
     "sax-beginner-alto-thoughts-are-free",
+    "sax-beginner-alto-let-us-be-glad-and-cheerful",
     "sax-beginner-alto-alouette",
     "sax-beginner-alto-ode-to-joy",
     "sax-beginner-alto-long-tone-c-sharp",
@@ -352,6 +354,7 @@
     "sax-beginner-alto-slur-two-tongue-two",
     "sax-beginner-alto-every-year-again",
     "sax-beginner-alto-surprise-symphony",
+    "sax-beginner-alto-o-come-little-children",
     "sax-beginner-alto-amazing-grace",
     "sax-beginner-alto-happy-birthday-to-you",
     "sax-beginner-alto-now-thank-we-all-our-god",
@@ -422,9 +425,12 @@
       "sax-beginner-alto-f-or-f-sharp",
       "sax-beginner-alto-five-notes-from-d",
       "sax-beginner-alto-smooth-pairs",
+      "sax-beginner-alto-f-sharp-ladder",
+      "sax-beginner-alto-skips",
       "sax-beginner-alto-twinkle-twinkle-little-star",
       "sax-beginner-alto-twinkle-duet",
       "sax-beginner-alto-aura-lee",
+      "sax-beginner-alto-aura-lee-duet",
       "sax-beginner-alto-old-hundredth",
       "sax-beginner-alto-all-my-clothes-are-green",
       "sax-beginner-alto-au-clair-de-la-lune-complete",
@@ -446,10 +452,7 @@
       "sax-beginner-alto-all-my-little-ducklings",
       "sax-beginner-alto-rain-rain-go-away",
       "sax-beginner-alto-bake-bake-a-cake",
-      "sax-beginner-alto-a-la-claire-fontaine",
-      "sax-beginner-alto-twinkle-up-high",
-      "sax-beginner-alto-let-us-be-glad-and-cheerful",
-      "sax-beginner-alto-o-come-little-children"
+      "sax-beginner-alto-twinkle-up-high"
      ]
     },
     {
@@ -465,6 +468,7 @@
       "sax-beginner-alto-a-bird-comes-flying",
       "sax-beginner-alto-holy-god-we-praise-thy-name",
       "sax-beginner-alto-oranges-and-lemons",
+      "sax-beginner-alto-a-la-claire-fontaine",
       "sax-beginner-alto-mary-moves-to-f",
       "sax-beginner-alto-lightly-row-in-f",
       "sax-beginner-alto-a-mother-had-four-children",
@@ -488,6 +492,7 @@
       "sax-beginner-alto-my-bonnie-lies-over-the-ocean",
       "sax-beginner-alto-away-in-a-manger",
       "sax-beginner-alto-thoughts-are-free",
+      "sax-beginner-alto-let-us-be-glad-and-cheerful",
       "sax-beginner-alto-alouette",
       "sax-beginner-alto-ode-to-joy"
      ]
@@ -502,6 +507,7 @@
       "sax-beginner-alto-slur-two-tongue-two",
       "sax-beginner-alto-every-year-again",
       "sax-beginner-alto-surprise-symphony",
+      "sax-beginner-alto-o-come-little-children",
       "sax-beginner-alto-amazing-grace",
       "sax-beginner-alto-happy-birthday-to-you",
       "sax-beginner-alto-now-thank-we-all-our-god",
@@ -566,9 +572,12 @@
     "sax-beginner-tenor-f-or-f-sharp",
     "sax-beginner-tenor-five-notes-from-d",
     "sax-beginner-tenor-smooth-pairs",
+    "sax-beginner-tenor-f-sharp-ladder",
+    "sax-beginner-tenor-skips",
     "sax-beginner-tenor-twinkle-twinkle-little-star",
     "sax-beginner-tenor-twinkle-duet",
     "sax-beginner-tenor-aura-lee",
+    "sax-beginner-tenor-aura-lee-duet",
     "sax-beginner-tenor-old-hundredth",
     "sax-beginner-tenor-all-my-clothes-are-green",
     "sax-beginner-tenor-au-clair-de-la-lune-complete",
@@ -585,10 +594,7 @@
     "sax-beginner-tenor-all-my-little-ducklings",
     "sax-beginner-tenor-rain-rain-go-away",
     "sax-beginner-tenor-bake-bake-a-cake",
-    "sax-beginner-tenor-a-la-claire-fontaine",
     "sax-beginner-tenor-twinkle-up-high",
-    "sax-beginner-tenor-let-us-be-glad-and-cheerful",
-    "sax-beginner-tenor-o-come-little-children",
     "sax-beginner-tenor-long-tone-b-flat",
     "sax-beginner-tenor-a-b-flat-c",
     "sax-beginner-tenor-f-major-scale",
@@ -599,6 +605,7 @@
     "sax-beginner-tenor-a-bird-comes-flying",
     "sax-beginner-tenor-holy-god-we-praise-thy-name",
     "sax-beginner-tenor-oranges-and-lemons",
+    "sax-beginner-tenor-a-la-claire-fontaine",
     "sax-beginner-tenor-mary-moves-to-f",
     "sax-beginner-tenor-lightly-row-in-f",
     "sax-beginner-tenor-a-mother-had-four-children",
@@ -617,6 +624,7 @@
     "sax-beginner-tenor-my-bonnie-lies-over-the-ocean",
     "sax-beginner-tenor-away-in-a-manger",
     "sax-beginner-tenor-thoughts-are-free",
+    "sax-beginner-tenor-let-us-be-glad-and-cheerful",
     "sax-beginner-tenor-alouette",
     "sax-beginner-tenor-ode-to-joy",
     "sax-beginner-tenor-long-tone-c-sharp",
@@ -626,6 +634,7 @@
     "sax-beginner-tenor-slur-two-tongue-two",
     "sax-beginner-tenor-every-year-again",
     "sax-beginner-tenor-surprise-symphony",
+    "sax-beginner-tenor-o-come-little-children",
     "sax-beginner-tenor-amazing-grace",
     "sax-beginner-tenor-happy-birthday-to-you",
     "sax-beginner-tenor-now-thank-we-all-our-god",
@@ -696,9 +705,12 @@
       "sax-beginner-tenor-f-or-f-sharp",
       "sax-beginner-tenor-five-notes-from-d",
       "sax-beginner-tenor-smooth-pairs",
+      "sax-beginner-tenor-f-sharp-ladder",
+      "sax-beginner-tenor-skips",
       "sax-beginner-tenor-twinkle-twinkle-little-star",
       "sax-beginner-tenor-twinkle-duet",
       "sax-beginner-tenor-aura-lee",
+      "sax-beginner-tenor-aura-lee-duet",
       "sax-beginner-tenor-old-hundredth",
       "sax-beginner-tenor-all-my-clothes-are-green",
       "sax-beginner-tenor-au-clair-de-la-lune-complete",
@@ -720,10 +732,7 @@
       "sax-beginner-tenor-all-my-little-ducklings",
       "sax-beginner-tenor-rain-rain-go-away",
       "sax-beginner-tenor-bake-bake-a-cake",
-      "sax-beginner-tenor-a-la-claire-fontaine",
-      "sax-beginner-tenor-twinkle-up-high",
-      "sax-beginner-tenor-let-us-be-glad-and-cheerful",
-      "sax-beginner-tenor-o-come-little-children"
+      "sax-beginner-tenor-twinkle-up-high"
      ]
     },
     {
@@ -739,6 +748,7 @@
       "sax-beginner-tenor-a-bird-comes-flying",
       "sax-beginner-tenor-holy-god-we-praise-thy-name",
       "sax-beginner-tenor-oranges-and-lemons",
+      "sax-beginner-tenor-a-la-claire-fontaine",
       "sax-beginner-tenor-mary-moves-to-f",
       "sax-beginner-tenor-lightly-row-in-f",
       "sax-beginner-tenor-a-mother-had-four-children",
@@ -762,6 +772,7 @@
       "sax-beginner-tenor-my-bonnie-lies-over-the-ocean",
       "sax-beginner-tenor-away-in-a-manger",
       "sax-beginner-tenor-thoughts-are-free",
+      "sax-beginner-tenor-let-us-be-glad-and-cheerful",
       "sax-beginner-tenor-alouette",
       "sax-beginner-tenor-ode-to-joy"
      ]
@@ -776,6 +787,7 @@
       "sax-beginner-tenor-slur-two-tongue-two",
       "sax-beginner-tenor-every-year-again",
       "sax-beginner-tenor-surprise-symphony",
+      "sax-beginner-tenor-o-come-little-children",
       "sax-beginner-tenor-amazing-grace",
       "sax-beginner-tenor-happy-birthday-to-you",
       "sax-beginner-tenor-now-thank-we-all-our-god",
@@ -1202,47 +1214,47 @@
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-alto-twinkle-twinkle-little-star": {
-   "title": "35 · Twinkle, Twinkle, Little Star",
+   "title": "37 · Twinkle, Twinkle, Little Star",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-alto-aura-lee": {
-   "title": "37 · Aura Lee",
+   "title": "39 · Aura Lee",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-alto-au-clair-de-la-lune-complete": {
-   "title": "40 · Au Clair de la Lune (complete)",
+   "title": "43 · Au Clair de la Lune (complete)",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-alto-yankee-doodle": {
-   "title": "43 · Yankee Doodle",
+   "title": "46 · Yankee Doodle",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-alto-octaves": {
-   "title": "44 · Octaves",
+   "title": "47 · Octaves",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-alto-long-tones-going-up": {
-   "title": "45 · Long tones going up",
+   "title": "48 · Long tones going up",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-alto-g-major-scale": {
-   "title": "46 · G major scale",
+   "title": "49 · G major scale",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-alto-one-and-two-and": {
-   "title": "49 · One and two and",
+   "title": "52 · One and two and",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-alto-frere-jacques": {
-   "title": "50 · Frère Jacques",
+   "title": "53 · Frère Jacques",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-alto-all-my-little-ducklings": {
-   "title": "51 · All My Little Ducklings",
+   "title": "54 · All My Little Ducklings",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-alto-twinkle-up-high": {
-   "title": "55 · Twinkle, up high",
+   "title": "57 · Twinkle, up high",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-alto-long-tone-b-flat": {
@@ -1266,87 +1278,87 @@
    "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-alto-mary-moves-to-f": {
-   "title": "68 · Mary Moves to F",
+   "title": "69 · Mary Moves to F",
    "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-alto-lightly-row-in-f": {
-   "title": "69 · Lightly Row in F",
+   "title": "70 · Lightly Row in F",
    "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-alto-long-tone-low-c": {
-   "title": "72 · Long tone: low C",
+   "title": "73 · Long tone: low C",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-pinky-push-ups": {
-   "title": "73 · Pinky push-ups",
+   "title": "74 · Pinky push-ups",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-c-major-scale": {
-   "title": "74 · C major scale",
+   "title": "75 · C major scale",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-long-short": {
-   "title": "76 · Long, short",
+   "title": "77 · Long, short",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-london-bridge": {
-   "title": "77 · London Bridge",
+   "title": "78 · London Bridge",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-michael-row-the-boat-ashore": {
-   "title": "81 · Michael, Row the Boat Ashore",
+   "title": "82 · Michael, Row the Boat Ashore",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-alouette": {
-   "title": "86 · Alouette",
+   "title": "88 · Alouette",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-ode-to-joy": {
-   "title": "87 · Ode to Joy",
+   "title": "89 · Ode to Joy",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-long-tone-c-sharp": {
-   "title": "88 · Long tone: C sharp",
+   "title": "90 · Long tone: C sharp",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-alto-b-c-sharp-d": {
-   "title": "89 · B, C sharp, D",
+   "title": "91 · B, C sharp, D",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-alto-d-major-scale": {
-   "title": "90 · D major scale",
+   "title": "92 · D major scale",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-alto-slur-two-tongue-two": {
-   "title": "92 · Slur two, tongue two",
+   "title": "94 · Slur two, tongue two",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-alto-amazing-grace": {
-   "title": "95 · Amazing Grace",
+   "title": "98 · Amazing Grace",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-alto-happy-birthday-to-you": {
-   "title": "96 · Happy Birthday to You",
+   "title": "99 · Happy Birthday to You",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-alto-auld-lang-syne": {
-   "title": "100 · Auld Lang Syne",
+   "title": "103 · Auld Lang Syne",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-alto-g-major-scale-and-arpeggio": {
-   "title": "102 · G major scale and arpeggio",
+   "title": "105 · G major scale and arpeggio",
    "subtitle": "Saxophone Beginner Booklet · Finish · Four scales"
   },
   "sax-beginner-alto-f-major-scale-and-arpeggio": {
-   "title": "103 · F major scale and arpeggio",
+   "title": "106 · F major scale and arpeggio",
    "subtitle": "Saxophone Beginner Booklet · Finish · Four scales"
   },
   "sax-beginner-alto-c-major-scale-and-arpeggio": {
-   "title": "104 · C major scale and arpeggio",
+   "title": "107 · C major scale and arpeggio",
    "subtitle": "Saxophone Beginner Booklet · Finish · Four scales"
   },
   "sax-beginner-alto-d-major-scale-and-arpeggio": {
-   "title": "105 · D major scale and arpeggio",
+   "title": "108 · D major scale and arpeggio",
    "subtitle": "Saxophone Beginner Booklet · Finish · Four scales"
   },
   "sax-beginner-tenor-count-then-play": {
@@ -1466,47 +1478,47 @@
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-tenor-twinkle-twinkle-little-star": {
-   "title": "35 · Twinkle, Twinkle, Little Star",
+   "title": "37 · Twinkle, Twinkle, Little Star",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-tenor-aura-lee": {
-   "title": "37 · Aura Lee",
+   "title": "39 · Aura Lee",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-tenor-au-clair-de-la-lune-complete": {
-   "title": "40 · Au Clair de la Lune (complete)",
+   "title": "43 · Au Clair de la Lune (complete)",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-tenor-yankee-doodle": {
-   "title": "43 · Yankee Doodle",
+   "title": "46 · Yankee Doodle",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-tenor-octaves": {
-   "title": "44 · Octaves",
+   "title": "47 · Octaves",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-tenor-long-tones-going-up": {
-   "title": "45 · Long tones going up",
+   "title": "48 · Long tones going up",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-tenor-g-major-scale": {
-   "title": "46 · G major scale",
+   "title": "49 · G major scale",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-tenor-one-and-two-and": {
-   "title": "49 · One and two and",
+   "title": "52 · One and two and",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-tenor-frere-jacques": {
-   "title": "50 · Frère Jacques",
+   "title": "53 · Frère Jacques",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-tenor-all-my-little-ducklings": {
-   "title": "51 · All My Little Ducklings",
+   "title": "54 · All My Little Ducklings",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-tenor-twinkle-up-high": {
-   "title": "55 · Twinkle, up high",
+   "title": "57 · Twinkle, up high",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-tenor-long-tone-b-flat": {
@@ -1530,87 +1542,87 @@
    "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-tenor-mary-moves-to-f": {
-   "title": "68 · Mary Moves to F",
+   "title": "69 · Mary Moves to F",
    "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-tenor-lightly-row-in-f": {
-   "title": "69 · Lightly Row in F",
+   "title": "70 · Lightly Row in F",
    "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-tenor-long-tone-low-c": {
-   "title": "72 · Long tone: low C",
+   "title": "73 · Long tone: low C",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-pinky-push-ups": {
-   "title": "73 · Pinky push-ups",
+   "title": "74 · Pinky push-ups",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-c-major-scale": {
-   "title": "74 · C major scale",
+   "title": "75 · C major scale",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-long-short": {
-   "title": "76 · Long, short",
+   "title": "77 · Long, short",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-london-bridge": {
-   "title": "77 · London Bridge",
+   "title": "78 · London Bridge",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-michael-row-the-boat-ashore": {
-   "title": "81 · Michael, Row the Boat Ashore",
+   "title": "82 · Michael, Row the Boat Ashore",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-alouette": {
-   "title": "86 · Alouette",
+   "title": "88 · Alouette",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-ode-to-joy": {
-   "title": "87 · Ode to Joy",
+   "title": "89 · Ode to Joy",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-long-tone-c-sharp": {
-   "title": "88 · Long tone: C sharp",
+   "title": "90 · Long tone: C sharp",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-tenor-b-c-sharp-d": {
-   "title": "89 · B, C sharp, D",
+   "title": "91 · B, C sharp, D",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-tenor-d-major-scale": {
-   "title": "90 · D major scale",
+   "title": "92 · D major scale",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-tenor-slur-two-tongue-two": {
-   "title": "92 · Slur two, tongue two",
+   "title": "94 · Slur two, tongue two",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-tenor-amazing-grace": {
-   "title": "95 · Amazing Grace",
+   "title": "98 · Amazing Grace",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-tenor-happy-birthday-to-you": {
-   "title": "96 · Happy Birthday to You",
+   "title": "99 · Happy Birthday to You",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-tenor-auld-lang-syne": {
-   "title": "100 · Auld Lang Syne",
+   "title": "103 · Auld Lang Syne",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-tenor-g-major-scale-and-arpeggio": {
-   "title": "102 · G major scale and arpeggio",
+   "title": "105 · G major scale and arpeggio",
    "subtitle": "Saxophone Beginner Booklet · Finish · Four scales"
   },
   "sax-beginner-tenor-f-major-scale-and-arpeggio": {
-   "title": "103 · F major scale and arpeggio",
+   "title": "106 · F major scale and arpeggio",
    "subtitle": "Saxophone Beginner Booklet · Finish · Four scales"
   },
   "sax-beginner-tenor-c-major-scale-and-arpeggio": {
-   "title": "104 · C major scale and arpeggio",
+   "title": "107 · C major scale and arpeggio",
    "subtitle": "Saxophone Beginner Booklet · Finish · Four scales"
   },
   "sax-beginner-tenor-d-major-scale-and-arpeggio": {
-   "title": "105 · D major scale and arpeggio",
+   "title": "108 · D major scale and arpeggio",
    "subtitle": "Saxophone Beginner Booklet · Finish · Four scales"
   },
   "sax-beginner-alto-hot-cross-buns-duet": {
@@ -1630,11 +1642,11 @@
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-alto-twinkle-duet": {
-   "title": "36 · Twinkle duet",
+   "title": "38 · Twinkle duet",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-alto-g-major-arpeggio": {
-   "title": "47 · G major arpeggio",
+   "title": "50 · G major arpeggio",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-alto-f-major-arpeggio": {
@@ -1646,19 +1658,19 @@
    "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-alto-c-major-arpeggio": {
-   "title": "75 · C major arpeggio",
+   "title": "76 · C major arpeggio",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-london-bridge-duet": {
-   "title": "78 · London Bridge duet",
+   "title": "79 · London Bridge duet",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-d-major-arpeggio": {
-   "title": "91 · D major arpeggio",
+   "title": "93 · D major arpeggio",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-alto-jupiter": {
-   "title": "101 · Jupiter",
+   "title": "104 · Jupiter",
    "subtitle": "Saxophone Beginner Booklet · Finale · A solo with piano"
   },
   "sax-beginner-tenor-hot-cross-buns-duet": {
@@ -1678,11 +1690,11 @@
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-tenor-twinkle-duet": {
-   "title": "36 · Twinkle duet",
+   "title": "38 · Twinkle duet",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-tenor-g-major-arpeggio": {
-   "title": "47 · G major arpeggio",
+   "title": "50 · G major arpeggio",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-tenor-f-major-arpeggio": {
@@ -1694,19 +1706,19 @@
    "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-tenor-c-major-arpeggio": {
-   "title": "75 · C major arpeggio",
+   "title": "76 · C major arpeggio",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-london-bridge-duet": {
-   "title": "78 · London Bridge duet",
+   "title": "79 · London Bridge duet",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-d-major-arpeggio": {
-   "title": "91 · D major arpeggio",
+   "title": "93 · D major arpeggio",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-tenor-jupiter": {
-   "title": "101 · Jupiter",
+   "title": "104 · Jupiter",
    "subtitle": "Saxophone Beginner Booklet · Finale · A solo with piano"
   },
   "sax-beginner-alto-long-tones-b-a-and-g": {
@@ -1734,44 +1746,44 @@
    "subtitle": "Saxophone Beginner Booklet · Unit 3 · The right hand: F, E and D"
   },
   "sax-beginner-alto-old-hundredth": {
-   "title": "38 · Old Hundredth",
+   "title": "41 · Old Hundredth",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-alto-all-my-clothes-are-green": {
-   "title": "39 · All My Clothes Are Green",
+   "title": "42 · All My Clothes Are Green",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-alto-fox-you-stole-the-goose": {
-   "title": "41 · Fox, You Stole the Goose",
+   "title": "44 · Fox, You Stole the Goose",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-alto-ode-to-joy-from-f-sharp": {
-   "title": "42 · Ode to Joy, from F sharp",
+   "title": "45 · Ode to Joy, from F sharp",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-alto-taler-taler": {
-   "title": "48 · Taler, Taler",
+   "title": "51 · Taler, Taler",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-alto-rain-rain-go-away": {
-   "title": "52 · Rain, Rain, Go Away",
+   "title": "55 · Rain, Rain, Go Away",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-alto-bake-bake-a-cake": {
-   "title": "53 · Bake, Bake a Cake",
+   "title": "56 · Bake, Bake a Cake",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-alto-a-la-claire-fontaine": {
-   "title": "54 · À la Claire Fontaine",
-   "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+   "title": "68 · À la Claire Fontaine",
+   "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-alto-let-us-be-glad-and-cheerful": {
-   "title": "56 · Let Us Be Glad and Cheerful",
-   "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+   "title": "87 · Let Us Be Glad and Cheerful",
+   "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-o-come-little-children": {
-   "title": "57 · O Come, Little Children",
-   "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+   "title": "97 · O Come, Little Children",
+   "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-alto-a-bird-comes-flying": {
    "title": "65 · A Bird Comes Flying",
@@ -1786,55 +1798,55 @@
    "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-alto-a-mother-had-four-children": {
-   "title": "70 · A Mother Had Four Children",
+   "title": "71 · A Mother Had Four Children",
    "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-alto-on-the-wall": {
-   "title": "71 · On the Wall",
+   "title": "72 · On the Wall",
    "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-alto-all-the-birds-are-here": {
-   "title": "79 · All the Birds Are Here",
+   "title": "80 · All the Birds Are Here",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-o-sanctissima": {
-   "title": "80 · O Sanctissima",
+   "title": "81 · O Sanctissima",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-little-snowflake": {
-   "title": "82 · Little Snowflake",
+   "title": "83 · Little Snowflake",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-my-bonnie-lies-over-the-ocean": {
-   "title": "83 · My Bonnie Lies over the Ocean",
+   "title": "84 · My Bonnie Lies over the Ocean",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-away-in-a-manger": {
-   "title": "84 · Away in a Manger",
+   "title": "85 · Away in a Manger",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-thoughts-are-free": {
-   "title": "85 · Thoughts Are Free",
+   "title": "86 · Thoughts Are Free",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-alto-every-year-again": {
-   "title": "93 · Every Year Again",
+   "title": "95 · Every Year Again",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-alto-surprise-symphony": {
-   "title": "94 · Surprise Symphony",
+   "title": "96 · Surprise Symphony",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-alto-now-thank-we-all-our-god": {
-   "title": "97 · Now Thank We All Our God",
+   "title": "100 · Now Thank We All Our God",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-alto-praise-to-the-lord-the-almighty": {
-   "title": "98 · Praise to the Lord, the Almighty",
+   "title": "101 · Praise to the Lord, the Almighty",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-alto-o-come-all-ye-faithful": {
-   "title": "99 · O Come, All Ye Faithful",
+   "title": "102 · O Come, All Ye Faithful",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-tenor-long-tones-b-a-and-g": {
@@ -1862,44 +1874,44 @@
    "subtitle": "Saxophone Beginner Booklet · Unit 3 · The right hand: F, E and D"
   },
   "sax-beginner-tenor-old-hundredth": {
-   "title": "38 · Old Hundredth",
+   "title": "41 · Old Hundredth",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-tenor-all-my-clothes-are-green": {
-   "title": "39 · All My Clothes Are Green",
+   "title": "42 · All My Clothes Are Green",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-tenor-fox-you-stole-the-goose": {
-   "title": "41 · Fox, You Stole the Goose",
+   "title": "44 · Fox, You Stole the Goose",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-tenor-ode-to-joy-from-f-sharp": {
-   "title": "42 · Ode to Joy, from F sharp",
+   "title": "45 · Ode to Joy, from F sharp",
    "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   },
   "sax-beginner-tenor-taler-taler": {
-   "title": "48 · Taler, Taler",
+   "title": "51 · Taler, Taler",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-tenor-rain-rain-go-away": {
-   "title": "52 · Rain, Rain, Go Away",
+   "title": "55 · Rain, Rain, Go Away",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-tenor-bake-bake-a-cake": {
-   "title": "53 · Bake, Bake a Cake",
+   "title": "56 · Bake, Bake a Cake",
    "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
   },
   "sax-beginner-tenor-a-la-claire-fontaine": {
-   "title": "54 · À la Claire Fontaine",
-   "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+   "title": "68 · À la Claire Fontaine",
+   "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-tenor-let-us-be-glad-and-cheerful": {
-   "title": "56 · Let Us Be Glad and Cheerful",
-   "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+   "title": "87 · Let Us Be Glad and Cheerful",
+   "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-o-come-little-children": {
-   "title": "57 · O Come, Little Children",
-   "subtitle": "Saxophone Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+   "title": "97 · O Come, Little Children",
+   "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-tenor-a-bird-comes-flying": {
    "title": "65 · A Bird Comes Flying",
@@ -1914,56 +1926,80 @@
    "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-tenor-a-mother-had-four-children": {
-   "title": "70 · A Mother Had Four Children",
+   "title": "71 · A Mother Had Four Children",
    "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-tenor-on-the-wall": {
-   "title": "71 · On the Wall",
+   "title": "72 · On the Wall",
    "subtitle": "Saxophone Beginner Booklet · Unit 6 · B flat and the key of F"
   },
   "sax-beginner-tenor-all-the-birds-are-here": {
-   "title": "79 · All the Birds Are Here",
+   "title": "80 · All the Birds Are Here",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-o-sanctissima": {
-   "title": "80 · O Sanctissima",
+   "title": "81 · O Sanctissima",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-little-snowflake": {
-   "title": "82 · Little Snowflake",
+   "title": "83 · Little Snowflake",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-my-bonnie-lies-over-the-ocean": {
-   "title": "83 · My Bonnie Lies over the Ocean",
+   "title": "84 · My Bonnie Lies over the Ocean",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-away-in-a-manger": {
-   "title": "84 · Away in a Manger",
+   "title": "85 · Away in a Manger",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-thoughts-are-free": {
-   "title": "85 · Thoughts Are Free",
+   "title": "86 · Thoughts Are Free",
    "subtitle": "Saxophone Beginner Booklet · Unit 7 · Low C and the dotted quarter"
   },
   "sax-beginner-tenor-every-year-again": {
-   "title": "93 · Every Year Again",
+   "title": "95 · Every Year Again",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-tenor-surprise-symphony": {
-   "title": "94 · Surprise Symphony",
+   "title": "96 · Surprise Symphony",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-tenor-now-thank-we-all-our-god": {
-   "title": "97 · Now Thank We All Our God",
+   "title": "100 · Now Thank We All Our God",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-tenor-praise-to-the-lord-the-almighty": {
-   "title": "98 · Praise to the Lord, the Almighty",
+   "title": "101 · Praise to the Lord, the Almighty",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
   },
   "sax-beginner-tenor-o-come-all-ye-faithful": {
-   "title": "99 · O Come, All Ye Faithful",
+   "title": "102 · O Come, All Ye Faithful",
    "subtitle": "Saxophone Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "sax-beginner-alto-f-sharp-ladder": {
+   "title": "35 · F sharp ladder",
+   "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "sax-beginner-alto-skips": {
+   "title": "36 · Skips",
+   "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "sax-beginner-alto-aura-lee-duet": {
+   "title": "40 · Aura Lee duet",
+   "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "sax-beginner-tenor-f-sharp-ladder": {
+   "title": "35 · F sharp ladder",
+   "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "sax-beginner-tenor-skips": {
+   "title": "36 · Skips",
+   "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "sax-beginner-tenor-aura-lee-duet": {
+   "title": "40 · Aura Lee duet",
+   "subtitle": "Saxophone Beginner Booklet · Unit 4 · F sharp and the key of G"
   }
  }
 }

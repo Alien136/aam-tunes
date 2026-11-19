@@ -57,3 +57,10 @@ Everything needed to carry on from any conversation is in this repository and in
   `src`, print with `--sources`) and 4 new exercises of ours (Stepping Stones, Sunrise, Echo Song, Morning Bells).
 - Same codes, same unit QR links: merged long-tone lines keep the old slug (`slug=`); the five dropped long-tone tunes stay playable.
 - `--fill` prints how full each page is.
+
+## 2026-11-19 (later) · Beginner Booklet: every unit starts at the top of a page
+- Alex's rule: the unit title, note cards and idea boxes always open a page. `build_unit` flushes its own `Page` again.
+- To make each unit end on a full page: three G-major tunes moved from unit 5 to units 6, 7, 8 as review (`_move`), unit 2 lost its
+  WRITE line, unit 4 gained two F sharp drills and an Aura Lee duet, unit 1 a play-by-ear prompt; what room is left at the end of a
+  unit becomes one to four lines of staff paper (`manuscript`). Check with `--fill` after any content change.
+- 33 pages, 108 numbered lines.
