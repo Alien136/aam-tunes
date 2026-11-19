@@ -550,7 +550,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 
 <script>
 // >>> SETTINGS
-var PLAYER_VERSION = "2026-11-19 01:07 UTC (after 66cf7c1)";    // stamped by tools/release.py when a version is released
+var PLAYER_VERSION = "2026-11-19 02:32 UTC (after fc5a50b)";    // stamped by tools/release.py when a version is released
 var STUDENT_HOME = "https://alexattardmusic.com/student-login/";              // where the "back" link goes: put the address of your student login page here, e.g. "/student-login/"
 var STUDENT_HOME_LABEL = "Student home";         // what the link says. Leave "" for "Student login" (or "Website" while the address above is "/")
 var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    // folder with p36.mp3 ... d-ride.mp3 (keep the final "/")
@@ -943,7 +943,7 @@ function aamBoot(TUNE) {
     var sec = TUNE.sections.filter(function (s) { return s.id === view; })[0];
     var rh = sec ? sec.abc.rh : TUNE.bars.map(blankBar);
     var lh = sec ? sec.abc.lh : NOTA.lh;
-    var out = "X:1\nL:1/8\nM:" + BPB + "/4\nK:" + NOTA.key + "\n" + (sp ? "%%staffsep " + sp.sep + "\n%%sysstaffsep " + sp.sys + "\n" : "") + (lh ? "%%score {RH LH}\nV:RH clef=treble\nV:LH clef=bass\n" : "");
+    var out = "X:1\nL:1/8\nM:" + BPB + "/4\nK:" + NOTA.key + "\n" + (sp ? "%%staffsep " + sp.sep + "\n%%sysstaffsep " + sp.sys + "\n" : "") + (lh ? "%%score {RH LH}\nV:RH clef=treble\nV:LH clef=" + (NOTA.lh_clef || "bass") + "\n" : "");
     for (var s = 0; s < NB; s += per) {
       var idx = []; for (var i = s; i < Math.min(s + per, NB); i++) idx.push(i);
       var end = s + per >= NB ? " |]\n" : " |\n";
@@ -1266,6 +1266,7 @@ function aamBoot(TUNE) {
   if (TUNE.sections.some(function (x) { return x.lh && x.lh.length; })) {
     ["rh", "lh"].forEach(function (h) {
       var b = $("hand-" + h); b.hidden = false;
+      if (TUNE.hand_labels) b.textContent = TUNE.hand_labels[h === "rh" ? 0 : 1];     // a duet ("Part A", "Part B") or a solo with piano
       b.onclick = function () { hands[h] = !hands[h]; b.setAttribute("aria-pressed", hands[h] ? "true" : "false"); };
     });
   }
