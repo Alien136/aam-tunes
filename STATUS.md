@@ -107,3 +107,11 @@ Everything needed to carry on from any conversation is in this repository and in
 - Search (books with 12+ lines): digits match the start of the line number; words match the name or chapter, accents ignored;
   Enter opens the first match. Chips (3+ chapters) jump to a chapter and hide while searching.
 - Rows show the number in its own column and drop the repeated chapter text; books without numbers have no number column.
+
+## 2026-11-19 · Phone: tempo wheel; Learn mode: pink line
+- Phones (up to 620 px wide): the plus and minus are gone from the play bar; the tempo number is a button that opens a wheel
+  (`tpdlg`): every speed 40 to 240, scroll-snap, the middle one is chosen, with Slow / Medium / Goal chips from the tune's presets.
+  Wider screens keep the slider and the plus and minus; the number opens the wheel there too.
+- Learn mode: a pink vertical line (`.lr-line`, an SVG rect inside the music) sits on the current note and slides to the next one;
+  the note itself is pink, finished notes green.
+- "Too loud for the microphone" now needs a quarter of a second of distorted AND unreadable sound, and it clears itself.
