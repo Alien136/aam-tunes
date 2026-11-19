@@ -125,3 +125,5 @@ Everything needed to carry on from any conversation is in this repository and in
 ## 2026-11-19 · Learn mode marker: a soft blue cloud (the pink line is gone)
 - Alex did not like the pink line with a dot. `.lr-line` is now one blurred, translucent blue rounded rectangle (SVG filter
   `#lr-soft`) drawn under the music, sized to the whole note (head and stem), sliding to the next note. The note itself is dark blue.
+
+## 2026-11-19 · Tempo wheel flipped: faster speeds are at the top (240 down to 40).

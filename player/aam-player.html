@@ -1545,15 +1545,15 @@ function aamBoot(TUNE) {
   tempo.oninput = function () { setTempo(+tempo.value); };
   (function () {                                          // the tempo wheel: every speed from 40 to 240, the one in the middle is chosen
     var dlg = $("tpdlg"), list = $("tp-list"), H = 44, html = "", busy = false, raf = 0;
-    for (var v = 40; v <= 240; v++) html += '<button data-v="' + v + '">' + v + "</button>";
+    for (var v = 240; v >= 40; v--) html += '<button data-v="' + v + '">' + v + "</button>";      // faster is up, slower is down
     list.innerHTML = html;
     var mark = function () { [].forEach.call(list.children, function (b) { b.classList.toggle("on", +b.dataset.v === state.tempo); }); };
     var names = ["Slow", "Medium", "Goal"], pres = (TUNE.tempo_presets || []).filter(function (x, i, a) { return a.indexOf(x) === i; });
     $("tp-chips").innerHTML = pres.map(function (x, i) { return '<button data-v="' + x + '">' + (pres.length === 3 ? names[i] + " · " : "") + x + "</button>"; }).join("");
-    var to = function (v, smooth) { busy = true; list.scrollTo({ top: (v - 40) * H, behavior: smooth ? "smooth" : "auto" }); setTimeout(function () { busy = false; }, smooth ? 450 : 60); };
+    var to = function (v, smooth) { busy = true; list.scrollTo({ top: (240 - v) * H, behavior: smooth ? "smooth" : "auto" }); setTimeout(function () { busy = false; }, smooth ? 450 : 60); };
     list.addEventListener("scroll", function () {
       if (busy) return;
-      cancelAnimationFrame(raf); raf = requestAnimationFrame(function () { var v = 40 + Math.round(list.scrollTop / H); if (v !== state.tempo) { setTempo(v); mark(); } });
+      cancelAnimationFrame(raf); raf = requestAnimationFrame(function () { var v = 240 - Math.round(list.scrollTop / H); if (v !== state.tempo) { setTempo(v); mark(); } });
     });
     list.addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) { setTempo(+b.dataset.v); mark(); to(state.tempo, true); } });
     $("tp-chips").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) { setTempo(+b.dataset.v); mark(); to(state.tempo, true); } });
