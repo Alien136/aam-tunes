@@ -100,3 +100,10 @@ Everything needed to carry on from any conversation is in this repository and in
 - Tested with generated saxophone-like audio fed to Chromium as a fake microphone (`/home/claude/v2/mkwav.py`, `eartest.js`):
   clean, noisy and 25 cents flat with legato repeats, and tenor low notes all finish. NOT yet tested with a real saxophone or on a
   real iPhone (Safari may not allow the speech processing to be switched off).
+
+## 2026-11-19 · Contents list: search, chapter chips, denser rows
+- The contents dialog (tap the title) is a fixed-height card: search box and chapter chips at the top, a scrolling list, Previous /
+  Next and the PDF download pinned at the bottom. It opens scrolled to the current line.
+- Search (books with 12+ lines): digits match the start of the line number; words match the name or chapter, accents ignored;
+  Enter opens the first match. Chips (3+ chapters) jump to a chapter and hide while searching.
+- Rows show the number in its own column and drop the repeated chapter text; books without numbers have no number column.
