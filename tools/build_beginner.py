@@ -8,7 +8,7 @@
                                                                         numbered line and the booklet's shelf in index.json
 The code is given on the command line and never stored in the repository (index.json keeps only its hash).
 
-The book before the Welcome Booklet. Eight units; each one adds one to three notes (with the fingering diagram from the
+The book before the Welcome Booklet. Nine units; each one adds one to three notes (with the fingering diagram from the
 Welcome Booklet's chart), long tones on the new notes, short drills, then tunes that use only the notes learned so far.
 New ideas sit in colour-coded boxes at the top of the unit: amber = new note, blue = new rhythm, green = key signature,
 red = new word. All of it is one ReportLab canvas; every line of music is engraved by LilyPond to a PNG and placed.
@@ -334,7 +334,6 @@ _after(8, "Happy Birthday to You",
 # ---------------------------------------------------------------- every unit fills whole pages: a few tunes move to later units as review, a few lines are added
 def _move(kf, title, kt, after): it = _line(kf, title); _u(kf)["lines"].remove(it); _after(kt, after, it)
 _move(5, "À la Claire Fontaine", 6, "Oranges and Lemons"); _line(6, "À la Claire Fontaine")["sub"] = "French traditional. The key of G."
-_move(5, "Let Us Be Glad and Cheerful", 7, "Thoughts Are Free")
 _move(5, "O Come, Little Children", 8, "Surprise Symphony")
 _before_check(1, EAR("Find the start of \"Mary Had a Little Lamb\" without any music. It begins on B and its first seven notes use only B, A and G."))
 _after(4, "Smooth pairs",
@@ -344,6 +343,80 @@ _after(4, "Aura Lee",
        L("Aura Lee duet", "d'4 g' fis' g' | a' e' a'2 | g'4 fis' e' fis' | g'1 | d'4 g' fis' g' | a' e' a'2 | g'4 fis' e' fis' | g'1", DUET, key="g",
          b="b'4 b' a' b' | c'' c'' c''2 | b'4 a' g' a' | b'1 | b'4 b' a' b' | c'' c'' c''2 | b'4 a' g' a' | b'1", pill="DUET"))
 _u(2)["lines"] = [it for it in _u(2)["lines"] if not (it.get("badge") == "WRITE")]      # unit 2 is exactly two pages without it
+
+# ---------------------------------------------------------------- fourth edition: a ninth unit, more drills where the jumps are big, tunes easiest first
+UNITS.append(dict(title="The top of the staff: A, B and C", notes=[("a''", "Upper A", "Low A plus the octave key."), ("b''", "Upper B", "Low B plus the octave key."), ("c'''", "Upper C", "Middle C plus the octave key: middle finger only.")],
+  boxes=[("word", "Ledger lines", "Short extra lines for notes too high or too low for the staff. Upper A sits on the first ledger line above the staff, B sits over it and C is on the second."),
+         ("skill", "The upper register", "Fast, steady air and a relaxed jaw. If a high note sounds thin or sharp, open your throat and blow more air: never pinch."),
+         ("word", "Octave", "The distance from a note to the next note with the same letter name. You can now play C in three places: low, middle and upper."),
+         ("word", "Two-octave scale", "A scale that keeps climbing past the first octave to the same note one octave higher again.")],
+  lines=[CLAP("c'4. c'8 c'8 c' c'4 | c'2 c'4. c'8 | c'8 c' c'4. c'8 c'4 | c'1", ["1-2", "and", "3", "and", "4", "1-2", "3-4", "and", "1", "and", "2-3", "and", "4", "1-2-3-4"]),
+         L("Long tones: A, B and C", "a''1 | r1 | b''1 | r1 | c'''1 | r1", "Fast air. Keep your jaw loose.", names=True, hl=["a''", "b''", "c'''"]),
+         L("Octaves again", "a'2 a''2 | b'2 b''2 | c''2 c'''2 | c'''1", "Only the thumb moves."),
+         L("Steps up high", "g''4 a'' b'' c''' | c''' b'' a'' g'' | g''4 a'' b'' a'' | g''1"),
+         L("C major scale, two octaves", "c'4 d' e' f' | g' a' b' c'' | d'' e'' f'' g'' | a'' b'' c'''2 | c'''4 b'' a'' g'' | f'' e'' d'' c'' | b' a' g' f' | e' d' c'2", "From your lowest C to your highest.", pill="SCALE"),
+         L("C major arpeggio, two octaves", "c'4 e' g' c'' | e'' g'' c'''2 | c'''4 g'' e'' c'' | g' e' c'2", pill="SCALE"),
+         L("Skips up high", "g''4 b'' a'' c''' | b'' g'' a''2 | e''4 g'' f'' a'' | g''1", "Look one note ahead."),
+         L("Frère Jacques, up high", "c''4 d'' e'' c'' | c'' d'' e'' c'' | e'' f'' g''2 | e''4 f'' g''2 | g''8 a'' g'' f'' e''4 c'' | g''8 a'' g'' f'' e''4 c'' | c'' g' c''2 | c''4 g' c''2", "French traditional", pill="ROUND", src=WIKI + " (moved to C)"),
+         L("All the Birds, up high", "c''4. e''8 g''4 c''' | a'' c'''8( a'') g''2 | f''4. g''8 e''4 c'' | d''2 c''4 r | g''4 g'' f'' f'' | e'' g''8( e'') d''2 | g''4 g'' f'' f'' | e'' g''8( e'') d''2 | c''4. e''8 g''4 c''' | a'' c'''8( a'') g''2 | f''4. g''8 e''4 c'' | d''2 c''4 r",
+           "German folk song. The tune from Unit 7, one octave higher.", bpl=4, src=WIKI + " (German article \"Alle Vögel sind schon da\", moved to C)", tempo_word="Allegro"),
+         L("Angels We Have Heard on High", "e''4 e'' e'' g'' | g''4. f''8 e''2 | e''4 d'' e'' g'' | e''4. d''8 c''2 | g''2( a''8 g'' f'' e'' | f''2 g''8 f'' e'' d'' | e''2 f''8 e'' d'' c'' | d''4.) g'8 g'2 | c''4 d'' e'' f'' | e''2 d''2 | g''2( a''8 g'' f'' e'' | f''2 g''8 f'' e'' d'' | e''2 f''8 e'' d'' c'' | d''4.) g'8 g'2 | c''4 d'' e'' f'' | e''2( d''2) | c''1",
+           "French traditional", rep=4, bpl=6, src=WIKI + " (moved to C; the repeats of the refrain written out)", tempo_word="Moderato", about="A French carol. One long slur carries the word \"Gloria\": tongue the first note only and keep the air moving."),
+         L("Hark! The Herald Angels Sing", "g'4 c'' c''4. b'8 | c''4 e'' e''( d'') | g'' g'' g''4. f''8 | e''4 d'' e''2 | g'4 c'' c''4. b'8 | c''4 e'' e''( d'') | g''4 d'' d''4. b'8 | b'4 a' g'2 | g''4 g'' g'' c'' | f'' e'' e''( d'') | g''4 g'' g'' c'' | f'' e'' e''( d'') | a''4 a'' a'' g'' | f'' e'' f''2 | d''4 e''8( f'') g''4. c''8 | c''4 d'' e''2 | a''4. a''8 a''4 g'' | f'' e'' f''2 | d''4 e''8( f'') g''4. c''8 | c''4 d'' c''2",
+           "Felix Mendelssohn", src=WIKI + " (moved to C)", tempo_word="Allegro", about="Mendelssohn wrote the tune in 1840. It became a Christmas carol fifteen years later."),
+         WRITE("Name the notes", "Count the ledger lines.", "a''2 c'''2 | b''2 g''2 | c'''2 a''2 | b''1", "names"),
+         EAR("Play \"Hot Cross Buns\" in three places: starting on low E, on middle B and on upper B."),
+         dict(type="check", items=["My upper A, B and C sound full, not pinched.", "I can play the C major scale over two octaves.", "I can read ledger lines without counting every time."])]))
+# unit 3: smaller steps down to the low notes
+_after(3, "Right-hand walk",
+       L("Left hand to right hand", "a'4 g' f' g' | a' g' f'2 | g'4 f' e' f' | g'1", "The right index finger joins in."),
+       L("Down the stairs", "g'4 f' e' d' | e' f' g'2 | f'4 e' d' e' | d'1", "One finger at a time."))
+_it = _line(3, "Two Ds"); _u(3)["lines"].remove(_it)
+_after(3, "Three beats", _it, L("Coming in on four", "r2. g'4 | a'2. g'4 | f'2. e'4 | d'1", "Count 1, 2, 3 and come in on 4: that is how a pick-up works."))
+# unit 5: the upper notes and the eighth notes each get their own drills
+_after(5, "Long tones going up",
+       L("Crossing to upper E", "d''4 e'' d'' e'' | d''2 e''2 | e''4 fis'' g'' fis'' | e''1", "Right hand lifts, thumb stays.", key="g"),
+       L("Up the ladder", "d''4 e'' fis'' g'' | g'' fis'' e'' d'' | d'' fis'' e'' g'' | d''1", key="g"))
+_after(5, "One and two and",
+       L("Eighths on the scale", "g'8 g' a' a' b' b' c'' c'' | d''4 d'' d''2 | d''8 d'' c'' c'' b' b' a' a' | g'4 g' g'2", "Tongue lightly: \"too-too\".", key="g"),
+       L("Running eighths", "g'8 a' b' c'' d''4 d'' | e''8 d'' c'' b' a'4 a' | b'8 c'' d'' e'' d''4 b' | a'8 b' a' fis' g'2", "Keep the eighth notes even.", key="g"))
+for _k, _t in ((6, "Oranges and Lemons"), (6, "A Mother Had Four Children"), (6, "À la Claire Fontaine"), (8, "O Come, Little Children")): _line(_k, _t).update(review=True, pill="REVIEW")
+_line(6, "Oranges and Lemons")["sub"] = "English traditional. The key of G."
+_line(6, "A Mother Had Four Children")["sub"] = "German folk song. The key of G."
+
+# page balance for the fourth edition
+_u(3)["lines"] = [it for it in _u(3)["lines"] if it["type"] != "create"]
+_after(5, "Twinkle, up high",
+       L("Twinkle, up high duet", "g'4 g' d'' d'' | e'' e'' d''2 | c''4 c'' b' b' | a' a' g'2 | d''4 d'' c'' c'' | b' b' a'2 | d''4 d'' c'' c'' | b' b' a'2 | g'4 g' d'' d'' | e'' e'' d''2 | c''4 c'' b' b' | a' a' g'2", DUET, key="g",
+         b="g'4 g' b' b' | c'' c'' b'2 | a'4 a' g' g' | c'' c'' b'2 | b'4 b' a' a' | g' g' c''2 | b'4 b' a' a' | g' g' c''2 | g'4 g' b' b' | c'' c'' b'2 | a'4 a' g' g' | c'' c'' b'2", pill="DUET"))
+_after(9, "All the Birds, up high",
+       L("Fox, up high", "c''4 d'' e'' f'' | g'' g'' g'' g'' | a'' f'' c''' a'' | g''1 | a''4 f'' c''' a'' | g''1 | g''4 f'' f'' f'' | f'' e'' e'' e'' | e'' d'' e'' d'' | c''( e'' g''2) | g''4 f'' f'' f'' | f'' e'' e'' e'' | e'' d'' e'' d'' | c''1",
+         "German folk song. The tune from Unit 4, in C.", src=WIKI + " (German article \"Fuchs, du hast die Gans gestohlen\", moved to C)"),
+       L("O Sanctissima, up high", "g''2 a''2 | g''4. f''8 e''4( f'') | g''2 a''2 | g''4. f''8 e''4( f'') | g''2 g''2 | a''2 b''4 c''' | b''2 a''2 | g''1 \\breathe | d''4.( e''8) d''4 e'' | f''4.( g''8) f''2 | e''4.( f''8) e''4 f'' | g''4.( a''8) g''2 | c'''4( b'') a''( g'') | c''' a'' g'' f'' | e''2 d''2 | c''1",
+         "Sicilian traditional. The tune from Unit 7, one octave higher.", bpl=8, src=WIKI + " (German article \"O du fröhliche\", one octave higher)", tempo_word="Andante"))
+
+def hardness(it):
+    """Rough difficulty of a tune: its range, its biggest leap, its length and its rhythms."""
+    ps, durs, dur = [], set(), "4"
+    for t in it["music"].replace("|", " ").split():
+        m = re.match(r"^([a-g])(is|es)?([',]*)(\d*\.?)", t)
+        if m:
+            ps.append("c d ef g a b".index(m.group(1)) + {"is": 1, "es": -1, None: 0}[m.group(2)] + 12 * (m.group(3).count("'") - m.group(3).count(","))); dur = m.group(4) or dur; durs.add(dur)
+    leap = max([abs(a - b) for a, b in zip(ps, ps[1:])] or [0])
+    bars = len(it["music"].split("|"))
+    return (100 if it.get("review") else 0) + (max(ps) - min(ps)) + 0.5 * leap + 0.25 * bars + (3 if "8" in durs else 0) + (3 if "4." in durs else 0)
+def order_unit(u):
+    """Inside a unit the tunes run easiest first. Drills, written work and the checkpoint stay where they are; a duet stays behind its tune."""
+    out, seg = [], []
+    def close():
+        seg.sort(key=lambda g: hardness(g[0])); out.extend(x for g in seg for x in g); seg.clear()
+    for it in u["lines"]:
+        tune = it["type"] == "line" and not it.get("badge") and (it.get("src") or it.get("b") or len(it["music"].split("|")) >= 8) and it.get("pill") != "SCALE"
+        if not tune: close(); out.append(it)
+        elif it.get("b") and seg and it["title"].split()[0] == seg[-1][0]["title"].split()[0]: seg[-1].append(it)
+        else: seg.append([it])
+    close(); u["lines"] = out
+for _u_ in UNITS: order_unit(_u_)
 
 # ---------------------------------------------------------------- the finale: a solo with piano accompaniment
 # Sax part in written pitch; piano part written in the same frame (as if the sax were in C) and transposed for each edition.
@@ -357,7 +430,7 @@ FINALE = dict(title="Jupiter", sub="Gustav Holst, from The Planets (easy rhythm)
     lh=["c2.", "g,2.", "f,2 g,4", "c2 g,4", "f,2 c4", "a,2 g,4", "f,2 g,4", "c4 a,2", "f,2 g,4", "c2 g,4",
         "f,2 g,4", "c2 g,4", "f,2 c4", "a,2 g,4", "f,2 g,4", "c4 a,2", "f,2 g,4", "c2.", "<c, c>2."])
 FINALE_LINE = L(FINALE["title"], FINALE["music"], FINALE["sub"], key="c", time="3/4", tempo=FINALE["tempo"], tempo_word=FINALE["tempo_word"], about=FINALE["about"], src=FINALE["src"], pill="SOLO")
-PILL["SOLO"] = "#D4922A"
+PILL["SOLO"] = "#D4922A"; PILL["REVIEW"] = "#6B7785"
 RHYTHM_GYM = [L("Level 1", "c'4 c' c'2 | c'2 c'4 c' | c'4 r c' r | c'2. r4 | c'1 | r2 c'2", "Quarter, half, dotted half and whole notes.", rhythm=True, badge="CLAP", bpl=6),
               L("Level 2", "c'8 c' c'4 c'2 | c'4 c'8 c' c'4 c' | c'8 c' c' c' c'4 r | c'2 c'8 c' c'4 | r4 c'8 c' c'2 | c'1", "Add eighth notes.", rhythm=True, badge="CLAP", bpl=6),
               L("Level 3", "c'4. c'8 c'2 | c'4 c'4. c'8 c'4 | c'4. c'8 c'4. c'8 | c'8 c' c'4. c'8 c'4 | c'2 ~ c'8 c' c'4 | c'1", "Add dotted quarter notes and a tie.", rhythm=True, badge="CLAP", bpl=6),
@@ -837,7 +910,7 @@ def cover(book):
 
 def how_page(book):
     c = book.c; y = B.header(c, "Start here", "How this book works")
-    p, ph = para_h("There are eight units and a finale. Each unit adds one, two or three notes and a few new ideas. Work through a unit in order, top to bottom, "
+    p, ph = para_h("There are nine units and a finale. Each unit adds one, two or three notes and a few new ideas. Work through a unit in order, top to bottom, "
                    "and don't move on until its Checkpoint is ticked. Everything new arrives in a colored box, and the color tells you what kind of thing it is.", CW, ParagraphStyle("hb", parent=B.body, fontSize=10.5, leading=15.5)); p.drawOn(c, M, y - ph); y -= ph + 14
     bw = (CW - 10) / 2
     demo = [("note", "A note you haven't played before", "Shows the note on the staff and which keys to press. Its first appearances in the music are printed in amber."),
@@ -1017,13 +1090,13 @@ def glossary_page(book):
     ents += [("Solo", "A piece for one player.", 0), ("Arpeggio", "The notes of a chord played one at a time: notes 1, 3, 5 and 8 of a scale.", 5), ("Duet", "A piece for two players.", 1),
              ("Transposing", "Playing the same tune starting on a different note.", 6), ("Embouchure", "The way your mouth holds the mouthpiece.", 0), ("Metronome", "A device that clicks a steady beat at the tempo you set.", 0)]
     seen = set(); ents = [e for e in sorted(ents, key=lambda e: e[0].lower()) if not (e[0] in seen or seen.add(e[0]))]
-    cols = 3; gw = (CW - 18 * (cols - 1)) / cols; st = ParagraphStyle("gl", parent=P_BODY, fontSize=7.9, leading=10.4)
+    cols = 3; gw = (CW - 18 * (cols - 1)) / cols; st = ParagraphStyle("gl", parent=P_BODY, fontSize=7.5, leading=9.7)
     paras = [para_h("<font name='Pop-B' size='8.8' color='%s'>%s</font>%s<br/>%s" % (SLATE, t.replace("♯", "<font name='DJ-B'>♯</font>").replace("♭", "<font name='DJ-B'>♭</font>"),
                     ("  <font color='%s' size='7'>Unit %d</font>" % (AMBER, k)) if k else "", x), gw, st) for t, x, k in ents]
-    total = sum(ph + 8 for _, ph in paras); col, yy, acc = 0, y, 0
+    total = sum(ph + 6 for _, ph in paras); col, yy, acc = 0, y, 0
     for pr, ph in paras:
         if col < cols - 1 and acc >= total * (col + 1) / cols - ph / 2: col += 1; yy = y
-        pr.drawOn(c, M + col * (gw + 18), yy - ph); yy -= ph + 8; acc += ph + 8
+        pr.drawOn(c, M + col * (gw + 18), yy - ph); yy -= ph + 6; acc += ph + 6
         assert yy > 50, "glossary overflows"
     book.footer(); c.showPage()
 

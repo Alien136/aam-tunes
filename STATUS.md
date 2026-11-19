@@ -64,3 +64,10 @@ Everything needed to carry on from any conversation is in this repository and in
   WRITE line, unit 4 gained two F sharp drills and an Aura Lee duet, unit 1 a play-by-ear prompt; what room is left at the end of a
   unit becomes one to four lines of staff paper (`manuscript`). Check with `--fill` after any content change.
 - 33 pages, 108 numbered lines.
+
+## 2026-11-19 (evening) · Beginner Booklet, fourth edition (nine units)
+- Unit 9 "The top of the staff: A, B and C" (two-octave C major scale and arpeggio, six tunes); the book now reaches upper C.
+- Units 3 and 5 gained step-by-step drills; `order_unit` sorts the tunes inside each unit easiest first by `hardness()` (range, biggest
+  leap, length, eighth notes, dotted quarters); drills and written work stay put, a duet stays behind its tune, `review=True` tunes go last.
+- 37 pages, 128 numbered lines. Same codes and unit QR links. Check `--fill` after any content change: every unit must start at the top
+  of a page and end on a full one (staff paper takes up to four lines of slack).
