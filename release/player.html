@@ -635,7 +635,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 
 <script>
 // >>> SETTINGS
-var PLAYER_VERSION = "2026-11-19 11:26 UTC (after ee9f1ce)";    // stamped by tools/release.py when a version is released
+var PLAYER_VERSION = "2026-11-19 11:33 UTC (after bb45350)";    // stamped by tools/release.py when a version is released
 var STUDENT_HOME = "https://alexattardmusic.com/student-login/";              // where the "back" link goes: put the address of your student login page here, e.g. "/student-login/"
 var STUDENT_HOME_LABEL = "Student home";         // what the link says. Leave "" for "Student login" (or "Website" while the address above is "/")
 var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    // folder with p36.mp3 ... d-ride.mp3 (keep the final "/")
@@ -1214,7 +1214,7 @@ function aamBoot(TUNE) {
       ear.start().then(function () {
         learn.on = true; learn.seq = seq; learn.i = 0; learn.prev = null; learn.okRun = learn.badRun = learn.misses = 0; learn.gap = true; learn.level = 0; learn.since = Date.now();
         $("learn-bar").hidden = false; $("learn-skip").hidden = false; $("learn-btn").setAttribute("aria-pressed", "true");
-        var t = learnTarget(); learnSay("Play the note in the blue cloud: " + noteName(t + EAR_SHIFT) + ". Take your time.", false); perShown = 0; drawScore(); ear.off(learnHear); ear.on(learnHear);
+        var t = learnTarget(); learnSay("Play the note in the blue cloud: " + noteName(t + EAR_SHIFT) + ". Take your time." + (EAR_SHIFT ? " (On this instrument it sounds as " + noteName(t) + " on a piano.)" : ""), false); perShown = 0; drawScore(); ear.off(learnHear); ear.on(learnHear);
       }).catch(function (e) { $("learn-bar").hidden = false; learnSay(micWhy(e), false); $("learn-skip").hidden = true; perShown = 0; drawScore(); });
     };
     var c = ear.cal();

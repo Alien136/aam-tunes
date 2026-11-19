@@ -1214,7 +1214,7 @@ function aamBoot(TUNE) {
       ear.start().then(function () {
         learn.on = true; learn.seq = seq; learn.i = 0; learn.prev = null; learn.okRun = learn.badRun = learn.misses = 0; learn.gap = true; learn.level = 0; learn.since = Date.now();
         $("learn-bar").hidden = false; $("learn-skip").hidden = false; $("learn-btn").setAttribute("aria-pressed", "true");
-        var t = learnTarget(); learnSay("Play the note in the blue cloud: " + noteName(t + EAR_SHIFT) + ". Take your time.", false); perShown = 0; drawScore(); ear.off(learnHear); ear.on(learnHear);
+        var t = learnTarget(); learnSay("Play the note in the blue cloud: " + noteName(t + EAR_SHIFT) + ". Take your time." + (EAR_SHIFT ? " (On this instrument it sounds as " + noteName(t) + " on a piano.)" : ""), false); perShown = 0; drawScore(); ear.off(learnHear); ear.on(learnHear);
       }).catch(function (e) { $("learn-bar").hidden = false; learnSay(micWhy(e), false); $("learn-skip").hidden = true; perShown = 0; drawScore(); });
     };
     var c = ear.cal();
