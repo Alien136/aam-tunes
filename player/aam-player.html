@@ -134,7 +134,7 @@
 #aam-play .score .hl { fill: transparent; stroke: none; }
 #aam-play .score .tag-t { font: 600 12px var(--body); fill: var(--accent-text); }
 #aam-play .score .hl.in-range { fill: var(--range); }
-#aam-play .score .hl.is-now { fill: #bfe3fb; stroke: var(--accent); stroke-width: 1.5; }
+#aam-play .score .hl.is-now { fill: #4aa8f0; fill-opacity: .13; stroke: none; filter: url(#lr-soft); }   /* the bar being played: a faint wash; the note itself carries the cloud */
 #aam-play .score .mk-g { color: #8a99a8; fill: #8a99a8; }
 /* Learn mode and the tuner */
 #aam-play .score .lr-ok { color: #1a9b5a; fill: #1a9b5a; } #aam-play .score .lr-now { color: #0b63a8; fill: #0b63a8; } #aam-play .score .lr-line { fill: #4aa8f0; fill-opacity: .42; stroke: none; transition: transform .16s ease-out; pointer-events: none; } #aam-play .score .lr-miss { color: #d0443a; fill: #d0443a; }
@@ -1141,27 +1141,72 @@ function aamBoot(TUNE) {
 
   // ---- Learn mode: no band and no tempo; each note turns green when it is played, and the marker waits for the next one
   var learn = { on: false, i: 0, seq: null, okRun: 0, badRun: 0, badNote: null, misses: 0, gap: true, since: 0, level: 0 };
-  function learnSeq() { var s = TUNE.sections.filter(function (x) { return x.id === state.view; })[0]; return s && s.learn && notationShift() === 0 ? s.learn : null; }
-  function learnEls() { var svg = score.querySelector("svg"); return svg ? [].slice.call(svg.querySelectorAll(".abcjs-note.abcjs-v0")) : []; }
-  function learnPaint() {                                 // colour the notes again (the music is redrawn when the window changes)
-    $("learn-btn").hidden = !!window.AAM_DEMO || !learnSeq();
-    if (!learn.on) return;
-    var els = learnEls(); if (els.length !== learn.seq.length) return;
-    els.forEach(function (e, k) { e.classList.toggle("lr-ok", k < learn.i); e.classList.toggle("lr-now", k === learn.i); });
-    var el = els[learn.i], svg = score.querySelector("svg"), line = svg && svg.querySelector(".lr-line");
-    if (!el) { if (line) line.remove(); return; }
-    try {                                                 // a soft blue cloud behind the note to play: it covers the head and the stem
-      var NS = "http://www.w3.org/2000/svg", nb = el.getBBox(), px = 7, py = 6;
-      if (!svg.querySelector("#lr-soft")) {                // blurred edges, drawn by the SVG itself so every browser shows them
-        var defs = document.createElementNS(NS, "defs"), f = document.createElementNS(NS, "filter"), g = document.createElementNS(NS, "feGaussianBlur");
-        f.setAttribute("id", "lr-soft"); f.setAttribute("x", "-50%"); f.setAttribute("y", "-50%"); f.setAttribute("width", "200%"); f.setAttribute("height", "200%");
-        g.setAttribute("stdDeviation", "2.2"); f.appendChild(g); defs.appendChild(f); svg.insertBefore(defs, svg.firstChild);
-      }
-      if (!line) { line = document.createElementNS(NS, "rect"); line.setAttribute("class", "lr-line"); line.setAttribute("filter", "url(#lr-soft)"); line.setAttribute("x", 0); line.setAttribute("y", 0); svg.insertBefore(line, svg.firstChild.nextSibling); }   // under the music, so the note stays sharp
+  // The blue cloud is the one "you are here" marker: Learn mode puts it on the note to play, playback moves it note by note in time.
+  var playEl = null, beatMap = { svg: null };
+  function softFilter(svg) {                              // blurred edges, drawn by the SVG itself so every browser shows them
+    if (svg.querySelector("#lr-soft")) return;
+    var NS = "http://www.w3.org/2000/svg", defs = document.createElementNS(NS, "defs"), f = document.createElementNS(NS, "filter"), g = document.createElementNS(NS, "feGaussianBlur");
+    f.setAttribute("id", "lr-soft"); f.setAttribute("x", "-50%"); f.setAttribute("y", "-50%"); f.setAttribute("width", "200%"); f.setAttribute("height", "200%");
+    g.setAttribute("stdDeviation", "2.2"); f.appendChild(g); defs.appendChild(f); svg.insertBefore(defs, svg.firstChild);
+  }
+  function cloudAt(el) {                                  // a soft blue cloud behind one note (head and stem) or rest
+    var svg = score.querySelector("svg"); if (!svg || !el) return;
+    try {
+      softFilter(svg);
+      var line = svg.querySelector(".lr-line"), nb = el.getBBox(), px = 7, py = 6;
+      if (!line) { line = document.createElementNS("http://www.w3.org/2000/svg", "rect"); line.setAttribute("class", "lr-line"); line.setAttribute("filter", "url(#lr-soft)"); line.setAttribute("x", 0); line.setAttribute("y", 0); svg.insertBefore(line, svg.firstChild.nextSibling); }   // under the music, so the note stays sharp
       var w = nb.width + 2 * px, h = nb.height + 2 * py;
       line.setAttribute("width", w); line.setAttribute("height", h); line.setAttribute("rx", Math.min(w, h) / 2.2);
       line.style.transform = "translate(" + (nb.x - px).toFixed(2) + "px," + (nb.y - py).toFixed(2) + "px)";
     } catch (e) {}
+  }
+  function cloudOff() {
+    var l = score.querySelector(".lr-line"); if (l) l.remove();
+    if (playEl) { playEl.classList.remove("lr-now"); playEl = null; }
+  }
+  function beats() {                                      // where every note and rest of the top part starts: bar number and beat, read from the drawn music
+    var svg = score.querySelector("svg"); if (!svg) return null;
+    if (beatMap.svg === svg) return beatMap;
+    var bars = {}, notes = [], pos = {};
+    [].forEach.call(svg.querySelectorAll(".abcjs-v0.abcjs-note, .abcjs-v0.abcjs-rest"), function (el) {
+      var c = el.getAttribute("class"), mm = /abcjs-mm(\d+)/.exec(c), d = /abcjs-d(\d+)-?(\d*)/.exec(c); if (!mm || !d) return;
+      var k = +mm[1], beat = pos[k] || 0, it = { k: k, beat: beat, el: el, rest: /abcjs-rest/.test(c) };
+      pos[k] = beat + 4 * parseFloat(d[1] + "." + (d[2] || "0"));
+      (bars[k] = bars[k] || []).push(it); if (!it.rest) notes.push(it);
+    });
+    beatMap = { svg: svg, bars: bars, notes: notes, seqs: {} }; return beatMap;
+  }
+  function playCloud(k, beat) {                           // playback: the cloud sits on the note (or rest) sounding now
+    var bm = score.hidden ? null : beats(), row = bm && bm.bars[k], hit = null;
+    if (row) for (var i = 0; i < row.length; i++) if (row[i].beat <= beat + 0.03) hit = row[i];
+    if (!hit) { cloudOff(); return; }
+    if (hit.el === playEl) return;
+    if (playEl) playEl.classList.remove("lr-now");
+    playEl = hit.el; playEl.classList.add("lr-now"); cloudAt(playEl);
+  }
+  function learnSeq() {                                   // the sounding pitch of each written note, in order (-1: tied on from the note before)
+    var s = TUNE.sections.filter(function (x) { return x.id === state.view; })[0];
+    if (!s || keyState.inst !== NATIVE) return null;     // the page must show what this instrument reads; a key change moves page and sound together
+    if (s.learn) return s.learn;
+    if (/piano/.test(TUNE.instrument || "") || (s.lh && s.lh.length) || !s.rh || !s.rh.length) return null;      // one note at a time only
+    var bm = beats(); if (!bm) return null;
+    if (s.id in bm.seqs) return bm.seqs[s.id];
+    var at = {}, chord = false, used = 0;
+    s.rh.forEach(function (e) { var key = Math.round(e[0] * 48); if (key in at) chord = true; at[key] = e[1]; });
+    var seq = bm.notes.map(function (n) { var key = Math.round((n.k * BPB + n.beat) * 48); if (key in at) { used++; return at[key]; } return -1; });
+    return (bm.seqs[s.id] = chord || used !== s.rh.length || !seq.length ? null : seq);                          // every sounding note must have found its written note
+  }
+  function learnEls() { var svg = score.querySelector("svg"); return svg ? [].slice.call(svg.querySelectorAll(".abcjs-note.abcjs-v0")) : []; }
+  function learnPaint() {                                 // colour the notes again (the music is redrawn when the window changes)
+    var svg0 = score.querySelector("svg"); if (svg0) softFilter(svg0);
+    $("learn-btn").hidden = !!window.AAM_DEMO || !learnSeq();
+    if (learn.on && learn.key !== keyState.key) { learnStop(); return; }                                         // the key was changed: start again in the new key
+    if (!learn.on) return;
+    var els = learnEls(); if (els.length !== learn.seq.length) return;
+    els.forEach(function (e, k) { e.classList.toggle("lr-ok", k < learn.i); e.classList.toggle("lr-now", k === learn.i); });
+    var el = els[learn.i];
+    if (!el) { cloudOff(); return; }
+    cloudAt(el);
     var a = el.getBoundingClientRect(), b = score.getBoundingClientRect(); if (a.bottom > b.bottom - 8 || a.top < b.top + 8) score.scrollTop += a.top - b.top - 40;
   }
   function learnSay(text, hint) { $("learn-msg").textContent = text; $("learn-hear").hidden = !hint; }
@@ -1204,7 +1249,7 @@ function aamBoot(TUNE) {
     if (!learn || !learn.on) return;
     learn.on = false; ear.off(learnHear); $("learn-bar").hidden = true; $("learn-btn").setAttribute("aria-pressed", "false");
     learnEls().forEach(function (e) { e.classList.remove("lr-ok", "lr-now", "lr-miss"); });
-    var ln = score.querySelector(".lr-line"); if (ln) ln.remove();
+    cloudOff();
     perShown = 0; drawScore();                            // the bar above the music has gone: lay the page out again
   }
   function learnStart() {
@@ -1212,7 +1257,7 @@ function aamBoot(TUNE) {
     if (state.playing) stop();
     var go = function () {
       ear.start().then(function () {
-        learn.on = true; learn.seq = seq; learn.i = 0; learn.prev = null; learn.okRun = learn.badRun = learn.misses = 0; learn.gap = true; learn.level = 0; learn.since = Date.now();
+        learn.on = true; learn.key = keyState.key; learn.seq = seq.map(function (m) { return m < 0 ? m : m + keyState.key; }); learn.i = 0; learn.prev = null; learn.okRun = learn.badRun = learn.misses = 0; learn.gap = true; learn.level = 0; learn.since = Date.now();
         $("learn-bar").hidden = false; $("learn-skip").hidden = false; $("learn-btn").setAttribute("aria-pressed", "true");
         var t = learnTarget(); learnSay("Play the note in the blue cloud: " + noteName(t + EAR_SHIFT) + ". Take your time." + (EAR_SHIFT ? " (On this instrument it sounds as " + noteName(t) + " on a piano.)" : ""), false); perShown = 0; drawScore(); ear.off(learnHear); ear.on(learnHear);
       }).catch(function (e) { $("learn-bar").hidden = false; learnSay(micWhy(e), false); $("learn-skip").hidden = true; perShown = 0; drawScore(); });
@@ -2051,7 +2096,7 @@ function aamBoot(TUNE) {
     if (cycleId !== null) { Tone.Transport.clear(cycleId); cycleId = null; }
     if (keyAtStart !== null && keyState.key !== keyAtStart) { keyState.key = keyAtStart; keyApply(); }   // through the keys: back to where it started
     keyAtStart = null;
-    cells.forEach(function (c) { c.classList.remove("is-now"); }); curBar = -1; last = -1; markNow(-1); $("chord-now").textContent = ""; $("now-where").textContent = "Stopped. Press play to start again."; $("p-reps").textContent = repsShort();
+    cells.forEach(function (c) { c.classList.remove("is-now"); }); curBar = -1; last = -1; markNow(-1); cloudOff(); $("chord-now").textContent = ""; $("now-where").textContent = "Stopped. Press play to start again."; $("p-reps").textContent = repsShort();
     $("p-chord").textContent = ""; $("p-where").textContent = ""; hideCount();
     applyRange(null);
   }
@@ -2077,6 +2122,7 @@ function aamBoot(TUNE) {
     var t = Tone.Transport.ticks, k = Math.floor(t / BAR) - LEAD, where, chord = "";
     var endBar = rng()[1];
     if (k > endBar) { k = endBar; t = (endBar + LEAD) * BAR; }    // the instant between the last bar and the stop
+    if (t >= state.start) playCloud(k, (t % BAR) / PPQ); else if (playEl) cloudOff();
     if (t < state.start) { var cb = Math.floor((t - (state.start - LEAD * BAR)) / PPQ); where = "Count-in: " + Math.min(2 * BPB, cb + 1) + " of " + 2 * BPB; if (cb >= 0 && cb < 2 * BPB) showCount(cb); }
     else {
       if (!$("cnt").hidden) hideCount();

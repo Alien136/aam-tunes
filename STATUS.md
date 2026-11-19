@@ -127,3 +127,15 @@ Everything needed to carry on from any conversation is in this repository and in
   `#lr-soft`) drawn under the music, sized to the whole note (head and stem), sliding to the next note. The note itself is dark blue.
 
 ## 2026-11-19 · Tempo wheel flipped: faster speeds are at the top (240 down to 40).
+
+## 2026-11-19 · The blue cloud follows playback on every tune; Learn mode on every single-line tune
+- Playback: `playCloud(k, beat)` (called from `frame()`) puts the cloud on the note or rest sounding now. `beats()` reads each
+  top-part note's bar and beat from the drawn music (abcjs classes `abcjs-mm<bar>` and `abcjs-d<length>`), so it needs nothing from
+  the tune files. The playing bar keeps a faint blue wash (`.hl.is-now`).
+- Learn mode no longer needs `learn` in the tune file: `learnSeq()` matches each written note to the `rh` event at the same beat
+  (-1 where there is none: a tie). It is offered when the section has a one-note-at-a-time `rh` part, no `lh`, the instrument is not
+  piano, and the page shows the instrument's own reading (`keyState.inst === NATIVE`). A key change adds `keyState.key`, so
+  through-the-keys exercises work in every key. A `learn` list in the file still wins (the beginner duets use it for part A).
+- **Rule for every generator from now on:** a single-line part must be published as `sections[].rh` events with matching
+  `abc.rh` (one written note per sounding note, ties written as ties). Then the Tuner, Learn mode and the cloud work with no
+  extra step. Check after publishing: the tune shows the "Learn the notes" button on its notation tabs.
