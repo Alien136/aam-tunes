@@ -894,6 +894,19 @@ def chart_page(book):
         c.drawImage(im, x0 + 6, (top + bot) / 2 - th / 2 - 6, tw, th, mask="auto")
     book.footer(); c.showPage()
 
+def full_chart(path, book):
+    """The Welcome Booklet's complete fingering chart (low B flat to high F, three pages) goes at the back, with this book's footer."""
+    import io
+    from pypdf import PdfReader, PdfWriter
+    chart = os.path.join(CACHE, "fingering.pdf"); B.fingering_pages(chart)
+    w = PdfWriter()
+    for pg in PdfReader(path).pages: w.add_page(pg)
+    for pg in PdfReader(chart).pages:
+        buf = io.BytesIO(); c = canvas.Canvas(buf, pagesize=letter); book.c = c; book.footer(); c.save(); buf.seek(0)
+        pg.merge_page(PdfReader(buf).pages[0]); w.add_page(pg)
+    w.add_metadata({"/Title": "Saxophone Beginner Booklet", "/Author": "Alex Attard Music"})
+    with open(path, "wb") as fh: w.write(fh)
+
 def sources_text():
     out = []
     for u in UNITS:
@@ -915,7 +928,8 @@ def main():
         book.toc = list(toc); how_page(book); book.toc = []
         start_page(book); reading_page(book)
         for k, u in enumerate(UNITS): build_unit(book, k, u)
-        finale_pages(book); scales_page(book); rhythm_page(book); glossary_page(book); chart_page(book); book.c.save()
+        finale_pages(book); scales_page(book); rhythm_page(book); glossary_page(book); book.c.save()
+        if final: full_chart(out, book)
         toc = [t for t in book.toc if t[0].startswith("Unit") or t[0] == "Finale"]
     print(out, book.n - 1, "pages,", book.line_no, "numbered lines")
     if REPO: publish(REPO)
