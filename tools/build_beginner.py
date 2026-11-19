@@ -488,6 +488,7 @@ def ly_line(it, blank=False):
     quiz = it.get("quiz")
     lyr = ["____"] * len(names) if quiz in ("names", "counts") else it.get("lyr") or (names if it.get("names") else None)
     lyrics = ('\\new Lyrics \\lyricsto "m" { \\lyricmode { ' + " ".join('"%s"' % x for x in lyr) + " } }") if lyr else ""
+    if it.get("lyr_free"): lyrics = "\\new Lyrics \\lyricmode { %s }" % it["lyr_free"]; lyr = True       # words with their own lengths: they can sit under rests
     partial = "\\partial %s " % it["partial"] if it.get("partial") else ""
     key = it.get("key", "c"); kly = key[0] + ("es" if key.endswith("b") else "") + " \\major"
     tempo = '\\tempo "%s" ' % it["tempo_word"] if it.get("tempo_word") else ""
@@ -994,8 +995,8 @@ def reading_page(book):
              dict(music="b'4 b' b' b' | b' b' b' b' | b' b' b' b' | b'1", lyr=["1", "2", "3", "4"] * 3 + ["1-2-3-4"])),
             ("How long each note lasts", "A <b>whole note</b> is 4 beats, a <b>half note</b> is 2 and a <b>quarter note</b> is 1.",
              dict(music="b'1 | b'2 b'2 | b'4 b' b' b' | b'1", lyr=["4 beats", "2", "2", "1", "1", "1", "1", "4 beats"])),
-            ("Rests", "A <b>rest</b> is a measured silence. Each note length has a rest of the same length. Keep counting through it.",
-             dict(music="r1 | r2 b'2 | r4 b' r b' | b'1", lyr=["3-4", "2", "4", "1-2-3-4"]))]
+            ("Rests", "A <b>rest</b> is a measured silence. Each note length has a rest of the same length. The numbers under the rests are the beats you count in silence.",
+             dict(music="r1 | r2 b'2 | r4 b' r b' | b'1", lyr_free='"1-2-3-4"1 "1-2"2 \\skip 2 "1"4 \\skip 4 "3"4 \\skip 4 \\skip 1'))]
     blocks = []
     for title, text, it in rows:
         png = render(ly_line(dict(key="c", time="4/4", **it)), "line"); im = ImageReader(png); iw, ih = im.getSize()
