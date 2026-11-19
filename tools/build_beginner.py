@@ -46,8 +46,9 @@ LINE_MM = 176.0
 # ---------------------------------------------------------------- the curriculum
 # music: LilyPond, absolute pitch, bars separated by "|".  names: print letter names under the notes.
 # hl: notes to print in amber (the new notes, where they first appear).  bpl: bars per line.  src: where the tune was checked.
-def L(title, music, sub="", key="c", time="4/4", names=False, hl=(), bpl=4, partial=None, lyr=None, src=None, tempo=None):
-    return dict(type="line", title=title, music=music, sub=sub, key=key, time=time, names=names, hl=set(hl), bpl=bpl, partial=partial, lyr=lyr, src=src, tempo=tempo)
+def L(title, music, sub="", key="c", time="4/4", names=False, hl=(), bpl=4, partial=None, lyr=None, src=None, tempo=None, slug=None):
+    # slug: give the OLD title here when you rename a line, so QR codes on copies already printed keep working
+    return dict(slug=slug, type="line", title=title, music=music, sub=sub, key=key, time=time, names=names, hl=set(hl), bpl=bpl, partial=partial, lyr=lyr, src=src, tempo=tempo)
 
 WIKI = "checked against the notation in Wikipedia"
 MEM = "written from memory: check"
@@ -363,7 +364,7 @@ PCS = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"]
 SLUGS = {}
 def slug_of(it):
     if id(it) not in SLUGS:
-        base = "sax-beginner-%s-" % ED + re.sub(r"[^a-z0-9]+", "-", it["title"].lower().replace("♯", " sharp").replace("♭", " flat").replace("è", "e")).strip("-")
+        base = "sax-beginner-%s-" % ED + re.sub(r"[^a-z0-9]+", "-", (it.get("slug") or it["title"]).lower().replace("♯", " sharp").replace("♭", " flat").replace("è", "e")).strip("-")
         s, k = base, 2
         while s in SLUGS.values(): s = "%s-%d" % (base, k); k += 1
         SLUGS[id(it)] = s
@@ -451,9 +452,8 @@ def publish(repo):
             t = to_tune(it, ch); json.dump(t, open(os.path.join(repo, "tunes", t["slug"] + ".json"), "w"), ensure_ascii=False, separators=(",", ":"))
             idx["tunes"][t["slug"]] = dict(title=t["title"], subtitle=t["subtitle"]); items.append(t["slug"]); slugs.append(t["slug"])
         contents.append(dict(title=ch, items=items))
-    for gone in set(old["tunes"]) - set(slugs) if old else ():      # a line that was renamed or removed
-        idx["tunes"].pop(gone, None); f = os.path.join(repo, "tunes", gone + ".json"); os.path.exists(f) and os.remove(f)
-    entry = dict(id=pdf_id, title=title, hash=h, tunes=slugs, contents=contents)
+    kept = [x for x in (old["tunes"] if old else []) if x not in slugs]      # lines dropped from the book stay playable: a student may hold an earlier printing
+    entry = dict(id=pdf_id, title=title, hash=h, tunes=slugs + kept, contents=contents)
     rest = [p for p in idx["pdfs"] if p["id"] != pdf_id]; at = next((i for i, p in enumerate(rest) if p.get("free")), len(rest))
     idx["pdfs"] = rest[:at] + [entry] + rest[at:]
     json.dump(idx, open(ip, "w"), ensure_ascii=False, indent=1)
