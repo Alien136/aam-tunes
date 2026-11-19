@@ -121,3 +121,7 @@ Everything needed to carry on from any conversation is in this repository and in
   middle, `.p-right` (key, repeats, settings).
 - Learn line: an SVG group `.lr-line` (rect + circle) on top of the music. It lies on the note's stem and runs a little past the
   staff, with a dot where the stem meets the head; a whole note gets the line and dot through the middle of the head.
+
+## 2026-11-19 · Learn mode marker: a soft blue cloud (the pink line is gone)
+- Alex did not like the pink line with a dot. `.lr-line` is now one blurred, translucent blue rounded rectangle (SVG filter
+  `#lr-soft`) drawn under the music, sized to the whole note (head and stem), sliding to the next note. The note itself is dark blue.
