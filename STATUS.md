@@ -84,3 +84,19 @@ Everything needed to carry on from any conversation is in this repository and in
   run `publish_pdf.py` again afterwards.
 - Not real protection for paid material: the repository is public and the codes are short. Single-tune lead sheets have no
   contents dialog yet, so no download button.
+
+## 2026-11-19 (late) · Tuner and Learn mode (listening through the microphone)
+- Player: `ear` opens the microphone with echo cancellation, noise suppression and auto gain off, and measures pitch with McLeod's
+  method (normalized autocorrelation, parabolic refinement, clarity score), searched only inside the instrument's range. No audio
+  leaves the device.
+- **Tuner** chip (every tune): written note name for the instrument, flat/sharp needle, steady-note timer. Its first run is a
+  two-step microphone check (room noise, then one long note) saved in localStorage `aam-ear` {floor, off (cents), at}.
+- **Learn the notes** chip (only where a section has `learn`): no band; the current note is blue, a note turns green when its pitch
+  is held about 0.16 s (within 50 cents after the player's own offset); a repeated note needs a tongued break or a 1.1 s hold; a
+  steady wrong note names what was played; Skip, Start again, Hear it (after two misses), Stop. Showing or hiding the bar calls
+  `perShown = 0; drawScore()` so the page is laid out again.
+- `build_beginner.py` writes `learn` (sounding MIDI per written note, -1 for a tied continuation) into every beginner tune. Other
+  books do not have it yet.
+- Tested with generated saxophone-like audio fed to Chromium as a fake microphone (`/home/claude/v2/mkwav.py`, `eartest.js`):
+  clean, noisy and 25 cents flat with legato repeats, and tenor low notes all finish. NOT yet tested with a real saxophone or on a
+  real iPhone (Safari may not allow the speech processing to be switched off).

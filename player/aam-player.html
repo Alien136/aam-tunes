@@ -136,6 +136,20 @@
 #aam-play .score .hl.in-range { fill: var(--range); }
 #aam-play .score .hl.is-now { fill: #bfe3fb; stroke: var(--accent); stroke-width: 1.5; }
 #aam-play .score .mk-g { color: #8a99a8; fill: #8a99a8; }
+/* Learn mode and the tuner */
+#aam-play .score .lr-ok { color: #1a9b5a; fill: #1a9b5a; } #aam-play .score .lr-now { color: var(--accent); fill: var(--accent); } #aam-play .score .lr-miss { color: #d0443a; fill: #d0443a; }
+#aam-play .chip[aria-pressed="true"] { background: var(--now); color: var(--now-ink); border-color: var(--now); }
+#aam-play .learn-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 14px; background: var(--tint); border: 1px solid var(--line); }
+#aam-play .learn-bar[hidden] { display: none; }
+#aam-play .learn-bar b { font: 600 15px var(--body); color: var(--ink); flex: 1 1 220px; } #aam-play .learn-bar span { display: flex; gap: 6px; flex-wrap: wrap; }
+#aam-play .learn-bar button { height: 36px; padding: 0 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--ink); font: 600 13px var(--body); }
+#aam-play .t-face { display: grid; justify-items: center; gap: 2px; } #aam-play .t-note { font: 700 64px/1 var(--display); color: var(--ink); } #aam-play .t-sub { font: 500 12px var(--body); color: var(--muted); min-height: 16px; }
+#aam-play .t-meter { position: relative; height: 34px; border-radius: 12px; background: var(--tint); display: flex; justify-content: space-between; align-items: center; padding: 0 10px; font: 600 11px var(--body); color: var(--muted); }
+#aam-play .t-mid { position: absolute; left: calc(50% - 12px); top: 0; bottom: 0; width: 24px; background: rgba(26,155,90,.18); }
+#aam-play .t-needle { position: absolute; top: 3px; bottom: 3px; width: 6px; margin-left: -3px; border-radius: 3px; background: #d0443a; transition: left .12s linear; } #aam-play .t-needle.good { background: #1a9b5a; } #aam-play .t-needle.idle { background: #c5ccd3; }
+#aam-play .t-word { text-align: center; font: 600 15px var(--body); color: var(--ink); } #aam-play .t-hold { text-align: center; font: 500 13px var(--mono); color: var(--muted); min-height: 18px; }
+#aam-play .t-go, #aam-play .t-cal { width: 100%; height: 44px; border-radius: 12px; font: 600 15px var(--body); text-align: center; } #aam-play .t-go { background: var(--accent); color: var(--accent-ink); } #aam-play .t-cal { background: var(--tint); color: var(--ink); }
+#aam-play .t-go[hidden] { display: none; } #aam-play .t-tip:empty { display: none; }
 #aam-play .score .mk-l { color: var(--accent-text); fill: var(--accent-text); }
 #aam-play .score .ch-t { font: 500 13.5px "Inter", "Segoe UI Symbol", "Apple Symbols", sans-serif; fill: var(--ink); }
 #aam-play .key { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--muted); }
@@ -458,7 +472,10 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
         <span class="lbl">Music</span>
         <div class="seg" role="group" aria-label="Music on screen" data-r="views"></div>
         <button class="chip" data-r="hear" aria-pressed="false"><span class="lg">Hear it played</span><span class="sm">Hear it</span></button>
+        <button class="chip" data-r="learn-btn" aria-pressed="false" hidden><span class="lg">Learn the notes</span><span class="sm">Learn</span></button>
+        <button class="chip" data-r="tuner-btn">Tuner</button>
       </div>
+      <div class="learn-bar" data-r="learn-bar" hidden><b data-r="learn-msg" aria-live="polite"></b><span><button data-r="learn-hear" hidden>Hear it</button><button data-r="learn-skip">Skip note</button><button data-r="learn-again">Start again</button><button data-r="learn-stop">Stop</button></span></div>
 
       <div class="row" data-r="row-loop" style="justify-content:space-between">
         <div class="row" style="gap:10px">
@@ -520,6 +537,21 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
       </div>
     </div>
     <!-- contents: a PDF with several exercises (a booklet) lists them here; tap the title to open it -->
+    <!-- tuner: also the microphone check for Learn mode -->
+    <div class="kdlg" data-r="tdlg" hidden role="dialog" aria-label="Tuner">
+      <div class="kcard">
+        <div class="khead"><h2>Tuner</h2><button class="btn-done" data-r="t-close">Done</button></div>
+        <p class="k-note" data-r="t-msg" aria-live="polite"></p>
+        <div class="t-face"><div class="t-note" data-r="t-note">–</div><div class="t-sub" data-r="t-sub"></div></div>
+        <div class="t-meter"><i class="t-mid"></i><i class="t-needle idle" data-r="t-needle"></i><span>flat</span><span>sharp</span></div>
+        <div class="t-word" data-r="t-word" aria-live="polite">Play a long note</div>
+        <div class="t-hold" data-r="t-hold"></div>
+        <p class="k-note t-tip" data-r="t-tip"></p>
+        <button class="t-go" data-r="t-go" hidden>Start learning the notes</button>
+        <button class="t-cal" data-r="t-cal">Check my microphone again</button>
+        <p class="k-note">Nothing is recorded. The sound is measured on this device and thrown away.</p>
+      </div>
+    </div>
     <!-- metronome: a click on every beat, with the music or on its own -->
     <div class="kdlg" data-r="mdlg" hidden role="dialog" aria-label="Metronome">
       <div class="kcard">
@@ -917,6 +949,216 @@ function aamBoot(TUNE) {
   }
   $("hear").onclick = function () { if (!isSection(state.view)) return; state.hear = !state.hear; syncDemo(); };
   if (!TUNE.sections.length) $("hear").hidden = true;
+  // ---------- listening: a tuner, and Learn mode (the marker moves when the student plays the right note)
+  // The microphone is opened with the phone's speech processing off (it flattens held notes). Pitch comes from how often the wave
+  // repeats (McLeod's method), searched only inside the instrument's range, with a clarity score so noise is never guessed at.
+  // Nothing is recorded or sent anywhere: each slice of sound is measured and thrown away.
+  var EAR_SHIFT = ({ alto: 9, bari: 21, tenor: 14, soprano: 2, clarinet: 2, trumpet: 2 })[TUNE.instrument] || 0;   // written note = sounding note + this
+  var NOTE_NAMES = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
+  var noteName = function (m) { return NOTE_NAMES[((m % 12) + 12) % 12]; };
+  var ear = (function () {
+    var ctx = null, an = null, buf = null, stream = null, timer = null, subs = [], cal = null, quietUntil = 0;
+    try { cal = JSON.parse(localStorage.getItem("aam-ear") || "null"); } catch (e) {}
+    var lo = EAR_SHIFT ? 58 - EAR_SHIFT - 2 : 34, hi = EAR_SHIFT ? 89 - EAR_SHIFT + 7 : 100;      // sounding range in MIDI numbers
+    var hz = function (m) { return 440 * Math.pow(2, (m - 69) / 12); };
+    function pitch(x, sr) {                               // -> { hz, clarity, rms, clip }
+      var N = 2048, o = x.length - N, i, t, sum = 0, peak = 0;
+      for (i = 0; i < N; i++) { var v = x[o + i]; sum += v * v; if (v > peak) peak = v; else if (-v > peak) peak = -v; }
+      var res = { hz: 0, clarity: 0, rms: Math.sqrt(sum / N), clip: peak > 0.985 };
+      if (res.rms < 0.0015) return res;
+      var t0 = Math.max(2, Math.floor(sr / hz(hi))), t1 = Math.min(N / 2 - 2, Math.ceil(sr / hz(lo))), nsdf = new Float32Array(t1 + 2);
+      for (t = t0 - 1; t <= t1 + 1; t++) {
+        var ac = 0, m = 0;
+        for (i = 0; i < N - t; i++) { var a = x[o + i], b = x[o + i + t]; ac += a * b; m += a * a + b * b; }
+        nsdf[t] = m > 0 ? 2 * ac / m : 0;
+      }
+      var best = 0, peaks = [];
+      for (t = t0; t <= t1; t++) if (nsdf[t] > 0 && nsdf[t] > nsdf[t - 1] && nsdf[t] >= nsdf[t + 1]) { peaks.push(t); if (nsdf[t] > best) best = nsdf[t]; }
+      if (!peaks.length) return res;
+      for (i = 0; i < peaks.length; i++) if (nsdf[peaks[i]] >= 0.9 * best) { t = peaks[i]; break; }      // the first strong repeat is the note itself, not an octave below
+      var y0 = nsdf[t - 1], y1 = nsdf[t], y2 = nsdf[t + 1], d = y0 - 2 * y1 + y2, sh = d ? 0.5 * (y0 - y2) / d : 0;
+      res.hz = sr / (t + sh); res.clarity = y1;
+      return res;
+    }
+    function tick() {
+      if (!an) return;
+      an.getFloatTimeDomainData(buf);
+      var r = pitch(buf, ctx.sampleRate), floor = cal ? cal.floor : 0.01;
+      r.t = Date.now(); r.heard = r.rms > floor; r.ok = r.heard && r.clarity >= 0.8 && r.hz > 0 && r.t > quietUntil;
+      if (r.ok) { r.midi = 69 + 12 * Math.log(r.hz / 440) / Math.LN2; r.note = Math.round(r.midi); r.cents = Math.round(100 * (r.midi - r.note)); }
+      subs.slice().forEach(function (f) { f(r); });
+    }
+    return {
+      on: function (f) { subs.push(f); }, off: function (f) { var n = subs.length; subs = subs.filter(function (g) { return g !== f; }); if (n && !subs.length) this.stop(); },
+      hz: hz, cal: function () { return cal; },
+      setCal: function (c) { cal = c; try { localStorage.setItem("aam-ear", JSON.stringify(c)); } catch (e) {} },
+      start: function () {
+        if (stream) return Promise.resolve();
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !(window.AudioContext || window.webkitAudioContext)) return Promise.reject(new Error("nomic"));
+        return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 } }).then(function (s) {
+          stream = s; ctx = new (window.AudioContext || window.webkitAudioContext)();
+          an = ctx.createAnalyser(); an.fftSize = 4096; an.smoothingTimeConstant = 0; ctx.createMediaStreamSource(s).connect(an);
+          buf = new Float32Array(an.fftSize); timer = setInterval(tick, 40);
+          return ctx.state === "suspended" ? ctx.resume() : null;
+        });
+      },
+      stop: function () {
+        clearInterval(timer); timer = null;
+        if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
+        if (ctx) { try { ctx.close(); } catch (e) {} }
+        stream = ctx = an = null;
+      },
+      beep: function (m, secs) {                          // play one note so the student can hear what to aim for; the microphone ignores it
+        if (!ctx) return;
+        var o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime; o.type = "triangle"; o.frequency.value = hz(m);
+        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.25, t + 0.03); g.gain.setValueAtTime(0.25, t + secs - 0.08); g.gain.linearRampToValueAtTime(0, t + secs);
+        o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + secs + 0.02); quietUntil = Date.now() + secs * 1000 + 250;
+      }
+    };
+  })();
+  var micWhy = function (e) {
+    return e && e.message === "nomic" ? "This browser can't use the microphone. Try Chrome or Safari."
+      : "The microphone is blocked. Allow it for this site in your browser's settings, then try again.";
+  };
+
+  // ---- the tuner (its first run is also the microphone check that Learn mode relies on)
+  (function () {
+    var dlg = $("tdlg"), live = false, phase = "", t0 = 0, samples = [], smooth = null, hold = { note: null, since: 0, best: 0 }, after = null;
+    function show(note, cents) {
+      var n = $("t-note"), needle = $("t-needle"), word = $("t-word");
+      if (note == null) { n.textContent = "–"; $("t-sub").textContent = ""; needle.style.left = "50%"; needle.className = "t-needle idle"; word.textContent = "Play a long note"; return; }
+      var w = note + EAR_SHIFT;
+      n.textContent = noteName(w); $("t-sub").textContent = EAR_SHIFT ? "sounds as " + noteName(note) + " on a piano" : "";
+      needle.style.left = Math.max(2, Math.min(98, 50 + cents)) + "%";
+      var good = Math.abs(cents) <= 10; needle.className = "t-needle" + (good ? " good" : "");
+      word.textContent = good ? "In tune" : cents < 0 ? "Flat: " + (-cents) + " cents low" : "Sharp: " + cents + " cents high";
+    }
+    function heard(r) {
+      var now = r.t, msg = $("t-msg");
+      if (phase === "quiet") {                            // step 1: how loud is the room?
+        samples.push(r.rms);
+        if (now - t0 > 1800) {
+          samples.sort(function (a, b) { return a - b; });
+          var med = samples[Math.floor(samples.length / 2)], top = samples[Math.floor(samples.length * 0.9)];
+          cal0.floor = Math.min(0.08, Math.max(0.006, 2.5 * top, 4 * med)); cal0.noisy = top > 0.03;
+          ear.setCal({ floor: cal0.floor, off: 0, at: 0 });                 // a first guess, so the next step can hear
+          phase = "play"; samples = []; t0 = now;
+          msg.textContent = (cal0.noisy ? "It's a little noisy here: a quieter room will work better. " : "") + "Step 2 of 2: play one long, steady note.";
+        }
+        return;
+      }
+      if (r.clip) $("t-tip").textContent = "Too loud for the microphone: move it a little further away.";
+      else if (r.heard && !r.ok && r.rms < 3 * (ear.cal() || cal0).floor) $("t-tip").textContent = "";
+      if (!r.ok) { if (now - (heard.last || 0) > 350) { smooth = null; hold.note = null; show(null); } return; }
+      heard.last = now; if (!r.clip) $("t-tip").textContent = "";
+      smooth = smooth == null || Math.abs(smooth - r.midi) > 0.7 ? r.midi : smooth + 0.35 * (r.midi - smooth);
+      var note = Math.round(smooth), cents = Math.round(100 * (smooth - note));
+      show(note, cents);
+      if (hold.note !== note) { hold.note = note; hold.since = now; }
+      var secs = (now - hold.since) / 1000; if (secs > hold.best) hold.best = secs;
+      $("t-hold").textContent = "Steady for " + secs.toFixed(1) + " s  ·  best today " + hold.best.toFixed(1) + " s";
+      if (phase === "play") {                             // step 2: one steady note sets the level and how sharp or flat this player sits
+        samples.push([r.rms, 100 * (r.midi - Math.round(r.midi))]);
+        if (secs > 1.2 && samples.length > 20) {
+          var offs = samples.map(function (s) { return s[1]; }).sort(function (a, b) { return a - b; }), lv = samples.map(function (s) { return s[0]; }).sort(function (a, b) { return a - b; });
+          var c = { floor: Math.max(cal0.floor, Math.min(0.25 * lv[Math.floor(lv.length / 2)], 0.05)), off: Math.max(-35, Math.min(35, Math.round(offs[Math.floor(offs.length / 2)]))), at: Date.now() };
+          ear.setCal(c); phase = "tune";
+          msg.textContent = "Your microphone is ready. Hold any note and bring the marker to the middle.";
+          $("t-go").hidden = !after;
+        }
+      }
+    }
+    var cal0 = {};
+    function begin(recal) {
+      $("t-msg").textContent = "Starting the microphone…"; $("t-tip").textContent = ""; $("t-go").hidden = true; show(null); $("t-hold").textContent = "";
+      ear.start().then(function () {
+        if (!live) { ear.on(heard); live = true; }
+        var c = ear.cal();
+        if (!c || !c.at || recal) { phase = "quiet"; samples = []; t0 = Date.now(); cal0 = {}; $("t-msg").textContent = "Step 1 of 2: stay quiet for two seconds…"; }
+        else { phase = "tune"; $("t-msg").textContent = "Hold any note and bring the marker to the middle."; $("t-go").hidden = !after; }
+      }).catch(function (e) { $("t-msg").textContent = micWhy(e); });
+    }
+    function close() { dlg.hidden = true; if (live) { ear.off(heard); live = false; } phase = ""; after = null; }
+    openTuner = function (then) { if (state.playing) stop(); after = then || null; dlg.hidden = false; begin(false); };
+    $("tuner-btn").onclick = function () { openTuner(null); };
+    $("t-close").onclick = close;
+    $("t-cal").onclick = function () { begin(true); };
+    $("t-go").onclick = function () { var f = after; close(); if (f) f(); };
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) close(); });
+    if (window.AAM_DEMO) $("tuner-btn").hidden = true;
+  })();
+  var openTuner;
+
+  // ---- Learn mode: no band and no tempo; each note turns green when it is played, and the marker waits for the next one
+  var learn = { on: false, i: 0, seq: null, okRun: 0, badRun: 0, badNote: null, misses: 0, gap: true, since: 0, level: 0 };
+  function learnSeq() { var s = TUNE.sections.filter(function (x) { return x.id === state.view; })[0]; return s && s.learn && notationShift() === 0 ? s.learn : null; }
+  function learnEls() { var svg = score.querySelector("svg"); return svg ? [].slice.call(svg.querySelectorAll(".abcjs-note.abcjs-v0")) : []; }
+  function learnPaint() {                                 // colour the notes again (the music is redrawn when the window changes)
+    $("learn-btn").hidden = !!window.AAM_DEMO || !learnSeq();
+    if (!learn.on) return;
+    var els = learnEls(); if (els.length !== learn.seq.length) return;
+    els.forEach(function (e, k) { e.classList.toggle("lr-ok", k < learn.i); e.classList.toggle("lr-now", k === learn.i); });
+    var el = els[learn.i];
+    if (el) { var a = el.getBoundingClientRect(), b = score.getBoundingClientRect(); if (a.bottom > b.bottom - 8 || a.top < b.top + 8) score.scrollTop += a.top - b.top - 40; }
+  }
+  function learnSay(text, hint) { $("learn-msg").textContent = text; $("learn-hear").hidden = !hint; }
+  function learnTarget() { while (learn.i < learn.seq.length && learn.seq[learn.i] < 0) learn.i++; return learn.i < learn.seq.length ? learn.seq[learn.i] : null; }   // tied notes ride along
+  function learnNext(skipped) {
+    learn.prev = learn.seq[learn.i]; learn.i++; learn.okRun = learn.badRun = learn.misses = 0; learn.badNote = null; learn.gap = false; learn.since = Date.now();
+    var t = learnTarget(); learnPaint();
+    if (t == null) { learnSay("You played every note. Now try it with the metronome.", false); $("learn-skip").hidden = true; ear.off(learnHear); return; }
+    learnSay(skipped ? "Skipped. Next note: " + noteName(t + EAR_SHIFT) + "." : "Next: " + noteName(t + EAR_SHIFT), false);
+  }
+  function learnHear(r) {
+    var t = learnTarget(); if (t == null) return;
+    var c = ear.cal() || { off: 0 };
+    if (r.clip) learnSay("Too loud for the microphone: move it a little further away.", false);
+    if (!r.heard || r.clarity < 0.5 || (learn.level && r.rms < 0.45 * learn.level)) { learn.gap = true; learn.okRun = 0; learn.badRun = 0; return; }   // silence, breath or a tongued break: the dying end of a note never counts as the next one
+    if (!r.ok) { learn.okRun = 0; learn.badRun = 0; return; }
+    learn.level = learn.level ? learn.level + 0.2 * (r.rms - learn.level) : r.rms;
+    var d = 100 * (r.midi - t) - c.off;
+    if (Math.abs(d) <= 50) {
+      learn.badRun = 0; learn.okRun++;
+      var again = learn.prev === t && !learn.gap;         // the same note twice: wait for a new tongue stroke, or a clearly longer hold
+      if (learn.okRun >= 4 && (!again || Date.now() - learn.since > 1100)) learnNext(false);
+      return;
+    }
+    learn.okRun = 0;
+    var got = Math.round(r.midi - c.off / 100);
+    if (got === learn.prev && (!learn.gap || Date.now() - learn.since < 700)) return;                     // still holding the note before: not a mistake
+    if (got !== learn.badNote) { learn.badNote = got; learn.badRun = 0; }
+    if (++learn.badRun === 8) {
+      learn.misses++;
+      var el = learnEls()[learn.i]; if (el) { el.classList.add("lr-miss"); setTimeout(function () { el.classList.remove("lr-miss"); }, 900); }
+      var oct = Math.abs(got - t) % 12 === 0;
+      learnSay(oct ? "Right note, wrong octave. Check your octave key (left thumb)." : "You played " + noteName(got + EAR_SHIFT) + ". This note is " + noteName(t + EAR_SHIFT) + "." +
+        (learn.misses >= 3 ? " Look it up in the fingering chart at the back of your booklet, or tap Hear it." : ""), learn.misses >= 2);
+    }
+  }
+  function learnStop() {
+    if (!learn || !learn.on) return;
+    learn.on = false; ear.off(learnHear); $("learn-bar").hidden = true; $("learn-btn").setAttribute("aria-pressed", "false");
+    learnEls().forEach(function (e) { e.classList.remove("lr-ok", "lr-now", "lr-miss"); });
+    perShown = 0; drawScore();                            // the bar above the music has gone: lay the page out again
+  }
+  function learnStart() {
+    var seq = learnSeq(); if (!seq) return;
+    if (state.playing) stop();
+    var go = function () {
+      ear.start().then(function () {
+        learn.on = true; learn.seq = seq; learn.i = 0; learn.prev = null; learn.okRun = learn.badRun = learn.misses = 0; learn.gap = true; learn.level = 0; learn.since = Date.now();
+        $("learn-bar").hidden = false; $("learn-skip").hidden = false; $("learn-btn").setAttribute("aria-pressed", "true");
+        var t = learnTarget(); learnSay("Play the blue note: " + noteName(t + EAR_SHIFT) + ". Take your time.", false); perShown = 0; drawScore(); ear.off(learnHear); ear.on(learnHear);
+      }).catch(function (e) { $("learn-bar").hidden = false; learnSay(micWhy(e), false); $("learn-skip").hidden = true; perShown = 0; drawScore(); });
+    };
+    var c = ear.cal();
+    if (!c || !c.at) openTuner(go); else go();           // first time: the ten-second microphone check comes first
+  }
+  $("learn-btn").onclick = function () { if (learn.on) learnStop(); else learnStart(); };
+  $("learn-stop").onclick = learnStop;
+  $("learn-again").onclick = function () { learnStop(); learnStart(); };
+  $("learn-skip").onclick = function () { if (learn.on && learnTarget() != null) learnNext(true); };
+  $("learn-hear").onclick = function () { var t = learnTarget(); if (t != null) ear.beep(t, 1.2); };
   function blankBar(bar) { return bar.map(function (c) { return '"' + c.sym + '"x' + c.beats * 2; }).join(" "); }
   // Chord names are drawn by hand above the staff, lined up with the note each chord starts on. Left to abcjs, a chord name's
   // width pushes the next note away and the notes come out unevenly spaced.
@@ -1117,6 +1359,7 @@ function aamBoot(TUNE) {
     if (/g/.test(marks)) key.push('<i style="background:#8a99a8"></i>Passing tones in grey');
     if (/l/.test(marks)) key.push('<i style="background:var(--accent-text)"></i>The ii–V–I licks in blue');
     $("key").innerHTML = key.map(function (k) { return "<span>" + k + "</span>"; }).join("");
+    learnPaint();
   }
   function measureAt(e) {
     var svg = score.querySelector("svg"), hit = -1; if (!svg) return -1;
@@ -1740,7 +1983,7 @@ function aamBoot(TUNE) {
       }
     }).then(function () {
       setTempo(state.tempo); applyRange(null);
-      state.playing = true; setIcon(true); startFrom(); requestAnimationFrame(frame);
+      learnStop(); state.playing = true; setIcon(true); startFrom(); requestAnimationFrame(frame);
       AAM_TRACK.play(TUNE, function () { return { view: state.view, tempo: state.tempo, looped: state.a !== null && state.b !== null, heard: state.demo !== "off", key: keyState.key }; });
     }).catch(function () { $("now-where").textContent = "Couldn't load the sounds. Check your connection and try again."; flash("Couldn't load the sounds. Check your connection and try again.", 4500); });
   };

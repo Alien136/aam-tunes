@@ -775,7 +775,7 @@ STRIP = re.compile(r"\\(?:[a-zA-Z]+|[<>!])|-[.>]")
 def parse_part(it, music, bpb, wk, below):
     """Written notes -> (events in sounding pitch, one ABC string per bar, marks, the first sounding pitch class of each bar)."""
     import gen_study as g
-    sp = PX.Abc(PX.keysig(wk, False)); ev, abc, marks, roots, held, dur = [], [], [], [], None, "4"
+    sp = PX.Abc(PX.keysig(wk, False)); ev, abc, marks, roots, held, dur = [], [], [], [], None, "4"; seq = []
     for bi, toks in enumerate([b.split() for b in music.split("|")]):
         sp.bar(); t, parts, mk, prev8, root, notes = 0.0, [], "", None, None, []
         for tok in toks:
@@ -803,11 +803,12 @@ def parse_part(it, music, bpb, wk, below):
                 if d == 0.5 and prev8 is not None and int(prev8) == int(t): parts[-1] += txt       # two eighths in one beat share a beam
                 else: parts.append(txt)
                 prev8 = t if d == 0.5 else None
-                if held and held[1] == sounding: held[2] += d
-                else: held = [bi * bpb + t, sounding, d, 90]; ev.append(held)
+                if held and held[1] == sounding: held[2] += d; seq.append(-1)             # tied on: nothing new to play
+                else: held = [bi * bpb + t, sounding, d, 90]; ev.append(held); seq.append(sounding)
                 if not tie: held = None
             t = round(t + d, 6)
         abc.append(" ".join(parts)); marks.append(mk); roots.append(root)
+    parse_part.seq = seq                                             # Learn mode: the sounding pitch of each written note, in order
     return ev, abc, marks, roots
 
 PIANO = re.compile(r"<([^>]+)>(\d+\.?)|([a-g](?:is|es)?[',]*)(\d+\.?)|r(\d+\.?)")
@@ -832,14 +833,14 @@ def to_tune(it, chapter):
     drone = it["title"].lower().startswith("long tone"); tune_like = bool(it.get("src")) or bool(it.get("b"))
     music = it["music"] + (" | " + it["music"] if it.get("repeat") else "")
     if it.get("rep"): bs = music.split("|"); music = "|".join(bs[:it["rep"]] + bs)
-    ev, abc, marks, roots = parse_part(it, music, bpb, wk, below)
+    ev, abc, marks, roots = parse_part(it, music, bpb, wk, below); seq = parse_part.seq
     chords, last = [], (wk.pc - below) % 12
     for r in roots:
         if r is not None: last = r
         rr = last if drone else (wk.pc - below) % 12
         chords.append([dict(sym=PCS[rr], beats=bpb, root=rr, degs=[0, 2, 4, 5, 7, 9, 11], scale="Ionian (major)")])
     T = it.get("tempo") or (60 if drone else (84 if bpb == 3 else 76) if tune_like else 66)   # the player opens at this tempo; the presets go up from it
-    sec = dict(id="notes", title="Notes", tab="Notes", desc=(it.get("about") or it.get("sub") or "").rstrip("."), rh=ev, lh=[], abc=dict(rh=abc, marks=marks))
+    sec = dict(id="notes", title="Notes", tab="Notes", desc=(it.get("about") or it.get("sub") or "").rstrip("."), rh=ev, lh=[], abc=dict(rh=abc, marks=marks), learn=seq)
     tune = dict(format="aam-tune/1", slug=slug_of(it), title="%d · %s" % (it["_no"], it["title"]), subtitle="Saxophone Beginner Booklet · " + chapter,
                 instrument=ED, concert_key=PCS[(wk.pc - below) % 12], native=g.INSTRUMENTS[ED][1] % 12, style="drone" if drone else "click", keys="off",
                 hide=["chords", "solo", "names"], hear=True, first_bar=1, chart_tempo=T, tempo_presets=[T, T + 20, T + 40], form=[], bars=chords, sections=[sec],
