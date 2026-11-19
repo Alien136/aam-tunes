@@ -122,7 +122,7 @@ def main(spec_path, repo):
     idx = json.load(open(ip)) if os.path.exists(ip) else dict(format="aam-index/1", owner="aam", pdfs=[], tunes={})
     norm = re.sub(r"[^A-Z0-9]", "", pdf["code"].upper())
     h = hashlib.sha256(("aam:" + norm).encode()).hexdigest()
-    clash = [p["id"] for p in idx["pdfs"] if p["hash"] == h and p["id"] != pdf["id"]]
+    clash = [p["id"] for p in idx["pdfs"] if p.get("hash") == h and p["id"] != pdf["id"]]
     assert not clash, "that code is already used by " + clash[0]
     contents, slugs = [], []
     for ch in spec["contents"]:

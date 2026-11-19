@@ -890,7 +890,7 @@ function aamBoot(TUNE) {
   if (!views.length) views.push({ id: "chords", title: "Chord chart", sm: "Chords" });
   state.view = views[0].id;                                    // a tune opens on the chord chart; an exercise on its first page
   if (TUNE.open_on && views.some(function (v) { return v.id === TUNE.open_on; })) state.view = TUNE.open_on;   // unless the tune names its opening page
-  state.hear = !!window.AAM_DEMO || TUNE.style === "solo";     // the public demo and written piano pieces play the music from the start
+  state.hear = !!window.AAM_DEMO || TUNE.style === "solo" || TUNE.hear === true;     // the public demo and written piano pieces play the music from the start
   var score = $("score"), measures = [], perShown = 0;
   views.forEach(function (v) {
     var b = document.createElement("button"); b.innerHTML = '<span class="lg">' + v.title + '</span><span class="sm">' + v.sm + "</span>"; b.dataset.view = v.id;

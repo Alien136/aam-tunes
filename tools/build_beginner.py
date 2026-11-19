@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 """Alex Attard Music: Saxophone Beginner Booklet (one edition for alto and tenor: both read the same written notes).
 
-  python3 tools/build_beginner.py            ->  tools/out/Sax_Beginner_Booklet.pdf
+  python3 tools/build_beginner.py                                   ->  tools/out/Sax_Beginner_Booklet.pdf (no QR codes)
+  python3 tools/build_beginner.py alto --code SBA-0000 [--publish /path/to/aam-tunes]
+                                                                    ->  tools/out/Sax_Beginner_Booklet_Alto.pdf, with a QR on the cover
+                                                                        and on every unit; --publish also writes one player tune per
+                                                                        numbered line and the booklet's shelf in index.json
+The code is given on the command line and never stored in the repository (index.json keeps only its hash).
 
 The book before the Welcome Booklet. Eight units; each one adds one to three notes (with the fingering diagram from the
 Welcome Booklet's chart), long tones on the new notes, short drills, then tunes that use only the notes learned so far.
@@ -9,12 +14,17 @@ New ideas sit in colour-coded boxes at the top of the unit: amber = new note, bl
 red = new word. All of it is one ReportLab canvas; every line of music is engraved by LilyPond to a PNG and placed.
 The curriculum is the UNITS list below: edit a line there and rebuild.
 """
-import hashlib, os, re, subprocess, sys
+import hashlib, io, json, os, re, subprocess, sys
 from concurrent.futures import ThreadPoolExecutor
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-sys.argv = [sys.argv[0], "alto"]
+ARGS = sys.argv[1:]
+ED = ARGS[0] if ARGS and ARGS[0] in ("alto", "tenor") else None
+CODE = ARGS[ARGS.index("--code") + 1] if "--code" in ARGS else None
+REPO = ARGS[ARGS.index("--publish") + 1] if "--publish" in ARGS else None
+sys.argv = [sys.argv[0], ED or "alto"]
 import build_book as B                                              # fonts, colours, key diagram, drawn saxophone
+import publish_exercise as PX                                       # ABC spelling for the player
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.colors import HexColor, white
@@ -36,8 +46,8 @@ LINE_MM = 176.0
 # ---------------------------------------------------------------- the curriculum
 # music: LilyPond, absolute pitch, bars separated by "|".  names: print letter names under the notes.
 # hl: notes to print in amber (the new notes, where they first appear).  bpl: bars per line.  src: where the tune was checked.
-def L(title, music, sub="", key="c", time="4/4", names=False, hl=(), bpl=4, partial=None, lyr=None, src=None):
-    return dict(type="line", title=title, music=music, sub=sub, key=key, time=time, names=names, hl=set(hl), bpl=bpl, partial=partial, lyr=lyr, src=src)
+def L(title, music, sub="", key="c", time="4/4", names=False, hl=(), bpl=4, partial=None, lyr=None, src=None, tempo=None):
+    return dict(type="line", title=title, music=music, sub=sub, key=key, time=time, names=names, hl=set(hl), bpl=bpl, partial=partial, lyr=lyr, src=src, tempo=tempo)
 
 WIKI = "checked against the notation in Wikipedia"
 MEM = "written from memory: check"
@@ -144,6 +154,7 @@ SCALES = [("G major", "g", "g'4 a' b' c'' | d'' e'' fis'' g'' | g'' fis'' e'' d'
           ("F major", "f", "f'4 g' a' bes' | c'' d'' e'' f'' | f'' e'' d'' c'' | bes' a' g' f' | f'4 a' c'' f'' | c'' a' f'2"),
           ("C major", "c", "c'4 d' e' f' | g' a' b' c'' | c'' b' a' g' | f' e' d' c' | c'4 e' g' c'' | g' e' c'2"),
           ("D major", "d", "d'4 e' fis' g' | a' b' cis'' d'' | d'' cis'' b' a' | g' fis' e' d' | d'4 fis' a' d'' | a' fis' d'2")]
+SCALE_LINES = [L(name + " scale and arpeggio", music, key=key, bpl=3, tempo=60) for name, key, music in SCALES]
 CHART = ["c'", "d'", "e'", "f'", "fis'", "g'", "a'", "bes'", "b'", "c''", "cis''", "d''", "e''", "f''", "fis''", "g''"]
 
 # ---------------------------------------------------------------- LilyPond helpers
@@ -216,8 +227,8 @@ def para_h(text, w, style=P_BODY):
 class Page:
     """Collects blocks (height, draw) for one unit and flows them over pages, spreading spare room between blocks."""
     def __init__(self, c, book): self.c, self.book, self.blocks = c, book, []
-    def add(self, h, draw, gap=10): self.blocks.append((h, draw, gap))
-    def flush(self, kicker, title):
+    def add(self, h, draw, gap=10, it=None): self.blocks.append((h, draw, gap, it))
+    def flush(self, kicker, title, qr=None):
         """Fewest pages that fit (gaps may shrink a little), blocks shared out evenly, spare room spread between blocks."""
         import itertools
         c, hs, gs = self.c, [b[0] for b in self.blocks], [b[2] for b in self.blocks]
@@ -235,13 +246,15 @@ class Page:
         edges = best[1]
         for k, (a, b) in enumerate(zip(edges, edges[1:])):
             ytop = B.header(c, kicker, title if k == 0 else title + " (continued)") + 8
+            if k == 0 and qr: qr(c)
             nat = need(a, b); f, extra = 1.0, 0.0
             if nat > R: f = (R - sum(hs[a:b])) / max(1e-9, sum(gs[a + 1:b]))
             elif b - a > 1: extra = min(26, (R - nat) / (b - a - 1))
             y = ytop
             for q in range(a, b):
-                h, draw, gap = self.blocks[q]
+                h, draw, gap, it = self.blocks[q]
                 if q > a: y -= gap * f + extra
+                if it is not None: it["_page"] = self.book.n
                 draw(c, y); y -= h
             self.book.footer(); c.showPage()
         self.blocks = []
@@ -282,7 +295,7 @@ def concept_h(w, text): return para_h(text, w - 26)[1] + 36
 
 def music_block(book, pg, it, png):
     im = ImageReader(png); iw, ih = im.getSize(); w = iw * 72 / 300; h = ih * 72 / 300
-    book.line_no += 1; no = book.line_no
+    book.line_no += 1; no = book.line_no; it["_no"] = no
     def draw(c, y, no=no):
         c.setFillColor(HexColor(SLATE)); c.roundRect(M, y - 14, 20, 14, 4, fill=1, stroke=0)
         c.setFillColor(white); c.setFont("Pop-B", 8.4); c.drawCentredString(M + 10, y - 10.6, str(no))
@@ -293,7 +306,7 @@ def music_block(book, pg, it, png):
             c.setFillColor(HexColor(MUTED)); B.draw_mixed(c, x + tw + 9, y - 11, it["sub"], "DJ", 8.4)
         c.setStrokeColor(HexColor("#B9C2CB")); c.setLineWidth(0.9); c.roundRect(W - M - 12, y - 13.5, 12, 12, 2.5, fill=0, stroke=1)   # tick it when you can play it
         c.drawImage(im, M - 1, y - 18 - h, w, h)
-    pg.add(18 + h, draw, gap=9)
+    pg.add(18 + h, draw, gap=9, it=it)
 
 def blank_staff_png():
     return render(ly_line(dict(music="", key="c", time="4/4"), blank=True), "blank")
@@ -340,7 +353,111 @@ def build_unit(book, k, u):
                     c.setStrokeColor(HexColor(SLATE)); c.setLineWidth(0.9); c.setFillColor(white); c.roundRect(M + 14, yy - 2, 10, 10, 2, fill=1, stroke=1)
                     c.setFillColor(HexColor(SLATE)); B.draw_mixed(c, M + 31, yy, t, "DJ", 9.4)
             pg.add(hh, draw, gap=12)
-    pg.flush("Unit %d" % (k + 1), u["title"])
+    first = next(it for it in u["lines"] if it["type"] == "line")
+    pg.flush("Unit %d" % (k + 1), u["title"], qr=(lambda c: unit_qr(c, first)) if CODE else None)
+
+# ---------------------------------------------------------------- the player: one tune per numbered line
+PLAY = "https://alexattardmusic.com/play/"
+BELOW = {"alto": 9, "tenor": 14}
+PCS = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"]
+SLUGS = {}
+def slug_of(it):
+    if id(it) not in SLUGS:
+        base = "sax-beginner-%s-" % ED + re.sub(r"[^a-z0-9]+", "-", it["title"].lower().replace("♯", " sharp").replace("♭", " flat").replace("è", "e")).strip("-")
+        s, k = base, 2
+        while s in SLUGS.values(): s = "%s-%d" % (base, k); k += 1
+        SLUGS[id(it)] = s
+    return SLUGS[id(it)]
+def qr_img(slug):
+    import qrcode
+    q = qrcode.QRCode(border=2, box_size=10, error_correction=qrcode.constants.ERROR_CORRECT_M)
+    q.add_data(PLAY + "?t=" + slug + "&c=" + re.sub(r"[^A-Z0-9]", "", CODE.upper())); q.make(fit=True)
+    buf = io.BytesIO(); q.make_image(fill_color=SLATE, back_color="white").save(buf, format="PNG"); buf.seek(0); return ImageReader(buf)
+def unit_qr(c, first):
+    qs = 62; qx = W - M - qs + 3; qy = H - 30 - qs
+    c.drawImage(qr_img(slug_of(first)), qx, qy, qs, qs)
+    c.setFillColor(HexColor(AMBER)); c.setFont("Pop-B", 5.6); c.drawCentredString(qx + qs / 2, qy - 5, " ".join("PLAY ALONG") + "  ·  " + CODE)
+
+LTOK = re.compile(r"^([a-g])(is|es)?([',]*)(\d*\.*)([~()]*)$")
+BEATS = {"1": 4.0, "2": 2.0, "2.": 3.0, "4": 1.0, "4.": 1.5, "8": 0.5}
+def rest_abc(d):
+    out = []
+    for step in (4.0, 3.0, 2.0, 1.0, 0.5):
+        while d >= step - 1e-9: out.append("z" + PX.LEN[step]); d -= step
+    return out
+def to_tune(it, chapter):
+    """One numbered line as a player tune: the written notes on screen, a click (or a drone under long tones), and the notes played back."""
+    import gen_study as g
+    bpb = int(it["time"][0]); wkey = it["key"].upper(); below = BELOW[ED]
+    wk = g.parse_note(wkey); sp = PX.Abc(PX.keysig(wk, False))
+    drone = it["title"].lower().startswith("long tone"); tune_like = bool(it.get("src"))
+    bars = [b.split() for b in it["music"].split("|")]
+    ev, abc, marks, chords, held, dur, last_root = [], [], [], [], None, "4", (wk.pc - below) % 12
+    for bi, toks in enumerate(bars):
+        sp.bar(); t, parts, mk, prev8, root = 0.0, [], "", None, None
+        notes = []
+        for tok in toks:
+            if tok == "~": notes[-1][2] = True; continue
+            m = re.match(r"^r(\d+\.?)?$", tok)
+            if m: dur = m.group(1) or dur; notes.append(["r", BEATS[dur], False, "", ""]); continue
+            m = LTOK.match(tok); assert m, (it["title"], tok)
+            if m.group(4): dur = m.group(4)
+            n = g.Note(m.group(1).upper(), {"is": 1, "es": -1, None: 0}[m.group(2)], 3 + m.group(3).count("'") - m.group(3).count(","))
+            notes.append([n, BEATS[dur], "~" in m.group(5), "(" if "(" in m.group(5) else "", ")" if ")" in m.group(5) else ""])
+        total = sum(x[1] for x in notes)
+        if total < bpb - 1e-9:                                       # a pick-up bar gets rests in front, a short last bar gets them behind
+            pad = [["r", d, False, "", ""] for d in [{"z8": 4.0, "z6": 3.0, "z4": 2.0, "z2": 1.0, "z": 0.5}[z] for z in rest_abc(bpb - total)]]
+            notes = pad + notes if bi == 0 else notes + pad
+        assert abs(sum(x[1] for x in notes) - bpb) < 1e-9, (it["title"], "bar %d" % (bi + 1))
+        for n, d, tie, so, sc in notes:
+            if n == "r":
+                parts.append("z" + PX.LEN[d]); held = None; prev8 = None
+            else:
+                sounding = n.midi - below
+                if root is None: root = sounding % 12
+                txt = so + sp.note(n) + PX.LEN[d] + ("-" if tie else "") + sc; mk += "."
+                if d == 0.5 and prev8 is not None and int(prev8) == int(t): parts[-1] += txt       # two eighths in one beat share a beam
+                else: parts.append(txt)
+                prev8 = t if d == 0.5 else None
+                if held and held[1] == sounding: held[2] += d
+                else: held = [bi * bpb + t, sounding, d, 90]; ev.append(held)
+                if not tie: held = None
+            t = round(t + d, 6)
+        abc.append(" ".join(parts)); marks.append(mk)
+        if root is not None: last_root = root
+        r = last_root if drone else (wk.pc - below) % 12
+        chords.append([dict(sym=PCS[r], beats=bpb, root=r, degs=[0, 2, 4, 5, 7, 9, 11], scale="Ionian (major)")])
+    T = it.get("tempo") or (60 if drone else (84 if bpb == 3 else 76) if tune_like else 66)   # the player opens at this tempo; the presets go up from it
+    sec = dict(id="notes", title="Notes", tab="Notes", desc=(it.get("sub") or "").rstrip("."), rh=ev, lh=[], abc=dict(rh=abc, marks=marks))
+    tune = dict(format="aam-tune/1", slug=slug_of(it), title="%d · %s" % (it["_no"], it["title"]), subtitle="Saxophone Beginner Booklet · " + chapter,
+                instrument=ED, concert_key=PCS[(wk.pc - below) % 12], native=g.INSTRUMENTS[ED][1] % 12, style="drone" if drone else "click", keys="off",
+                hide=["chords", "solo", "names"], hear=True, first_bar=1, chart_tempo=T, tempo_presets=[T, T + 20, T + 40], form=[], bars=chords, sections=[sec],
+                notation=dict(key=wkey, staves="treble"), page=it["_page"])
+    if bpb != 4: tune["meter"] = [bpb, 4]
+    if it.get("src"): tune["source"] = it["src"]
+    return tune
+
+def publish(repo):
+    pdf_id = "sax-beginner-" + ED; title = "Saxophone Beginner Booklet · " + {"alto": "Alto", "tenor": "Tenor"}[ED]
+    ip = os.path.join(repo, "index.json"); idx = json.load(open(ip))
+    h = hashlib.sha256(("aam:" + re.sub(r"[^A-Z0-9]", "", CODE.upper())).encode()).hexdigest()
+    clash = [p["id"] for p in idx["pdfs"] if p.get("hash") == h and p["id"] != pdf_id]; assert not clash, "that code is already used by " + clash[0]
+    contents, slugs = [], []
+    groups = [("Unit %d · %s" % (k + 1, u["title"]), [it for it in u["lines"] if it["type"] == "line"]) for k, u in enumerate(UNITS)] + [("Finish · Four scales", SCALE_LINES)]
+    old = next((p for p in idx["pdfs"] if p["id"] == pdf_id), None)
+    for ch, lines in groups:
+        items = []
+        for it in lines:
+            t = to_tune(it, ch); json.dump(t, open(os.path.join(repo, "tunes", t["slug"] + ".json"), "w"), ensure_ascii=False, separators=(",", ":"))
+            idx["tunes"][t["slug"]] = dict(title=t["title"], subtitle=t["subtitle"]); items.append(t["slug"]); slugs.append(t["slug"])
+        contents.append(dict(title=ch, items=items))
+    for gone in set(old["tunes"]) - set(slugs) if old else ():      # a line that was renamed or removed
+        idx["tunes"].pop(gone, None); f = os.path.join(repo, "tunes", gone + ".json"); os.path.exists(f) and os.remove(f)
+    entry = dict(id=pdf_id, title=title, hash=h, tunes=slugs, contents=contents)
+    rest = [p for p in idx["pdfs"] if p["id"] != pdf_id]; at = next((i for i, p in enumerate(rest) if p.get("free")), len(rest))
+    idx["pdfs"] = rest[:at] + [entry] + rest[at:]
+    json.dump(idx, open(ip, "w"), ensure_ascii=False, indent=1)
+    print("published %d tunes for %s" % (len(slugs), title))
 
 # ---------------------------------------------------------------- front and back pages
 def cover(book):
@@ -352,7 +469,7 @@ def cover(book):
     c.setFillColor(HexColor(AMBER)); c.setFont("Pop-B", 11); c.drawString(M, H - 110, " ".join("ALEX ATTARD MUSIC"))
     c.setFillColor(white); c.setFont("Pop-B", 50); c.drawString(M, H - 198, "Saxophone")
     c.setFont("Pop-L", 38); c.drawString(M, H - 244, "Beginner Booklet")
-    c.setFillColor(HexColor(AMBER)); c.setFont("Pop-M", 17); c.drawString(M, H - 284, "Alto and Tenor Saxophone")
+    c.setFillColor(HexColor(AMBER)); c.setFont("Pop-M", 17); B.draw_mixed(c, M, H - 284, {"alto": "E♭ Alto Saxophone", "tenor": "B♭ Tenor Saxophone", None: "Alto and Tenor Saxophone"}[ED], "Pop-M", 17)
     top, bot = H - band - 44, 92
     c.setFillColor(HexColor(TINT)); c.roundRect(M, bot, CW, top - bot, 10, fill=1, stroke=0)
     c.setFillColor(HexColor(AMBER)); c.rect(M, bot, 5, top - bot, fill=1, stroke=0)
@@ -360,7 +477,15 @@ def cover(book):
     c.setFillColor(HexColor(SLATE)); c.setFont("Pop-B", 20); c.drawString(M + 30, y, "Your first notes start here.")
     p, ph = para_h("This book takes you from your very first sound to real tunes, one or two new notes at a time. Every unit starts with long tones, "
                    "adds a new idea, and ends with music you already know. Keep it on your stand, play a little every day, and bring it to every lesson.",
-                   CW - 60, ParagraphStyle("cv", parent=B.body, fontSize=13, leading=20)); p.drawOn(c, M + 30, y - 18 - ph)
+                   CW - 60 - (150 if CODE else 0), ParagraphStyle("cv", parent=B.body, fontSize=11.8 if CODE else 13, leading=18 if CODE else 20)); p.drawOn(c, M + 30, y - 18 - ph)
+    if CODE:
+        qs = 104; qx = W - M - 24 - qs; qy = (top + bot) / 2 - qs / 2 + 30
+        c.setFillColor(white); c.roundRect(qx - 6, qy - 6, qs + 12, qs + 12, 8, fill=1, stroke=0)
+        c.drawImage(qr_img(slug_of(UNITS[0]["lines"][0])), qx, qy, qs, qs)
+        c.setFillColor(HexColor(AMBER)); c.setFont("Pop-B", 8.5); c.drawCentredString(qx + qs / 2, qy - 22, " ".join("PLAY ALONG"))
+        c.setFillColor(HexColor(SLATE)); c.setFont("Pop-B", 15); c.drawCentredString(qx + qs / 2, qy - 41, CODE)
+        c.setFillColor(HexColor(MUTED)); c.setFont("DJ", 7.4); c.drawCentredString(qx + qs / 2, qy - 55, "Scan, or type this code at"); c.drawCentredString(qx + qs / 2, qy - 65, "alexattardmusic.com/play")
+        c.setFillColor(HexColor(SLATE))
     c.setFont("Pop-M", 14); c.drawString(M + 30, y - 18 - ph - 28, "Alex")
     c.setFillColor(HexColor(AMBER)); c.rect(0, 0, W, 6, fill=1, stroke=0)
     c.setFillColor(HexColor(SLATE)); c.setFont("Pop-M", 11); c.drawString(M, 40, "Alex Attard Music")
@@ -455,8 +580,7 @@ def scales_page(book):
     p, ph = para_h("You now know every note in four major scales. Play one each day as part of your warm-up: the scale up and down, then its <b>arpeggio</b> (notes 1, 3, 5 and 8). "
                    "When all four are easy at ♩ = 80, you are ready for the <b>Saxophone Welcome Booklet</b>: every key, faster fingers and your first jazz.", CW, ParagraphStyle("sb", parent=B.body, fontSize=10.4, leading=15))
     pg.add(ph, lambda c, y: p.drawOn(c, M, y - ph), gap=14)
-    for name, key, music in SCALES:
-        it = L(name + " scale and arpeggio", music, key=key, bpl=3); music_block(book, pg, it, render(ly_line(it), "line"))
+    for it in SCALE_LINES: music_block(book, pg, it, render(ly_line(it), "line"))
     def cert(c, y):
         h = 96; c.setFillColor(HexColor(TINT)); c.roundRect(M, y - h, CW, h, 10, fill=1, stroke=0); c.setFillColor(HexColor(AMBER)); c.rect(M, y - h, 5, h, fill=1, stroke=0)
         c.setFillColor(HexColor(SLATE)); c.setFont("Pop-B", 16); c.drawString(M + 24, y - 30, "Beginner Booklet complete")
@@ -493,7 +617,8 @@ def main():
     items = [it for u in UNITS for it in u["lines"] if it["type"] == "line"]
     with ThreadPoolExecutor(8) as ex:
         for it, png in zip(items, ex.map(lambda it: render(ly_line(it), "line"), items)): PNGS[id(it)] = png
-    out = os.path.join(B.OUT, "Sax_Beginner_Booklet.pdf")
+    assert not (CODE or REPO) or ED, "give the edition (alto or tenor) with --code or --publish"
+    out = os.path.join(B.OUT, "Sax_Beginner_Booklet%s.pdf" % ("_" + ED.capitalize() if ED else ""))
     # two passes: the first finds the page numbers for the progress table
     toc = []
     for final in (False, True):
@@ -504,6 +629,7 @@ def main():
         scales_page(book); chart_page(book); book.c.save()
         toc = [t for t in book.toc if t[0].startswith("Unit")]
     print(out, book.n - 1, "pages,", book.line_no, "numbered lines")
+    if REPO: publish(REPO)
     for t, s in sources_text(): print("  %-34s %s" % (t, s))
 
 if __name__ == "__main__":
