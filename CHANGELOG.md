@@ -10,9 +10,17 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+
+### Fixed
+
+### Prevented
+
+## v1.2 · 2026-11-20
+
+### Added
 - Free Saxophone Starter Pack (alto and tenor): the Beginner Booklet under its own code, with a last page inviting the free first lesson. It opens the same play-along lines as the Beginner Booklet and has its own PDF download.
 - Install on phone: the player page carries a home-screen icon, a name and the full-screen flag, and Practice settings has "Add to your home screen" with the steps for the phone in hand. (Working with no signal needs one file uploaded to the website; not done yet.)
-- Four more band styles: Slow Swing, Samba, Afro-Cuban and Shuffle Blues (nine in all).
+- (Test copy only, not offered to students yet) four more band styles waiting for Alex's ear: Slow Swing, Samba, Afro-Cuban, Shuffle Blues.
 - Learn mode on piano pages, one hand at a time: tap Learn, choose Right hand or Left hand, and it follows that staff. A hand with a few chords is fine (any note of the chord counts); a hand that is all chords is not offered.
 
 ### Changed

@@ -267,3 +267,9 @@ Everything needed to carry on from any conversation is in this repository and in
 - `pdfOf(slug)` now prefers a booklet the student has unlocked when two booklets share a tune. Without it a Starter Pack reader is
   shown the Beginner Booklet's shelf and cannot download the PDF: the released player (v1.1) does NOT have this yet, so release the
   test copy before the Starter Pack is given to anyone. The PDF check opens a shared shelf as a student who unlocked that booklet.
+
+## 2026-11-20 · v1.2
+- Alex said ship. Released: the Starter Pack shelf fix (`pdfOf`), Learn mode on piano pages, install on phone (icon, full
+  screen, steps), the metronome's band switch. The four styles nobody has heard (`slow`, `samba`, `afro`, `shuffle`) carry
+  `beta: true` in `BAND` and are listed by the picker only in the test copy; remove the flag per style when Alex approves it.
+- The free lesson is 30 minutes (Alex, 20 Nov), as printed on the Starter Pack's last page and in email 4.
