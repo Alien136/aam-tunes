@@ -88,6 +88,14 @@ A second booklet for the same instrument reuses that instrument's chart, cover d
 - Nothing from the microphone is recorded or sent anywhere. The sounds credit stays. US spelling. No new outside script or font.
 - Then run the full check (below). Tell Alex exactly where to tap in beta to see it.
 
+## Adding a band style (a Player job)
+
+One style a night. Add one entry to `BAND` in the player (see STATUS.md, "Band styles"): drum grid, bass rule, comping rhythms,
+swing amount. Base the patterns on what the style's players actually do and name two recordings or method-book sources you checked
+in the log. A new bass rule goes in `bandParts`. Use only sounds that are in `sounds/` (a style that needs new sounds waits for the
+sound-set row). The `style` check group must pass for the new style without being edited. Nobody on this side can hear it: every
+new style gets a Needs Alex line "Listen to <style> in beta", and it is never called finished until he has.
+
 ## The brand and style pass (Saturdays)
 
 Render every booklet's PDF from its generator. Compare with the brand rules: slate #2F3E4E, amber #D4922A, tint #FBF1E1, muted

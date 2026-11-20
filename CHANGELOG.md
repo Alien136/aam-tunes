@@ -10,6 +10,7 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- Band styles: a picker beside the instrument's name (and in Practice settings) changes the band while it plays. Five styles to start: Medium Swing, Two-Feel, Up-Tempo Swing, Bossa Nova, Straight Ballad. The choice is remembered per tune.
 
 ### Fixed
 

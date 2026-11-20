@@ -186,3 +186,21 @@ Everything needed to carry on from any conversation is in this repository and in
   My tunes list, so generators keep writing it.
 - Check: the play bar group of `tools/check_features.js` also checks the icon and name at four sizes and on a piano tune.
 - "Ship now" and "Beta" requests from Alex: see BUILDER.md.
+
+## 2026-11-20 · Band styles (beta, not released)
+- `BAND` in the player is the table of styles: `sw` (how late an off-beat eighth is, in ticks), `drums` (one grid per bar, cycled:
+  `[sound, beat, loudness, classic-kit dB, chance]`), `bass` (a rule: `walk`, `two`, `bossa`), `comp` and `half` (comping rhythms for
+  a chord that lasts a bar / half a bar), `kit` (extra drum sounds). `bandParts(S)` writes the bass and chords; one generic block in
+  `scheduleMusic()` plays any table style. Medium Swing (`swing`) and Straight Ballad (`ballad`, the old "straight" feel) keep their
+  own hand-tuned code and are only gated by name. Every style is scheduled up front and gated on the variable `band`, so the
+  style can change while the band plays.
+- A tune can name its style with `"band": "<id>"`; the older `"feel": "straight"` still means the ballad. The student's choice is
+  kept in localStorage `aam-band` per tune (`aam-feel` is read once for old choices).
+- The swing of the written "Hear it" line follows the style playing (`SW`).
+- Picker: `st-pill` (`data-r="style-btn"`) beside the instrument name, the `feel` chip in Practice settings ("Style: ..."), dialog
+  `stdlg`. Only for band tunes (`style` absent or "swing"). Analytics event `aam_style` (style).
+- Sounds: the closed hi-hat `hhc` (already in sounds/v2) is now loaded for band tunes. Styles that need an electric bass, a pop
+  kit, percussion or an electric piano need a new sound set (`sounds/v3`). The band is still 4/4 only.
+- Check group `style` in `tools/check_features.js`: every style sounds, its name fits on a phone, the choice is remembered,
+  exercises have no picker.
+- NOT judged by ear: nobody has listened to Two-Feel, Up-Tempo or Bossa yet. Alex listens in beta before a release.

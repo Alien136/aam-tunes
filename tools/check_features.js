@@ -9,10 +9,11 @@
      PDF download     the newest booklet PDF arrives and really is a PDF
      play bar         Play is in the exact middle and nothing overlaps, at four screen sizes; the phone tempo wheel sets the tempo;
                       the instrument icon and name sit under the title
+     style            the style picker lists the band styles, each one sounds, the choice is remembered, exercises have none
 
    The microphone is a sound file: saxophone-like tones are generated here and fed to the browser as a fake microphone.
 
-   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|learn|cloud|contents|pdf|bar]
+   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|learn|cloud|contents|pdf|bar|style]
    Needs:  playwright, plus the tone and abcjs packages (tools/node_modules or $AAM_NODE_MODULES). Nothing is fetched from the internet. */
 const fs = require("fs"), path = require("path"), os = require("os");
 const { chromium, devices } = require("playwright");
@@ -183,9 +184,33 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       await page.context().close();
     }
   }
+  if (want("style")) {                                      // band styles: the picker, each style sounds, the choice is remembered, exercises have none
+    const TEN = fs.readdirSync(path.join(ROOT, "tunes")).map(f => f.replace(/\.json$/, "")).find(sl => { const t = tune(sl); return t.instrument === "tenor" && (!t.style || t.style === "swing"); });
+    const ctx = await b.newContext({ ...devices["iPhone 13"] }); await wire(ctx); const page = await ctx.newPage(); page.on("pageerror", e => expect(false, "script error: " + e.message));
+    await page.addInitScript(() => { window.__starts = 0; const o = AudioBufferSourceNode.prototype.start; AudioBufferSourceNode.prototype.start = function () { window.__starts++; return o.apply(this, arguments); }; });
+    await page.goto(URL_OF(TEN)); await page.waitForTimeout(2200);
+    const ids = await (async () => { await page.click('[data-r="style-btn"]'); const x = await page.$$eval('[data-r="st-list"] button', bs => bs.map(e => e.dataset.id)); await page.click('[data-r="st-close"]'); return x; })();
+    expect(ids.length >= 5 && ids[0] === "swing", "style picker: lists the styles, Medium Swing first (" + ids.length + ")");
+    await page.click('[data-r="p-play"]'); await page.waitForTimeout(7000);
+    for (const id of ids) {
+      await page.click('[data-r="style-btn"]'); await page.click('[data-r="st-list"] button[data-id="' + id + '"]'); await page.click('[data-r="st-close"]');
+      const a0 = await page.evaluate(() => window.__starts); await page.waitForTimeout(3500); const n = await page.evaluate(() => window.__starts) - a0;
+      const fit = await page.evaluate(() => { const p = document.querySelector('[data-r="style-btn"]').getBoundingClientRect(), all = [...document.querySelectorAll("#aam-play .head button, #aam-play .head a")].filter(e => e.offsetParent && !e.closest('[data-r="subtitle"]')).map(e => e.getBoundingClientRect());
+        return p.right <= innerWidth && !all.some(r => p.right > r.left + 1 && p.left < r.right - 1 && p.bottom > r.top + 1 && p.top < r.bottom - 1); });
+      expect(n >= 12, "style " + id + ": the band plays (" + n + " sounds in 3.5 s)");
+      expect(fit, "style " + id + ": its name fits beside the instrument on a phone");
+    }
+    await page.click('[data-r="p-play"]');
+    await page.click('[data-r="style-btn"]'); await page.click('[data-r="st-list"] button[data-id="bossa"]'); await page.click('[data-r="st-close"]');
+    await page.reload(); await page.waitForTimeout(2200);
+    expect((await page.textContent('[data-r="style-btn"]')) === "Bossa Nova", "style: the choice is remembered for the tune");
+    await page.goto(URL_OF(HCB)); await page.waitForTimeout(1800);
+    expect(!(await page.$('[data-r="style-btn"]')), "style: an exercise with a click has no style picker");
+    await ctx.close();
+  }
   if (want("bar")) {                                        // a piano page shows the piano
     const page = await open({ viewport: { width: 390, height: 844 } }, "winter-wonderland-piano");
-    const who = await page.evaluate(() => { const e = document.querySelector('[data-r="subtitle"]'); return e.getAttribute("data-inst") + "|" + e.textContent.trim(); });
+    const who = await page.evaluate(() => { const e = document.querySelector('[data-r="subtitle"]'); return e.getAttribute("data-inst") + "|" + e.querySelector('[data-r="inst-name"]').textContent.trim(); });
     expect(who === "piano|Piano", "under the title of a piano tune: the piano icon and \"Piano\"");
     await page.context().close();
   }
