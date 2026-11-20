@@ -297,6 +297,14 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     expect(dlg.open && /Share/.test(dlg.steps) && /Add to Home Screen/.test(dlg.steps), "install: on an iPhone the steps say Share, then Add to Home Screen");
     expect(/[?&]t=sax-beginner-alto-hot-cross-buns/.test(dlg.url) && /[?&]c=\w+/.test(dlg.url), "install: the address now names this tune and its code, so the icon opens it unlocked");
     await page.context().close();
+    const ctxA = await b.newContext({ ...devices["iPhone 13"] }); await wire(ctxA);                       // the same page opened from the home screen
+    await ctxA.addInitScript(() => { const mm = window.matchMedia.bind(window); window.matchMedia = q => /display-mode: standalone/.test(q) ? { matches: true, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} } : mm(q); });
+    const pa = await ctxA.newPage(); await pa.goto(URL_OF(HCB)); await pa.waitForTimeout(1800);
+    const appv = await pa.evaluate(() => { const bar = document.querySelector('[data-r="pbar"]'), pl = document.querySelector('[data-r="p-play"]').getBoundingClientRect(), sc = document.querySelector(".score").getBoundingClientRect();
+      return { gap: Math.round(innerHeight - pl.bottom), fit: /viewport-fit=cover/.test((document.querySelector('meta[name="viewport"]') || {}).content || "") || !document.querySelector('meta[name="viewport"]'), clear: sc.bottom <= bar.getBoundingClientRect().top + 1, btn: document.querySelector('[data-r="install-btn"]').hidden }; });
+    expect(appv.gap >= 24 && appv.clear, "from the home screen: the play bar keeps clear of the bottom edge and the music stops above it (" + appv.gap + " px under Play)");
+    expect(appv.btn, "from the home screen: the \"Add to your home screen\" button is not shown again");
+    await ctxA.close();
     const sw = fs.readFileSync(path.join(app, "sw.js"), "utf8");
     expect(/r\.mode === "navigate"/.test(sw) && /"\/play"/.test(sw) && !/respondWith\(fetch\(r\)\)/.test(sw), "install: the offline file only answers the play page and the player's own files");
   }

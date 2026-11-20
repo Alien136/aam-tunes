@@ -273,3 +273,9 @@ Everything needed to carry on from any conversation is in this repository and in
   screen, steps), the metronome's band switch. The four styles nobody has heard (`slow`, `samba`, `afro`, `shuffle`) carry
   `beta: true` in `BAND` and are listed by the picker only in the test copy; remove the flag per style when Alex approves it.
 - The free lesson is 30 minutes (Alex, 20 Nov), as printed on the Starter Pack's last page and in email 4.
+
+## 2026-11-20 · Beta: the play bar from the home screen
+- Alex added the test player to his iPhone's home screen: icon and full screen work. The play bar was cut off at the bottom.
+- The install block now appends `viewport-fit=cover` to the page's viewport meta (so `env(safe-area-inset-*)` is real) and, when
+  running from the home screen, adds the class `is-app` to `#aam-play`: `.is-app .pbar` and `.is-app.is-open` keep at least 26 px
+  under the Play button whatever the phone reports. Not yet confirmed on his phone.

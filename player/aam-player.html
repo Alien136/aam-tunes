@@ -34,6 +34,8 @@
 #aam-play .play svg { width: 24px; height: 24px; fill: currentColor; }
 #aam-play .apply-pill { position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); z-index: 1; height: 40px; padding: 0 20px; border-radius: 999px; background: var(--now); color: var(--now-ink); font: 600 15px/40px var(--body); white-space: nowrap; box-shadow: 0 6px 20px rgba(20,23,26,.28); }
 #aam-play .pend { outline: 2px dashed var(--accent); outline-offset: 2px; }
+#aam-play.is-app .pbar { padding-bottom: max(26px, calc(10px + env(safe-area-inset-bottom))); }
+#aam-play.is-app.is-open { padding-bottom: max(104px, calc(88px + env(safe-area-inset-bottom))); padding-top: max(14px, calc(8px + env(safe-area-inset-top))); }
 #aam-play .install-btn { display: block; margin: 16px 2px 0; height: 44px; padding: 0 18px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); color: var(--accent-text); font: 600 14.5px/41px var(--body); text-align: center; }
 #aam-play .in-steps { margin: 0; padding: 0 0 0 22px; display: grid; gap: 10px; font-size: 15px; line-height: 1.45; color: var(--ink); } #aam-play .in-steps b { font-weight: 600; }
 #aam-play .in-go { height: 46px; border-radius: 999px; background: var(--now); color: var(--now-ink); font: 600 15px/46px var(--body); text-align: center; }
@@ -2640,6 +2642,11 @@ function aamLibrary() {
     if (DEMO) return;
     var APP = "https://raw.githubusercontent.com/Alien136/aam-tunes/main/player/app/", beta = PLAYER_VERSION === "test copy", h = document.head;
     var alone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+    try {                                                     // let the page know the phone's safe areas (the notch, the home bar), in the browser and from the home screen
+      var vp = document.querySelector('meta[name="viewport"]');
+      if (vp && !/viewport-fit/.test(vp.content)) vp.content += ", viewport-fit=cover";
+      if (alone) document.getElementById("aam-play").classList.add("is-app");   // opened from the home screen: the play bar keeps clear of the bottom edge even if the phone reports no safe area
+    } catch (e) {}
     try {
       [].forEach.call(h.querySelectorAll('link[rel="apple-touch-icon"], link[rel="apple-touch-icon-precomposed"], link[rel="manifest"]'), function (e) { e.parentNode.removeChild(e); });   // the website's own icon would win otherwise
       var add = function (tag, at) { var e = document.createElement(tag); Object.keys(at).forEach(function (k) { e.setAttribute(k, at[k]); }); e.setAttribute("data-aam", "1"); h.appendChild(e); };
