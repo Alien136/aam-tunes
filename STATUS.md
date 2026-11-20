@@ -164,3 +164,17 @@ Everything needed to carry on from any conversation is in this repository and in
   `aam_learn_stop` (notes, reached, seconds, skipped, wrong_notes, value = minutes), `aam_fingering` (how: button / after misses),
   `aam_pdf_download` (pdf, edition), `aam_search` (pdf, kind: number / name, found).
 - Real accounts for the player are tabled (project doc "Player accounts - tabled"). Usage is followed in Analytics for now.
+
+## 2026-11-20 · Version numbers, the guard, and the nightly builder
+- **Read `BUILDER.md` first if you are a scheduled run.** It is the runbook for the nightly builder and the Sunday release review:
+  how a job is picked, the six nights of a booklet, the checks, the list of things never done, and the Lessons list.
+- Versions: `VERSION` holds the number of the live player (1.0 = everything up to 20 November 2026). `CHANGELOG.md` has an
+  Unreleased block (Added / Fixed / Prevented) that `tools/release.py --version X.Y` moves under the new version. The player's
+  version line now reads "v1.0 · <date> UTC (after <commit>)".
+- `tools/guard.py` runs before every push and refuses it when: `release/` changed outside a release run, the guard or release tool
+  changed, a PDF or .bin is on main, a booklet or tune disappeared or a code fingerprint changed, a real code is written anywhere
+  (it fingerprints every word of the change), or the test player lost its root, version line or sounds credit. `--release` for a
+  release run, `--tools` for a session with Alex that changes the gate on purpose.
+- `tools/setup.sh` prepares a fresh machine (LilyPond, Python packages, node packages, the pdf branch) and prints READY.
+- Alex follows the work in the Build Desk doc (Claude Docs): Needs Alex, Ideas inbox, Roadmap, Library (every booklet, its code and
+  its link), Nightly log, Releases. Beta = `?player=test` on the play page. Nothing goes live until he says "ship".

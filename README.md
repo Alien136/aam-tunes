@@ -12,3 +12,10 @@ Adding a tune = adding one file to `tunes/` and one entry to `index.json`. Nothi
 
 `tools/publish_exercise.py` publishes a booklet: a PDF with several exercises, grouped into chapters, each with its own
 backing (a drone, a click or the band) and an optional "through the keys" mode. Its header documents the input file.
+
+## Working on this repository
+
+- `STATUS.md`: the running log of what was built and why. `BUILDER.md`: the runbook for the scheduled nightly builder.
+- `VERSION` and `CHANGELOG.md`: the live player's version and what each version added, fixed and prevented.
+- `bash tools/setup.sh` prepares a machine. `python3 tools/guard.py` must pass before any push.
+- `release/player.html` is the live player and is written only by `tools/release.py`. `player/aam-player.html` is the test copy (`?player=test`).
