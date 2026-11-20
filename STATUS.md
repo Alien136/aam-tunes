@@ -290,3 +290,12 @@ Everything needed to carry on from any conversation is in this repository and in
   the right pitch in any octave, because a tenor or alto sounds the line an octave away from the tune file. The listening range
   stays wide (`EAR_FIXED` is 0). No fingering diagrams on these tunes (`IS_SAX` goes by the tune's own instrument).
 - Check group `demo`.
+
+## 2026-11-21 · Beta: the instrument button in the public demo
+- The demo card (`demoChrome`) no longer builds a `<select>`. Its bar has an empty `.demo-inst` slot and the pill built with the
+  page text (`inst-btn`) is moved into it by whichever of the two runs second; `showInst` reaches the pill through the variable
+  `pill`, never through the subtitle element. The older choice in localStorage `aam-demo-inst` is read once into `aam-play-as`.
+- Trumpet added to the list and to the header icons (`ICON.trumpet`).
+- Analytics: `aam_instrument` carries `instrument` (piano, flute, clarinet, trumpet, tenor, alto) and `where` ("demo" or
+  "player"). To see the split in reports, `instrument` and `where` must be registered as custom dimensions.
+- See the demo's test copy at the lessons page address with `?player=test` added.

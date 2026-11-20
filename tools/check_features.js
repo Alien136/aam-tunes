@@ -254,7 +254,7 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       await page.click('[data-r="p-insts"] button[data-as="alto"]'); await page.waitForTimeout(900);
       const after = await page.evaluate(() => ({ name: document.querySelector('[data-r="inst-name"]').textContent, key: document.querySelector('[data-r="p-key-k"]').textContent, learn: !document.querySelector('[data-r="learn-btn"]').hidden,
         fit: (() => { const p = document.querySelector('[data-r="inst-btn"]').getBoundingClientRect(), l = document.querySelector('[data-r="lib-btn"]').getBoundingClientRect(); return p.right <= l.left || p.top >= l.bottom; })() }));
-      expect(n === 5 && after.name === "Alto saxophone" && after.key === "D" && after.fit, "demo tune: choosing alto saxophone rewrites the page for it (key " + after.key + ") and the name fits");
+      expect(n === 6 && after.name === "Alto saxophone" && after.key === "D" && after.fit, "demo tune: choosing alto saxophone rewrites the page for it (key " + after.key + ") and the name fits");
       expect(after.learn, "demo tune as alto: Learn is still offered");
       await page.click('[data-r="learn-btn"]'); const said = [], t0 = Date.now(); while (Date.now() - t0 < seq.length * 800 + 9000) { await page.waitForTimeout(200); const m = await txt(page, "learn-msg"); if (said[said.length - 1] !== m) said.push(m); if (/every note/.test(m)) break; }
       expect(/F♯|F#/.test(said[0] || ""), "demo tune as alto: Learn names the first note as the alto reads it (" + (said[0] || "").slice(0, 60) + ")");
@@ -262,6 +262,23 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       await page.reload(); await page.waitForTimeout(1800);
       expect((await txt(page, "inst-name")) === "Alto saxophone", "demo tune: the instrument is remembered");
     });
+  }
+  if (want("demo")) {                                       // the public demo card on the lessons page: the same instrument button, in its bar, and Analytics hears the choice
+    const ctxD = await b.newContext({ ...devices["iPhone 13"] }); await wire(ctxD);
+    await ctxD.addInitScript(() => { window.__ev = []; window.gtag = function (a, n, p) { if (a === "event") window.__ev.push(n + (p && p.instrument ? ":" + p.instrument + ":" + (p.where || "") : "")); }; });
+    const page = await ctxD.newPage(); page.on("pageerror", e => expect(false, "script error: " + e.message));
+    await page.goto("https://alexattardmusic.com/lessons/?player=test"); await page.click("#aam-demo .poster"); await page.waitForSelector("#aam-demo iframe"); await page.waitForTimeout(3500);
+    const f = page.frames().find(x => x !== page.mainFrame());
+    const inBar = await f.evaluate(() => { const p = document.querySelector('[data-r="inst-btn"]'); return !!p && !!p.closest(".demo-bar") && p.getBoundingClientRect().width > 40 && !document.querySelector(".demo-inst select") && !document.querySelector('[data-r="gate"]:not([hidden])'); });
+    expect(inBar, "demo card: the instrument button sits in the demo's bar, and the tune opened");
+    await f.click('[data-r="inst-btn"]'); await page.waitForTimeout(300); await f.click('[data-r="p-insts"] button[data-as="clarinet"]'); await page.waitForTimeout(900);
+    const got = await f.evaluate(() => ({ name: document.querySelector('[data-r="inst-name"]').textContent, key: document.querySelector('[data-r="p-key-k"]').textContent, ev: window.__ev }));
+    expect(got.name === "Clarinet" && got.key === "G", "demo card: choosing clarinet rewrites the page for a B♭ instrument (key " + got.key + ")");
+    expect(got.ev.includes("aam_instrument:clarinet:demo"), "demo card: Analytics hears which instrument was chosen, and that it was in the demo (" + got.ev.filter(x => /instrument/.test(x)).join(", ") + ")");
+    await f.click(".demo-chips button:nth-child(2)"); await page.waitForTimeout(2500);
+    const f2 = page.frames().find(x => x !== page.mainFrame());
+    expect((await f2.textContent('[data-r="inst-name"]')) === "Clarinet", "demo card: the next tune opens written for the same instrument");
+    await ctxD.close();
   }
   if (want("cloud")) {                                      // a piano page: one cloud per hand, and no wash on the bar; a one-line page: one cloud
     const page = await open({ ...devices["iPhone 13"] }, "winter-wonderland-piano");

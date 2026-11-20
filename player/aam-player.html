@@ -772,7 +772,6 @@ function aamBoot(TUNE) {
   })();
   var MINOR = /m$/.test(HOME), HOMEROOT = HOME.replace(/m$/, "");
   var keyState = { key: Math.max(-5, Math.min(6, TUNE.start_key | 0)), inst: NATIVE };   // start_key: an exercise that begins away from its written key (the booklet starts on B♭ or C)
-  if (window.AAM_DEMO) { try { keyState.inst = { "Alto sax": 9, "Tenor sax": 2, "Clarinet": 2, "Trumpet": 2 }[localStorage.getItem("aam-demo-inst")] || 0; } catch (e) {} }   // the demo's "I play" choice
   try { var kv = JSON.parse(localStorage.getItem("aam-keys") || "{}")[TUNE.slug]; if (kv) { keyState.key = kv[0] | 0; keyState.inst = [0, 2, 9].indexOf(kv[1]) >= 0 ? kv[1] : NATIVE; } } catch (e) {}
   function shownKey(inst) { return (MINOR ? MIN : MAJ)[(pcOf(HOMEROOT) + keyState.key + (inst == null ? keyState.inst : inst) + 120) % 12]; }
   function spell(sym) {                                    // a concert chord name -> the name to show
@@ -872,21 +871,28 @@ function aamBoot(TUNE) {
       sax: S + '<path d="M4.5 7.5 9 5.5"/><path d="M9 5.5c4-1.6 6.5.3 6.5 4V20a5 5 0 0 0 10 0v-5" stroke-width="2.6"/><path d="M23.7 15 21.3 9.6h8.4L27.3 15z" fill="currentColor" stroke-width="1.4"/>' + D + '<circle cx="11.6" cy="12" r="1.5"/><circle cx="11.6" cy="16" r="1.5"/><circle cx="11.6" cy="20" r="1.5"/></g></svg>',
       clarinet: S + '<g transform="rotate(32 16 16)"><path d="M16 1.5v3.5" stroke-width="2.4"/><rect x="13.6" y="5" width="4.8" height="18" rx="1.2"/><path d="M13.6 23 11 29.5h10L18.4 23" fill="currentColor" stroke-width="1.4"/>' + D + '<circle cx="16" cy="9" r="1.15"/><circle cx="16" cy="12.6" r="1.15"/><circle cx="16" cy="16.2" r="1.15"/><circle cx="16" cy="19.8" r="1.15"/></g></g></svg>',
       flute: S + '<g transform="rotate(-24 16 16)"><rect x="1" y="14" width="30" height="4.4" rx="2.2"/><path d="M5 14v4.4" stroke-width="1.4"/>' + D + '<ellipse cx="9" cy="13.2" rx="2" ry="1.1"/><circle cx="15" cy="16.2" r="1.15"/><circle cx="18.6" cy="16.2" r="1.15"/><circle cx="22.2" cy="16.2" r="1.15"/><circle cx="25.8" cy="16.2" r="1.15"/></g></g></svg>',
-      piano: S + '<rect x="3" y="7" width="26" height="18" rx="2.5"/><path d="M8.2 17v8M13.4 17v8M18.6 7v18M23.8 17v8" stroke-width="1.4"/>' + D + '<rect x="6.7" y="7" width="3" height="10.5" rx=".6"/><rect x="11.9" y="7" width="3" height="10.5" rx=".6"/><rect x="22.3" y="7" width="3" height="10.5" rx=".6"/></g></svg>'
+      piano: S + '<rect x="3" y="7" width="26" height="18" rx="2.5"/><path d="M8.2 17v8M13.4 17v8M18.6 7v18M23.8 17v8" stroke-width="1.4"/>' + D + '<rect x="6.7" y="7" width="3" height="10.5" rx=".6"/><rect x="11.9" y="7" width="3" height="10.5" rx=".6"/><rect x="22.3" y="7" width="3" height="10.5" rx=".6"/></g></svg>',
+      trumpet: S + '<path d="M3 12.2h17" stroke-width="2.4"/><path d="M2.6 10.2v4"/><path d="M20 12.2c3.6 0 5.8-2 7.6-5.2v10.4c-1.8-3.2-4-5.2-7.6-5.2z" fill="currentColor" stroke-width="1.4"/><rect x="7" y="12.2" width="12" height="7" rx="3.5"/><path d="M10 8v13M13.2 8v13M16.4 8v13" stroke-width="2.2"/></svg>'
     };
     var WHO = { alto: ["sax", "Alto saxophone"], tenor: ["sax", "Tenor saxophone"], soprano: ["sax", "Soprano saxophone"], bari: ["sax", "Baritone saxophone"],
-                clarinet: ["clarinet", "Clarinet"], flute: ["flute", "Flute"], piano: ["piano", "Piano"] }[TUNE.instrument || ""];
+                clarinet: ["clarinet", "Clarinet"], flute: ["flute", "Flute"], piano: ["piano", "Piano"], trumpet: ["trumpet", "Trumpet"] }[TUNE.instrument || ""];
     var el = $("subtitle");
     if (!WHO && !TUNE.instrument && TUNE.keys !== "off") {  // a tune written at concert pitch (the free demo tunes): the reader says what they play, and the page is written for it
-      var AS = { piano: ["piano", "Piano", 0], flute: ["flute", "Flute", 0], clarinet: ["clarinet", "Clarinet", 2], tenor: ["sax", "Tenor saxophone", 2], alto: ["sax", "Alto saxophone", 9] };
-      var pick = null; try { pick = localStorage.getItem("aam-play-as"); } catch (e) {}
+      var AS = { piano: ["piano", "Piano", 0], flute: ["flute", "Flute", 0], clarinet: ["clarinet", "Clarinet", 2], trumpet: ["trumpet", "Trumpet", 2], tenor: ["sax", "Tenor saxophone", 2], alto: ["sax", "Alto saxophone", 9] };
+      var pick = null;
+      try {
+        pick = localStorage.getItem("aam-play-as");
+        var was = localStorage.getItem("aam-demo-inst");      // the demo's older "I play" list
+        if (!pick && was) { pick = { "Alto sax": "alto", "Tenor sax": "tenor", "Clarinet": "clarinet", "Trumpet": "trumpet", "Flute": "flute", "Piano": "piano" }[was] || null; if (pick) localStorage.setItem("aam-play-as", pick); }
+      } catch (e) {}
       el.classList.add("inst");
       el.innerHTML = '<button class="st-pill inst-pill" data-r="inst-btn" aria-haspopup="dialog" aria-label="Your instrument"><span class="inst-ic"></span><span data-r="inst-name"></span></button><span class="sub-rest"></span>';
       el.lastChild.textContent = TUNE.subtitle;
+      var pill = el.firstChild;                             // the public demo moves it into its own bar, so it is always reached through this variable
       showInst = function () {                              // the pill follows the reading in force (it can also be changed in the Key dialog)
         EAR_SHIFT = keyState.inst;
         var a = AS[pick] && AS[pick][2] === keyState.inst ? pick : keyState.inst === 9 ? "alto" : keyState.inst === 2 ? "tenor" : "piano";
-        el.querySelector(".inst-ic").innerHTML = ICON[AS[a][0]]; el.querySelector('[data-r="inst-name"]').textContent = AS[a][1]; el.setAttribute("data-inst", AS[a][0]);
+        pill.querySelector(".inst-ic").innerHTML = ICON[AS[a][0]]; pill.querySelector('[data-r="inst-name"]').textContent = AS[a][1]; el.setAttribute("data-inst", AS[a][0]);
         [].forEach.call($("p-insts").children, function (b) { b.setAttribute("aria-pressed", b.dataset.as === a ? "true" : "false"); });
       };
       $("p-insts").innerHTML = Object.keys(AS).map(function (k) { return '<button data-as="' + k + '"><b><span class="inst-ic">' + ICON[AS[k][0]] + "</span> " + AS[k][1] + "</b><small>" + (AS[k][2] === 9 ? "The page is written for an E♭ instrument" : AS[k][2] === 2 ? "The page is written for a B♭ instrument" : "The page is written at concert pitch") + "</small></button>"; }).join("");
@@ -896,11 +902,12 @@ function aamBoot(TUNE) {
           stage("inst", function () {
             pick = b.dataset.as; keyState.inst = AS[pick][2];
             try { localStorage.setItem("aam-play-as", pick); var all = JSON.parse(localStorage.getItem("aam-keys") || "{}"); all[TUNE.slug] = [keyState.key, keyState.inst]; localStorage.setItem("aam-keys", JSON.stringify(all)); } catch (e) {}
-            keyApply(); AAM_TRACK.event("aam_instrument", { tune: TUNE.slug, instrument: pick });
+            keyApply(); AAM_TRACK.event("aam_instrument", { tune: TUNE.slug, instrument: pick, where: window.AAM_DEMO ? "demo" : "player" });
           }, b);
         };
       });
-      el.firstChild.onclick = function () { showInst(); $("pdlg").hidden = false; };
+      pill.onclick = function () { showInst(); $("pdlg").hidden = false; };
+      var slot = root.querySelector(".demo-inst"); if (slot) slot.appendChild(pill);                             // the public demo keeps it in its own bar, beside the tune buttons
       $("p-close").onclick = function () { $("pdlg").hidden = true; };
       $("pdlg").addEventListener("click", function (e) { if (e.target === $("pdlg")) $("pdlg").hidden = true; });
       try { if (AS[pick] && !(JSON.parse(localStorage.getItem("aam-keys") || "{}")[TUNE.slug])) keyState.inst = AS[pick][2]; } catch (e) {}   // a new tune opens written for the instrument they chose last
@@ -2852,14 +2859,12 @@ function aamLibrary() {
   function demoChrome(slug) {                            // the demo's own header: tune buttons, "I play", and the way to book a lesson
     var p = pdfOf(slug) || { tunes: [] }, short = function (t) { return t.title.replace(/,.*$/, "").replace(" Go Marching In", ""); };
     root.classList.add("is-demo");
-    var insts = [["Piano", 0], ["Flute", 0], ["Alto sax", 9], ["Tenor sax", 2], ["Clarinet", 2], ["Trumpet", 2]], mine = "Piano";
-    try { mine = localStorage.getItem("aam-demo-inst") || "Piano"; } catch (e) {}
     var bar = document.createElement("div"); bar.className = "demo-bar";
     bar.innerHTML = '<div class="demo-chips">' + p.tunes.map(function (s) { var t = CAT.tunes[s]; return t ? '<button data-slug="' + esc(s) + '"' + (s === slug ? ' aria-current="true"' : "") + ">" + esc(short(t)) + "</button>" : ""; }).join("") + "</div>" +
-      '<label class="demo-inst">I play <select>' + insts.map(function (x) { return "<option" + (x[0] === mine ? " selected" : "") + ">" + x[0] + "</option>"; }).join("") + "</select></label>";
+      '<span class="demo-inst">I play </span>';              // the instrument button (built with the page text of each tune) sits here
     var head = root.querySelector(".head"); head.parentNode.insertBefore(bar, head.nextSibling);
     [].forEach.call(bar.querySelectorAll("[data-slug]"), function (b) { b.onclick = function () { if (b.dataset.slug !== slug) go(b.dataset.slug); }; });
-    bar.querySelector("select").onchange = function (e) { try { localStorage.setItem("aam-demo-inst", e.target.value); localStorage.removeItem("aam-keys"); } catch (e2) {} go(slug); };
+    var ipill = root.querySelector('[data-r="inst-btn"]'); if (ipill) bar.querySelector(".demo-inst").appendChild(ipill);
     var cta = document.createElement("a"); cta.className = "demo-cta"; cta.target = "_top"; cta.href = DEMO.cta || "/contact/"; cta.textContent = DEMO.cta_label || "Book a free trial lesson";
     cta.onclick = function () { AAM_TRACK.event("aam_demo_cta", { tune: slug, where: "header" }); };
     head.appendChild(cta);
