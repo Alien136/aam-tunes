@@ -7,7 +7,8 @@
      playback         the blue cloud moves from note to note in time
      contents list    search by number and by name, chapter chips, Enter opens the first match
      PDF download     the newest booklet PDF arrives and really is a PDF
-     play bar         Play is in the exact middle and nothing overlaps, at four screen sizes; the phone tempo wheel sets the tempo
+     play bar         Play is in the exact middle and nothing overlaps, at four screen sizes; the phone tempo wheel sets the tempo;
+                      the instrument icon and name sit under the title
 
    The microphone is a sound file: saxophone-like tones are generated here and fed to the browser as a fake microphone.
 
@@ -169,6 +170,9 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
                  lap: kids.some((a, i) => kids.some((q, j) => j > i && a.left < q.right - 1 && q.left < a.right - 1 && a.top < q.bottom - 1 && q.top < a.bottom - 1 && !(a.width > q.width * 3))) };
       });
       expect(Math.abs(r.off) <= 1 && !r.out && !r.lap, "play bar on a " + name + ": Play in the middle, nothing overlapping or cut off");
+      const who = await page.evaluate(() => { const e = document.querySelector('[data-r="subtitle"]'), i = e.querySelector(".inst-ic svg"), h = document.querySelector('[data-r="title"]').getBoundingClientRect(), b = e.getBoundingClientRect();
+        return { kind: e.getAttribute("data-inst"), name: e.textContent.trim(), icon: !!i && i.getBoundingClientRect().width >= 16, inside: b.right <= innerWidth + 1 && b.top >= h.bottom - 4 }; });
+      expect(who.kind === "sax" && who.name === "Alto saxophone" && who.icon && who.inside, "under the title on a " + name + ": the saxophone icon and \"Alto saxophone\", nothing else, not cut off");
       if (name === "phone") {
         await page.click('[data-r="p-bpm"]'); await page.waitForTimeout(400);
         const before = +(await txt(page, "p-bpm")); await page.evaluate(() => { document.querySelector('[data-r="tp-list"]').scrollTop -= 44 * 6; }); await page.waitForTimeout(500);
@@ -178,6 +182,12 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       }
       await page.context().close();
     }
+  }
+  if (want("bar")) {                                        // a piano page shows the piano
+    const page = await open({ viewport: { width: 390, height: 844 } }, "winter-wonderland-piano");
+    const who = await page.evaluate(() => { const e = document.querySelector('[data-r="subtitle"]'); return e.getAttribute("data-inst") + "|" + e.textContent.trim(); });
+    expect(who === "piano|Piano", "under the title of a piano tune: the piano icon and \"Piano\"");
+    await page.context().close();
   }
   await b.close();
   fs.rmSync(TMP, { recursive: true, force: true });

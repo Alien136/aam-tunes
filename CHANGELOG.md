@@ -15,6 +15,15 @@ moves that block under the new version when Alex says "ship".
 
 ### Prevented
 
+## v1.0.1 · 2026-11-20
+
+### Added
+- Under the title, an instrument icon and name (piano, saxophone, clarinet or flute) replace the line of small text, so a student sees at once they have the right edition.
+
+### Fixed
+
+### Prevented
+
 ## v1.0 · 2026-11-20
 
 Baseline: the first numbered version. Everything built up to 20 November 2026.

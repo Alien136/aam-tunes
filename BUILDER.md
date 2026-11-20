@@ -137,6 +137,17 @@ A second scheduled task. It writes; it does not ship.
    For each thing Alex corrected by hand, is the rule written in this file or in the skill that builds that product? Add the missing
    check or rule. Skill changes are proposed to Alex with a skill card in that chat; rules for the builder go under Lessons below.
 
+## When Alex asks for a change himself, in a chat
+
+He starts the request with one of two phrases. Neither phrase: treat it as Beta.
+
+- **"Beta: ..."** Build it in `player/aam-player.html` with its check, guard, push. It waits for the Sunday review.
+- **"Ship now: ..."** Build it, add its check, then release only that change as a patch version (1.0.1, 1.0.2 ...):
+  `tools/release.py --version <X.Y.Z>`, `tools/guard.py --release`, commit, push, a Releases row and a Nightly log row in the
+  Build Desk. If the test copy holds builder work he has not reviewed, do NOT release the test copy as it stands: make his change
+  on a copy of the last released player (`git show <last release commit>:player/aam-player.html`), release that, and make the same
+  change in the test copy so the two stay in step.
+
 ## Lessons
 
 Newest first. One line each: what went wrong or was nearly wrong, and the rule that now prevents it. The builder adds a line when a

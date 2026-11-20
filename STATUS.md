@@ -178,3 +178,11 @@ Everything needed to carry on from any conversation is in this repository and in
 - `tools/setup.sh` prepares a fresh machine (LilyPond, Python packages, node packages, the pdf branch) and prints READY.
 - Alex follows the work in the Build Desk doc (Claude Docs): Needs Alex, Ideas inbox, Roadmap, Library (every booklet, its code and
   its link), Nightly log, Releases. Beta = `?player=test` on the play page. Nothing goes live until he says "ship".
+
+## 2026-11-20 · v1.0.1: instrument icon and name under the title
+- The subtitle line under the title now shows a drawn icon and the instrument's name from `TUNE.instrument` (alto, tenor, soprano,
+  bari -> saxophone icon; clarinet; flute; piano). An instrument with no icon (trumpet, concert, the demo) keeps the old subtitle
+  text. The icons are original inline SVGs in the "page text" block of the player. `subtitle` in tune files is still used in the
+  My tunes list, so generators keep writing it.
+- Check: the play bar group of `tools/check_features.js` also checks the icon and name at four sizes and on a piano tune.
+- "Ship now" and "Beta" requests from Alex: see BUILDER.md.
