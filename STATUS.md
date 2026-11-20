@@ -234,3 +234,14 @@ Everything needed to carry on from any conversation is in this repository and in
   heard them. They are in beta for Alex's ear; BUILDER.md's rule (name two sources) applies to every style after these.
 - Metronome dialog: `m-only` ("With the band / Metronome only") and its heading are hidden when the page has no band
   (`STYLE !== "swing"`).
+
+## 2026-11-20 · Beta: Learn mode on piano pages, one hand at a time
+- `learnSeq(hand)`: on a piano page (`IS_PIANO`) it builds the sequence for `rh` (staff `.abcjs-v0`, `beatMap.notes`) or `lh`
+  (`.abcjs-v1`, `beatMap.notes2`). A chord becomes its lowest note in the sequence, with all its notes in `seq.alts[index]`;
+  `learnHear` accepts whichever is nearest to the pitch heard (the listener hears one pitch at a time). A hand is offered when every
+  sounding note found a written note and at most a quarter of its onsets are chords. `learn.hand` holds the hand; `learnEls()`
+  follows it. Dialog `hdlg` asks which hand when both are possible (`learnStart(hand)`).
+- Graded Repertoire Level 1: both hands of every piece qualify, except pieces written in two voices per hand if any fail the
+  note match. Lead-sheet piano pages: right hand only (the left hand is all guide-tone chords).
+- Checked with generated, sustained tones (check group `piano`). NOT checked with a real piano, whose notes die away: the
+  repeated-note rule and the level threshold may need tuning once Alex tries it.

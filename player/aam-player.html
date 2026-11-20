@@ -609,6 +609,14 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
         <p class="k-note">Nothing is recorded. The sound is measured on this device and thrown away.</p>
       </div>
     </div>
+    <!-- Learn mode on a piano page: which hand -->
+    <div class="kdlg" data-r="hdlg" hidden role="dialog" aria-label="Which hand">
+      <div class="kcard">
+        <div class="khead"><h2>Which hand?</h2><button class="btn-done" data-r="h-close">Cancel</button></div>
+        <div class="st-list" data-r="h-hands"><button data-hand="rh"><b>Right hand</b><small>The upper staff</small></button><button data-hand="lh"><b>Left hand</b><small>The lower staff</small></button></div>
+        <p class="k-note">Learn mode listens to one hand at a time. Play each note in the blue cloud; it moves on when the note is right.</p>
+      </div>
+    </div>
     <!-- band style: what kind of band plays the chords -->
     <div class="kdlg" data-r="stdlg" hidden role="dialog" aria-label="Band style">
       <div class="kcard">
@@ -1304,7 +1312,7 @@ function aamBoot(TUNE) {
   var openTuner;
 
   // ---- Learn mode: no band and no tempo; each note turns green when it is played, and the marker waits for the next one
-  var learn = { on: false, i: 0, seq: null, okRun: 0, badRun: 0, badNote: null, misses: 0, gap: true, since: 0, level: 0 };
+  var learn = { on: false, hand: "rh", alts: {}, key: 0, i: 0, seq: null, okRun: 0, badRun: 0, badNote: null, misses: 0, gap: true, since: 0, level: 0 };
   // The blue cloud is the one "you are here" marker: Learn mode puts it on the note to play, playback moves it note by note in time.
   var playEl = null, playEl2 = null, beatMap = { svg: null };          // playEl2: the left hand's note on a piano page (two staves, two clouds)
   var LH_SEL = /piano/.test(TUNE.instrument || "") ? ".abcjs-v1" : ".abcjs-none";   // the lower staff gets a cloud on piano pages only; a duet's second part does not
@@ -1334,7 +1342,7 @@ function aamBoot(TUNE) {
   function beats() {                                      // where every note and rest of the top part starts: bar number and beat, read from the drawn music
     var svg = score.querySelector("svg"); if (!svg) return null;
     if (beatMap.svg === svg) return beatMap;
-    var bars = {}, notes = [], bars2 = {};
+    var bars = {}, notes = [], bars2 = {}, notes2 = [];
     var read = function (sel, into, list) {
       var pos = {};
       [].forEach.call(svg.querySelectorAll(sel + ".abcjs-note, " + sel + ".abcjs-rest"), function (el) {
@@ -1345,8 +1353,8 @@ function aamBoot(TUNE) {
       });
     };
     read(".abcjs-v0", bars, notes);
-    read(LH_SEL, bars2, null);                                // a piano page's lower staff; nothing on a one-staff page
-    beatMap = { svg: svg, bars: bars, bars2: bars2, notes: notes, seqs: {} }; return beatMap;
+    read(LH_SEL, bars2, notes2);                                // a piano page's lower staff; nothing on a one-staff page
+    beatMap = { svg: svg, bars: bars, bars2: bars2, notes: notes, notes2: notes2, seqs: {} }; return beatMap;
   }
   function playCloud(k, beat) {                           // playback: the cloud sits on the note (or rest) sounding now; on a piano page each hand has its own
     var bm = score.hidden ? null : beats();
@@ -1365,22 +1373,37 @@ function aamBoot(TUNE) {
       if (playEl2) { playEl2.classList.add("lr-now"); cloudAt(playEl2, true); } else { var l2 = score.querySelector(".lr-line2"); if (l2) l2.remove(); }
     }
   }
-  function learnSeq() {                                   // the sounding pitch of each written note, in order (-1: tied on from the note before)
+  var IS_PIANO = /piano/.test(TUNE.instrument || "");
+  function learnSeq(hand) {                               // the sounding pitch of each written note, in order (-1: tied on from the note before)
     var s = TUNE.sections.filter(function (x) { return x.id === state.view; })[0];
     if (!s || keyState.inst !== NATIVE) return null;     // the page must show what this instrument reads; a key change moves page and sound together
-    if (s.learn) return s.learn;
-    if (/piano/.test(TUNE.instrument || "") || (s.lh && s.lh.length) || !s.rh || !s.rh.length) return null;      // one note at a time only
+    if (!IS_PIANO) {
+      if (s.learn) return s.learn;
+      if ((s.lh && s.lh.length) || !s.rh || !s.rh.length) return null;                                            // one line only
+      hand = "rh";
+    } else hand = hand || learn.hand || "rh";                                                                     // piano: one hand at a time
+    var ev = s[hand]; if (!ev || !ev.length) return null;
     var bm = beats(); if (!bm) return null;
-    if (s.id in bm.seqs) return bm.seqs[s.id];
-    var at = {}, chord = false, used = 0;
-    s.rh.forEach(function (e) { var key = Math.round(e[0] * 48); if (key in at) chord = true; at[key] = e[1]; });
-    var seq = bm.notes.map(function (n) { var key = Math.round((n.k * BPB + n.beat) * 48); if (key in at) { used++; return at[key]; } return -1; });
-    return (bm.seqs[s.id] = chord || used !== s.rh.length || !seq.length ? null : seq);                          // every sounding note must have found its written note
+    var ck = s.id + ":" + hand; if (ck in bm.seqs) return bm.seqs[ck];
+    var at = {}, used = 0, chords = 0, alts = {};
+    ev.forEach(function (e) { var key = Math.round(e[0] * 48); (at[key] = at[key] || []).push(e[1]); });
+    Object.keys(at).forEach(function (k) { if (at[k].length > 1) chords++; });
+    var seq = (hand === "lh" ? bm.notes2 : bm.notes).map(function (n, i) {
+      var key = Math.round((n.k * BPB + n.beat) * 48); if (!(key in at)) return -1;
+      used += at[key].length; if (at[key].length > 1) alts[i] = at[key];
+      return Math.min.apply(null, at[key]);
+    });
+    // every sounding note must have found its written note. One line: no chords at all. A piano hand: a few chords are fine
+    // (any one of a chord's notes is accepted, since only one pitch can be heard at a time), a hand that is mostly chords is not offered
+    var ok = seq.length && used === ev.length && (IS_PIANO ? chords <= 0.25 * Object.keys(at).length : !chords);
+    if (ok) seq.alts = alts;
+    return (bm.seqs[ck] = ok ? seq : null);
   }
-  function learnEls() { var svg = score.querySelector("svg"); return svg ? [].slice.call(svg.querySelectorAll(".abcjs-note.abcjs-v0")) : []; }
+  function learnAny() { return IS_PIANO ? (learnSeq("rh") || learnSeq("lh")) : learnSeq(); }
+  function learnEls() { var svg = score.querySelector("svg"); return svg ? [].slice.call(svg.querySelectorAll(".abcjs-note" + (IS_PIANO && learn.hand === "lh" ? ".abcjs-v1" : ".abcjs-v0"))) : []; }
   function learnPaint() {                                 // colour the notes again (the music is redrawn when the window changes)
     var svg0 = score.querySelector("svg"); if (svg0) softFilter(svg0);
-    $("learn-btn").hidden = !!window.AAM_DEMO || !learnSeq();
+    $("learn-btn").hidden = !!window.AAM_DEMO || !learnAny();
     if (learn.on && learn.key !== keyState.key) { learnStop(); return; }                                         // the key was changed: start again in the new key
     if (!learn.on) return;
     var els = learnEls(); if (els.length !== learn.seq.length) return;
@@ -1417,6 +1440,8 @@ function aamBoot(TUNE) {
   function learnHear(r) {
     var t = learnTarget(); if (t == null) return;
     var c = ear.cal() || { off: 0 };
+    var alt = learn.alts && learn.alts[learn.i];          // a chord: whichever of its notes is nearest to what was heard
+    if (alt && r.ok) alt.forEach(function (m) { if (Math.abs(m + learn.key - r.midi) < Math.abs(t - r.midi)) t = m + learn.key; });
     learn.clip = r.clip && !r.ok ? (learn.clip || 0) + 1 : 0;                                          // distorted AND unreadable for a quarter of a second
     if (learn.clip === 6) { learn.said = $("learn-msg").textContent; learnSay("Too loud for the microphone: move it a little further away.", false); }
     else if (!r.clip && learn.said && r.ok) { if (/^Too loud/.test($("learn-msg").textContent)) learnSay(learn.said, false); learn.said = null; }
@@ -1438,8 +1463,8 @@ function aamBoot(TUNE) {
       learn.misses++; learn.wrong++;
       var el = learnEls()[learn.i]; if (el) { el.classList.add("lr-miss"); setTimeout(function () { el.classList.remove("lr-miss"); }, 900); }
       var oct = Math.abs(got - t) % 12 === 0;
-      learnSay(oct ? "Right note, wrong octave. Check your octave key (left thumb)." : "You played " + noteName(got + EAR_SHIFT) + ". This note is " + noteName(t + EAR_SHIFT) + "." +
-        (learn.misses >= 3 ? (IS_SAX ? " Check the fingering shown here, or tap Hear it." : " Look it up in your fingering chart, or tap Hear it.") : ""), learn.misses >= 2);
+      learnSay(oct ? "Right note, wrong octave." + (IS_SAX ? " Check your octave key (left thumb)." : "") : "You played " + noteName(got + EAR_SHIFT) + ". This note is " + noteName(t + EAR_SHIFT) + "." +
+        (learn.misses >= 3 ? (IS_SAX ? " Check the fingering shown here, or tap Hear it." : IS_PIANO ? " Tap Hear it to listen to it." : " Look it up in your fingering chart, or tap Hear it.") : ""), learn.misses >= 2);
       learnFing();
     }
   }
@@ -1451,20 +1476,29 @@ function aamBoot(TUNE) {
     cloudOff();
     perShown = 0; drawScore();                            // the bar above the music has gone: lay the page out again
   }
-  function learnStart() {
+  function learnStart(hand) {
+    if (IS_PIANO) {                                       // piano: one hand at a time. Both possible: ask which; one possible: that one
+      var can = ["rh", "lh"].filter(function (h) { return !!learnSeq(h); });
+      if (!can.length) return;
+      if (!hand && can.length === 2) { $("hdlg").hidden = false; return; }
+      learn.hand = hand && can.indexOf(hand) >= 0 ? hand : can[0];
+    }
     var seq = learnSeq(); if (!seq) return;
     if (state.playing) stop();
     var go = function () {
       ear.start().then(function () {
-        learn.on = true; learn.key = keyState.key; learn.seq = seq.map(function (m) { return m < 0 ? m : m + keyState.key; }); learn.i = 0; learn.prev = null; learn.okRun = learn.badRun = learn.misses = 0; learn.skips = learn.wrong = 0; learn.t0 = Date.now(); learn.done = false; learn.autoFing = false; learn.gap = true; learn.level = 0; learn.since = Date.now();
+        learn.on = true; learn.key = keyState.key; learn.alts = seq.alts || {}; learn.seq = seq.map(function (m) { return m < 0 ? m : m + keyState.key; }); learn.i = 0; learn.prev = null; learn.okRun = learn.badRun = learn.misses = 0; learn.skips = learn.wrong = 0; learn.t0 = Date.now(); learn.done = false; learn.autoFing = false; learn.gap = true; learn.level = 0; learn.since = Date.now();
         $("learn-bar").hidden = false; $("learn-skip").hidden = false; $("learn-btn").setAttribute("aria-pressed", "true");
-        var t = learnTarget(); learnSay("Play the note in the blue cloud: " + noteName(t + EAR_SHIFT) + ". Take your time." + (EAR_SHIFT ? " (On this instrument it sounds as " + noteName(t) + " on a piano.)" : ""), false); learnFing(); AAM_TRACK.event("aam_learn_start", { tune: TUNE.slug, tune_title: TUNE.title, instrument: TUNE.instrument || "", notes: learn.seq.filter(function (m) { return m >= 0; }).length }); perShown = 0; drawScore(); ear.off(learnHear); ear.on(learnHear);
+        var t = learnTarget(); learnSay((IS_PIANO ? (learn.hand === "lh" ? "Left hand. " : "Right hand. ") : "") + "Play the note in the blue cloud: " + noteName(t + EAR_SHIFT) + ". Take your time." + (EAR_SHIFT ? " (On this instrument it sounds as " + noteName(t) + " on a piano.)" : ""), false); learnFing(); AAM_TRACK.event("aam_learn_start", { tune: TUNE.slug, tune_title: TUNE.title, instrument: TUNE.instrument || "", notes: learn.seq.filter(function (m) { return m >= 0; }).length }); perShown = 0; drawScore(); ear.off(learnHear); ear.on(learnHear);
       }).catch(function (e) { $("learn-bar").hidden = false; learnSay(micWhy(e), false); $("learn-skip").hidden = true; perShown = 0; drawScore(); });
     };
     var c = ear.cal();
     if (!c || !c.at) openTuner(go); else go();           // first time: the ten-second microphone check comes first
   }
   $("learn-btn").onclick = function () { if (learn.on) learnStop(); else learnStart(); };
+  [].forEach.call($("h-hands").children, function (b) { b.onclick = function () { $("hdlg").hidden = true; learnStart(b.dataset.hand); }; });
+  $("h-close").onclick = function () { $("hdlg").hidden = true; };
+  $("hdlg").addEventListener("click", function (e) { if (e.target === $("hdlg")) $("hdlg").hidden = true; });
   $("learn-stop").onclick = learnStop;
   $("learn-again").onclick = function () { learnStop(); learnStart(); };
   $("learn-skip").onclick = function () { if (learn.on && learnTarget() != null) learnNext(true); };

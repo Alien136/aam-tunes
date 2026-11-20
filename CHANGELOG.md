@@ -11,6 +11,7 @@ moves that block under the new version when Alex says "ship".
 
 ### Added
 - Four more band styles: Slow Swing, Samba, Afro-Cuban and Shuffle Blues (nine in all).
+- Learn mode on piano pages, one hand at a time: tap Learn, choose Right hand or Left hand, and it follows that staff. A hand with a few chords is fine (any note of the chord counts); a hand that is all chords is not offered.
 
 ### Changed
 - Metronome: the "Play it: with the music / metronome only" choice is now "Band: with the band / metronome only", and it is hidden on pages that have no band (pieces and exercises), where it did nothing.

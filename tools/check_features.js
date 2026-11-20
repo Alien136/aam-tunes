@@ -9,12 +9,13 @@
      PDF download     the newest booklet PDF arrives and really is a PDF
      play bar         Play is in the exact middle and nothing overlaps, at four screen sizes; the phone tempo wheel sets the tempo;
                       the instrument icon and name sit under the title
+     piano            Learn mode on a piano page: asks which hand, follows that hand to the end, green notes on its staff
      apply            repeats, key and instrument changes wait for "Apply changes" while the band plays; the page-turn copy has no cloud
      style            the style picker lists the band styles, each one sounds, the choice is remembered, exercises have none
 
    The microphone is a sound file: saxophone-like tones are generated here and fed to the browser as a fake microphone.
 
-   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|learn|cloud|contents|pdf|bar|style|apply]
+   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|learn|cloud|contents|pdf|bar|style|apply|piano]
    Needs:  playwright, plus the tone and abcjs packages (tools/node_modules or $AAM_NODE_MODULES). Nothing is fetched from the internet. */
 const fs = require("fs"), path = require("path"), os = require("os");
 const { chromium, devices } = require("playwright");
@@ -210,6 +211,31 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     await page.goto(URL_OF(HCB)); await page.waitForTimeout(1800);
     expect(!(await page.$('[data-r="style-btn"]')), "style: an exercise with a click has no style picker");
     await ctx.close();
+  }
+  if (want("piano")) {                                      // Learn mode on a piano page: one hand at a time, chosen in a small dialog
+    const handSeq = (slug, h) => { const at = {}; tune(slug).sections[0][h].forEach(e => { const k = Math.round(e[0] * 48); at[k] = Math.min(at[k] == null ? 999 : at[k], e[1]); }); return Object.keys(at).map(Number).sort((x, y) => x - y).map(k => at[k]); };
+    for (const [slug, h, name] of [["gr1-beethoven-ode-to-joy", "lh", "left"], ["gr1-mozart-theme-k265", "rh", "right"]]) {
+      const seq = handSeq(slug, h);
+      await withMic(wav("piano-" + h, played(seq, 0.5, 0.16)), { ...devices["iPhone 13"] }, async page => {
+        await calibrated(page); await page.goto(URL_OF(slug)); await page.waitForTimeout(1800);
+        await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(300);
+        const asked = await page.evaluate(() => !document.querySelector('[data-r="hdlg"]').hidden);
+        expect(asked, "piano Learn: it asks which hand (" + slug + ")");
+        await page.click('[data-r="h-hands"] button[data-hand="' + h + '"]');
+        const said = [], t0 = Date.now(); while (Date.now() - t0 < seq.length * 800 + 9000) { await page.waitForTimeout(200); const m = await txt(page, "learn-msg"); if (said[said.length - 1] !== m) said.push(m); if (/every note/.test(m)) break; }
+        const where = await page.evaluate(h => { const l = document.querySelector(".score .lr-ok"); return l ? (/abcjs-v1/.test(l.getAttribute("class")) ? "lh" : "rh") : "none"; }, h);
+        expect(new RegExp("^" + (h === "lh" ? "Left" : "Right") + " hand\\.").test(said[0] || ""), "piano Learn: it says which hand it is listening to (" + (said[0] || "").slice(0, 40) + ")");
+        expect(/every note/.test(said[said.length - 1] || ""), "piano Learn, " + name + " hand: every note of the hand is followed to the end (" + seq.length + " notes; last: " + (said[said.length - 1] || "").slice(0, 50) + ")");
+        expect(where === h, "piano Learn, " + name + " hand: the green notes are on that hand's staff");
+        expect(said.filter(m => WRONG.test(m)).length === 0, "piano Learn, " + name + " hand: no false wrong-note message (" + said.filter(m => WRONG.test(m)).slice(0, 2).join(" / ") + ")");
+      });
+    }
+    const page = await open({ ...devices["iPhone 13"] }, "winter-wonderland-piano");
+    await page.addInitScript(() => { try { localStorage.setItem("aam-ear", JSON.stringify({ floor: 0.01, off: 0, at: 1 })); } catch (e) {} });
+    await page.click('[data-r="views"] button:nth-child(3)'); await page.waitForTimeout(600);
+    const lead = await page.evaluate(() => { const b = document.querySelector('[data-r="learn-btn"]'); return !b.hidden; });
+    expect(lead, "piano lead sheet: Learn is offered for the right hand's line (the left hand is all chords)");
+    await page.context().close();
   }
   if (want("cloud")) {                                      // a piano page: one cloud per hand, and no wash on the bar; a one-line page: one cloud
     const page = await open({ ...devices["iPhone 13"] }, "winter-wonderland-piano");
