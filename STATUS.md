@@ -225,3 +225,12 @@ Everything needed to carry on from any conversation is in this repository and in
   `#lr-soft`. Two filters with one id made iPhone Safari draw the real cloud unblurred or not at all; the stale copy showed blue
   notes with no cloud. Not reproducible in Chromium, so the check asserts the copy is clean rather than how it looks.
 - Check group `apply` in `tools/check_features.js`.
+
+## 2026-11-20 · Beta: four more styles; the metronome's band switch
+- New `BAND` entries: `slow` (Slow Swing), `samba`, `afro` (Afro-Cuban: cascara on the ride bell, 2-3 clave on the rim), `shuffle`
+  (Shuffle Blues). New bass rules in `bandParts`: `tumbao` (the "and" of 2 and beat 4, the 4 anticipating the next chord) and
+  `boogie` (root, third, fifth, sixth). The ride bell `bell` is now loaded for band tunes. New group "Blues".
+- These four were written from general knowledge of the styles and NOT checked against recordings or method books, and nobody has
+  heard them. They are in beta for Alex's ear; BUILDER.md's rule (name two sources) applies to every style after these.
+- Metronome dialog: `m-only` ("With the band / Metronome only") and its heading are hidden when the page has no band
+  (`STYLE !== "swing"`).

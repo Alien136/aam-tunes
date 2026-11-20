@@ -10,6 +10,10 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- Four more band styles: Slow Swing, Samba, Afro-Cuban and Shuffle Blues (nine in all).
+
+### Changed
+- Metronome: the "Play it: with the music / metronome only" choice is now "Band: with the band / metronome only", and it is hidden on pages that have no band (pieces and exercises), where it did nothing.
 
 ### Fixed
 

@@ -634,8 +634,8 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
         <div class="k-sub"><b>Sound</b></div>
         <div class="m-seg" data-r="m-sounds"><button data-snd="click">Click</button><button data-snd="wood">Wood block</button><button data-snd="beep">Beep</button></div>
         <button class="m-sw" data-r="m-accent" aria-pressed="true"><span>Stronger first beat</span><i></i></button>
-        <div class="k-sub"><b>Play it</b></div>
-        <div class="m-seg" data-r="m-only"><button data-only="0">With the music</button><button data-only="1">Metronome only</button></div>
+        <div class="k-sub" data-r="m-only-h"><b>Band</b></div>
+        <div class="m-seg" data-r="m-only"><button data-only="0">With the band</button><button data-only="1">Metronome only</button></div>
         <div class="mix"><label><span>Volume</span><input type="range" min="-12" max="6" step="1" value="0" data-r="m-vol" aria-label="Metronome volume"></label></div>
         <p class="k-note" data-r="m-note"></p>
       </div>
@@ -758,7 +758,8 @@ function aamBoot(TUNE) {
   // played by the one generic scheduler (bandParts / the block after comping() in scheduleMusic). To add a style: add an entry here.
   //   sw     ticks an off-beat eighth is late (PPQ / 6 = triplet swing, 0 = even eighths)
   //   drums  one list per bar, cycled: [sound, beat, loudness, classic-kit dB (null = studio sounds only), chance (default 1)]
-  //   bass   "walk" | "two" | "bossa"                     comp   one list per bar for a chord that lasts the bar, cycled: [beat, length]
+  //   bass   "walk" | "two" | "bossa" | "tumbao" | "boogie"   (rules in bandParts)
+  //                              comp   one list per bar for a chord that lasts the bar, cycled: [beat, length]
   //   half   the same for a chord that lasts half a bar   kit    extra drum sounds this style needs loaded
   var BAND = {
     swing:  { name: "Medium Swing", group: "Jazz", sw: Math.round(PPQ / 6), note: "Walking bass, ride cymbal, swung eighths" },
@@ -783,9 +784,37 @@ function aamBoot(TUNE) {
                        ["kick", 0, 0.56, -10], ["kick", 1.5, 0.4, -14], ["kick", 2, 0.5, -11], ["kick", 3.5, 0.4, -14], ["stick", 1, 0.36, -9], ["stick", 2.5, 0.34, -9]]],
               comp: [[[0, 0.9], [1.5, 1.2], [3, 0.8]], [[1, 1.2], [2.5, 1.2]]],
               half: [[[0, 0.9], [1.5, 0.45]]] },
+    slow:   { name: "Slow Swing", group: "Jazz", sw: Math.round(PPQ / 6) + 6, note: "Laid back: soft ride, long chords, a walking bass that takes its time",
+              bass: "walk",
+              drums: [[["ride", 0, 0.4, -7], ["ride", 1, 0.54, -5], ["ride", 1.5, 0.3, -11], ["ride", 2, 0.42, -7], ["ride", 3, 0.54, -5], ["ride", 3.5, 0.32, -11],
+                       ["hh", 1, 0.6, -5], ["hh", 3, 0.6, -5], ["kick", 0, 0.3, -18], ["stick", 3, 0.3, -12, 0.5]]],
+              comp: [[[0, 2.5]], [[0, 1.4], [2.5, 1.2]], [[1.5, 2]], [[0, 3]]],
+              half: [[[0, 1.6]], [[0, 1.2]]] },
+    samba:  { name: "Samba", group: "Latin", sw: 0, note: "Fast and light: even eighths on the cymbal, short chords off the beat",
+              bass: "bossa",
+              drums: [[["ride", 0, 0.5, -6], ["ride", 0.5, 0.36, -6], ["ride", 1, 0.5, -6], ["ride", 1.5, 0.36, -6], ["ride", 2, 0.5, -6], ["ride", 2.5, 0.36, -6], ["ride", 3, 0.5, -6], ["ride", 3.5, 0.36, -6], ["hh", 1, 0.6, -5], ["hh", 3, 0.6, -5],
+                       ["kick", 0, 0.5, -11], ["kick", 1.5, 0.36, -15], ["kick", 2, 0.5, -11], ["kick", 3.5, 0.36, -15], ["stick", 0, 0.36, -9], ["stick", 1.5, 0.34, -9], ["stick", 2.5, 0.34, -9]],
+                      [["ride", 0, 0.5, -6], ["ride", 0.5, 0.36, -6], ["ride", 1, 0.5, -6], ["ride", 1.5, 0.36, -6], ["ride", 2, 0.5, -6], ["ride", 2.5, 0.36, -6], ["ride", 3, 0.5, -6], ["ride", 3.5, 0.36, -6], ["hh", 1, 0.6, -5], ["hh", 3, 0.6, -5],
+                       ["kick", 0, 0.5, -11], ["kick", 1.5, 0.36, -15], ["kick", 2, 0.5, -11], ["kick", 3.5, 0.36, -15], ["stick", 0.5, 0.34, -9], ["stick", 2, 0.36, -9], ["stick", 3.5, 0.34, -9]]],
+              comp: [[[0, 0.4], [1.5, 0.4], [2.5, 0.4]], [[0.5, 0.4], [2, 0.4], [3.5, 0.4]]],
+              half: [[[0, 0.4], [1.5, 0.4]]] },
+    afro:   { name: "Afro-Cuban", group: "Latin", sw: 0, note: "Cascara on the bell, clave on the rim, a bass that lands ahead of the bar", kit: ["bell"],
+              bass: "tumbao",
+              drums: [[["bell", 0, 0.5, null], ["bell", 1, 0.46, null], ["bell", 2, 0.5, null], ["bell", 2.5, 0.4, null], ["bell", 3.5, 0.44, null],
+                       ["stick", 1, 0.38, -9], ["stick", 2, 0.38, -9], ["kick", 1.5, 0.42, -13], ["kick", 3, 0.5, -11], ["hh", 1, 0.5, -6], ["hh", 3, 0.5, -6]],
+                      [["bell", 0, 0.5, null], ["bell", 1, 0.46, null], ["bell", 1.5, 0.4, null], ["bell", 2.5, 0.44, null], ["bell", 3.5, 0.44, null],
+                       ["stick", 0, 0.38, -9], ["stick", 1.5, 0.36, -9], ["stick", 3, 0.38, -9], ["kick", 1.5, 0.42, -13], ["kick", 3, 0.5, -11], ["hh", 1, 0.5, -6], ["hh", 3, 0.5, -6]]],
+              comp: [[[0, 0.5], [1.5, 0.5], [2.5, 0.9]], [[0.5, 0.5], [1.5, 0.5], [3, 0.9]]],
+              half: [[[0, 0.5], [1.5, 0.45]]] },
+    shuffle: { name: "Shuffle Blues", group: "Blues", sw: Math.round(PPQ / 6), note: "Long-short eighths all the way, snare on 2 and 4, a boogie bass",
+              bass: "boogie",
+              drums: [[["ride", 0, 0.6, -6], ["ride", 0.5, 0.4, -6], ["ride", 1, 0.6, -6], ["ride", 1.5, 0.4, -6], ["ride", 2, 0.6, -6], ["ride", 2.5, 0.4, -6], ["ride", 3, 0.6, -6], ["ride", 3.5, 0.4, -6],
+                       ["snare", 1, 0.66, null], ["snare", 3, 0.7, null], ["hh", 1, 0.7, -3], ["hh", 3, 0.7, -3], ["kick", 0, 0.6, -9], ["kick", 2, 0.56, -10], ["kick", 3.5, 0.4, -14, 0.3]]],
+              comp: [[[0, 0.5], [1.5, 0.5], [3.5, 0.4]], [[1, 0.5], [2.5, 0.5]]],
+              half: [[[0, 0.5], [1.5, 0.4]]] },
     ballad: { name: "Straight Ballad", group: "Pop", sw: 0, note: "Even eighths, held chords, bass on 1 and 3" }
   };
-  var BAND_GROUPS = ["Jazz", "Latin", "Pop"];
+  var BAND_GROUPS = ["Jazz", "Latin", "Blues", "Pop"];
   // A tune names its own style ("band" in the tune file; the older "feel": "straight" means the ballad); the student's choice is remembered per tune.
   var band = BAND[TUNE.band] ? TUNE.band : (TUNE.feel === "straight" || TUNE.style === "solo" ? "ballad" : "swing");
   try {
@@ -1912,7 +1941,7 @@ function aamBoot(TUNE) {
     var out = [], band = STYLE === "swing";
     man.piano.notes.forEach(function (m) { (tier === 1 ? [2] : [1, 3]).forEach(function (l) { out.push("p-" + m + "-" + l); }); });
     if (band) man.bass.notes.forEach(function (m) { (tier === 1 ? [[2, 1]] : [[2, 2], [3, 1], [3, 2], [1, 1], [1, 2]]).forEach(function (x) { out.push("b-" + m + "-" + x[0] + "-" + x[1]); }); });
-    (band ? ["ride", "hh", "kick", "snare", "stick", "hhc"] : ["stick"]).forEach(function (d) {
+    (band ? ["ride", "hh", "kick", "snare", "stick", "hhc", "bell"] : ["stick"]).forEach(function (d) {
       if (!man.drums[d]) return;
       var D = man.drums[d], mid = Math.ceil(D.layers / 2);
       for (var l = 1; l <= D.layers; l++) for (var r = 1; r <= D.rr; r++) { var first = (l === mid && r === 1) || d === "stick"; if (first === (tier === 1)) out.push("d-" + d + "-" + l + "-" + r); }
@@ -1956,9 +1985,9 @@ function aamBoot(TUNE) {
     var mid = (inst === "p" ? PMID : BMID)[best.tk.layer - 1], g = Math.max(0.45, Math.min(1.7, Math.pow(vel / mid, 1.3)));
     sndPlay(best.tk.buf, Math.pow(2, (midi - best.m) / 12), time, dur, g * (boost || 1), inst === "p" ? 0.5 : 0.12, inst === "p" ? SND.pOut : SND.bOut);
   }
-  var DCUT = { ride: [0.45, 0.75], hh: [0.55], kick: [0.5], snare: [0.35, 0.6], stick: [0.4, 0.62, 0.85], hhc: [] };
-  var DMID = { ride: [0.3, 0.6, 0.9], hh: [0.4, 0.75], kick: [0.35, 0.65], snare: [0.25, 0.47, 0.7], stick: [0.3, 0.5, 0.73, 0.95], hhc: [0.42] };
-  var DGAIN = { ride: 0.32, hh: 0.36, kick: 0.3, snare: 0.36, stick: 0.8, hhc: 0.22 };   // cymbals well under the band (set by ear, Nov 2026); the click keeps its level
+  var DCUT = { ride: [0.45, 0.75], hh: [0.55], kick: [0.5], snare: [0.35, 0.6], stick: [0.4, 0.62, 0.85], hhc: [], bell: [] };
+  var DMID = { ride: [0.3, 0.6, 0.9], hh: [0.4, 0.75], kick: [0.35, 0.65], snare: [0.25, 0.47, 0.7], stick: [0.3, 0.5, 0.73, 0.95], hhc: [0.42], bell: [0.48] };
+  var DGAIN = { ride: 0.32, hh: 0.36, kick: 0.3, snare: 0.36, stick: 0.8, hhc: 0.22, bell: 0.26 };   // cymbals well under the band (set by ear, Nov 2026); the click keeps its level
   function sndDrum(name, time, vel) {
     var D = SND.drums[name]; if (!D) return;
     var tk = sndTake("d-" + name, D.layers, D.rr, vel, DCUT[name]);
@@ -2030,6 +2059,7 @@ function aamBoot(TUNE) {
   // ---------- metronome: its own button on the play bar. A click on every beat while the player runs, with the music or on its own
   var MET_KEY = STYLE === "swing" ? "on" : "on1";               // on by default where there is no band (pieces, exercises); off by default with the band. Each remembers its own choice
   var met = { on: STYLE !== "swing", accent: true, sound: "click", vol: 0, only: false }, musicGate = null, metOut = null, metSyn = null;
+  if (STYLE !== "swing") { $("m-only").hidden = true; $("m-only-h").hidden = true; }      // "Metronome only" silences the band; a page with no band has nothing to silence
   try { var mm = JSON.parse(localStorage.getItem("aam-met") || "{}"); if (typeof mm[MET_KEY] === "boolean") met.on = mm[MET_KEY]; met.accent = mm.accent !== false; if (["click", "wood", "beep"].indexOf(mm.sound) >= 0) met.sound = mm.sound; if (typeof mm.vol === "number") met.vol = Math.max(-12, Math.min(6, mm.vol)); } catch (e) {}
   function metBuild() {
     if (metSyn || !window.Tone) return;
@@ -2053,8 +2083,8 @@ function aamBoot(TUNE) {
     [].forEach.call($("m-sounds").children, function (b) { b.setAttribute("aria-pressed", b.dataset.snd === met.sound ? "true" : "false"); });
     [].forEach.call($("m-only").children, function (b) { b.setAttribute("aria-pressed", (b.dataset.only === "1") === met.only ? "true" : "false"); });
     $("m-note").textContent = !met.on ? "Switch it on and it clicks on every beat whenever the player is playing. It follows the tempo slider."
-      : met.only ? "Press play: you get the count-in and the click, and the music stays silent while you read it on screen."
-      : "Press play: the click runs along with the music, at the tempo on the slider.";
+      : met.only ? "Press play: you get the count-in and the click, and the band stays silent while you read the page."
+      : "Press play: the click runs along with what is playing, at the tempo on the slider.";
     if (metOut) metOut.gain.rampTo(Tone.dbToGain(met.vol), 0.03);
     if (musicGate) musicGate.gain.rampTo(met.on && met.only ? 0 : 1, 0.04);
     if (save) { try { var keep = {}; try { keep = JSON.parse(localStorage.getItem("aam-met") || "{}"); } catch (e) {} keep[MET_KEY] = met.on; keep.accent = met.accent; keep.sound = met.sound; keep.vol = met.vol; localStorage.setItem("aam-met", JSON.stringify(keep)); } catch (e) {} }
@@ -2119,7 +2149,7 @@ function aamBoot(TUNE) {
   function bandParts(S) {                                      // the bass line and the piano's chords for a style from the BAND table
     var flat = []; TUNE.bars.forEach(function (bar, bi) { var beat = 0; bar.forEach(function (c) { flat.push({ c: c, bar: bi, beat: beat, n: bar.length }); beat += c.beats; }); });
     var low = function (c, prev) { var r = 33 + ((c.root - 33) % 12 + 12) % 12; if (prev !== null && Math.abs(r + 12 - prev) < Math.abs(r - prev) && r + 12 <= 47) r += 12; return r; };
-    var bass = [], comp = [], prev = null, pv = null;
+    var bass = [], comp = [], prev = null, pv = null; S._ant = false;
     if (S.bass === "walk") bass = walkingBass().filter(function (e) { return !e.ghost; }).map(function (e) { return { bar: e.bar, beat: e.beat, midi: e.midi, len: 0.98, vel: 0.72 + (e.beat % 2 === 1 ? 0.07 : 0) }; });
     flat.forEach(function (x, i) {
       var c = x.c, r = low(c, prev), nr = low(flat[(i + 1) % flat.length].c, r), fifth = r + c.degs[4] <= 50 ? r + c.degs[4] : r + c.degs[4] - 12; prev = r;
@@ -2133,6 +2163,16 @@ function aamBoot(TUNE) {
       if (S.bass === "bossa") {                                // long, short, long, short: root and fifth
         bass.push({ bar: x.bar, beat: x.beat, midi: r, len: 1.45, vel: 0.74 }, { bar: x.bar, beat: x.beat + 1.5, midi: c.beats >= 4 ? fifth : r, len: 0.5, vel: 0.56 });
         if (c.beats >= 4) bass.push({ bar: x.bar, beat: x.beat + 2, midi: fifth, len: 1.45, vel: 0.7 }, { bar: x.bar, beat: x.beat + 3.5, midi: r, len: 0.5, vel: 0.54 });
+      }
+      if (S.bass === "boogie") {                               // root, third, fifth, sixth: one to a beat
+        [0, 2, 4, 5].slice(0, c.beats >= 4 ? 4 : 2).forEach(function (d, q) { var n = r + c.degs[c.beats >= 4 ? d : (q ? 4 : 0)]; bass.push({ bar: x.bar, beat: x.beat + q * (c.beats >= 4 ? 1 : 1), midi: n > 52 ? n - 12 : n, len: 0.9, vel: 0.74 + (q % 2 ? 0.05 : 0) }); });
+      }
+      if (S.bass === "tumbao") {                               // the bass plays on the "and" of 2 and on 4, and that 4 already belongs to the next chord
+        if (!S._ant) bass.push({ bar: x.bar, beat: x.beat, midi: r, len: Math.min(1.4, c.beats * 0.9), vel: 0.74 });
+        S._ant = false;
+        if (c.beats >= 4) { bass.push({ bar: x.bar, beat: x.beat + 1.5, midi: fifth, len: 1.4, vel: 0.68 }, { bar: x.bar, beat: x.beat + 3, midi: nr, len: 1.9, vel: 0.76 }); S._ant = true; }
+        else if (x.beat + c.beats >= 4) { bass.push({ bar: x.bar, beat: x.beat + 1, midi: nr, len: 1.9, vel: 0.76 }); S._ant = true; }
+        else bass.push({ bar: x.bar, beat: x.beat + 1.5, midi: fifth, len: 0.5, vel: 0.6 });
       }
       var v = voicings(c, pv); pv = v;
       var bank = x.n === 1 ? S.comp : S.half, hits = bank[x.bar % bank.length];
