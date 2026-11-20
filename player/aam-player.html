@@ -32,6 +32,8 @@
 #aam-play .lbl { font: 600 12px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); min-width: 70px; }
 #aam-play .play { width: 60px; height: 60px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; flex: none; }
 #aam-play .play svg { width: 24px; height: 24px; fill: currentColor; }
+#aam-play .apply-pill { position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); z-index: 1; height: 40px; padding: 0 20px; border-radius: 999px; background: var(--now); color: var(--now-ink); font: 600 15px/40px var(--body); white-space: nowrap; box-shadow: 0 6px 20px rgba(20,23,26,.28); }
+#aam-play .pend { outline: 2px dashed var(--accent); outline-offset: 2px; }
 #aam-play .now { display: grid; gap: 2px; min-width: 0; }
 #aam-play .now .label { font: 600 15px var(--display); }
 #aam-play .now .where { font: 500 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -534,7 +536,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
           <button class="chip key-btn" data-r="key-btn" aria-haspopup="dialog">Key</button>
         </div>
         <div class="reps" data-r="reps-wrap">
-          <button class="reps-btn" data-r="reps" aria-haspopup="listbox" aria-expanded="false" aria-label="How many times through">Play 1×</button>
+          <button class="reps-btn" data-r="reps" aria-haspopup="listbox" aria-expanded="false" aria-label="Number of repeats">Play 1×</button>
           <ul class="reps-list" data-r="reps-list" role="listbox" hidden></ul>
         </div>
       </div>
@@ -567,10 +569,11 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
       </div>
         <button class="p-met" data-r="p-met" aria-haspopup="dialog" aria-pressed="false" aria-label="Metronome"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l4 18H5z"/><path d="M12 16.5L17.5 6"/><circle cx="16.4" cy="8.1" r="1.5"/><path d="M7.2 16.5h9.6"/></svg></button>
       </div>
+      <button class="apply-pill" data-r="apply" hidden>Apply changes</button>
       <button class="play" data-r="p-play" aria-label="Play"><svg viewBox="0 0 24 24" data-r="p-play-ic"><path d="M7 4v16l13-8z"/></svg></button>
       <div class="p-right">
         <button class="p-key" data-r="p-key" aria-haspopup="dialog" aria-label="Key and instrument"><b data-r="p-key-k">C</b><small data-r="p-key-i">Concert</small></button>
-        <button class="p-reps" data-r="p-reps" aria-haspopup="true" aria-label="How many times through">1×</button>
+        <button class="p-reps" data-r="p-reps" aria-haspopup="true" aria-label="Number of repeats">1×</button>
         <div class="p-reps-pop" data-r="p-reps-pop" hidden></div>
         <button class="p-gear" data-r="p-gear" aria-label="Practice settings"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
       </div>
@@ -907,15 +910,33 @@ function aamBoot(TUNE) {
     applyRange(state.playing ? startBar() : null);
   }
   root.querySelectorAll("[data-mode]").forEach(function (b) { b.onclick = function () { setMode(b.dataset.mode); }; });
+  // Changes that would pull the music out from under a player (how many repeats, the key, the instrument the page is written for)
+  // wait while the band is playing: the choice is outlined, "Apply changes" appears above Play, and nothing moves until it is tapped.
+  // Stopping applies them, so the next Play uses what the screen shows. Tempo, style, the mix and the metronome stay instant.
+  var staged = {};
+  function showApply() { var n = Object.keys(staged).length, b = $("apply"); if (b) { b.hidden = !n; b.textContent = n > 1 ? "Apply " + n + " changes" : "Apply changes"; } }
+  function stage(name, fn, btn) {
+    if (!state.playing) { fn(); return; }
+    staged[name] = fn;
+    if (btn) { [].forEach.call(btn.parentNode.children, function (x) { x.classList.remove("pend"); }); btn.classList.add("pend"); }
+    showApply();
+  }
+  function applyStaged() {
+    var fns = staged; staged = {};
+    [].forEach.call(root.querySelectorAll(".pend"), function (x) { x.classList.remove("pend"); });
+    Object.keys(fns).forEach(function (k) { fns[k](); });
+    showApply();
+  }
+  $("apply").onclick = function (e) { e.stopPropagation(); applyStaged(); };
   var repsName = function (n) { return n ? "Play " + n + "×" : "Keep looping"; };
   var repsShort = function () { return state.reps ? state.reps + "×" : "∞"; };
   // phones: the repeat count sits on the play bar; tapping it opens a small pad of choices
   (function () {
     var pop = $("p-reps-pop"), btn = $("p-reps");
-    pop.innerHTML = "<b>How many times through</b>";
+    pop.innerHTML = "<b>Number of repeats</b>";
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 20].forEach(function (n) {
       var b = document.createElement("button"); b.dataset.n = n; b.textContent = n ? n + "×" : "∞"; if (!n) b.setAttribute("aria-label", "Keep looping");
-      b.onclick = function (e) { e.stopPropagation(); state.reps = n; open(false); applyRange(null); };
+      b.onclick = function (e) { e.stopPropagation(); open(false); stage("reps", function () { state.reps = n; applyRange(null); }, b); };
       pop.appendChild(b);
     });
     function open(on) { pop.hidden = !on; btn.setAttribute("aria-expanded", on ? "true" : "false"); }
@@ -928,10 +949,10 @@ function aamBoot(TUNE) {
     var dlg = $("kdlg"), grid = $("k-keys"), names = MINOR ? MIN : MAJ, tail = MINOR ? "m" : "";
     names.forEach(function (nm, pc) {
       var b = document.createElement("button"); b.dataset.pc = pc; b.textContent = nice(nm) + tail;
-      b.onclick = function () { var k = ((pc - pcOf(HOMEROOT) - keyState.inst) % 12 + 12) % 12; keyState.key = k > 6 ? k - 12 : k; apply(); };
+      b.onclick = function () { stage("key", function () { var k = ((pc - pcOf(HOMEROOT) - keyState.inst) % 12 + 12) % 12; keyState.key = k > 6 ? k - 12 : k; apply(); }, b); };
       grid.appendChild(b);
     });
-    [].forEach.call($("k-insts").children, function (b) { b.onclick = function () { keyState.inst = +b.dataset.inst; apply(); }; });
+    [].forEach.call($("k-insts").children, function (b) { b.onclick = function () { stage("inst", function () { keyState.inst = +b.dataset.inst; apply(); }, b); }; });
     keyLabels = function () {
       var k = nice(shownKey()) + tail, shown = pcOf(shownKey()), home = (pcOf(HOMEROOT) + keyState.inst) % 12;
       $("p-key-k").textContent = k;
@@ -973,7 +994,7 @@ function aamBoot(TUNE) {
   [0].concat(Array.apply(null, Array(20)).map(function (_, i) { return i + 1; })).forEach(function (n) {   // Keep looping first, then 1×–20×
     var li = document.createElement("li"); li.textContent = repsName(n); li.dataset.n = n; li.setAttribute("role", "option");
     if (n === 0) li.className = "sep";
-    li.onclick = function () { state.reps = n; repsOpen(false); applyRange(null); };
+    li.onclick = function () { repsOpen(false); stage("reps", function () { state.reps = n; applyRange(null); }, li); };
     $("reps-list").appendChild(li);
   });
   function repsOpen(on) {
@@ -1699,7 +1720,8 @@ function aamBoot(TUNE) {
     o.style.width = score.clientWidth + "px"; o.style.height = Math.max(0, cut.top - 8 - pageTop(p)) + "px";
     var c = svg.cloneNode(true);
     [].slice.call(c.querySelectorAll(".is-now")).forEach(function (e) { e.classList.remove("is-now"); });
-    [].slice.call(c.querySelectorAll(".loop-g")).forEach(function (e) { e.parentNode.removeChild(e); });
+    [].slice.call(c.querySelectorAll(".loop-g, .lr-line, defs")).forEach(function (e) { if (e.tagName.toLowerCase() !== "defs" || e.querySelector("#lr-soft")) e.parentNode.removeChild(e); });   // the copy carries no cloud and no second filter with the same id (a phone then drew the real cloud unblurred, or not at all)
+    [].slice.call(c.querySelectorAll(".lr-now, .lr-ok, .lr-miss")).forEach(function (e) { e.classList.remove("lr-now", "lr-ok", "lr-miss"); });
     c.removeAttribute("id");
     c.style.cssText = "position:absolute;display:block;max-width:none;left:" + (vr.left - sr.left - score.clientLeft) + "px;top:" +
       (vr.top - sr.top - score.clientTop + score.scrollTop - pageTop(np)) + "px;width:" + vr.width + "px;height:" + vr.height + "px";
@@ -2299,6 +2321,7 @@ function aamBoot(TUNE) {
   function stop() {
     AAM_TRACK.stop();
     Tone.Transport.stop(); clearOneShots(); state.playing = false; state.pass = 1; setIcon(false);
+    applyStaged();                                                                         // anything waiting for "Apply changes" takes effect now that the music has stopped
     if (drone) drone.releaseAll();
     if (cycleId !== null) { Tone.Transport.clear(cycleId); cycleId = null; }
     if (keyAtStart !== null && keyState.key !== keyAtStart) { keyState.key = keyAtStart; keyApply(); }   // through the keys: back to where it started

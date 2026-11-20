@@ -10,9 +10,20 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
-- Band styles: a picker beside the instrument's name (and in Practice settings) changes the band while it plays. Five styles to start: Medium Swing, Two-Feel, Up-Tempo Swing, Bossa Nova, Straight Ballad. The choice is remembered per tune.
 
 ### Fixed
+
+### Prevented
+
+## v1.1 · 2026-11-20
+
+### Added
+- Band styles: a picker beside the instrument's name (and in Practice settings) changes the band while it plays. Five styles to start: Medium Swing, Two-Feel, Up-Tempo Swing, Bossa Nova, Straight Ballad. The choice is remembered per tune.
+- "Apply changes": while the band is playing, a new number of repeats, a new key or a new instrument reading waits (the choice is outlined) until "Apply changes" above the Play button is tapped. Stopping applies it. Tempo, style, the mix and the metronome stay instant.
+
+### Fixed
+- During a page turn the cloud could show as a plain blue shape, or the notes turned blue with no cloud. The copy of the next page no longer carries a cloud or a second copy of its blur.
+- "How many times through" is now "Number of repeats".
 
 ### Prevented
 

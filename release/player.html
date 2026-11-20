@@ -32,6 +32,8 @@
 #aam-play .lbl { font: 600 12px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); min-width: 70px; }
 #aam-play .play { width: 60px; height: 60px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; flex: none; }
 #aam-play .play svg { width: 24px; height: 24px; fill: currentColor; }
+#aam-play .apply-pill { position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); z-index: 1; height: 40px; padding: 0 20px; border-radius: 999px; background: var(--now); color: var(--now-ink); font: 600 15px/40px var(--body); white-space: nowrap; box-shadow: 0 6px 20px rgba(20,23,26,.28); }
+#aam-play .pend { outline: 2px dashed var(--accent); outline-offset: 2px; }
 #aam-play .now { display: grid; gap: 2px; min-width: 0; }
 #aam-play .now .label { font: 600 15px var(--display); }
 #aam-play .now .where { font: 500 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -401,6 +403,13 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 #aam-play .k-grid button[aria-pressed="true"] { background: var(--now); color: var(--now-ink); }
 #aam-play .k-grid button.home { box-shadow: inset 0 0 0 2px var(--accent); }
 #aam-play .k-note { margin: 0; font-size: 13px; color: var(--muted); }
+#aam-play .st-list { display: grid; gap: 4px; }
+#aam-play .st-list h3 { margin: 8px 2px 2px; font: 600 11px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--accent-text); }
+#aam-play .st-list button { display: grid; gap: 1px; width: 100%; padding: 10px 14px; border-radius: 14px; border: 1.5px solid var(--line, #d7e3ee); background: var(--surface); text-align: left; }
+#aam-play .st-list button b { font: 600 16px/1.25 var(--display); color: var(--ink); } #aam-play .st-list button small { font-size: 12.5px; line-height: 1.3; color: var(--muted); }
+#aam-play .st-list button[aria-pressed="true"] { background: var(--now); border-color: var(--now); } #aam-play .st-list button[aria-pressed="true"] b, #aam-play .st-list button[aria-pressed="true"] small { color: var(--now-ink); }
+#aam-play .st-pill { flex: none; margin-left: 4px; height: 26px; padding: 0 22px 0 10px; border-radius: 999px; border: 1.5px solid var(--line, #d7e3ee); background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%230c77ba' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.5 1.5 6 6l4.5-4.5'/%3E%3C/svg%3E") right 8px center / 9px no-repeat; color: var(--accent-text); font: 600 12.5px/23px var(--body); white-space: nowrap; }
+@media (max-width: 620px) { #aam-play .st-pill { height: 22px; font-size: 11.5px; line-height: 19px; padding: 0 20px 0 8px; } }
 #aam-play .k-sub { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 14px; }
 #aam-play .sax { width: 24px; height: 24px; fill: none; stroke: var(--accent-text); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 #aam-play .k-insts { display: grid; gap: 8px; }
@@ -507,7 +516,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
           <button class="chip" data-r="countin" aria-pressed="true">Count-in</button>
           <button class="chip" data-r="ramp" aria-pressed="false">Speed up +5 each time <small data-r="ramp-target"></small></button>
           <button class="chip" data-r="cycle" aria-pressed="false">Through the keys: off</button>
-          <button class="chip" data-r="feel" aria-pressed="false">Band: swing</button>
+          <button class="chip" data-r="feel" aria-haspopup="dialog">Style: Medium Swing</button>
         </div>
       </div>
 
@@ -527,7 +536,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
           <button class="chip key-btn" data-r="key-btn" aria-haspopup="dialog">Key</button>
         </div>
         <div class="reps" data-r="reps-wrap">
-          <button class="reps-btn" data-r="reps" aria-haspopup="listbox" aria-expanded="false" aria-label="How many times through">Play 1×</button>
+          <button class="reps-btn" data-r="reps" aria-haspopup="listbox" aria-expanded="false" aria-label="Number of repeats">Play 1×</button>
           <ul class="reps-list" data-r="reps-list" role="listbox" hidden></ul>
         </div>
       </div>
@@ -560,10 +569,11 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
       </div>
         <button class="p-met" data-r="p-met" aria-haspopup="dialog" aria-pressed="false" aria-label="Metronome"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l4 18H5z"/><path d="M12 16.5L17.5 6"/><circle cx="16.4" cy="8.1" r="1.5"/><path d="M7.2 16.5h9.6"/></svg></button>
       </div>
+      <button class="apply-pill" data-r="apply" hidden>Apply changes</button>
       <button class="play" data-r="p-play" aria-label="Play"><svg viewBox="0 0 24 24" data-r="p-play-ic"><path d="M7 4v16l13-8z"/></svg></button>
       <div class="p-right">
         <button class="p-key" data-r="p-key" aria-haspopup="dialog" aria-label="Key and instrument"><b data-r="p-key-k">C</b><small data-r="p-key-i">Concert</small></button>
-        <button class="p-reps" data-r="p-reps" aria-haspopup="true" aria-label="How many times through">1×</button>
+        <button class="p-reps" data-r="p-reps" aria-haspopup="true" aria-label="Number of repeats">1×</button>
         <div class="p-reps-pop" data-r="p-reps-pop" hidden></div>
         <button class="p-gear" data-r="p-gear" aria-label="Practice settings"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
       </div>
@@ -597,6 +607,14 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
         <button class="t-go" data-r="t-go" hidden>Start learning the notes</button>
         <button class="t-cal" data-r="t-cal">Check my microphone again</button>
         <p class="k-note">Nothing is recorded. The sound is measured on this device and thrown away.</p>
+      </div>
+    </div>
+    <!-- band style: what kind of band plays the chords -->
+    <div class="kdlg" data-r="stdlg" hidden role="dialog" aria-label="Band style">
+      <div class="kcard">
+        <div class="khead"><h2>Band style</h2><button class="btn-done" data-r="st-close">Done</button></div>
+        <div class="st-list" data-r="st-list"></div>
+        <p class="k-note">The band changes on the next note. Your choice is remembered for this tune.</p>
       </div>
     </div>
     <!-- tempo wheel (phones): scroll to a speed instead of tapping plus and minus -->
@@ -646,7 +664,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 
 <script>
 // >>> SETTINGS
-var PLAYER_VERSION = "v1.0.2 · 2026-11-20 09:11 UTC (after 3a3f320)";    // stamped by tools/release.py when a version is released
+var PLAYER_VERSION = "v1.1 · 2026-11-20 10:45 UTC (after a72589b)";    // stamped by tools/release.py when a version is released
 var STUDENT_HOME = "https://alexattardmusic.com/student-login/";              // where the "back" link goes: put the address of your student login page here, e.g. "/student-login/"
 var STUDENT_HOME_LABEL = "Student home";         // what the link says. Leave "" for "Student login" (or "Website" while the address above is "/")
 var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    // folder with p36.mp3 ... d-ride.mp3 (keep the final "/")
@@ -735,21 +753,47 @@ function aamBoot(TUNE) {
   // Time signature: quarter-note beats in a bar (2, 3 or 4). The band styles are 4/4 only; "solo" pieces, clicks and drones can be 2/4 or 3/4.
   var BPB = (TUNE.style && TUNE.style !== "swing" && TUNE.meter && [2, 3, 4].indexOf(+TUNE.meter[0]) >= 0 && +TUNE.meter[1] === 4) ? +TUNE.meter[0] : 4;
   var NB = TUNE.bars.length, PPQ = 192, BAR = BPB * PPQ, LEAD = 2;      // music bar k starts at tick (k + LEAD) * BAR
-  var SW = Math.round(PPQ / 6);                                         // swung eighth: off-beat moves 1/6 beat later (triplet feel)
-  // The band's feel. "swing": walking bass, ride cymbal, swung eighths. "straight": even eighths, bass on 1 and 3, held chords,
-  // a soft rim click on 2 and 4 (for classical, folk and pop tunes). A tune names its own ("feel" in the tune file); the player can switch.
-  var feel = TUNE.feel === "straight" || TUNE.style === "solo" ? "straight" : "swing";   // written classical pieces are never swung
-  try { var fv = JSON.parse(localStorage.getItem("aam-feel") || "{}")[TUNE.slug]; if (fv === "swing" || fv === "straight") feel = fv; } catch (e) {}
-  (function () {
-    var b = $("feel"); if (!b) return;
-    if ((TUNE.style || "swing") !== "swing") { b.hidden = true; return; }
-    var show = function () { b.textContent = "Band: " + feel; b.setAttribute("aria-pressed", feel === "straight" ? "true" : "false"); };
-    b.onclick = function () {
-      feel = feel === "swing" ? "straight" : "swing"; show();
-      try { var all = JSON.parse(localStorage.getItem("aam-feel") || "{}"); all[TUNE.slug] = feel; localStorage.setItem("aam-feel", JSON.stringify(all)); } catch (e) {}
-    };
-    show();
-  })();
+  // The band's styles. A style is DATA: how much the eighths swing, a drum grid, a bass rule and a bank of comping rhythms.
+  // "swing" and "ballad" are the two the player was born with and keep their own hand-tuned code below; every other style is
+  // played by the one generic scheduler (bandParts / the block after comping() in scheduleMusic). To add a style: add an entry here.
+  //   sw     ticks an off-beat eighth is late (PPQ / 6 = triplet swing, 0 = even eighths)
+  //   drums  one list per bar, cycled: [sound, beat, loudness, classic-kit dB (null = studio sounds only), chance (default 1)]
+  //   bass   "walk" | "two" | "bossa"                     comp   one list per bar for a chord that lasts the bar, cycled: [beat, length]
+  //   half   the same for a chord that lasts half a bar   kit    extra drum sounds this style needs loaded
+  var BAND = {
+    swing:  { name: "Medium Swing", group: "Jazz", sw: Math.round(PPQ / 6), note: "Walking bass, ride cymbal, swung eighths" },
+    two:    { name: "Two-Feel", group: "Jazz", sw: Math.round(PPQ / 6), note: "Bass in two, lighter drums: the head of a standard",
+              bass: "two",
+              drums: [[["ride", 0, 0.42, -6], ["ride", 1, 0.58, -4], ["ride", 1.5, 0.3, -10, 0.55], ["ride", 2, 0.44, -6], ["ride", 3, 0.58, -4], ["ride", 3.5, 0.32, -10],
+                       ["hh", 1, 0.7, -3], ["hh", 3, 0.7, -3], ["kick", 0, 0.34, -16], ["kick", 2, 0.3, -18], ["snare", 3.5, 0.28, null, 0.15]]],
+              comp: [[[0, 1.6], [2.5, 0.9]], [[1.5, 0.5], [3, 0.9]], [[0, 2.2]], [[0, 0.6], [1.5, 1.2]]],
+              half: [[[0, 1.3]], [[0, 0.6], [1.5, 0.4]]] },
+    up:     { name: "Up-Tempo Swing", group: "Jazz", sw: Math.round(PPQ / 10), note: "Lighter, straighter eighths and sparse chords for fast tempos",
+              bass: "walk",
+              drums: [[["ride", 0, 0.58, -2], ["ride", 1, 0.84, 0], ["ride", 1.5, 0.36, -8, 0.7], ["ride", 2, 0.6, -2], ["ride", 3, 0.84, 0], ["ride", 3.5, 0.4, -7],
+                       ["hh", 1, 0.8, -2], ["hh", 3, 0.8, -2], ["kick", 0, 0.3, -18], ["kick", 1, 0.28, -18], ["kick", 2, 0.3, -18], ["kick", 3, 0.28, -18],
+                       ["snare", 1.5, 0.34, null, 0.22], ["snare", 2.5, 0.3, null, 0.12], ["snare", 3.5, 0.36, null, 0.32], ["kick", 3.5, 0.5, null, 0.08]]],
+              comp: [[[1.5, 0.4]], [[0, 0.5], [3.5, 0.4]], [[2.5, 0.5]], [[3.5, 0.45]]],
+              half: [[[0, 0.5]], [[1.5, 0.4]]] },
+    bossa:  { name: "Bossa Nova", group: "Latin", sw: 0, note: "Even eighths, rim click, a gentle two in the bass", kit: ["hhc"],
+              bass: "bossa",
+              drums: [[["hhc", 0, 0.46, null], ["hhc", 0.5, 0.34, null], ["hhc", 1, 0.44, null], ["hhc", 1.5, 0.34, null], ["hhc", 2, 0.46, null], ["hhc", 2.5, 0.34, null], ["hhc", 3, 0.44, null], ["hhc", 3.5, 0.34, null],
+                       ["kick", 0, 0.56, -10], ["kick", 1.5, 0.4, -14], ["kick", 2, 0.5, -11], ["kick", 3.5, 0.4, -14], ["stick", 0, 0.36, -9], ["stick", 1.5, 0.34, -9], ["stick", 3, 0.36, -9]],
+                      [["hhc", 0, 0.46, null], ["hhc", 0.5, 0.34, null], ["hhc", 1, 0.44, null], ["hhc", 1.5, 0.34, null], ["hhc", 2, 0.46, null], ["hhc", 2.5, 0.34, null], ["hhc", 3, 0.44, null], ["hhc", 3.5, 0.34, null],
+                       ["kick", 0, 0.56, -10], ["kick", 1.5, 0.4, -14], ["kick", 2, 0.5, -11], ["kick", 3.5, 0.4, -14], ["stick", 1, 0.36, -9], ["stick", 2.5, 0.34, -9]]],
+              comp: [[[0, 0.9], [1.5, 1.2], [3, 0.8]], [[1, 1.2], [2.5, 1.2]]],
+              half: [[[0, 0.9], [1.5, 0.45]]] },
+    ballad: { name: "Straight Ballad", group: "Pop", sw: 0, note: "Even eighths, held chords, bass on 1 and 3" }
+  };
+  var BAND_GROUPS = ["Jazz", "Latin", "Pop"];
+  // A tune names its own style ("band" in the tune file; the older "feel": "straight" means the ballad); the student's choice is remembered per tune.
+  var band = BAND[TUNE.band] ? TUNE.band : (TUNE.feel === "straight" || TUNE.style === "solo" ? "ballad" : "swing");
+  try {
+    var bv = JSON.parse(localStorage.getItem("aam-band") || "{}")[TUNE.slug], fv = JSON.parse(localStorage.getItem("aam-feel") || "{}")[TUNE.slug];
+    if (BAND[bv]) band = bv; else if (fv === "straight") band = "ballad"; else if (fv === "swing") band = "swing";      // "aam-feel" is the choice made before there were styles
+  } catch (e) {}
+  var feel = BAND[band].sw ? "swing" : "straight";                                       // do the written eighths swing?
+  var SW = BAND[band].sw;                                                                // how late an off-beat eighth is, in ticks, in the style playing now
   var state = { tempo: TUNE.tempo_presets[0] || 100, bass: true, drums: true, comp: true, countin: true, ramp: false, demo: "off",
                 mode: "whole", from: 0, a: null, b: null, pending: false, reps: TUNE.reps || 1,
                 playing: false, loaded: false, pass: 1, start: 0 };
@@ -770,6 +814,33 @@ function aamBoot(TUNE) {
     if (!WHO) { el.classList.remove("inst"); el.textContent = TUNE.subtitle; return; }      // an instrument with no icon yet keeps the old line of text
     el.classList.add("inst"); el.innerHTML = '<span class="inst-ic">' + ICON[WHO[0]] + "</span><span data-r=\"inst-name\"></span>";
     el.lastChild.textContent = WHO[1]; el.setAttribute("data-inst", WHO[0]);
+  })();
+  (function () {                                              // the style picker: a pill beside the instrument's name and a chip in Practice settings open the same list
+    var chip = $("feel"), dlg = $("stdlg"), list = $("st-list"), pill = null;
+    if (STYLE !== "swing") { if (chip) chip.hidden = true; return; }        // exercises and written pieces have no band
+    var sub = $("subtitle");
+    if (sub.classList.contains("inst")) { pill = document.createElement("button"); pill.className = "st-pill"; pill.setAttribute("data-r", "style-btn"); pill.setAttribute("aria-haspopup", "dialog"); pill.setAttribute("aria-label", "Band style"); sub.appendChild(pill); }
+    var show = function () {
+      if (pill) pill.textContent = BAND[band].name;
+      if (chip) chip.textContent = "Style: " + BAND[band].name;
+      [].forEach.call(list.querySelectorAll("button"), function (b) { b.setAttribute("aria-pressed", b.dataset.id === band ? "true" : "false"); });
+    };
+    list.innerHTML = BAND_GROUPS.map(function (g) {
+      var ids = Object.keys(BAND).filter(function (id) { return BAND[id].group === g; });
+      return ids.length ? "<h3>" + g + "</h3>" + ids.map(function (id) { return '<button data-id="' + id + '"><b>' + BAND[id].name + "</b><small>" + BAND[id].note + "</small></button>"; }).join("") : "";
+    }).join("");
+    list.addEventListener("click", function (e) {
+      var b = e.target.closest("button"); if (!b || !BAND[b.dataset.id]) return;
+      band = b.dataset.id; feel = BAND[band].sw ? "swing" : "straight"; SW = BAND[band].sw; show();
+      try { var all = JSON.parse(localStorage.getItem("aam-band") || "{}"); all[TUNE.slug] = band; localStorage.setItem("aam-band", JSON.stringify(all)); } catch (e2) {}
+      AAM_TRACK.event("aam_style", { tune: TUNE.slug, tune_title: TUNE.title, instrument: TUNE.instrument || "", style: band });
+    });
+    var open = function () { dlg.hidden = false; show(); };
+    if (pill) pill.onclick = open;
+    if (chip) chip.onclick = open;
+    $("st-close").onclick = function () { dlg.hidden = true; };
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.hidden = true; });
+    show();
   })();
 
   $("gate").hidden = true; $("content").hidden = false;
@@ -839,15 +910,33 @@ function aamBoot(TUNE) {
     applyRange(state.playing ? startBar() : null);
   }
   root.querySelectorAll("[data-mode]").forEach(function (b) { b.onclick = function () { setMode(b.dataset.mode); }; });
+  // Changes that would pull the music out from under a player (how many repeats, the key, the instrument the page is written for)
+  // wait while the band is playing: the choice is outlined, "Apply changes" appears above Play, and nothing moves until it is tapped.
+  // Stopping applies them, so the next Play uses what the screen shows. Tempo, style, the mix and the metronome stay instant.
+  var staged = {};
+  function showApply() { var n = Object.keys(staged).length, b = $("apply"); if (b) { b.hidden = !n; b.textContent = n > 1 ? "Apply " + n + " changes" : "Apply changes"; } }
+  function stage(name, fn, btn) {
+    if (!state.playing) { fn(); return; }
+    staged[name] = fn;
+    if (btn) { [].forEach.call(btn.parentNode.children, function (x) { x.classList.remove("pend"); }); btn.classList.add("pend"); }
+    showApply();
+  }
+  function applyStaged() {
+    var fns = staged; staged = {};
+    [].forEach.call(root.querySelectorAll(".pend"), function (x) { x.classList.remove("pend"); });
+    Object.keys(fns).forEach(function (k) { fns[k](); });
+    showApply();
+  }
+  $("apply").onclick = function (e) { e.stopPropagation(); applyStaged(); };
   var repsName = function (n) { return n ? "Play " + n + "×" : "Keep looping"; };
   var repsShort = function () { return state.reps ? state.reps + "×" : "∞"; };
   // phones: the repeat count sits on the play bar; tapping it opens a small pad of choices
   (function () {
     var pop = $("p-reps-pop"), btn = $("p-reps");
-    pop.innerHTML = "<b>How many times through</b>";
+    pop.innerHTML = "<b>Number of repeats</b>";
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 20].forEach(function (n) {
       var b = document.createElement("button"); b.dataset.n = n; b.textContent = n ? n + "×" : "∞"; if (!n) b.setAttribute("aria-label", "Keep looping");
-      b.onclick = function (e) { e.stopPropagation(); state.reps = n; open(false); applyRange(null); };
+      b.onclick = function (e) { e.stopPropagation(); open(false); stage("reps", function () { state.reps = n; applyRange(null); }, b); };
       pop.appendChild(b);
     });
     function open(on) { pop.hidden = !on; btn.setAttribute("aria-expanded", on ? "true" : "false"); }
@@ -860,10 +949,10 @@ function aamBoot(TUNE) {
     var dlg = $("kdlg"), grid = $("k-keys"), names = MINOR ? MIN : MAJ, tail = MINOR ? "m" : "";
     names.forEach(function (nm, pc) {
       var b = document.createElement("button"); b.dataset.pc = pc; b.textContent = nice(nm) + tail;
-      b.onclick = function () { var k = ((pc - pcOf(HOMEROOT) - keyState.inst) % 12 + 12) % 12; keyState.key = k > 6 ? k - 12 : k; apply(); };
+      b.onclick = function () { stage("key", function () { var k = ((pc - pcOf(HOMEROOT) - keyState.inst) % 12 + 12) % 12; keyState.key = k > 6 ? k - 12 : k; apply(); }, b); };
       grid.appendChild(b);
     });
-    [].forEach.call($("k-insts").children, function (b) { b.onclick = function () { keyState.inst = +b.dataset.inst; apply(); }; });
+    [].forEach.call($("k-insts").children, function (b) { b.onclick = function () { stage("inst", function () { keyState.inst = +b.dataset.inst; apply(); }, b); }; });
     keyLabels = function () {
       var k = nice(shownKey()) + tail, shown = pcOf(shownKey()), home = (pcOf(HOMEROOT) + keyState.inst) % 12;
       $("p-key-k").textContent = k;
@@ -905,7 +994,7 @@ function aamBoot(TUNE) {
   [0].concat(Array.apply(null, Array(20)).map(function (_, i) { return i + 1; })).forEach(function (n) {   // Keep looping first, then 1×–20×
     var li = document.createElement("li"); li.textContent = repsName(n); li.dataset.n = n; li.setAttribute("role", "option");
     if (n === 0) li.className = "sep";
-    li.onclick = function () { state.reps = n; repsOpen(false); applyRange(null); };
+    li.onclick = function () { repsOpen(false); stage("reps", function () { state.reps = n; applyRange(null); }, li); };
     $("reps-list").appendChild(li);
   });
   function repsOpen(on) {
@@ -1631,7 +1720,8 @@ function aamBoot(TUNE) {
     o.style.width = score.clientWidth + "px"; o.style.height = Math.max(0, cut.top - 8 - pageTop(p)) + "px";
     var c = svg.cloneNode(true);
     [].slice.call(c.querySelectorAll(".is-now")).forEach(function (e) { e.classList.remove("is-now"); });
-    [].slice.call(c.querySelectorAll(".loop-g")).forEach(function (e) { e.parentNode.removeChild(e); });
+    [].slice.call(c.querySelectorAll(".loop-g, .lr-line, defs")).forEach(function (e) { if (e.tagName.toLowerCase() !== "defs" || e.querySelector("#lr-soft")) e.parentNode.removeChild(e); });   // the copy carries no cloud and no second filter with the same id (a phone then drew the real cloud unblurred, or not at all)
+    [].slice.call(c.querySelectorAll(".lr-now, .lr-ok, .lr-miss")).forEach(function (e) { e.classList.remove("lr-now", "lr-ok", "lr-miss"); });
     c.removeAttribute("id");
     c.style.cssText = "position:absolute;display:block;max-width:none;left:" + (vr.left - sr.left - score.clientLeft) + "px;top:" +
       (vr.top - sr.top - score.clientTop + score.scrollTop - pageTop(np)) + "px;width:" + vr.width + "px;height:" + vr.height + "px";
@@ -1752,7 +1842,7 @@ function aamBoot(TUNE) {
   }
 
   // ---------- music: walking bass and drums from the chords, piano from the tune file
-  function swing(beat) { var f = beat - Math.floor(beat); return Math.round(beat * PPQ) + (Math.abs(f - 0.5) < 0.01 ? SW : 0); }
+  function swing(beat, sw) { var f = beat - Math.floor(beat); return Math.round(beat * PPQ) + (Math.abs(f - 0.5) < 0.01 ? (sw == null ? BAND.swing.sw : sw) : 0); }
   function straightBand() {                                    // per chord: bass root (then the fifth, if the chord lasts the bar) and a held piano chord
     var out = [], prev = null, pv = null;
     TUNE.bars.forEach(function (bar, bi) {
@@ -1822,7 +1912,8 @@ function aamBoot(TUNE) {
     var out = [], band = STYLE === "swing";
     man.piano.notes.forEach(function (m) { (tier === 1 ? [2] : [1, 3]).forEach(function (l) { out.push("p-" + m + "-" + l); }); });
     if (band) man.bass.notes.forEach(function (m) { (tier === 1 ? [[2, 1]] : [[2, 2], [3, 1], [3, 2], [1, 1], [1, 2]]).forEach(function (x) { out.push("b-" + m + "-" + x[0] + "-" + x[1]); }); });
-    (band ? ["ride", "hh", "kick", "snare", "stick"] : ["stick"]).forEach(function (d) {
+    (band ? ["ride", "hh", "kick", "snare", "stick", "hhc"] : ["stick"]).forEach(function (d) {
+      if (!man.drums[d]) return;
       var D = man.drums[d], mid = Math.ceil(D.layers / 2);
       for (var l = 1; l <= D.layers; l++) for (var r = 1; r <= D.rr; r++) { var first = (l === mid && r === 1) || d === "stick"; if (first === (tier === 1)) out.push("d-" + d + "-" + l + "-" + r); }
     });
@@ -1865,11 +1956,12 @@ function aamBoot(TUNE) {
     var mid = (inst === "p" ? PMID : BMID)[best.tk.layer - 1], g = Math.max(0.45, Math.min(1.7, Math.pow(vel / mid, 1.3)));
     sndPlay(best.tk.buf, Math.pow(2, (midi - best.m) / 12), time, dur, g * (boost || 1), inst === "p" ? 0.5 : 0.12, inst === "p" ? SND.pOut : SND.bOut);
   }
-  var DCUT = { ride: [0.45, 0.75], hh: [0.55], kick: [0.5], snare: [0.35, 0.6], stick: [0.4, 0.62, 0.85] };
-  var DMID = { ride: [0.3, 0.6, 0.9], hh: [0.4, 0.75], kick: [0.35, 0.65], snare: [0.25, 0.47, 0.7], stick: [0.3, 0.5, 0.73, 0.95] };
-  var DGAIN = { ride: 0.32, hh: 0.36, kick: 0.3, snare: 0.36, stick: 0.8 };   // cymbals well under the band (set by ear, Nov 2026); the click keeps its level
+  var DCUT = { ride: [0.45, 0.75], hh: [0.55], kick: [0.5], snare: [0.35, 0.6], stick: [0.4, 0.62, 0.85], hhc: [] };
+  var DMID = { ride: [0.3, 0.6, 0.9], hh: [0.4, 0.75], kick: [0.35, 0.65], snare: [0.25, 0.47, 0.7], stick: [0.3, 0.5, 0.73, 0.95], hhc: [0.42] };
+  var DGAIN = { ride: 0.32, hh: 0.36, kick: 0.3, snare: 0.36, stick: 0.8, hhc: 0.22 };   // cymbals well under the band (set by ear, Nov 2026); the click keeps its level
   function sndDrum(name, time, vel) {
-    var D = SND.drums[name], tk = sndTake("d-" + name, D.layers, D.rr, vel, DCUT[name]);
+    var D = SND.drums[name]; if (!D) return;
+    var tk = sndTake("d-" + name, D.layers, D.rr, vel, DCUT[name]);
     if (!tk) return;
     sndPlay(tk.buf, 1, time, 0, DGAIN[name] * Math.max(0.4, Math.min(1.8, Math.pow(vel / DMID[name][tk.layer - 1], 1.5))), 0.1, SND.dOut);
   }
@@ -2024,6 +2116,30 @@ function aamBoot(TUNE) {
     });
     return out;
   }
+  function bandParts(S) {                                      // the bass line and the piano's chords for a style from the BAND table
+    var flat = []; TUNE.bars.forEach(function (bar, bi) { var beat = 0; bar.forEach(function (c) { flat.push({ c: c, bar: bi, beat: beat, n: bar.length }); beat += c.beats; }); });
+    var low = function (c, prev) { var r = 33 + ((c.root - 33) % 12 + 12) % 12; if (prev !== null && Math.abs(r + 12 - prev) < Math.abs(r - prev) && r + 12 <= 47) r += 12; return r; };
+    var bass = [], comp = [], prev = null, pv = null;
+    if (S.bass === "walk") bass = walkingBass().filter(function (e) { return !e.ghost; }).map(function (e) { return { bar: e.bar, beat: e.beat, midi: e.midi, len: 0.98, vel: 0.72 + (e.beat % 2 === 1 ? 0.07 : 0) }; });
+    flat.forEach(function (x, i) {
+      var c = x.c, r = low(c, prev), nr = low(flat[(i + 1) % flat.length].c, r), fifth = r + c.degs[4] <= 50 ? r + c.degs[4] : r + c.degs[4] - 12; prev = r;
+      if (S.bass === "two") {                                  // root, then the fifth; now and then a step into the next chord
+        if (c.beats >= 4) {
+          var lead = i % 2 === 1;
+          bass.push({ bar: x.bar, beat: x.beat, midi: r, len: 1.9, vel: 0.76 }, { bar: x.bar, beat: x.beat + 2, midi: fifth, len: lead ? 0.95 : 1.8, vel: 0.7 });
+          if (lead) bass.push({ bar: x.bar, beat: x.beat + 3, midi: nr > fifth ? nr - 1 : nr + 1, len: 0.95, vel: 0.66 });
+        } else bass.push({ bar: x.bar, beat: x.beat, midi: r, len: c.beats * 0.95, vel: 0.74 });
+      }
+      if (S.bass === "bossa") {                                // long, short, long, short: root and fifth
+        bass.push({ bar: x.bar, beat: x.beat, midi: r, len: 1.45, vel: 0.74 }, { bar: x.bar, beat: x.beat + 1.5, midi: c.beats >= 4 ? fifth : r, len: 0.5, vel: 0.56 });
+        if (c.beats >= 4) bass.push({ bar: x.bar, beat: x.beat + 2, midi: fifth, len: 1.45, vel: 0.7 }, { bar: x.bar, beat: x.beat + 3.5, midi: r, len: 0.5, vel: 0.54 });
+      }
+      var v = voicings(c, pv); pv = v;
+      var bank = x.n === 1 ? S.comp : S.half, hits = bank[x.bar % bank.length];
+      hits.forEach(function (h) { if (h[0] < c.beats) comp.push({ bar: x.bar, beat: x.beat + h[0], len: Math.min(h[1], c.beats - h[0] + 0.5), notes: v }); });
+    });
+    return { bass: bass, comp: comp };
+  }
   function scheduleMusic() {
     var secPerBeat = function () { return 60 / Tone.Transport.bpm.value; };
     for (var mb = 0; mb < NB + LEAD; mb++) for (var mq = 0; mq < BPB; mq++) (function (first, tick) {   // the metronome, count-in bars included
@@ -2044,7 +2160,7 @@ function aamBoot(TUNE) {
     }
     if (STYLE === "swing") walkingBass().forEach(function (e) {   // a player's touch: 2 and 4 lean in a little, no two notes quite alike
       at((e.bar + LEAD) * BAR + (e.ghost ? swing(e.beat) : e.beat * PPQ), function (time) {
-        if (!state.bass || feel !== "swing") return;
+        if (!state.bass || band !== "swing") return;
         if (e.ghost) { if (Math.random() < 0.6) bs(e.midi + keyState.key, secPerBeat() * 0.3, time, 0.36 + jit(0.05)); return; }
         bs(e.midi + keyState.key, secPerBeat() * 0.95, time + Math.random() * 0.006, 0.74 + (e.beat % 2 === 1 ? 0.07 : 0) + jit(0.07));
       });
@@ -2054,20 +2170,20 @@ function aamBoot(TUNE) {
       (function (k) {
         [[0, 0.56, -2], [1, 0.8, 0], [1.5, 0.42, -6], [2, 0.6, -2], [3, 0.8, 0], [3.5, 0.44, -6]].forEach(function (r) {   // ding, ding-a-ding: 2 and 4 the strongest
           at(b0 + swing(r[0]), function (time) {
-            if (!state.drums || feel !== "swing") return;
+            if (!state.drums || band !== "swing") return;
             var top = k === 0 && r[0] === 0;                   // the top of the form gets a clear downbeat
             drm("ride", time + Math.random() * 0.005, top ? 0.92 : r[1] + jit(0.07), r[2]);
           });
         });
-        [1, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums && feel === "swing") drm("hh", time, 0.72 + jit(0.06), -3); }); });
-        [0, 1, 2, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums && feel === "swing") drm("kick", time, 0.34 + jit(0.05), -16); }); });   // feathered: felt more than heard
+        [1, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums && band === "swing") drm("hh", time, 0.72 + jit(0.06), -3); }); });
+        [0, 1, 2, 3].forEach(function (bt) { at(b0 + bt * PPQ, function (time) { if (state.drums && band === "swing") drm("kick", time, 0.34 + jit(0.05), -16); }); });   // feathered: felt more than heard
         [[3.5, 0.3], [1.5, 0.12]].forEach(function (g) {      // the left hand: an occasional soft snare note
-          at(b0 + swing(g[0]), function (time) { if (state.drums && feel === "swing" && Math.random() < g[1]) drm("snare", time, 0.3 + jit(0.08), null); });
+          at(b0 + swing(g[0]), function (time) { if (state.drums && band === "swing" && Math.random() < g[1]) drm("snare", time, 0.3 + jit(0.08), null); });
         });
         // the straight band's drums: a quiet ride on every beat, kick on 1 and 3, a rim click on 2 and 4
         [0, 1, 2, 3].forEach(function (bt) {
           at(b0 + bt * PPQ, function (time) {
-            if (!state.drums || feel !== "straight") return;
+            if (!state.drums || band !== "ballad") return;
             drm("ride", time + Math.random() * 0.004, 0.36 + jit(0.05), -8);
             if (bt % 2 === 0) drm("kick", time, bt === 0 ? 0.6 : 0.48, -10); else drm("stick", time, 0.34 + jit(0.04), -9);
           });
@@ -2076,7 +2192,7 @@ function aamBoot(TUNE) {
     }
     if (STYLE === "swing") straightBand().forEach(function (e) {   // bass on 1 and 3, the chord held under the tune
       at((e.bar + LEAD) * BAR + e.beat * PPQ, function (time) {
-        if (feel !== "straight") return;
+        if (band !== "ballad") return;
         var d = e.len * secPerBeat();
         if (e.bass != null) { if (state.bass) bs(e.bass + keyState.key, d * 0.97, time + Math.random() * 0.005, 0.72 + jit(0.06)); return; }
         if (state.comp) e.notes.forEach(function (n, i) { pno(n + keyState.key, d * 0.96, time + i * 0.012 + Math.random() * 0.004, SND ? 0.36 + jit(0.05) + (i === e.notes.length - 1 ? 0.05 : 0) : 0.32, mixGain("comp")); });
@@ -2084,18 +2200,45 @@ function aamBoot(TUNE) {
     });
     if (STYLE === "swing") comping().forEach(function (e) {
       at((e.bar + LEAD) * BAR + swing(e.beat), function (time) {
-        if (!state.comp || feel !== "swing") return;
+        if (!state.comp || band !== "swing") return;
         var d = Math.max(0.15, e.len * secPerBeat());
         var push = Math.abs(e.beat - Math.round(e.beat)) > 0.1, v = 0.36 + (push ? 0.07 : 0) + jit(0.08);   // off-beat pushes speak a little more
         e.notes.forEach(function (n, i) { pno(n + keyState.key, d, time + i * 0.005 + Math.random() * 0.004, SND ? v + (i === e.notes.length - 1 ? 0.06 : 0) : 0.34, mixGain("comp")); });
       });
+    });
+    if (STYLE === "swing") Object.keys(BAND).forEach(function (id) {   // every other style: played from its entry in BAND
+      var S = BAND[id]; if (!S.drums) return;
+      var P = bandParts(S);
+      P.bass.forEach(function (e) {
+        at((e.bar + LEAD) * BAR + swing(e.beat, S.sw), function (time) {
+          if (band !== id || !state.bass) return;
+          if (e.chance != null && Math.random() > e.chance) return;
+          bs(e.midi + keyState.key, Math.max(0.12, e.len * secPerBeat() * 0.96), time + Math.random() * 0.006, e.vel + jit(0.06));
+        });
+      });
+      P.comp.forEach(function (e) {
+        at((e.bar + LEAD) * BAR + swing(e.beat, S.sw), function (time) {
+          if (band !== id || !state.comp) return;
+          var d = Math.max(0.15, e.len * secPerBeat()), push = Math.abs(e.beat - Math.round(e.beat)) > 0.1, v = 0.36 + (push ? 0.06 : 0) + jit(0.07);
+          e.notes.forEach(function (n, i) { pno(n + keyState.key, d, time + i * 0.006 + Math.random() * 0.004, SND ? v + (i === e.notes.length - 1 ? 0.06 : 0) : 0.34, mixGain("comp")); });
+        });
+      });
+      for (var kk = 0; kk < NB; kk++) (function (kk) {
+        S.drums[kk % S.drums.length].forEach(function (h) {
+          at((kk + LEAD) * BAR + swing(h[1], S.sw), function (time) {
+            if (band !== id || !state.drums) return;
+            if (h[4] != null && Math.random() > h[4]) return;
+            drm(h[0], time + Math.random() * 0.004, (kk === 0 && h[1] === 0 && h[0] === "ride" ? 0.9 : h[2] + jit(0.05)), h[3]);
+          });
+        });
+      })(kk);
     });
     TUNE.sections.forEach(function (s) {
       [["rh", 0.72], ["lh", 0.5]].forEach(function (h) {
         s[h[0]].forEach(function (e) {
           var off = Math.abs(e[0] - Math.floor(e[0]) - 0.5) < 0.01;      // an off-beat eighth: late when the band swings
           at(LEAD * BAR + Math.round(e[0] * PPQ), function (time) {
-            if (off && feel === "swing") time += SW / PPQ * secPerBeat();
+            if (off && SW) time += SW / PPQ * secPerBeat();
             if (state.demo !== s.id || !hands[h[0]]) return;
             var dyn = e[3] ? e[3] / 90 : 1;                    // the note's own loudness (90 = plain), so p and f in the music are heard
             pno(e[1] + keyState.key, Math.max(0.12, e[2] * secPerBeat() * 0.95), time, SND ? Math.max(0.2, Math.min(1, (h[1] + 0.09) * dyn + jit(0.05))) : Math.min(1, h[1] * dyn), 1.4 * mixGain("lead"));   // the written part sits in front of the band
@@ -2178,6 +2321,7 @@ function aamBoot(TUNE) {
   function stop() {
     AAM_TRACK.stop();
     Tone.Transport.stop(); clearOneShots(); state.playing = false; state.pass = 1; setIcon(false);
+    applyStaged();                                                                         // anything waiting for "Apply changes" takes effect now that the music has stopped
     if (drone) drone.releaseAll();
     if (cycleId !== null) { Tone.Transport.clear(cycleId); cycleId = null; }
     if (keyAtStart !== null && keyState.key !== keyAtStart) { keyState.key = keyAtStart; keyApply(); }   // through the keys: back to where it started

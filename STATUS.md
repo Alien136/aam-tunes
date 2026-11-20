@@ -214,3 +214,14 @@ Everything needed to carry on from any conversation is in this repository and in
   1.0.2 --notes <file>` checks and releases a copy of the last released player plus the fix (kept in git-ignored `tools/out/hotfix/`),
   and leaves the Unreleased block of the change log alone. The same fix is in the test copy.
 - `tools/check_features.js` skips the `style` group for a copy of the player that has no styles.
+
+## 2026-11-20 · v1.1: band styles released; "Apply changes"; page-turn cloud fix
+- Alex listened to the five styles in beta and said ship. v1.1 is the test copy as it stood (styles + everything in v1.0.2).
+- `stage(name, fn, btn)`: while `state.playing`, a change is kept in `staged` and its button gets the class `pend` (dashed
+  outline); the pill `[data-r="apply"]` above Play runs them (`applyStaged`). `stop()` also applies them. Staged today: number of
+  repeats (`reps`), key (`key`), instrument reading (`inst`). Instant by design: tempo, style, mix, metronome, the band's on/off
+  chips, Hear it. Not staged yet (Alex to decide): tapping a bar or a loop, through-the-keys, the speed-up ramp, count-in.
+- Page-turn copy (`showOver`): the cloned SVG is stripped of `.lr-line`, of `lr-now`/`lr-ok`/`lr-miss`, and of the `<defs>` holding
+  `#lr-soft`. Two filters with one id made iPhone Safari draw the real cloud unblurred or not at all; the stale copy showed blue
+  notes with no cloud. Not reproducible in Chromium, so the check asserts the copy is clean rather than how it looks.
+- Check group `apply` in `tools/check_features.js`.

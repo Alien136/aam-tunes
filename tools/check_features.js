@@ -9,11 +9,12 @@
      PDF download     the newest booklet PDF arrives and really is a PDF
      play bar         Play is in the exact middle and nothing overlaps, at four screen sizes; the phone tempo wheel sets the tempo;
                       the instrument icon and name sit under the title
+     apply            repeats, key and instrument changes wait for "Apply changes" while the band plays; the page-turn copy has no cloud
      style            the style picker lists the band styles, each one sounds, the choice is remembered, exercises have none
 
    The microphone is a sound file: saxophone-like tones are generated here and fed to the browser as a fake microphone.
 
-   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|learn|cloud|contents|pdf|bar|style]
+   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|learn|cloud|contents|pdf|bar|style|apply]
    Needs:  playwright, plus the tone and abcjs packages (tools/node_modules or $AAM_NODE_MODULES). Nothing is fetched from the internet. */
 const fs = require("fs"), path = require("path"), os = require("os");
 const { chromium, devices } = require("playwright");
@@ -225,6 +226,31 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     await one.click('[data-r="p-play"]'); await one.waitForTimeout(9000);
     const d = await one.evaluate(() => document.querySelectorAll(".score .lr-line").length); expect(d === 1, "a saxophone duet: one cloud, on the top part only (" + d + ")");
     await one.context().close();
+  }
+  if (want("apply")) {                                      // changes made while the band plays wait for "Apply changes"; the page-turn copy carries no cloud
+    const page = await open({ ...devices["iPhone 13"] }, "f-blues-piano");
+    const pill = () => page.evaluate(() => { const b = document.querySelector('[data-r="apply"]'); return b.hidden ? "" : b.textContent; });
+    expect((await page.evaluate(() => document.querySelector('[data-r="p-reps"]').getAttribute("aria-label"))) === "Number of repeats", "repeats: the button is called \"Number of repeats\"");
+    await page.click('[data-r="p-reps"]'); await page.click('[data-r="p-reps-pop"] button[data-n="3"]'); await page.waitForTimeout(200);
+    expect((await pill()) === "" && (await txt(page, "p-reps")) === "3×", "stopped: a new number of repeats applies at once, with no prompt");
+    await page.click('[data-r="views"] button:nth-child(3)'); await page.waitForTimeout(500);
+    await page.click('[data-r="p-play"]'); await page.waitForTimeout(6000);
+    await page.click('[data-r="p-reps"]'); await page.click('[data-r="p-reps-pop"] button[data-n="5"]'); await page.waitForTimeout(300);
+    expect((await pill()) === "Apply changes" && /\/3$/.test(await txt(page, "p-reps")), "playing: a new number of repeats waits, and \"Apply changes\" appears (" + (await txt(page, "p-reps")) + ")");
+    const fit = await page.evaluate(() => { const a = document.querySelector('[data-r="apply"]').getBoundingClientRect(), pl = document.querySelector('[data-r="p-play"]').getBoundingClientRect(); return Math.abs(a.left + a.width / 2 - pl.left - pl.width / 2) <= 2 && a.bottom <= pl.top && a.left >= 0 && a.right <= innerWidth; });
+    expect(fit, "\"Apply changes\" sits just above the Play button");
+    const keyBefore = await txt(page, "p-key-k");
+    await page.click('[data-r="p-key"]'); await page.click('[data-r="k-keys"] button:not([aria-pressed="true"])'); await page.click('[data-r="k-close"]'); await page.waitForTimeout(300);
+    expect((await pill()) === "Apply 2 changes" && (await txt(page, "p-key-k")) === keyBefore, "playing: a key change waits too, and the page does not move");
+    await page.waitForTimeout(9000);                          // far enough down the page for the page-turn copy to appear
+    const over = await page.evaluate(() => { const o = document.querySelector(".score-over"); return o ? [o.querySelectorAll(".lr-line").length, o.querySelectorAll(".lr-now").length, o.querySelectorAll("#lr-soft").length, document.querySelectorAll(".score .lr-line").length].join() : "none"; });
+    expect(over === "none" || /^0,0,0,/.test(over), "page turn: the copy of the next page carries no cloud, no blue note and no second filter (" + over + ")");
+    await page.click('[data-r="apply"]'); await page.waitForTimeout(700);
+    expect((await pill()) === "" && /\/5$/.test(await txt(page, "p-reps")) && (await txt(page, "p-key-k")) !== keyBefore, "Apply changes: the repeats and the key change together, and the prompt goes away");
+    await page.click('[data-r="p-reps"]'); await page.click('[data-r="p-reps-pop"] button[data-n="2"]'); await page.waitForTimeout(200);
+    await page.click('[data-r="p-play"]'); await page.waitForTimeout(500);
+    expect((await pill()) === "" && (await txt(page, "p-reps")) === "2×", "stopping applies what was waiting");
+    await page.context().close();
   }
   if (want("bar")) {                                        // a piano page shows the piano
     const page = await open({ viewport: { width: 390, height: 844 } }, "winter-wonderland-piano");
