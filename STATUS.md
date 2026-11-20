@@ -153,3 +153,14 @@ Everything needed to carry on from any conversation is in this repository and in
   `git fetch origin +refs/heads/pdf:refs/remotes/origin/pdf`).
 - Never commit a PDF or a `.bin` to `main`. The old `pdf/` folder's files remain in main's history (about 40 MB); removing them
   would mean rewriting history, which was not done.
+
+## 2026-11-20 · Fingering on screen; Analytics for the listening features; accounts tabled
+- `tools/export_fingerings.py` copies `KEYS` and `FINGERINGS` from `tools/build_book.py` into the player (the block between
+  `FINGERINGS:BEGIN` and `FINGERINGS:END`: `SAX_KEYS`, `SAX_BOX`, `SAX_FING` keyed by written MIDI 58 to 89). Run it whenever the
+  printed chart changes. `fingerSvg(written)` draws it; saxophones only (`IS_SAX`).
+- Learn mode: a Fingering button (remembered in localStorage `aam-fing`) shows the diagram for the note to play; it also appears by
+  itself after two misses on a note. Tuner: the diagram of the note being played sits beside the note name.
+- Analytics events (through `AAM_TRACK.event`): `aam_tuner` (first_time), `aam_learn_start` (notes), `aam_learn_done` and
+  `aam_learn_stop` (notes, reached, seconds, skipped, wrong_notes, value = minutes), `aam_fingering` (how: button / after misses),
+  `aam_pdf_download` (pdf, edition), `aam_search` (pdf, kind: number / name, found).
+- Real accounts for the player are tabled (project doc "Player accounts - tabled"). Usage is followed in Analytics for now.

@@ -75,6 +75,7 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     const note = await txt(page, "t-note"), word = await txt(page, "t-word"), msg = await txt(page, "t-msg"), cents = +(/(\d+) cents/.exec(word) || [0, -1])[1];
     expect(note === "A", "tuner: a piano C reads as A on alto (got " + note + ")");
     expect(/^Flat/.test(word) && cents >= 15 && cents <= 25, "tuner: 20 cents flat is shown as flat by 15 to 25 (got \"" + word + "\")");
+    expect(await page.evaluate(() => document.querySelectorAll('[data-r="t-fing"] .fg-k.on').length) === 2, "tuner: shows the fingering of the note being played (written A: two keys down)");
     expect(/ready/.test(msg), "tuner: the microphone check finishes (\"" + msg.slice(0, 40) + "\")");
   });
 
@@ -98,6 +99,16 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     await withMic(wav("key", played(ks, 0.5, 0.12)), {}, async page => {
       const r = await learnRun(page, KEY, 18000);
       expect(r.done && r.green === ks.length, "Learn works on a Welcome Booklet exercise in a shifted key, with no note list in the file (" + r.green + " of " + ks.length + " green)");
+    });
+    const miss = [sil(1.5), tone(63, 0.9), sil(0.3), tone(64, 0.9), sil(0.3), tone(63, 0.9), sil(2.2)].concat(...hcb.map(m => [tone(m, 0.55), sil(0.12)]), [sil(3)]);
+    await withMic(wav("miss", miss), {}, async page => {      // three wrong notes first: the fingering must appear by itself, and Analytics must hear about the session
+      await page.addInitScript(() => { window.__ev = []; window.gtag = function (a, n) { if (a === "event") window.__ev.push(n); }; });
+      await calibrated(page); await page.goto(URL_OF(HCB)); await page.waitForTimeout(1600); await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(5600);
+      const f = await page.evaluate(() => { const b = document.querySelector('[data-r="learn-fing"]'); return { shown: !b.hidden, keys: b.querySelectorAll(".fg-k.on").length, cap: (b.querySelector("small") || {}).textContent }; });
+      expect(f.shown && f.keys === 1 && /^B/.test(f.cap || ""), "Learn: after two misses the fingering for the note appears (written B: one key down) (" + JSON.stringify(f) + ")");
+      await page.waitForTimeout(12000);
+      const ev = await page.evaluate(() => window.__ev);
+      expect(["aam_open", "aam_learn_start", "aam_fingering", "aam_learn_done"].every(n => ev.includes(n)), "Analytics hears about Learn mode: start, fingering shown, finished (" + ev.join(", ") + ")");
     });
     await withMic(wav("voice", [sil(1.5), tone(59, 1.6), sil(0.4), tone(62, 1.0), sil(3)]), {}, async page => {
       const r = await learnRun(page, HCB, 6000);
