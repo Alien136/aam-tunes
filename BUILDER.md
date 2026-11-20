@@ -132,6 +132,12 @@ same. If a rebuilt PDF changes what a student sees, republish it with a new edit
 A second scheduled task. It writes; it does not ship.
 
 1. Setup and reading as above. Run both checks and the guard on `main` as it stands.
+2a. Usage: Google Analytics emails a CSV every Saturday to Alex's Gmail, subject containing "AAM player events (weekly for
+   Claude)" (last 28 days, every event name with its count and users). Find the newest one with the Gmail search tool (read
+   only: never send, reply or forward), read the attachment, and put the `aam_*` rows in the week's log line: tunes opened,
+   practice stretches and users, Learn mode starts against finishes, demo starts against trial bookings (`trial_booked`). Say
+   plainly when the email is missing. Since 20 Nov 2026 these details are registered as custom dimensions for use in Analytics
+   itself (not in the CSV): Who, Tune, Instrument, Where, Style, View, How, Booklet, Player version.
 2. Every Sunday: add a "Week of <date>" line to the Nightly log summing up the week: jobs done, what is in beta and not live, what
    was prevented, what is waiting on Alex.
 3. If the newest version in `CHANGELOG.md` is 13 or more days old AND Unreleased has at least one Added or Fixed line AND the checks

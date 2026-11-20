@@ -299,3 +299,12 @@ Everything needed to carry on from any conversation is in this repository and in
 - Analytics: `aam_instrument` carries `instrument` (piano, flute, clarinet, trumpet, tenor, alto) and `where` ("demo" or
   "player"). To see the split in reports, `instrument` and `where` must be registered as custom dimensions.
 - See the demo's test copy at the lessons page address with `?player=test` added.
+
+## 2026-11-20 (US) · Google Analytics: custom dimensions and a weekly emailed report
+- Done in Alex's Analytics property (alexattardmusic.com) through the browser pane, with him signed in: nine event-scoped custom
+  dimensions (Who=who, Tune=tune_title, Instrument=instrument, Where=where, Style=style, View=view, How=how, Booklet=pdf,
+  Player version=player_version). They apply to events from now on.
+- A scheduled email of the Events report (last 28 days, CSV, weekly, 12 months) goes to Alex's own Gmail as "AAM player events
+  (weekly for Claude)". The Sunday review reads it (BUILDER.md, step 2a). First one is due Saturday 21 November.
+- First reading, 23 Oct to 19 Nov 2026: 291 users and 723 page views on the site; aam_open 21 and aam_practice 10, each from 4
+  users (not yet split by student or teacher); demo started 3 times, demo booking button 1; trial_booked 5; form_submit 8.
