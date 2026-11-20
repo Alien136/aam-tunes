@@ -34,6 +34,10 @@
 #aam-play .play svg { width: 24px; height: 24px; fill: currentColor; }
 #aam-play .apply-pill { position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); z-index: 1; height: 40px; padding: 0 20px; border-radius: 999px; background: var(--now); color: var(--now-ink); font: 600 15px/40px var(--body); white-space: nowrap; box-shadow: 0 6px 20px rgba(20,23,26,.28); }
 #aam-play .pend { outline: 2px dashed var(--accent); outline-offset: 2px; }
+#aam-play .inst-pill { margin-left: 0; display: inline-flex; align-items: center; gap: 6px; color: var(--ink); } #aam-play .inst-pill .inst-ic { font-size: 17px; }
+@media (max-width: 620px) { #aam-play .sub-rest { display: none; } }
+#aam-play .sub-rest { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-weight: 400; }
+#aam-play .st-list button b .inst-ic { font-size: 20px; vertical-align: -4px; margin-right: 4px; color: var(--accent-text); } #aam-play .st-list button[aria-pressed="true"] b .inst-ic { color: var(--now-ink); }
 #aam-play.is-app .pbar { padding-bottom: max(26px, calc(10px + env(safe-area-inset-bottom))); }
 #aam-play.is-app.is-open { padding-bottom: max(104px, calc(88px + env(safe-area-inset-bottom))); padding-top: max(14px, calc(8px + env(safe-area-inset-top))); }
 #aam-play .install-btn { display: block; margin: 16px 2px 0; height: 44px; padding: 0 18px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); color: var(--accent-text); font: 600 14.5px/41px var(--body); text-align: center; }
@@ -614,6 +618,14 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
         <p class="k-note">Nothing is recorded. The sound is measured on this device and thrown away.</p>
       </div>
     </div>
+    <!-- a concert-pitch tune: what do you play? -->
+    <div class="kdlg" data-r="pdlg" hidden role="dialog" aria-label="Your instrument">
+      <div class="kcard">
+        <div class="khead"><h2>I play</h2><button class="btn-done" data-r="p-close">Done</button></div>
+        <div class="st-list" data-r="p-insts"></div>
+        <p class="k-note">The music on the page is rewritten for your instrument. The band stays in the same key.</p>
+      </div>
+    </div>
     <!-- install on the phone's home screen -->
     <div class="kdlg" data-r="idlg" hidden role="dialog" aria-label="Add to your home screen">
       <div class="kcard">
@@ -853,6 +865,7 @@ function aamBoot(TUNE) {
 
   // ---------- page text
   $("title").textContent = TUNE.title;
+  var showInst = function () {};
   (function () {                                              // under the title: the instrument's icon and name, so a student sees at a glance they have the right edition
     var S = '<svg viewBox="0 0 32 32" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">', D = '<g fill="currentColor" stroke="none">';
     var ICON = {
@@ -864,6 +877,35 @@ function aamBoot(TUNE) {
     var WHO = { alto: ["sax", "Alto saxophone"], tenor: ["sax", "Tenor saxophone"], soprano: ["sax", "Soprano saxophone"], bari: ["sax", "Baritone saxophone"],
                 clarinet: ["clarinet", "Clarinet"], flute: ["flute", "Flute"], piano: ["piano", "Piano"] }[TUNE.instrument || ""];
     var el = $("subtitle");
+    if (!WHO && !TUNE.instrument && TUNE.keys !== "off") {  // a tune written at concert pitch (the free demo tunes): the reader says what they play, and the page is written for it
+      var AS = { piano: ["piano", "Piano", 0], flute: ["flute", "Flute", 0], clarinet: ["clarinet", "Clarinet", 2], tenor: ["sax", "Tenor saxophone", 2], alto: ["sax", "Alto saxophone", 9] };
+      var pick = null; try { pick = localStorage.getItem("aam-play-as"); } catch (e) {}
+      el.classList.add("inst");
+      el.innerHTML = '<button class="st-pill inst-pill" data-r="inst-btn" aria-haspopup="dialog" aria-label="Your instrument"><span class="inst-ic"></span><span data-r="inst-name"></span></button><span class="sub-rest"></span>';
+      el.lastChild.textContent = TUNE.subtitle;
+      showInst = function () {                              // the pill follows the reading in force (it can also be changed in the Key dialog)
+        EAR_SHIFT = keyState.inst;
+        var a = AS[pick] && AS[pick][2] === keyState.inst ? pick : keyState.inst === 9 ? "alto" : keyState.inst === 2 ? "tenor" : "piano";
+        el.querySelector(".inst-ic").innerHTML = ICON[AS[a][0]]; el.querySelector('[data-r="inst-name"]').textContent = AS[a][1]; el.setAttribute("data-inst", AS[a][0]);
+        [].forEach.call($("p-insts").children, function (b) { b.setAttribute("aria-pressed", b.dataset.as === a ? "true" : "false"); });
+      };
+      $("p-insts").innerHTML = Object.keys(AS).map(function (k) { return '<button data-as="' + k + '"><b><span class="inst-ic">' + ICON[AS[k][0]] + "</span> " + AS[k][1] + "</b><small>" + (AS[k][2] === 9 ? "The page is written for an E♭ instrument" : AS[k][2] === 2 ? "The page is written for a B♭ instrument" : "The page is written at concert pitch") + "</small></button>"; }).join("");
+      [].forEach.call($("p-insts").children, function (b) {
+        b.onclick = function () {
+          $("pdlg").hidden = true;
+          stage("inst", function () {
+            pick = b.dataset.as; keyState.inst = AS[pick][2];
+            try { localStorage.setItem("aam-play-as", pick); var all = JSON.parse(localStorage.getItem("aam-keys") || "{}"); all[TUNE.slug] = [keyState.key, keyState.inst]; localStorage.setItem("aam-keys", JSON.stringify(all)); } catch (e) {}
+            keyApply(); AAM_TRACK.event("aam_instrument", { tune: TUNE.slug, instrument: pick });
+          }, b);
+        };
+      });
+      el.firstChild.onclick = function () { showInst(); $("pdlg").hidden = false; };
+      $("p-close").onclick = function () { $("pdlg").hidden = true; };
+      $("pdlg").addEventListener("click", function (e) { if (e.target === $("pdlg")) $("pdlg").hidden = true; });
+      try { if (AS[pick] && !(JSON.parse(localStorage.getItem("aam-keys") || "{}")[TUNE.slug])) keyState.inst = AS[pick][2]; } catch (e) {}   // a new tune opens written for the instrument they chose last
+      return;
+    }
     if (!WHO) { el.classList.remove("inst"); el.textContent = TUNE.subtitle; return; }      // an instrument with no icon yet keeps the old line of text
     el.classList.add("inst"); el.innerHTML = '<span class="inst-ic">' + ICON[WHO[0]] + "</span><span data-r=\"inst-name\"></span>";
     el.lastChild.textContent = WHO[1]; el.setAttribute("data-inst", WHO[0]);
@@ -1013,6 +1055,7 @@ function aamBoot(TUNE) {
       $("key-btn").textContent = "Key: " + k + (keyState.inst ? " (" + (keyState.inst === 2 ? "B♭" : "E♭") + " instrument)" : "");
       [].forEach.call(grid.children, function (b) { b.setAttribute("aria-pressed", +b.dataset.pc === shown ? "true" : "false"); b.classList.toggle("home", +b.dataset.pc === home); });
       [].forEach.call($("k-insts").children, function (b) { b.setAttribute("aria-pressed", +b.dataset.inst === keyState.inst ? "true" : "false"); });
+      showInst();
       var band = nice(shownKey(0)) + tail;
       $("k-note").textContent = (keyState.key ? "The outlined key is the original. " : "This is the tune's original key. ") +
         (keyState.inst ? "You read in " + k + " while the band plays in concert " + band + "." : "");
@@ -1175,13 +1218,15 @@ function aamBoot(TUNE) {
   // The microphone is opened with the phone's speech processing off (it flattens held notes). Pitch comes from how often the wave
   // repeats (McLeod's method), searched only inside the instrument's range, with a clarity score so noise is never guessed at.
   // Nothing is recorded or sent anywhere: each slice of sound is measured and thrown away.
-  var EAR_SHIFT = ({ alto: 9, bari: 21, tenor: 14, soprano: 2, clarinet: 2, trumpet: 2 })[TUNE.instrument] || 0;   // written note = sounding note + this
+  var EAR_FIXED = ({ alto: 9, bari: 21, tenor: 14, soprano: 2, clarinet: 2, trumpet: 2 })[TUNE.instrument] || 0;   // written note = sounding note + this
+  var EAR_SHIFT = TUNE.instrument ? EAR_FIXED : keyState.inst;       // a concert-pitch tune is read as the instrument the reader chose (showInst keeps this in step)
+  var ANY_OCT = function () { return !TUNE.instrument && keyState.inst !== NATIVE; };   // ...and their instrument may sound it in another octave than the tune file
   var NOTE_NAMES = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
   var noteName = function (m) { return NOTE_NAMES[((m % 12) + 12) % 12]; };
   var ear = (function () {
     var ctx = null, an = null, buf = null, stream = null, timer = null, subs = [], cal = null, quietUntil = 0;
     try { cal = JSON.parse(localStorage.getItem("aam-ear") || "null"); } catch (e) {}
-    var lo = EAR_SHIFT ? 58 - EAR_SHIFT - 2 : 34, hi = EAR_SHIFT ? 89 - EAR_SHIFT + 7 : 100;      // sounding range in MIDI numbers
+    var lo = EAR_FIXED ? 58 - EAR_FIXED - 2 : 34, hi = EAR_FIXED ? 89 - EAR_FIXED + 7 : 100;      // sounding range in MIDI numbers
     var hz = function (m) { return 440 * Math.pow(2, (m - 69) / 12); };
     function pitch(x, sr) {                               // -> { hz, clarity, rms, clip }
       var N = 2048, o = x.length - N, i, t, sum = 0, peak = 0;
@@ -1392,7 +1437,7 @@ function aamBoot(TUNE) {
   var IS_PIANO = /piano/.test(TUNE.instrument || "");
   function learnSeq(hand) {                               // the sounding pitch of each written note, in order (-1: tied on from the note before)
     var s = TUNE.sections.filter(function (x) { return x.id === state.view; })[0];
-    if (!s || keyState.inst !== NATIVE) return null;     // the page must show what this instrument reads; a key change moves page and sound together
+    if (!s || (keyState.inst !== NATIVE && TUNE.instrument)) return null;     // the page must show what this instrument reads (a concert-pitch tune is rewritten for the reader's instrument, so it always does)
     if (!IS_PIANO) {
       if (s.learn) return s.learn;
       if ((s.lh && s.lh.length) || !s.rh || !s.rh.length) return null;                                            // one line only
@@ -1464,7 +1509,8 @@ function aamBoot(TUNE) {
     if (!r.heard || r.clarity < 0.5 || (learn.level && r.rms < 0.45 * learn.level)) { learn.gap = true; learn.okRun = 0; learn.badRun = 0; return; }   // silence, breath or a tongued break: the dying end of a note never counts as the next one
     if (!r.ok) { learn.okRun = 0; learn.badRun = 0; return; }
     learn.level = learn.level ? learn.level + 0.2 * (r.rms - learn.level) : r.rms;
-    var d = 100 * (r.midi - t) - c.off;
+    var d = 100 * (r.midi - t) - c.off, anyOct = ANY_OCT();
+    if (anyOct) d = ((d % 1200) + 1800) % 1200 - 600;     // the right note in any octave
     if (Math.abs(d) <= 50) {
       learn.badRun = 0; learn.okRun++;
       var again = learn.prev === t && !learn.gap;         // the same note twice: wait for a new tongue stroke, or a clearly longer hold
@@ -1473,7 +1519,7 @@ function aamBoot(TUNE) {
     }
     learn.okRun = 0;
     var got = Math.round(r.midi - c.off / 100);
-    if (got === learn.prev && (!learn.gap || Date.now() - learn.since < 700)) return;                     // still holding the note before: not a mistake
+    if ((anyOct ? learn.prev != null && ((got - learn.prev) % 12 + 12) % 12 === 0 : got === learn.prev) && (!learn.gap || Date.now() - learn.since < 700)) return;                     // still holding the note before: not a mistake
     if (got !== learn.badNote) { learn.badNote = got; learn.badRun = 0; }
     if (++learn.badRun === 8) {
       learn.misses++; learn.wrong++;

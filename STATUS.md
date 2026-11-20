@@ -279,3 +279,14 @@ Everything needed to carry on from any conversation is in this repository and in
 - The install block now appends `viewport-fit=cover` to the page's viewport meta (so `env(safe-area-inset-*)` is real) and, when
   running from the home screen, adds the class `is-app` to `#aam-play`: `.is-app .pbar` and `.is-app.is-open` keep at least 26 px
   under the Play button whatever the phone reports. Not yet confirmed on his phone.
+
+## 2026-11-20 · Beta: an instrument picker on concert-pitch tunes
+- A tune with no `instrument` (the seven demo tunes) and keys not "off" gets a pill under the title (`inst-btn`) and the dialog
+  `pdlg` ("I play": piano, flute, clarinet, tenor, alto). Choosing sets `keyState.inst` (0, 2 or 9, the same reading the Key dialog
+  sets), saves it per tune in `aam-keys`, and remembers the instrument in localStorage `aam-play-as` so the next concert tune opens
+  written for it. `showInst()` keeps the pill in step and is called from `keyLabels`. While the band plays the change waits for
+  "Apply changes" like any other reading change. Analytics event `aam_instrument`.
+- Listening on these tunes: `EAR_SHIFT` follows `keyState.inst` (names as the reader reads them); `ANY_OCT()` makes Learn accept
+  the right pitch in any octave, because a tenor or alto sounds the line an octave away from the tune file. The listening range
+  stays wide (`EAR_FIXED` is 0). No fingering diagrams on these tunes (`IS_SAX` goes by the tune's own instrument).
+- Check group `demo`.

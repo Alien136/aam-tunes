@@ -9,6 +9,7 @@
      PDF download     the newest booklet PDF arrives and really is a PDF
      play bar         Play is in the exact middle and nothing overlaps, at four screen sizes; the phone tempo wheel sets the tempo;
                       the instrument icon and name sit under the title
+     demo             a concert-pitch tune shows an instrument, the reader can change it, and Learn follows it in any octave
      install          the home-screen icon, manifest and full-screen flag are on the page; Practice settings explains how to add it
      piano            Learn mode on a piano page: asks which hand, follows that hand to the end, green notes on its staff
      apply            repeats, key and instrument changes wait for "Apply changes" while the band plays; the page-turn copy has no cloud
@@ -16,7 +17,7 @@
 
    The microphone is a sound file: saxophone-like tones are generated here and fed to the browser as a fake microphone.
 
-   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|learn|cloud|contents|pdf|bar|style|apply|piano|install]
+   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|learn|cloud|contents|pdf|bar|style|apply|piano|install|demo]
    Needs:  playwright, plus the tone and abcjs packages (tools/node_modules or $AAM_NODE_MODULES). Nothing is fetched from the internet. */
 const fs = require("fs"), path = require("path"), os = require("os");
 const { chromium, devices } = require("playwright");
@@ -240,6 +241,27 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     const lead = await page.evaluate(() => { const b = document.querySelector('[data-r="learn-btn"]'); return !b.hidden; });
     expect(lead, "piano lead sheet: Learn is offered for the right hand's line (the left hand is all chords)");
     await page.context().close();
+  }
+  if (want("demo")) {                                       // a concert-pitch tune (the free demo tunes): pick your instrument, and Learn follows it in any octave
+    const DJ = "demo-jingle-bells", mel = tune(DJ).sections.find(x => x.id === "melody"), at = {};
+    mel.rh.forEach(e => { at[Math.round(e[0] * 48)] = e[1]; }); const seq = Object.keys(at).map(Number).sort((x, y) => x - y).map(k => at[k] - 12);   // an alto plays it an octave under the tune file
+    await withMic(wav("demo-alto", played(seq, 0.5, 0.16)), { ...devices["iPhone 13"] }, async page => {
+      await calibrated(page); await page.goto(URL_OF(DJ)); await page.waitForTimeout(1800);
+      const before = await page.evaluate(() => ({ name: document.querySelector('[data-r="inst-name"]').textContent, kind: document.querySelector('[data-r="subtitle"]').getAttribute("data-inst") }));
+      expect(before.name === "Piano" && before.kind === "piano", "demo tune: it opens with an instrument under the title (" + before.name + ")");
+      await page.click('[data-r="inst-btn"]'); await page.waitForTimeout(250);
+      const n = await page.evaluate(() => document.querySelectorAll('[data-r="p-insts"] button').length);
+      await page.click('[data-r="p-insts"] button[data-as="alto"]'); await page.waitForTimeout(900);
+      const after = await page.evaluate(() => ({ name: document.querySelector('[data-r="inst-name"]').textContent, key: document.querySelector('[data-r="p-key-k"]').textContent, learn: !document.querySelector('[data-r="learn-btn"]').hidden,
+        fit: (() => { const p = document.querySelector('[data-r="inst-btn"]').getBoundingClientRect(), l = document.querySelector('[data-r="lib-btn"]').getBoundingClientRect(); return p.right <= l.left || p.top >= l.bottom; })() }));
+      expect(n === 5 && after.name === "Alto saxophone" && after.key === "D" && after.fit, "demo tune: choosing alto saxophone rewrites the page for it (key " + after.key + ") and the name fits");
+      expect(after.learn, "demo tune as alto: Learn is still offered");
+      await page.click('[data-r="learn-btn"]'); const said = [], t0 = Date.now(); while (Date.now() - t0 < seq.length * 800 + 9000) { await page.waitForTimeout(200); const m = await txt(page, "learn-msg"); if (said[said.length - 1] !== m) said.push(m); if (/every note/.test(m)) break; }
+      expect(/F♯|F#/.test(said[0] || ""), "demo tune as alto: Learn names the first note as the alto reads it (" + (said[0] || "").slice(0, 60) + ")");
+      expect(/every note/.test(said[said.length - 1] || "") && said.filter(m => WRONG.test(m)).length === 0, "demo tune as alto: the melody played an octave lower is followed to the end, with no wrong-note message (" + (said[said.length - 1] || "").slice(0, 40) + ")");
+      await page.reload(); await page.waitForTimeout(1800);
+      expect((await txt(page, "inst-name")) === "Alto saxophone", "demo tune: the instrument is remembered");
+    });
   }
   if (want("cloud")) {                                      // a piano page: one cloud per hand, and no wash on the bar; a one-line page: one cloud
     const page = await open({ ...devices["iPhone 13"] }, "winter-wonderland-piano");
