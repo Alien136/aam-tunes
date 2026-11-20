@@ -245,3 +245,25 @@ Everything needed to carry on from any conversation is in this repository and in
   note match. Lead-sheet piano pages: right hand only (the left hand is all guide-tone chords).
 - Checked with generated, sustained tones (check group `piano`). NOT checked with a real piano, whose notes die away: the
   repeated-note rule and the level threshold may need tuning once Alex tries it.
+
+## 2026-11-20 · Starter Pack edition; install on phone (beta)
+- `tools/build_beginner.py <alto|tenor> --starter --code XXX-0000 --publish <repo>` builds the free Starter Pack: the same book,
+  "FREE STARTER PACK" on the cover, a last page (`invite_page`) with a QR code to the booking form (`BOOKING`), file
+  `Sax_Starter_Pack_<Ed>.pdf`. In the player it is a second shelf (`sax-starter-<ed>`) over the Beginner Booklet's own tunes: no
+  tune file is written twice, so publish the Beginner Booklet first, and after any change to the booklet rebuild BOTH (same codes).
+  The Starter Pack codes are in the Build Desk Library, not here.
+- The four Starter Pack emails are drafts in the Claude Doc "Starter Pack emails". MailerLite (free plan) is the email tool; the
+  account exists; the domain is not connected yet (needs Alex at a computer).
+- Install on phone, in the library part of the player (after `urlFor`): removes the website's own apple-touch-icon and manifest
+  links and adds ours from `player/app/` (`icon-180/192/512.png`, `manifest.json`, `manifest-beta.json` for the test copy), plus
+  `apple-mobile-web-app-capable`, the home-screen name "Attard Music" and a theme colour. `install-btn` in Practice settings opens
+  `idlg` with steps for iPhone, or Android's own install box (`beforeinstallprompt`). Before showing the steps it rewrites the
+  address to `?t=<tune>&c=<code>` so the icon opens that tune unlocked (a home-screen app on iPhone keeps its own storage).
+  Hidden when already running from the home screen and in the public demo. Analytics event `aam_install`.
+- Offline: `player/app/sw.js` is written but NOT in use. It must be uploaded to the website as `/aam-sw.js` (the test copy
+  registers it with scope `/play/`; a 404 does nothing). It answers only the play page, this repository's files and the Tone,
+  abcjs and font files. Untested on real phones: try it in beta first, then let the released player register it.
+- Not checkable here: how iPhone Safari treats the icon and full-screen flag when they are added by script. Alex tests on his phone.
+- `pdfOf(slug)` now prefers a booklet the student has unlocked when two booklets share a tune. Without it a Starter Pack reader is
+  shown the Beginner Booklet's shelf and cannot download the PDF: the released player (v1.1) does NOT have this yet, so release the
+  test copy before the Starter Pack is given to anyone. The PDF check opens a shared shelf as a student who unlocked that booklet.

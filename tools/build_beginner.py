@@ -3,6 +3,8 @@
 
   python3 tools/build_beginner.py                                   ->  tools/out/Sax_Beginner_Booklet.pdf (no QR codes)
   python3 tools/build_beginner.py alto --code SBA-0000 [--publish /path/to/aam-tunes]
+  python3 tools/build_beginner.py alto --starter --code XXX-0000 --publish /path/to/aam-tunes     the free Starter Pack edition (publish the
+                                                                        Beginner Booklet itself first: the Starter Pack opens the same player lines)
                                                                     ->  tools/out/Sax_Beginner_Booklet_Alto.pdf, with a QR on the cover
                                                                         and on every unit; --publish also writes one player tune per
                                                                         numbered line and the booklet's shelf in index.json
@@ -22,6 +24,8 @@ ARGS = sys.argv[1:]
 ED = ARGS[0] if ARGS and ARGS[0] in ("alto", "tenor") else None
 CODE = ARGS[ARGS.index("--code") + 1] if "--code" in ARGS else None
 REPO = ARGS[ARGS.index("--publish") + 1] if "--publish" in ARGS else None
+STARTER = "--starter" in ARGS                                           # the free Starter Pack: the same book and the same player lines, its own code, a last page inviting the free first lesson
+BOOK_ID = "sax-starter-" if STARTER else "sax-beginner-"                # the shelf in the player (the tunes themselves are always the Beginner Booklet's)
 sys.argv = [sys.argv[0], ED or "alto"]
 import build_book as B                                              # fonts, colours, key diagram, drawn saxophone
 import publish_exercise as PX                                       # ABC spelling for the player
@@ -857,7 +861,7 @@ def to_tune(it, chapter):
     return tune
 
 def publish(repo):
-    pdf_id = "sax-beginner-" + ED; title = "Saxophone Beginner Booklet · " + {"alto": "Alto", "tenor": "Tenor"}[ED]
+    pdf_id = BOOK_ID + ED; title = ("Free Saxophone Starter Pack · " if STARTER else "Saxophone Beginner Booklet · ") + {"alto": "Alto", "tenor": "Tenor"}[ED]
     ip = os.path.join(repo, "index.json"); idx = json.load(open(ip))
     h = hashlib.sha256(("aam:" + re.sub(r"[^A-Z0-9]", "", CODE.upper())).encode()).hexdigest()
     clash = [p["id"] for p in idx["pdfs"] if p.get("hash") == h and p["id"] != pdf_id]; assert not clash, "that code is already used by " + clash[0]
@@ -868,6 +872,9 @@ def publish(repo):
     for ch, lines in groups:
         items = []
         for it in lines:
+            if STARTER:                                         # the Starter Pack is a second shelf over the Beginner Booklet's own tunes: nothing is written twice
+                sl = slug_of(it); assert sl in idx["tunes"], "publish the Beginner Booklet first: %s is not in the player yet" % sl
+                items.append(sl); slugs.append(sl); continue
             t = to_tune(it, ch); json.dump(t, open(os.path.join(repo, "tunes", t["slug"] + ".json"), "w"), ensure_ascii=False, separators=(",", ":"))
             idx["tunes"][t["slug"]] = dict(title=t["title"], subtitle=t["subtitle"]); items.append(t["slug"]); slugs.append(t["slug"])
         contents.append(dict(title=ch, items=items))
@@ -885,7 +892,7 @@ def cover(book):
     png, clef = B.cover_staff_png(); im = ImageReader(png); iw, ih = im.getSize(); sw = 290
     c.drawImage(im, M, H - band + 48, sw, sw * ih / iw, mask="auto")
     B.draw_sax(c, 345, H - band + 36, 1.95)
-    c.setFillColor(HexColor(AMBER)); c.setFont("Pop-B", 11); c.drawString(M, H - 110, " ".join("ALEX ATTARD MUSIC"))
+    c.setFillColor(HexColor(AMBER)); c.setFont("Pop-B", 11); c.drawString(M, H - 110, " ".join("ALEX ATTARD MUSIC") + ("     ·     " + " ".join("FREE STARTER PACK") if STARTER else ""))
     c.setFillColor(white); c.setFont("Pop-B", 50); c.drawString(M, H - 198, "Saxophone")
     c.setFont("Pop-L", 38); c.drawString(M, H - 244, "Beginner Booklet")
     c.setFillColor(HexColor(AMBER)); c.setFont("Pop-M", 17); B.draw_mixed(c, M, H - 284, {"alto": "E♭ Alto Saxophone", "tenor": "B♭ Tenor Saxophone", None: "Alto and Tenor Saxophone"}[ED], "Pop-M", 17)
@@ -895,7 +902,7 @@ def cover(book):
     y = top - 46
     c.setFillColor(HexColor(SLATE)); c.setFont("Pop-B", 20); c.drawString(M + 30, y, "Your first notes start here.")
     p, ph = para_h("This book takes you from your very first sound to real tunes, one or two new notes at a time. Every unit starts with long tones, "
-                   "adds a new idea, and ends with music you already know. Keep it on your stand, play a little every day, and bring it to every lesson.",
+                   "adds a new idea, and ends with music you already know. Keep it on your stand and play a little every day" + (". When you want a teacher beside you, the last page has an invitation: your first lesson is free." if STARTER else ", and bring it to every lesson."),
                    CW - 60 - (150 if CODE else 0), ParagraphStyle("cv", parent=B.body, fontSize=11.8 if CODE else 13, leading=18 if CODE else 20)); p.drawOn(c, M + 30, y - 18 - ph)
     if CODE:
         qs = 104; qx = W - M - 24 - qs; qy = (top + bot) / 2 - qs / 2 + 30
@@ -1132,6 +1139,39 @@ def full_chart(path, book):
     w.add_metadata({"/Title": "Saxophone Beginner Booklet", "/Author": "Alex Attard Music"})
     with open(path, "wb") as fh: w.write(fh)
 
+BOOKING = "https://alexattardmusic.com/contact/#book"
+def invite_page(path, book):
+    """The Starter Pack's last page: an invitation to the free first lesson, with a QR code to the booking form."""
+    import io, qrcode
+    from pypdf import PdfReader, PdfWriter
+    buf = io.BytesIO(); c = canvas.Canvas(buf, pagesize=letter); band = 250
+    c.setFillColor(HexColor(SLATE)); c.rect(0, H - band, W, band, fill=1, stroke=0)
+    c.setFillColor(HexColor(AMBER)); c.setFont("Pop-B", 11); c.drawString(M, H - 92, " ".join("WHEN YOU ARE READY"))
+    c.setFillColor(white); c.setFont("Pop-B", 40); c.drawString(M, H - 150, "Your first lesson")
+    c.setFont("Pop-L", 40); c.drawString(M, H - 198, "is free.")
+    y = H - band - 44
+    p, ph = para_h("You have the book and the band. A teacher adds the part a book cannot: someone who hears your sound, fixes the small things "
+                   "before they become habits, and picks the next step for you. Lessons are live, one-on-one and online, for kids, teens and adults.",
+                   CW, ParagraphStyle("iv", parent=B.body, fontSize=14.5, leading=22.5)); p.drawOn(c, M, y - ph); y -= ph + 28
+    y = B.tip_box(c, M, y, CW, "What happens in the free lesson", ["We meet online for 30 minutes, with your instrument.",
+        "I hear where you are, whether you have played for a week or for years.", "You leave with a written plan for your next week of practice.",
+        "No card, no commitment. If it is a good fit, we pick a weekly time."]) - 34
+    q = qrcode.QRCode(border=2, box_size=10, error_correction=qrcode.constants.ERROR_CORRECT_M); q.add_data(BOOKING); q.make(fit=True)
+    ib = io.BytesIO(); q.make_image(fill_color=SLATE, back_color="white").save(ib, format="PNG"); ib.seek(0)
+    qs = 150; c.drawImage(ImageReader(ib), M, y - qs, qs, qs)
+    c.setFillColor(HexColor(AMBER)); c.setFont("Pop-B", 11); c.drawString(M + qs + 30, y - 34, " ".join("BOOK YOUR FREE LESSON"))
+    c.setFillColor(HexColor(SLATE)); c.setFont("Pop-B", 23); c.drawString(M + qs + 30, y - 66, "Scan the code, or go to")
+    c.setFont("Pop-M", 17); c.drawString(M + qs + 30, y - 93, "alexattardmusic.com/contact")
+    c.setFillColor(HexColor(MUTED)); c.setFont("DJ", 11.5); c.drawString(M + qs + 30, y - 119, "Saxophone, clarinet, flute and piano.")
+    c.setFillColor(HexColor(SLATE)); c.setFont("Pop-M", 15); c.drawString(M + qs + 30, y - 146, "Alex")
+    assert y - qs > 56, "the invitation page runs into the footer"
+    book.c = c; book.footer(); c.save(); buf.seek(0)
+    w = PdfWriter()
+    for pg in PdfReader(path).pages: w.add_page(pg)
+    w.add_page(PdfReader(buf).pages[0])
+    w.add_metadata({"/Title": "Free Saxophone Starter Pack", "/Author": "Alex Attard Music"})
+    with open(path, "wb") as fh: w.write(fh)
+
 def sources_text():
     out = []
     for u in UNITS:
@@ -1146,7 +1186,7 @@ def main():
     with ThreadPoolExecutor(8) as ex:
         for it, png in zip(items, ex.map(lambda it: render(ly_line(it), "line"), items)): PNGS[id(it)] = png
     assert not (CODE or REPO) or ED, "give the edition (alto or tenor) with --code or --publish"
-    out = os.path.join(B.OUT, "Sax_Beginner_Booklet%s.pdf" % ("_" + ED.capitalize() if ED else ""))
+    out = os.path.join(B.OUT, ("Sax_Starter_Pack%s.pdf" if STARTER else "Sax_Beginner_Booklet%s.pdf") % ("_" + ED.capitalize() if ED else ""))
     # two passes: the first finds the page numbers for the progress table
     toc = []
     for final in (False, True):
@@ -1155,7 +1195,9 @@ def main():
         start_page(book); reading_page(book)
         for k, u in enumerate(UNITS): build_unit(book, k, u)
         finale_pages(book); scales_page(book); rhythm_page(book); glossary_page(book); book.c.save()
-        if final: full_chart(out, book)
+        if final:
+            full_chart(out, book)
+            if STARTER: invite_page(out, book)
         toc = [t for t in book.toc if t[0].startswith("Unit") or t[0] == "Finale"]
     print(out, book.n - 1, "pages,", book.line_no, "numbered lines")
     if "--fill" in ARGS:
@@ -1163,7 +1205,7 @@ def main():
     if REPO:
         publish(REPO)
         if os.environ.get("AAM_CODE"):
-            import publish_pdf; publish_pdf.publish_pdf(out, "sax-beginner-" + ED, CODE, EDITION, repo=REPO)
+            import publish_pdf; publish_pdf.publish_pdf(out, BOOK_ID + ED, CODE, EDITION, repo=REPO)
         else: print("AAM_CODE not set: the PDF in the player was NOT updated")
     if "--sources" in ARGS:
         for t, s in sources_text(): print("  %-34s %s" % (t, s))

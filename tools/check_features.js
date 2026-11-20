@@ -9,13 +9,14 @@
      PDF download     the newest booklet PDF arrives and really is a PDF
      play bar         Play is in the exact middle and nothing overlaps, at four screen sizes; the phone tempo wheel sets the tempo;
                       the instrument icon and name sit under the title
+     install          the home-screen icon, manifest and full-screen flag are on the page; Practice settings explains how to add it
      piano            Learn mode on a piano page: asks which hand, follows that hand to the end, green notes on its staff
      apply            repeats, key and instrument changes wait for "Apply changes" while the band plays; the page-turn copy has no cloud
      style            the style picker lists the band styles, each one sounds, the choice is remembered, exercises have none
 
    The microphone is a sound file: saxophone-like tones are generated here and fed to the browser as a fake microphone.
 
-   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|learn|cloud|contents|pdf|bar|style|apply|piano]
+   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|learn|cloud|contents|pdf|bar|style|apply|piano|install]
    Needs:  playwright, plus the tone and abcjs packages (tools/node_modules or $AAM_NODE_MODULES). Nothing is fetched from the internet. */
 const fs = require("fs"), path = require("path"), os = require("os");
 const { chromium, devices } = require("playwright");
@@ -154,7 +155,10 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
   }
 
   if (want("pdf")) for (const p of index.pdfs.filter(p => p.file)) {
-    const page = await open({ viewport: { width: 1280, height: 800 } }, p.tunes[0]);
+    const shares = index.pdfs.some(q => q.id !== p.id && index.pdfs.indexOf(q) < index.pdfs.indexOf(p) && q.tunes.includes(p.tunes[0]));   // a second shelf over another booklet's tunes (the Starter Pack)
+    const ctx0 = await b.newContext({ acceptDownloads: true, viewport: { width: 1280, height: 800 } }); await wire(ctx0);
+    if (shares) await ctx0.addInitScript(id => { try { if (!localStorage.getItem("aam-library")) localStorage.setItem("aam-library", JSON.stringify({ pdfs: [id] })); } catch (e) {} }, p.id);   // a student who unlocked THIS booklet
+    const page = await ctx0.newPage(); page.on("pageerror", e => expect(false, "script error: " + e.message)); await page.goto(URL_OF(p.tunes[0])); await page.waitForTimeout(1700);
     await page.click('[data-r="title"]'); await page.waitForTimeout(300);
     const [dl] = await Promise.all([page.waitForEvent("download", { timeout: 25000 }).catch(() => null), page.click("[data-dl]")]);
     let good = false; if (dl) { const f = path.join(TMP, p.id + ".pdf"); await dl.saveAs(f); const fd = fs.openSync(f, "r"), head = Buffer.alloc(5); fs.readSync(fd, head, 0, 5, 0); fs.closeSync(fd); good = head.toString() === "%PDF-" && fs.statSync(f).size === p.file.size; }
@@ -277,6 +281,24 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     await page.click('[data-r="p-play"]'); await page.waitForTimeout(500);
     expect((await pill()) === "" && (await txt(page, "p-reps")) === "2×", "stopping applies what was waiting");
     await page.context().close();
+  }
+  if (want("install")) {                                    // install on the phone: icon, manifest, full-screen flag, and the how-to in Practice settings
+    const page = await open({ ...devices["iPhone 13"] }, HCB);
+    const head = await page.evaluate(() => ({ icon: (document.head.querySelector('link[rel="apple-touch-icon"]') || {}).href || "", icons: document.head.querySelectorAll('link[rel="apple-touch-icon"]').length,
+      man: (document.head.querySelector('link[rel="manifest"]') || {}).href || "", cap: (document.head.querySelector('meta[name="apple-mobile-web-app-capable"]') || {}).content || "", name: (document.head.querySelector('meta[name="apple-mobile-web-app-title"]') || {}).content || "" }));
+    const app = path.join(ROOT, "player", "app"), file = u => path.join(app, u.split("/player/app/")[1] || "missing");
+    expect(head.icons === 1 && /\/player\/app\/icon-180\.png$/.test(head.icon) && fs.existsSync(file(head.icon)), "install: the page carries one home-screen icon, and the file exists");
+    let man = null; try { man = JSON.parse(fs.readFileSync(file(head.man), "utf8")); } catch (e) {}
+    expect(man && man.display === "standalone" && /^https:\/\/alexattardmusic\.com\/play\//.test(man.start_url) && man.icons.every(i => fs.existsSync(file(i.src))), "install: the manifest opens the play page full screen and its icons exist");
+    expect(head.cap === "yes" && head.name.length > 0 && head.name.length <= 12, "install: full-screen flag and a home-screen name that fits under an icon (" + head.name + ")");
+    await page.click('[data-r="p-gear"]'); await page.waitForTimeout(400);
+    await page.click('[data-r="install-btn"]'); await page.waitForTimeout(300);
+    const dlg = await page.evaluate(() => ({ open: !document.querySelector('[data-r="idlg"]').hidden, steps: document.querySelector('[data-r="i-steps"]').textContent, url: location.search }));
+    expect(dlg.open && /Share/.test(dlg.steps) && /Add to Home Screen/.test(dlg.steps), "install: on an iPhone the steps say Share, then Add to Home Screen");
+    expect(/[?&]t=sax-beginner-alto-hot-cross-buns/.test(dlg.url) && /[?&]c=\w+/.test(dlg.url), "install: the address now names this tune and its code, so the icon opens it unlocked");
+    await page.context().close();
+    const sw = fs.readFileSync(path.join(app, "sw.js"), "utf8");
+    expect(/r\.mode === "navigate"/.test(sw) && /"\/play"/.test(sw) && !/respondWith\(fetch\(r\)\)/.test(sw), "install: the offline file only answers the play page and the player's own files");
   }
   if (want("bar")) {                                        // a piano page shows the piano
     const page = await open({ viewport: { width: 390, height: 844 } }, "winter-wonderland-piano");

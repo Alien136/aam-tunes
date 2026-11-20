@@ -34,6 +34,9 @@
 #aam-play .play svg { width: 24px; height: 24px; fill: currentColor; }
 #aam-play .apply-pill { position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); z-index: 1; height: 40px; padding: 0 20px; border-radius: 999px; background: var(--now); color: var(--now-ink); font: 600 15px/40px var(--body); white-space: nowrap; box-shadow: 0 6px 20px rgba(20,23,26,.28); }
 #aam-play .pend { outline: 2px dashed var(--accent); outline-offset: 2px; }
+#aam-play .install-btn { display: block; margin: 16px 2px 0; height: 44px; padding: 0 18px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); color: var(--accent-text); font: 600 14.5px/41px var(--body); text-align: center; }
+#aam-play .in-steps { margin: 0; padding: 0 0 0 22px; display: grid; gap: 10px; font-size: 15px; line-height: 1.45; color: var(--ink); } #aam-play .in-steps b { font-weight: 600; }
+#aam-play .in-go { height: 46px; border-radius: 999px; background: var(--now); color: var(--now-ink); font: 600 15px/46px var(--body); text-align: center; }
 #aam-play .now { display: grid; gap: 2px; min-width: 0; }
 #aam-play .now .label { font: 600 15px var(--display); }
 #aam-play .now .where { font: 500 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -609,6 +612,15 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
         <p class="k-note">Nothing is recorded. The sound is measured on this device and thrown away.</p>
       </div>
     </div>
+    <!-- install on the phone's home screen -->
+    <div class="kdlg" data-r="idlg" hidden role="dialog" aria-label="Add to your home screen">
+      <div class="kcard">
+        <div class="khead"><h2>Add to your home screen</h2><button class="btn-done" data-r="i-close">Done</button></div>
+        <ol class="in-steps" data-r="i-steps"></ol>
+        <button class="in-go" data-r="i-go" hidden>Install</button>
+        <p class="k-note" data-r="i-note"></p>
+      </div>
+    </div>
     <!-- Learn mode on a piano page: which hand -->
     <div class="kdlg" data-r="hdlg" hidden role="dialog" aria-label="Which hand">
       <div class="kcard">
@@ -664,6 +676,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
     <div class="sheet" data-r="sheet" role="dialog" aria-label="Practice settings">
       <div class="sheet-head"><h2>Practice settings</h2><button class="done" data-r="done">Done</button></div>
       <div class="sheet-body" data-r="sheet-body"></div>
+      <button class="install-btn" data-r="install-btn" hidden>Add to your home screen</button>
       <p class="snd-credit" data-r="snd-credit" hidden></p>
       <p class="snd-credit" data-r="ver"></p>
     </div>
@@ -2612,10 +2625,51 @@ function aamLibrary() {
   }
   var DEMO = window.AAM_DEMO || null;                    // the public demo (an embedded frame on the lessons page): free tunes only, no codes
   var myPdfs = function () { return CAT.pdfs.filter(function (p) { return DEMO ? p.free : p.free || lib.all || lib.pdfs.indexOf(p.id) >= 0; }); };
-  var pdfOf = function (slug) { return CAT.pdfs.filter(function (p) { return p.tunes.indexOf(slug) >= 0; })[0]; };
+  var pdfOf = function (slug) {                          // the booklet a tune is shown under: one this student unlocked, when two booklets share the tune (the free Starter Pack and the Beginner Booklet)
+    var has = CAT.pdfs.filter(function (p) { return p.tunes.indexOf(slug) >= 0; });
+    return has.filter(function (p) { return lib.pdfs.indexOf(p.id) >= 0; })[0] || has[0];
+  };
   var mine = function (slug) { return !!CAT.tunes[slug] && myPdfs().some(function (p) { return p.tunes.indexOf(slug) >= 0; }); };
   var sessionCode = "", canStore = (function () { try { localStorage.setItem("aam-t", "1"); localStorage.removeItem("aam-t"); return true; } catch (e) { return false; } })();
   var urlFor = function (slug) { return location.pathname + "?tune=" + encodeURIComponent(slug) + (!canStore && sessionCode ? "&c=" + sessionCode : ""); };   // no storage: the code rides along
+  // ---------- install on the phone: the page gets an icon, a name and "open full screen", and a short how-to in Practice settings.
+  // Nothing here needs an app store. Offline is a separate file on the website (player/app/sw.js -> /aam-sw.js); it is asked for
+  // only by the test copy until it has been tried on real phones.
+  (function () {
+    if (DEMO) return;
+    var APP = "https://raw.githubusercontent.com/Alien136/aam-tunes/main/player/app/", beta = PLAYER_VERSION === "test copy", h = document.head;
+    var alone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+    try {
+      [].forEach.call(h.querySelectorAll('link[rel="apple-touch-icon"], link[rel="apple-touch-icon-precomposed"], link[rel="manifest"]'), function (e) { e.parentNode.removeChild(e); });   // the website's own icon would win otherwise
+      var add = function (tag, at) { var e = document.createElement(tag); Object.keys(at).forEach(function (k) { e.setAttribute(k, at[k]); }); e.setAttribute("data-aam", "1"); h.appendChild(e); };
+      add("link", { rel: "apple-touch-icon", sizes: "180x180", href: APP + "icon-180.png" });
+      add("link", { rel: "manifest", href: APP + (beta ? "manifest-beta.json" : "manifest.json"), crossorigin: "anonymous" });
+      [["apple-mobile-web-app-capable", "yes"], ["mobile-web-app-capable", "yes"], ["apple-mobile-web-app-title", "Attard Music"], ["apple-mobile-web-app-status-bar-style", "default"], ["theme-color", "#e8f5fe"]]
+        .forEach(function (m) { var old = h.querySelector('meta[name="' + m[0] + '"]'); if (old) old.parentNode.removeChild(old); add("meta", { name: m[0], content: m[1] }); });
+    } catch (e) {}
+    if (beta && "serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("/aam-sw.js", { scope: "/play/" }).catch(function () {});   // 404 until the file is uploaded: nothing happens
+    var ask = null; window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); ask = e; });   // Android: the browser's own install box, kept for our button
+    var btn = $("install-btn"), dlg = $("idlg"); if (!btn || !dlg) return;
+    btn.hidden = alone;                                       // already opened from the home screen
+    btn.onclick = function () {
+      var ua = navigator.userAgent || "", ios = /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1), slug = lib.last;
+      try {                                                   // the icon opens the address that is showing: make it this tune, unlocked (a home-screen app keeps its own memory)
+        var u = location.pathname + "?" + (slug ? "t=" + encodeURIComponent(slug) : "") + (sessionCode ? "&c=" + sessionCode : "") + (beta ? "&player=test" : "");
+        history.replaceState(null, "", u);
+      } catch (e) {}
+      var share = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px"><path d="M12 15V3M8 7l4-4 4 4M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>';
+      $("i-steps").innerHTML = ios
+        ? "<li>Tap the <b>Share</b> button " + share + " in your browser's bar.</li><li>Scroll down and tap <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>. The icon appears with your other apps.</li>"
+        : ask ? "<li>Tap <b>Install</b> below.</li><li>Confirm in the box that opens. The icon appears with your other apps.</li>"
+        : "<li>Open your browser's menu (the three dots).</li><li>Tap <b>Add to Home screen</b> or <b>Install app</b>.</li><li>Confirm. The icon appears with your other apps.</li>";
+      $("i-go").hidden = !ask || ios;
+      $("i-note").textContent = sessionCode ? "It opens full screen, like an app, on the tune you have open now." : "It opens full screen, like an app. The first time, it asks for your booklet's code once.";
+      dlg.hidden = false; AAM_TRACK.event("aam_install", { how: ios ? "ios steps" : ask ? "prompt" : "steps" });
+    };
+    $("i-go").onclick = function () { if (ask) { ask.prompt(); ask = null; } dlg.hidden = true; };
+    $("i-close").onclick = function () { dlg.hidden = true; };
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.hidden = true; });
+  })();
   var go = function (slug) { if (DEMO) { try { window.parent.aamDemoGo(slug); } catch (e) {} return; } location.href = urlFor(slug); };
 
   function menu(current) {

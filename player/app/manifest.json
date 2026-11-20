@@ -1,0 +1,25 @@
+{
+ "name": "Alex Attard Music Play-Along",
+ "short_name": "Attard Music",
+ "description": "Play along with the band, learn the notes, tune up.",
+ "start_url": "https://alexattardmusic.com/play/",
+ "scope": "https://alexattardmusic.com/",
+ "display": "standalone",
+ "orientation": "any",
+ "background_color": "#e8f5fe",
+ "theme_color": "#0c77ba",
+ "icons": [
+  {
+   "src": "https://raw.githubusercontent.com/Alien136/aam-tunes/main/player/app/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "https://raw.githubusercontent.com/Alien136/aam-tunes/main/player/app/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any maskable"
+  }
+ ]
+}
