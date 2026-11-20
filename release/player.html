@@ -137,7 +137,7 @@
 #aam-play .score .hl { fill: transparent; stroke: none; }
 #aam-play .score .tag-t { font: 600 12px var(--body); fill: var(--accent-text); }
 #aam-play .score .hl.in-range { fill: var(--range); }
-#aam-play .score .hl.is-now { fill: #4aa8f0; fill-opacity: .13; stroke: none; filter: url(#lr-soft); }   /* the bar being played: a faint wash; the note itself carries the cloud */
+#aam-play .score.bar-wash .hl.is-now { fill: #4aa8f0; fill-opacity: .13; stroke: none; filter: url(#lr-soft); }   /* a faint wash on the bar being played, ONLY where the bar has no note or rest for the cloud to sit on */
 #aam-play .score .mk-g { color: #8a99a8; fill: #8a99a8; }
 /* Learn mode and the tuner */
 #aam-play .score .lr-ok { color: #1a9b5a; fill: #1a9b5a; } #aam-play .score .lr-now { color: #0b63a8; fill: #0b63a8; } #aam-play .score .lr-line { fill: #4aa8f0; fill-opacity: .42; stroke: none; transition: transform .16s ease-out; pointer-events: none; } #aam-play .score .lr-miss { color: #d0443a; fill: #d0443a; }
@@ -646,7 +646,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 
 <script>
 // >>> SETTINGS
-var PLAYER_VERSION = "v1.0.1 · 2026-11-20 08:36 UTC (after b292470)";    // stamped by tools/release.py when a version is released
+var PLAYER_VERSION = "v1.0.2 · 2026-11-20 09:11 UTC (after 3a3f320)";    // stamped by tools/release.py when a version is released
 var STUDENT_HOME = "https://alexattardmusic.com/student-login/";              // where the "back" link goes: put the address of your student login page here, e.g. "/student-login/"
 var STUDENT_HOME_LABEL = "Student home";         // what the link says. Leave "" for "Student login" (or "Website" while the address above is "/")
 var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    // folder with p36.mp3 ... d-ride.mp3 (keep the final "/")
@@ -1188,47 +1188,64 @@ function aamBoot(TUNE) {
   // ---- Learn mode: no band and no tempo; each note turns green when it is played, and the marker waits for the next one
   var learn = { on: false, i: 0, seq: null, okRun: 0, badRun: 0, badNote: null, misses: 0, gap: true, since: 0, level: 0 };
   // The blue cloud is the one "you are here" marker: Learn mode puts it on the note to play, playback moves it note by note in time.
-  var playEl = null, beatMap = { svg: null };
+  var playEl = null, playEl2 = null, beatMap = { svg: null };          // playEl2: the left hand's note on a piano page (two staves, two clouds)
+  var LH_SEL = /piano/.test(TUNE.instrument || "") ? ".abcjs-v1" : ".abcjs-none";   // the lower staff gets a cloud on piano pages only; a duet's second part does not
   function softFilter(svg) {                              // blurred edges, drawn by the SVG itself so every browser shows them
     if (svg.querySelector("#lr-soft")) return;
     var NS = "http://www.w3.org/2000/svg", defs = document.createElementNS(NS, "defs"), f = document.createElementNS(NS, "filter"), g = document.createElementNS(NS, "feGaussianBlur");
     f.setAttribute("id", "lr-soft"); f.setAttribute("x", "-50%"); f.setAttribute("y", "-50%"); f.setAttribute("width", "200%"); f.setAttribute("height", "200%");
     g.setAttribute("stdDeviation", "2.2"); f.appendChild(g); defs.appendChild(f); svg.insertBefore(defs, svg.firstChild);
   }
-  function cloudAt(el) {                                  // a soft blue cloud behind one note (head and stem) or rest
+  function cloudAt(el, second) {                          // a soft blue cloud behind one note (head and stem) or rest; second: the left hand's own cloud
     var svg = score.querySelector("svg"); if (!svg || !el) return;
     try {
       softFilter(svg);
-      var line = svg.querySelector(".lr-line"), nb = el.getBBox(), px = 7, py = 6;
-      if (!line) { line = document.createElementNS("http://www.w3.org/2000/svg", "rect"); line.setAttribute("class", "lr-line"); line.setAttribute("filter", "url(#lr-soft)"); line.setAttribute("x", 0); line.setAttribute("y", 0); svg.insertBefore(line, svg.firstChild.nextSibling); }   // under the music, so the note stays sharp
+      var line = svg.querySelector(second ? ".lr-line2" : ".lr-line:not(.lr-line2)"), nb = el.getBBox(), px = 7, py = 6;
+      if (!line) { line = document.createElementNS("http://www.w3.org/2000/svg", "rect"); line.setAttribute("class", second ? "lr-line lr-line2" : "lr-line"); line.setAttribute("filter", "url(#lr-soft)"); line.setAttribute("x", 0); line.setAttribute("y", 0); svg.insertBefore(line, svg.firstChild.nextSibling); }   // under the music, so the note stays sharp
       var w = nb.width + 2 * px, h = nb.height + 2 * py;
       line.setAttribute("width", w); line.setAttribute("height", h); line.setAttribute("rx", Math.min(w, h) / 2.2);
       line.style.transform = "translate(" + (nb.x - px).toFixed(2) + "px," + (nb.y - py).toFixed(2) + "px)";
     } catch (e) {}
   }
   function cloudOff() {
-    var l = score.querySelector(".lr-line"); if (l) l.remove();
+    [].forEach.call(score.querySelectorAll(".lr-line"), function (l) { l.remove(); });
     if (playEl) { playEl.classList.remove("lr-now"); playEl = null; }
+    if (playEl2) { playEl2.classList.remove("lr-now"); playEl2 = null; }
+    score.classList.remove("bar-wash");
   }
   function beats() {                                      // where every note and rest of the top part starts: bar number and beat, read from the drawn music
     var svg = score.querySelector("svg"); if (!svg) return null;
     if (beatMap.svg === svg) return beatMap;
-    var bars = {}, notes = [], pos = {};
-    [].forEach.call(svg.querySelectorAll(".abcjs-v0.abcjs-note, .abcjs-v0.abcjs-rest"), function (el) {
-      var c = el.getAttribute("class"), mm = /abcjs-mm(\d+)/.exec(c), d = /abcjs-d(\d+)-?(\d*)/.exec(c); if (!mm || !d) return;
-      var k = +mm[1], beat = pos[k] || 0, it = { k: k, beat: beat, el: el, rest: /abcjs-rest/.test(c) };
-      pos[k] = beat + 4 * parseFloat(d[1] + "." + (d[2] || "0"));
-      (bars[k] = bars[k] || []).push(it); if (!it.rest) notes.push(it);
-    });
-    beatMap = { svg: svg, bars: bars, notes: notes, seqs: {} }; return beatMap;
+    var bars = {}, notes = [], bars2 = {};
+    var read = function (sel, into, list) {
+      var pos = {};
+      [].forEach.call(svg.querySelectorAll(sel + ".abcjs-note, " + sel + ".abcjs-rest"), function (el) {
+        var c = el.getAttribute("class"), mm = /abcjs-mm(\d+)/.exec(c), d = /abcjs-d(\d+)-?(\d*)/.exec(c); if (!mm || !d) return;
+        var k = +mm[1], beat = pos[k] || 0, it = { k: k, beat: beat, el: el, rest: /abcjs-rest/.test(c) };
+        pos[k] = beat + 4 * parseFloat(d[1] + "." + (d[2] || "0"));
+        (into[k] = into[k] || []).push(it); if (list && !it.rest) list.push(it);
+      });
+    };
+    read(".abcjs-v0", bars, notes);
+    read(LH_SEL, bars2, null);                                // a piano page's lower staff; nothing on a one-staff page
+    beatMap = { svg: svg, bars: bars, bars2: bars2, notes: notes, seqs: {} }; return beatMap;
   }
-  function playCloud(k, beat) {                           // playback: the cloud sits on the note (or rest) sounding now
-    var bm = score.hidden ? null : beats(), row = bm && bm.bars[k], hit = null;
-    if (row) for (var i = 0; i < row.length; i++) if (row[i].beat <= beat + 0.03) hit = row[i];
-    if (!hit) { cloudOff(); return; }
-    if (hit.el === playEl) return;
-    if (playEl) playEl.classList.remove("lr-now");
-    playEl = hit.el; playEl.classList.add("lr-now"); cloudAt(playEl);
+  function playCloud(k, beat) {                           // playback: the cloud sits on the note (or rest) sounding now; on a piano page each hand has its own
+    var bm = score.hidden ? null : beats();
+    var find = function (row) { var hit = null; if (row) for (var i = 0; i < row.length; i++) if (row[i].beat <= beat + 0.03) hit = row[i]; return hit; };
+    var hit = bm && find(bm.bars[k]), hit2 = bm && find(bm.bars2[k]);
+    if (!hit && !hit2) { cloudOff(); if (bm) score.classList.add("bar-wash"); return; }   // nothing written in this bar: the bar itself is washed instead
+    score.classList.remove("bar-wash");
+    if ((hit ? hit.el : null) !== playEl) {
+      if (playEl) playEl.classList.remove("lr-now");
+      playEl = hit ? hit.el : null;
+      if (playEl) { playEl.classList.add("lr-now"); cloudAt(playEl); } else { var l1 = score.querySelector(".lr-line:not(.lr-line2)"); if (l1) l1.remove(); }
+    }
+    if ((hit2 ? hit2.el : null) !== playEl2) {
+      if (playEl2) playEl2.classList.remove("lr-now");
+      playEl2 = hit2 ? hit2.el : null;
+      if (playEl2) { playEl2.classList.add("lr-now"); cloudAt(playEl2, true); } else { var l2 = score.querySelector(".lr-line2"); if (l2) l2.remove(); }
+    }
   }
   function learnSeq() {                                   // the sounding pitch of each written note, in order (-1: tied on from the note before)
     var s = TUNE.sections.filter(function (x) { return x.id === state.view; })[0];
@@ -2191,7 +2208,7 @@ function aamBoot(TUNE) {
     var t = Tone.Transport.ticks, k = Math.floor(t / BAR) - LEAD, where, chord = "";
     var endBar = rng()[1];
     if (k > endBar) { k = endBar; t = (endBar + LEAD) * BAR; }    // the instant between the last bar and the stop
-    if (t >= state.start) playCloud(k, (t % BAR) / PPQ); else if (playEl) cloudOff();
+    if (t >= state.start) playCloud(k, (t % BAR) / PPQ); else if (playEl || playEl2) cloudOff();
     if (t < state.start) { var cb = Math.floor((t - (state.start - LEAD * BAR)) / PPQ); where = "Count-in: " + Math.min(2 * BPB, cb + 1) + " of " + 2 * BPB; if (cb >= 0 && cb < 2 * BPB) showCount(cb); }
     else {
       if (!$("cnt").hidden) hideCount();

@@ -153,8 +153,10 @@ He starts the request with one of two phrases. Neither phrase: treat it as Beta.
 - **"Ship now: ..."** Build it, add its check, then release only that change as a patch version (1.0.1, 1.0.2 ...):
   `tools/release.py --version <X.Y.Z>`, `tools/guard.py --release`, commit, push, a Releases row and a Nightly log row in the
   Build Desk. If the test copy holds builder work he has not reviewed, do NOT release the test copy as it stands: make his change
-  on a copy of the last released player (`git show <last release commit>:player/aam-player.html`), release that, and make the same
-  change in the test copy so the two stay in step.
+  on a copy of the last released player (`git show <last release commit>:player/aam-player.html > tools/out/hotfix/player.html`),
+  release it with `tools/release.py --from <that file> --version <X.Y.Z> --notes <file with its change-log lines>`, and make the
+  same change in the test copy so the two stay in step. The next ship-now fix starts from the newest release, so keep the fixed
+  copy's changes in the test copy: the test copy must always contain everything that is live.
 
 ## Lessons
 

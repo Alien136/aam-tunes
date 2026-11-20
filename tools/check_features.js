@@ -184,7 +184,9 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       await page.context().close();
     }
   }
-  if (want("style")) {                                      // band styles: the picker, each style sounds, the choice is remembered, exercises have none
+  const HAS_STYLES = fs.readFileSync(path.resolve(ROOT, process.argv.includes("--file") ? process.argv[process.argv.indexOf("--file") + 1] : "player/aam-player.html"), "utf8").includes('data-r="stdlg"');
+  if (want("style") && !HAS_STYLES) console.log("  (style checks skipped: this copy of the player has no band styles)");
+  if (want("style") && HAS_STYLES) {                        // band styles: the picker, each style sounds, the choice is remembered, exercises have none
     const TEN = fs.readdirSync(path.join(ROOT, "tunes")).map(f => f.replace(/\.json$/, "")).find(sl => { const t = tune(sl); return t.instrument === "tenor" && (!t.style || t.style === "swing"); });
     const ctx = await b.newContext({ ...devices["iPhone 13"] }); await wire(ctx); const page = await ctx.newPage(); page.on("pageerror", e => expect(false, "script error: " + e.message));
     await page.addInitScript(() => { window.__starts = 0; const o = AudioBufferSourceNode.prototype.start; AudioBufferSourceNode.prototype.start = function () { window.__starts++; return o.apply(this, arguments); }; });
@@ -207,6 +209,22 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     await page.goto(URL_OF(HCB)); await page.waitForTimeout(1800);
     expect(!(await page.$('[data-r="style-btn"]')), "style: an exercise with a click has no style picker");
     await ctx.close();
+  }
+  if (want("cloud")) {                                      // a piano page: one cloud per hand, and no wash on the bar; a one-line page: one cloud
+    const page = await open({ ...devices["iPhone 13"] }, "winter-wonderland-piano");
+    const count = () => page.evaluate(() => ({ rh: document.querySelectorAll(".score .lr-line:not(.lr-line2)").length, lh: document.querySelectorAll(".score .lr-line2").length,
+      wash: [...document.querySelectorAll(".score .hl.is-now")].some(e => { const c = getComputedStyle(e); return c.fill !== "rgba(0, 0, 0, 0)" && c.fill !== "transparent" && c.fill !== "none"; }) }));
+    await page.click('[data-r="views"] button:nth-child(3)'); await page.waitForTimeout(500); await page.click('[data-r="p-play"]'); await page.waitForTimeout(8500);
+    let c = await count(); expect(c.rh === 1 && c.lh === 1, "piano page: a cloud on the right hand's note and one on the left hand's (" + c.rh + ", " + c.lh + ")");
+    expect(!c.wash, "playback: the bar itself is not washed when a note carries the cloud");
+    await page.click('[data-r="p-play"]'); await page.waitForTimeout(400);
+    await page.click('[data-r="views"] button:nth-child(2)'); await page.waitForTimeout(500); await page.click('[data-r="p-play"]'); await page.waitForTimeout(8500);
+    c = await count(); expect(c.rh === 0 && c.lh === 1, "piano page with an empty right hand: the left hand still has its cloud");
+    await page.context().close();
+    const one = await open({ ...devices["iPhone 13"] }, "sax-beginner-alto-cuckoo-duet");
+    await one.click('[data-r="p-play"]'); await one.waitForTimeout(9000);
+    const d = await one.evaluate(() => document.querySelectorAll(".score .lr-line").length); expect(d === 1, "a saxophone duet: one cloud, on the top part only (" + d + ")");
+    await one.context().close();
   }
   if (want("bar")) {                                        // a piano page shows the piano
     const page = await open({ viewport: { width: 390, height: 844 } }, "winter-wonderland-piano");

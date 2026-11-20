@@ -16,6 +16,14 @@ moves that block under the new version when Alex says "ship".
 
 ### Prevented
 
+## v1.0.2 · 2026-11-20
+
+### Added
+- Piano pages: the left hand has its own blue cloud during playback, so each hand shows where it is. Single-line instruments keep one cloud.
+
+### Fixed
+- During playback the bar no longer has a second, larger blue wash behind the note's cloud (it showed most during a page turn). A bar with nothing written in it still gets the faint wash, so the place is never lost.
+
 ## v1.0.1 · 2026-11-20
 
 ### Added

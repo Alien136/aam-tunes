@@ -204,3 +204,13 @@ Everything needed to carry on from any conversation is in this repository and in
 - Check group `style` in `tools/check_features.js`: every style sounds, its name fits on a phone, the choice is remembered,
   exercises have no picker.
 - NOT judged by ear: nobody has listened to Two-Feel, Up-Tempo or Bossa yet. Alex listens in beta before a release.
+
+## 2026-11-20 · v1.0.2: one cloud per hand on piano pages, no wash on the bar
+- Playback: the bar's own blue wash (`.hl.is-now`) is drawn only when `.score` has the class `bar-wash`, which `playCloud` sets
+  when the bar has no note or rest in either staff. Otherwise the note's cloud is the only marker.
+- Piano pages (`TUNE.instrument` contains "piano"): `beats()` also reads the lower staff (`.abcjs-v1`) into `bars2`, and
+  `playCloud` keeps a second cloud (`.lr-line.lr-line2`, element `playEl2`) on the left hand's note. A duet's second part gets none.
+- Released as a "ship now" fix while the test copy held the unreleased band styles: `tools/release.py --from <file> --version
+  1.0.2 --notes <file>` checks and releases a copy of the last released player plus the fix (kept in git-ignored `tools/out/hotfix/`),
+  and leaves the Unreleased block of the change log alone. The same fix is in the test copy.
+- `tools/check_features.js` skips the `style` group for a copy of the player that has no styles.
