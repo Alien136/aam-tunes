@@ -15,8 +15,10 @@ moves that block under the new version when Alex says "ship".
 
 ### Fixed
 - Opened from the home screen, the play bar sat too close to the bottom edge of the phone and was partly cut off. It now keeps clear of the edge.
+- Beginner Booklet and Starter Pack, page 28 (alto and tenor): the green SCALE label on line 116, "C major arpeggio, two octaves", was printed over the line's tick box. The generator now sets a heading that is too long for its space slightly smaller, so it stops short of the box. Fixed in the generator; the PDFs students download still show the old page until the booklets are republished.
 
 ### Prevented
+- Booklet generator (`cell` in `tools/build_beginner.py`): it now refuses to build when a line's title and label cannot fit beside the tick box even at the smaller size. A clarinet, flute or piano book built from the same generator cannot print a label over a tick box.
 
 ## v1.2 · 2026-11-20
 

@@ -647,14 +647,20 @@ def cell(book, it, png, cw):
     sp = para_h(fix(it["sub"]), cw - 27 - 16, P_SUB) if under and it.get("sub") else None
     ap = para_h(fix(it["about"]), cw - 27, P_ABOUT) if it.get("about") else None
     top = 18 + (sp[1] + 1 if sp else 0) + (ap[1] + 3 if ap else 0)
+    # the title and its pill must stop short of the tick box: a long title in a half-width cell is set a little smaller, never over the box
+    lead = pdfmetrics.stringWidth(badge, "Pop-B", 7.2) + 19 if badge else 27
+    tail = pdfmetrics.stringWidth(it["pill"], "Pop-B", 7.2) + 20 if it.get("pill") else 0
+    room = cw - (0 if badge == "WRITE" else 16) - lead - tail
+    ts = min(10.6, 10.6 * room / (tw - 27 - 8 - tail))
+    if ts < 9: raise SystemExit("Heading too long for its cell: %r (%s). Shorten the title or give the line the full width." % (it["title"], "half width" if half else "full width"))
     def draw(c, x0, y, top_all, no=no):
         x = x0
         if badge: x += _pill(c, x, y, badge, PILL[badge]) + 7
         else:
             c.setFillColor(HexColor(SLATE)); c.roundRect(x0, y - 14, 20, 14, 4, fill=1, stroke=0)
             c.setFillColor(white); c.setFont("Pop-B", 8.4); c.drawCentredString(x0 + 10, y - 10.6, str(no)); x += 27
-        c.setFillColor(HexColor(SLATE)); B.draw_mixed(c, x, y - 11, it["title"], "Pop-B", 10.6)
-        x += sum(pdfmetrics.stringWidth(ch, "DJ-B" if ch in "♭♯" else "Pop-B", 10.6) for ch in it["title"]) + 8
+        c.setFillColor(HexColor(SLATE)); B.draw_mixed(c, x, y - 11, it["title"], "Pop-B", ts)
+        x += sum(pdfmetrics.stringWidth(ch, "DJ-B" if ch in "♭♯" else "Pop-B", ts) for ch in it["title"]) + 8
         if it.get("pill"): x += _pill(c, x, y, it["pill"], PILL[it["pill"]]) + 8
         yy = y - 16
         if sp: sp[0].drawOn(c, x0 + 27, yy - sp[1]); yy -= sp[1] + 1

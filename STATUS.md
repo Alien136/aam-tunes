@@ -308,3 +308,24 @@ Everything needed to carry on from any conversation is in this repository and in
   (weekly for Claude)". The Sunday review reads it (BUILDER.md, step 2a). First one is due Saturday 21 November.
 - First reading, 23 Oct to 19 Nov 2026: 291 users and 723 page views on the site; aam_open 21 and aam_practice 10, each from 4
   users (not yet split by student or teacher); demo started 3 times, demo booking button 1; trial_booked 5; form_submit 8.
+
+## 2026-11-21 · Saturday style pass: headings stop short of the tick box
+- Rendered from the generators and looked at page by page: Beginner Booklet alto (37 pages), Starter Pack alto (38), Welcome
+  Booklet alto (27), Graded Repertoire Level 1 (20); tenor editions compared with alto page by page.
+- Fixed at the source: `cell()` in `tools/build_beginner.py` measured a heading only to decide where the subtitle goes, never
+  against the tick box. In a half-width cell "C major arpeggio, two octaves" + SCALE ran 7 pt into the box (line 116, page 28).
+  `cell()` now works out `ts`, the title size that leaves 4 pt before the box (10.6 pt normally, never under 9 pt), and stops the
+  build with a message if 9 pt is still too wide. Only page 28 changed, in all four editions (pixel comparison of every page).
+- NOT republished: the four PDFs on the `pdf` branch are the released ones and still show the old page 28. Republishing a
+  released booklet is waiting for Alex's answer in the Build Desk (the runbook says republish; the nightly task says nothing may
+  reach students). When he says yes: rebuild both Beginner Booklets, then both Starter Packs, with `--publish` and the same codes.
+- Seen and left for later Saturdays (one fix a night), most visible first:
+  1. Welcome Booklet, Blues pages 23 and 24 (`gen_study.py`): body lines set too tight, so wrapped lines touch the next line
+     ("dominant chord.", "climbs to the root."); page 24 has no page header.
+  2. Footers differ: Welcome = "Alex Attard Music" + page (the brand rule); Beginner adds the book title and "Edition 4 ·
+     November 2026"; Graded Repertoire = "Alex Attard Graded Repertoire · Level 1 · Baroque & Classical" in muted grey with a
+     slate page number. Needs one shared footer; the edition line may be wanted, so ask before removing it.
+  3. Beginner Booklet pages 30 to 33 (finale, piano score, four scales, rhythm gym) end with a third of the page empty.
+  4. Welcome Booklet music pages: the title sits closer to its kicker, and the amber rule lower, than on the text pages.
+  5. Beginner cover: the signature "Alex" sits on or just under the bottom edge of the welcome box.
+  6. Glossary: "Whole, half and quarter notes" wraps its "Unit 1" tag onto a line of its own.
