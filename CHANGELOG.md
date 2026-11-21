@@ -10,6 +10,7 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- The booklet's PDF button is now first in the contents list ("Download the booklet (PDF)"), above the search box. A link that ends in `&pdf=1` opens the player with that list open and the button marked, for the "download the booklet" link in the Starter Pack emails. Analytics records whether a download came from the link or the list.
 - Tunes written at concert pitch (the free demo tunes) show an instrument under the title, and tapping it lets the reader choose theirs: piano, flute, clarinet, tenor or alto saxophone. The page is rewritten for it, the choice is remembered, and the tuner and Learn mode follow it (Learn accepts the right note in any octave).
 - The public demo on the lessons page uses the same instrument button, with trumpet added, in place of its small "I play" menu. The page changes at once, without reloading the tune, and Analytics records which instrument was chosen.
 

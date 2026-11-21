@@ -167,6 +167,22 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     await page.context().close();
   }
 
+  if (want("pdf")) {                                      // the "download the booklet" link in an email: ...&pdf=1 opens the list with the PDF button first
+    const ctx0 = await b.newContext({ acceptDownloads: true, ...devices["iPhone 13"] }); await wire(ctx0);
+    const page = await ctx0.newPage(); page.on("pageerror", e => expect(false, "script error: " + e.message));
+    await page.goto(URL_OF("sax-beginner-alto-count-then-play") + "&pdf=1"); await page.waitForTimeout(2500);
+    const st = await page.evaluate(() => { const toc = document.querySelector('[data-r="toc"]'), box = document.querySelector(".toc-dl"), list = document.querySelector('[data-r="toc-list"]'), btn = document.querySelector("[data-dl]");
+      const r = btn && btn.getBoundingClientRect(); return { open: toc && !toc.hidden, hi: !!box && box.classList.contains("hi"), above: !!r && r.bottom <= list.getBoundingClientRect().top + 1, seen: !!r && r.top >= 0 && r.bottom <= innerHeight, label: btn && btn.textContent, url: location.search }; });
+    expect(st.open && st.hi, "PDF link: &pdf=1 opens the contents with the download button marked");
+    expect(st.above && st.seen && /Download the booklet \(PDF\)/.test(st.label || ""), "PDF link: the download button is first, above the list, on a phone screen");
+    expect(!/pdf=|c=/.test(st.url), "PDF link: the code and the pdf flag leave the address bar");
+    const [dl] = await Promise.all([page.waitForEvent("download", { timeout: 25000 }).catch(() => null), page.click("[data-dl]")]);
+    expect(!!dl, "PDF link: the button downloads the booklet");
+    await page.click('[data-r="toc-close"]'); await page.click('[data-r="title"]'); await page.waitForTimeout(300);
+    expect(await page.evaluate(() => !document.querySelector(".toc-dl").classList.contains("hi")), "PDF link: opening the list from the title is the ordinary list");
+    await page.context().close();
+  }
+
   if (want("bar")) {
     for (const [name, opts, slug] of [["phone", { ...devices["iPhone 13"] }, HCB], ["small phone", { viewport: { width: 360, height: 700 } }, "sax-beginner-alto-rain-rain-go-away"],
                                       ["tablet", { viewport: { width: 820, height: 1100 } }, "sax-welcome-alto-long-tones-down"], ["laptop", { viewport: { width: 1280, height: 800 } }, HCB]]) {
