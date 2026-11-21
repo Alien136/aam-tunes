@@ -789,9 +789,9 @@ function aamBoot(TUNE) {
     if (Math.abs(acc) > 1 || /^(Cb|Fb|E#|B#)$/.test(name)) name = (/#/.test(tk) || "GDAEB".indexOf(tk) >= 0 ? SHARP : MAJ)[pc];   // no double sharps or C flats
     return name + m[3];
   }
-  var STYLE = TUNE.style || "swing";                           // "swing": the band. "drone": a held root and fifth with a click. "click": a click only.
+  var STYLE = TUNE.style || "swing";                                  // changed to "swing" below for a "with_band" tune                           // "swing": the band. "drone": a held root and fifth with a click. "click": a click only.
   // Time signature: quarter-note beats in a bar (2, 3 or 4). The band styles are 4/4 only; "solo" pieces, clicks and drones can be 2/4 or 3/4.
-  var BPB = (TUNE.style && TUNE.style !== "swing" && TUNE.meter && [2, 3, 4].indexOf(+TUNE.meter[0]) >= 0 && +TUNE.meter[1] === 4) ? +TUNE.meter[0] : 4;
+  var BPB = (TUNE.meter && [2, 3, 4].indexOf(+TUNE.meter[0]) >= 0 && +TUNE.meter[1] === 4 && (+TUNE.meter[0] !== 2 || (TUNE.style && TUNE.style !== "swing"))) ? +TUNE.meter[0] : 4;   // the band plays in 4 and in 3
   var NB = TUNE.bars.length, PPQ = 192, BAR = BPB * PPQ, LEAD = 2;      // music bar k starts at tick (k + LEAD) * BAR
   // The band's styles. A style is DATA: how much the eighths swing, a drum grid, a bass rule and a bank of comping rhythms.
   // "swing" and "ballad" are the two the player was born with and keep their own hand-tuned code below; every other style is
@@ -802,6 +802,7 @@ function aamBoot(TUNE) {
   //                              comp   one list per bar for a chord that lasts the bar, cycled: [beat, length]
   //   half   the same for a chord that lasts half a bar   kit    extra drum sounds this style needs loaded
   //   beta   true = in the picker of the test copy only. Remove it when Alex has listened and said yes.
+  //   m      beats in a bar this style is written for (3 = a waltz). Left out = 4. A tune is offered only the styles in its own meter.
   var BAND = {
     swing:  { name: "Medium Swing", group: "Jazz", sw: Math.round(PPQ / 6), note: "Walking bass, ride cymbal, swung eighths" },
     two:    { name: "Two-Feel", group: "Jazz", sw: Math.round(PPQ / 6), note: "Bass in two, lighter drums: the head of a standard",
@@ -853,14 +854,40 @@ function aamBoot(TUNE) {
                        ["snare", 1, 0.66, null], ["snare", 3, 0.7, null], ["hh", 1, 0.7, -3], ["hh", 3, 0.7, -3], ["kick", 0, 0.6, -9], ["kick", 2, 0.56, -10], ["kick", 3.5, 0.4, -14, 0.3]]],
               comp: [[[0, 0.5], [1.5, 0.5], [3.5, 0.4]], [[1, 0.5], [2.5, 0.5]]],
               half: [[[0, 0.5], [1.5, 0.4]]] },
-    ballad: { name: "Straight Ballad", group: "Pop", sw: 0, note: "Even eighths, held chords, bass on 1 and 3" }
+    waltz:  { name: "Jazz Waltz", beta: true, m: 3, group: "Jazz", sw: Math.round(PPQ / 6), note: "Three in a bar: ride cymbal, hi-hat on 2, swung eighths",
+              bass: "waltz",
+              drums: [[["ride", 0, 0.56, -3], ["ride", 1, 0.7, -2], ["ride", 1.5, 0.36, -8, 0.6], ["ride", 2, 0.6, -3], ["hh", 1, 0.66, -4], ["kick", 0, 0.34, -16]],
+                      [["ride", 0, 0.56, -3], ["ride", 1, 0.7, -2], ["ride", 2, 0.6, -3], ["ride", 2.5, 0.36, -8], ["hh", 1, 0.66, -4], ["hh", 2, 0.5, -6], ["kick", 0, 0.34, -16], ["snare", 2.5, 0.28, null, 0.2]]],
+              comp: [[[0, 1.3], [1.5, 1.2]], [[1, 0.9]], [[0, 0.6], [2, 0.8]], [[1.5, 1.3]]],
+              half: [[[0, 0.9]], [[0, 0.6]]] },
+    waltzb: { name: "Ballad in 3", beta: true, m: 3, group: "Pop", sw: 0, note: "Three in a bar, even eighths, held chords: a slow straight ballad",
+              bass: "waltz",
+              drums: [[["ride", 0, 0.4, -8], ["ride", 1, 0.3, -10], ["ride", 2, 0.32, -10], ["kick", 0, 0.52, -11], ["stick", 2, 0.32, -10]],
+                      [["ride", 0, 0.4, -8], ["ride", 1, 0.3, -10], ["ride", 2, 0.32, -10], ["kick", 0, 0.5, -11], ["stick", 1, 0.3, -10], ["stick", 2, 0.3, -10, 0.5]]],
+              comp: [[[0, 2.8]], [[0, 1.8], [2, 0.9]]],
+              half: [[[0, 1.7]], [[0, 0.9]]] },
+    ballad: { name: "Straight Ballad", group: "Pop", sw: 0, note: "Even eighths, held chords, bass on 1 and 3" },
+    soul:   { name: "Soul Jazz", beta: true, group: "Pop", sw: 0, note: "Even eighths, a backbeat on 2 and 4, a bass riff that pushes into beat 3", kit: ["hhc"],
+              bass: "soul",
+              drums: [[["hhc", 0, 0.5, null], ["hhc", 0.5, 0.34, null], ["hhc", 1, 0.48, null], ["hhc", 1.5, 0.34, null], ["hhc", 2, 0.5, null], ["hhc", 2.5, 0.34, null], ["hhc", 3, 0.48, null], ["hhc", 3.5, 0.36, null],
+                       ["hh", 1, 0.6, -3], ["hh", 3, 0.6, -3], ["kick", 0, 0.62, -9], ["kick", 1.5, 0.46, -13], ["kick", 2.5, 0.4, -14, 0.6], ["snare", 1, 0.66, null], ["snare", 3, 0.7, null]],
+                      [["hhc", 0, 0.5, null], ["hhc", 0.5, 0.34, null], ["hhc", 1, 0.48, null], ["hhc", 1.5, 0.34, null], ["hhc", 2, 0.5, null], ["hhc", 2.5, 0.34, null], ["hhc", 3, 0.48, null], ["hhc", 3.5, 0.36, null],
+                       ["hh", 1, 0.6, -3], ["hh", 3, 0.6, -3], ["kick", 0, 0.62, -9], ["kick", 1.5, 0.46, -13], ["kick", 2, 0.5, -11], ["snare", 1, 0.66, null], ["snare", 3, 0.7, null], ["snare", 3.5, 0.3, null, 0.3]]],
+              comp: [[[1.5, 0.4], [2.5, 0.4]], [[0, 0.5], [1.5, 0.4], [3.5, 0.4]]],
+              half: [[[0, 0.45], [1.5, 0.4]]] }
   };
+  var bandFits = function (id) { return !!BAND[id] && (BAND[id].m || 4) === BPB; };          // a style and a tune must count the same number of beats
   var BAND_GROUPS = ["Jazz", "Latin", "Blues", "Pop"];
   // A tune names its own style ("band" in the tune file; the older "feel": "straight" means the ballad); the student's choice is remembered per tune.
-  var band = BAND[TUNE.band] ? TUNE.band : (TUNE.feel === "straight" || TUNE.style === "solo" ? "ballad" : "swing");
+  var bandLive = function (id) { return bandFits(id) && (!BAND[id].beta || PLAYER_VERSION === "test copy"); };      // a style students may hear: beta styles sound in the test copy only
+  // "with_band": a tune that older players show with a click (its "style") gets the band here, once its style is released (the 3/4 tunes).
+  // "band_new": a style to use in place of "band" once it is released; older players do not know it and keep "band".
+  if (TUNE.with_band && bandLive(TUNE.band)) STYLE = "swing";
+  if (bandLive(TUNE.band_new)) TUNE.band = TUNE.band_new;
+  var band = bandFits(TUNE.band) ? TUNE.band : BPB === 3 ? (TUNE.feel === "straight" ? "waltzb" : "waltz") : (TUNE.feel === "straight" || TUNE.style === "solo" ? "ballad" : "swing");
   try {
     var bv = JSON.parse(localStorage.getItem("aam-band") || "{}")[TUNE.slug], fv = JSON.parse(localStorage.getItem("aam-feel") || "{}")[TUNE.slug];
-    if (BAND[bv]) band = bv; else if (fv === "straight") band = "ballad"; else if (fv === "swing") band = "swing";      // "aam-feel" is the choice made before there were styles
+    if (bandFits(bv)) band = bv; else if (BPB === 4 && fv === "straight") band = "ballad"; else if (BPB === 4 && fv === "swing") band = "swing";      // "aam-feel" is the choice made before there were styles
   } catch (e) {}
   var feel = BAND[band].sw ? "swing" : "straight";                                       // do the written eighths swing?
   var SW = BAND[band].sw;                                                                // how late an off-beat eighth is, in ticks, in the style playing now
@@ -934,7 +961,7 @@ function aamBoot(TUNE) {
       [].forEach.call(list.querySelectorAll("button"), function (b) { b.setAttribute("aria-pressed", b.dataset.id === band ? "true" : "false"); });
     };
     list.innerHTML = BAND_GROUPS.map(function (g) {
-      var ids = Object.keys(BAND).filter(function (id) { return BAND[id].group === g && (!BAND[id].beta || PLAYER_VERSION === "test copy"); });   // a style marked beta is offered in the test copy only, until Alex has heard it
+      var ids = Object.keys(BAND).filter(function (id) { return BAND[id].group === g && bandLive(id); });   // a style marked beta is offered in the test copy only, until Alex has heard it
       return ids.length ? "<h3>" + g + "</h3>" + ids.map(function (id) { return '<button data-id="' + id + '"><b>' + BAND[id].name + "</b><small>" + BAND[id].note + "</small></button>"; }).join("") : "";
     }).join("");
     list.addEventListener("click", function (e) {
@@ -2254,7 +2281,7 @@ function aamBoot(TUNE) {
   // hand moves as little as possible, kept between E3 and E5 so it never gets muddy, in Charleston-style rhythms.
   var VOICE = { "Mixolydian": [2, 5, 6, 1], "Phrygian dominant": [2, 5, 6, 1], "Melodic minor": [2, 4, 5, 1], "Locrian": [2, 4, 6, 0] };
   function voicings(c, prev) {
-    var idx = VOICE[c.scale] || [2, 4, 6, 1];                      // degree indexes: 3rd, 5th (13th on dominants), 7th, 9th
+    var idx = c.voice || VOICE[c.scale] || [2, 4, 6, 1];           // degree indexes: 3rd, 5th (13th on dominants), 7th, 9th. A chord can bring its own ("voice": a sus chord plays its 4th)
     var pcs = idx.map(function (d) { return (c.root + c.degs[d]) % 12; });
     var opts = [];
     [[0, 1, 2, 3], [2, 3, 0, 1]].forEach(function (order) {        // A: from the 3rd up; B: from the 7th up
@@ -2285,11 +2312,24 @@ function aamBoot(TUNE) {
   }
   function bandParts(S) {                                      // the bass line and the piano's chords for a style from the BAND table
     var flat = []; TUNE.bars.forEach(function (bar, bi) { var beat = 0; bar.forEach(function (c) { flat.push({ c: c, bar: bi, beat: beat, n: bar.length }); beat += c.beats; }); });
-    var low = function (c, prev) { var r = 33 + ((c.root - 33) % 12 + 12) % 12; if (prev !== null && Math.abs(r + 12 - prev) < Math.abs(r - prev) && r + 12 <= 47) r += 12; return r; };
+    var low = function (c, prev) { var br = c.bass != null ? c.bass : c.root, r = 33 + ((br - 33) % 12 + 12) % 12; if (prev !== null && Math.abs(r + 12 - prev) < Math.abs(r - prev) && r + 12 <= 47) r += 12; return r; };
     var bass = [], comp = [], prev = null, pv = null; S._ant = false;
     if (S.bass === "walk") bass = walkingBass().filter(function (e) { return !e.ghost; }).map(function (e) { return { bar: e.bar, beat: e.beat, midi: e.midi, len: 0.98, vel: 0.72 + (e.beat % 2 === 1 ? 0.07 : 0) }; });
     flat.forEach(function (x, i) {
       var c = x.c, r = low(c, prev), nr = low(flat[(i + 1) % flat.length].c, r), fifth = r + c.degs[4] <= 50 ? r + c.degs[4] : r + c.degs[4] - 12; prev = r;
+      if (S.bass === "soul") {                                 // root, the root again just before beat 3, the fifth, then down to the seventh and a step into the next chord
+        bass.push({ bar: x.bar, beat: x.beat, midi: r, len: 1.4, vel: 0.78 });
+        if (c.beats >= 2) bass.push({ bar: x.bar, beat: x.beat + 1.5, midi: r, len: 0.45, vel: 0.6 });
+        if (c.beats >= 4) {
+          var sev = r + c.degs[6] - 12; if (sev < 28) sev += 12;
+          bass.push({ bar: x.bar, beat: x.beat + 2, midi: fifth, len: 0.9, vel: 0.72 }, { bar: x.bar, beat: x.beat + 3, midi: sev, len: 0.45, vel: 0.64 },
+                    { bar: x.bar, beat: x.beat + 3.5, midi: nr === r ? fifth : nr > r ? nr - 1 : nr + 1, len: 0.45, vel: 0.62 });
+        }
+      }
+      if (S.bass === "waltz") {                                // the root rings through the bar; every second bar steps into the next chord on beat 3
+        if (c.beats >= BPB && i % 2 === 1) bass.push({ bar: x.bar, beat: x.beat, midi: r, len: 1.9, vel: 0.76 }, { bar: x.bar, beat: x.beat + 2, midi: nr === r ? fifth : nr > r ? nr - 1 : nr + 1, len: 0.95, vel: 0.66 });
+        else bass.push({ bar: x.bar, beat: x.beat, midi: r, len: c.beats * 0.95, vel: 0.76 });
+      }
       if (S.bass === "two") {                                  // root, then the fifth; now and then a step into the next chord
         if (c.beats >= 4) {
           var lead = i % 2 === 1;
@@ -2308,7 +2348,7 @@ function aamBoot(TUNE) {
         if (!S._ant) bass.push({ bar: x.bar, beat: x.beat, midi: r, len: Math.min(1.4, c.beats * 0.9), vel: 0.74 });
         S._ant = false;
         if (c.beats >= 4) { bass.push({ bar: x.bar, beat: x.beat + 1.5, midi: fifth, len: 1.4, vel: 0.68 }, { bar: x.bar, beat: x.beat + 3, midi: nr, len: 1.9, vel: 0.76 }); S._ant = true; }
-        else if (x.beat + c.beats >= 4) { bass.push({ bar: x.bar, beat: x.beat + 1, midi: nr, len: 1.9, vel: 0.76 }); S._ant = true; }
+        else if (x.beat + c.beats >= BPB) { bass.push({ bar: x.bar, beat: x.beat + 1, midi: nr, len: 1.9, vel: 0.76 }); S._ant = true; }
         else bass.push({ bar: x.bar, beat: x.beat + 1.5, midi: fifth, len: 0.5, vel: 0.6 });
       }
       var v = voicings(c, pv); pv = v;
@@ -2335,14 +2375,15 @@ function aamBoot(TUNE) {
         })((kb + LEAD) * BAR, TUNE.bars[kb]);
       }
     }
-    if (STYLE === "swing") walkingBass().forEach(function (e) {   // a player's touch: 2 and 4 lean in a little, no two notes quite alike
+    var FOUR = BPB === 4;                                      // the hand-tuned swing and ballad are written in four
+    if (STYLE === "swing" && FOUR) walkingBass().forEach(function (e) {   // a player's touch: 2 and 4 lean in a little, no two notes quite alike
       at((e.bar + LEAD) * BAR + (e.ghost ? swing(e.beat) : e.beat * PPQ), function (time) {
         if (!state.bass || band !== "swing") return;
         if (e.ghost) { if (Math.random() < 0.6) bs(e.midi + keyState.key, secPerBeat() * 0.3, time, 0.36 + jit(0.05)); return; }
         bs(e.midi + keyState.key, secPerBeat() * 0.95, time + Math.random() * 0.006, 0.74 + (e.beat % 2 === 1 ? 0.07 : 0) + jit(0.07));
       });
     });
-    for (var k = 0; k < (STYLE === "swing" ? NB : 0); k++) {
+    for (var k = 0; k < (STYLE === "swing" && FOUR ? NB : 0); k++) {
       var b0 = (k + LEAD) * BAR;
       (function (k) {
         [[0, 0.56, -2], [1, 0.8, 0], [1.5, 0.42, -6], [2, 0.6, -2], [3, 0.8, 0], [3.5, 0.44, -6]].forEach(function (r) {   // ding, ding-a-ding: 2 and 4 the strongest
@@ -2367,7 +2408,7 @@ function aamBoot(TUNE) {
         });
       })(k);
     }
-    if (STYLE === "swing") straightBand().forEach(function (e) {   // bass on 1 and 3, the chord held under the tune
+    if (STYLE === "swing" && FOUR) straightBand().forEach(function (e) {   // bass on 1 and 3, the chord held under the tune
       at((e.bar + LEAD) * BAR + e.beat * PPQ, function (time) {
         if (band !== "ballad") return;
         var d = e.len * secPerBeat();
@@ -2375,7 +2416,7 @@ function aamBoot(TUNE) {
         if (state.comp) e.notes.forEach(function (n, i) { pno(n + keyState.key, d * 0.96, time + i * 0.012 + Math.random() * 0.004, SND ? 0.36 + jit(0.05) + (i === e.notes.length - 1 ? 0.05 : 0) : 0.32, mixGain("comp")); });
       });
     });
-    if (STYLE === "swing") comping().forEach(function (e) {
+    if (STYLE === "swing" && FOUR) comping().forEach(function (e) {
       at((e.bar + LEAD) * BAR + swing(e.beat), function (time) {
         if (!state.comp || band !== "swing") return;
         var d = Math.max(0.15, e.len * secPerBeat());
@@ -2384,7 +2425,7 @@ function aamBoot(TUNE) {
       });
     });
     if (STYLE === "swing") Object.keys(BAND).forEach(function (id) {   // every other style: played from its entry in BAND
-      var S = BAND[id]; if (!S.drums) return;
+      var S = BAND[id]; if (!S.drums || !bandFits(id)) return;
       var P = bandParts(S);
       P.bass.forEach(function (e) {
         at((e.bar + LEAD) * BAR + swing(e.beat, S.sw), function (time) {

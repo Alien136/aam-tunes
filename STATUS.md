@@ -439,3 +439,21 @@ Everything needed to carry on from any conversation is in this repository and in
 - Player: 24 new exercises, one per key (`flute-welcome-2oct-major-c` ... `-minor-b`), because each key has its own length.
   `page_map()` in `book_player.py` has its own flute numbering; the other 20 exercises kept their slugs.
 - The saxophone Welcome Booklet is unchanged (alto compared page by page).
+
+## 2026-11-21 · Beta: Soul Jazz style; the band in 3/4 (Jazz Waltz, Ballad in 3)
+- `BAND` has three new entries, all `beta: true`: `soul` (bass rule "soul": root, root on the and of 2, fifth, seventh below, a step into the
+  next chord), `waltz` and `waltzb` (`m: 3`, bass rule "waltz"). Models, from knowledge and NOT yet judged by ear: Soul Jazz = Eddie Harris and
+  Les McCann "Cold Duck Time", Cannonball Adderley "Mercy, Mercy, Mercy"; Jazz Waltz = Miles Davis "Someday My Prince Will Come", Bill Evans
+  "Waltz for Debby". Alex listens in beta, then remove `beta` per style.
+- `BPB` now follows `meter` for band tunes too (3 or 4; 2/4 stays exercises only). `m` on a style = its beats per bar; `bandFits(id)` keeps a
+  style to tunes in its meter (picker, default, scheduler); `bandLive(id)` adds "not beta, or the test copy". The two hand-tuned styles
+  (Medium Swing, Straight Ballad) are 4/4 only.
+- Three tune keys, all ignored by older players: `with_band: true` (a tune whose `style` is a click plays with the band once its `band` style
+  is live: how a 3/4 tune stays safe in v1.3), `band_new` (use this style in place of `band` once it is live), and on a chord `bass`
+  (pitch class of a slash chord's bass note) and `voice` (degree indexes for the piano, e.g. `[3,4,6,1]` for a sus chord).
+- Going Home (4 exercises) republished with its real concert chords, `with_band` and `band: "waltzb"`; Cold Duck Time and Mercy, Mercy, Mercy
+  have `band_new: "soul"`. In v1.3 all three behave exactly as before (checked with `check_release.js --file release/player.html`).
+- Checks (`--only style`): 4/4 offers no waltz; Going Home opens with Ballad in 3, lists only styles in three, each sounds; Cold Duck Time
+  opens with Soul Jazz in the test copy and Bossa Nova in a released copy while the style is beta. Soul Jazz sits after Straight Ballad in the
+  picker on purpose: the ballad check counts sounds in a fixed window and is sensitive to where in the tune it lands.
+- To release a style: delete its `beta: true`, then ship. Not done: `gen_study.py` still writes 4/4 only (Going Home is hand-written).

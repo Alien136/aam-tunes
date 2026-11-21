@@ -10,6 +10,8 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- Beta (test copy only, until Alex has listened): a **Soul Jazz** band style (even eighths, backbeat on 2 and 4, a bass riff) for tunes like Cold Duck Time and Mercy, Mercy, Mercy. Those two tunes open with it in the test copy; students keep Bossa Nova until it is released.
+- Beta (test copy only): the band can play in 3/4. Two styles in three, **Jazz Waltz** (swung) and **Ballad in 3** (straight). A tune in 3/4 is offered only the styles in three, and a tune in 4/4 only the styles in four. Going Home's four exercises play with the band in the test copy; students keep the click until the styles are released.
 
 ### Fixed
 

@@ -260,6 +260,31 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     expect((await page.textContent('[data-r="style-btn"]')) === "Bossa Nova", "style: the choice is remembered for the tune");
     await page.goto(URL_OF(HCB)); await page.waitForTimeout(1800);
     expect(!(await page.$('[data-r="style-btn"]')), "style: an exercise with a click has no style picker");
+    expect(!ids.some(id => /^waltz/.test(id)), "style: a tune in 4/4 is not offered a waltz");
+    const WALTZ = "going-home-alto-arpeggios", html = await page.content();
+    const TESTCOPY = /var PLAYER_VERSION = "test copy"/.test(html), isBeta = id => new RegExp("\\b" + id + ":\\s*\\{ name: \"[^\"]+\", beta: true").test(html);
+    if (html.includes('soul:')) {                             // "band_new": a tune moves to a new style only where that style is released (beta styles: the test copy)
+      await page.goto(URL_OF("cold-duck-time-alto")); await page.waitForTimeout(2200);
+      const want = TESTCOPY || !isBeta("soul") ? "Soul Jazz" : "Bossa Nova", got = await page.textContent('[data-r="style-btn"]');
+      expect(got === want, "soul style: Cold Duck Time opens with " + want + " (" + got + ")");
+    }
+    if (html.includes('waltzb:') && !TESTCOPY && isBeta("waltzb")) {
+      await page.goto(URL_OF(WALTZ)); await page.waitForTimeout(2200);
+      expect(!(await page.$('[data-r="style-btn"]')), "3/4 band: students keep the click on Going Home until the waltz styles are released");
+    }
+    if (html.includes('waltzb:') && (TESTCOPY || !isBeta("waltzb"))) {      // the band in 3/4: a tune that older players show with a click
+      await page.goto(URL_OF(WALTZ)); await page.waitForTimeout(2200);
+      expect(/Ballad in 3/.test(await page.textContent('[data-r="style-btn"]')), "3/4 band: Going Home opens with the Ballad in 3 style");
+      await page.click('[data-r="style-btn"]'); const w = await page.$$eval('[data-r="st-list"] button', bs => bs.map(e => e.dataset.id)); await page.click('[data-r="st-close"]');
+      expect(w.length >= 1 && w.every(id => /^waltz/.test(id)), "3/4 band: a tune in 3/4 is offered only the styles in three (" + w.join(", ") + ")");
+      await page.click('[data-r="p-play"]'); await page.waitForTimeout(6000);
+      for (const id of w) {
+        await page.click('[data-r="style-btn"]'); await page.click('[data-r="st-list"] button[data-id="' + id + '"]'); await page.click('[data-r="st-close"]');
+        const a0 = await page.evaluate(() => window.__starts); await page.waitForTimeout(3500); const n = await page.evaluate(() => window.__starts) - a0;
+        expect(n >= 8, "3/4 band: style " + id + " plays (" + n + " sounds in 3.5 s)");
+      }
+      await page.click('[data-r="p-play"]');
+    }
     await ctx.close();
   }
   if (want("piano")) {                                      // Learn mode on a piano page: one hand at a time, chosen in a small dialog

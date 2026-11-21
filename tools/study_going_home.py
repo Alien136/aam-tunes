@@ -118,7 +118,16 @@ lickOff = { \revert NoteHead.color \revert Stem.color \revert Beam.color \revert
     s += '\\markup \\fill-line { \\small "alexattardmusic.com" }\n'
     return s
 
-# ---------------------------------------------------------------- the player: four exercises in 3/4, click only (the exam book has the backing track)
+# ---------------------------------------------------------------- the player: four exercises in 3/4, with the band (a click in players older than the 3/4 band)
+# The band's chords, in concert pitch (the alto part's chords a major sixth lower). "bass" is the note of a slash chord, "voice" makes a sus chord play its 4th.
+# Players from before the 3/4 band read "style" (a click); newer ones read "with_band" and play the "Ballad in 3" style.
+ION, DOR, MEL, MIX = [0, 2, 4, 5, 7, 9, 11], [0, 2, 3, 5, 7, 9, 10], [0, 2, 3, 5, 7, 9, 11], [0, 2, 4, 5, 7, 9, 10]
+def _c(sym, show, root, degs, scale, beats=3, **kw): return dict(sym=sym, show=show, beats=beats, root=root, degs=degs, scale=scale, **kw)
+BAND_BARS = [[_c("Dbmaj7", "B♭maj7", 1, ION, "Ionian (major)")], [_c("Bbm7", "Gm7", 10, DOR, "Dorian")], [_c("Dbm6/E", "B♭m6/C♯", 1, MEL, "Melodic minor", bass=4)], [_c("Ebm7", "Cm7", 3, DOR, "Dorian")],
+             [_c("Dbmaj7", "B♭maj7", 1, ION, "Ionian (major)")], [_c("Cm7", "Am7", 0, DOR, "Dorian")], [_c("Gm7", "Em7", 7, DOR, "Dorian")],
+             [_c("Ab7sus", "F7sus", 8, MIX, "Mixolydian", beats=2, voice=[3, 4, 6, 1]), _c("A7sus", "F♯7sus", 9, MIX, "Mixolydian", beats=1, voice=[3, 4, 6, 1])]]
+
+
 def publish(repo):
     sys.argv = [sys.argv[0]]; sys.path.insert(0, HERE)
     import build_beginner as G                                      # for parse_part: written notes -> sounding events and the notation the player draws
@@ -135,8 +144,8 @@ def publish(repo):
         it = dict(title=title); music = " | ".join(bars)
         ev, abc, marks, roots = G.parse_part(it, music, 3, wk, below); seq = G.parse_part.seq
         root = (wk.pc - below) % 12
-        chords = [[dict(sym=PCS[root], beats=3, root=root, degs=[0, 2, 4, 5, 7, 9, 11], scale="Ionian (major)")] for _ in bars]
-        tune = dict(format="aam-tune/1", slug=SLUG + "-" + sl, title=title, subtitle="Going Home · Alto Sax · solo section", instrument="alto", concert_key=ck, native=9, style="click", keys="off",
+        chords = [BAND_BARS[k % 8] for k in range(len(bars))]
+        tune = dict(format="aam-tune/1", slug=SLUG + "-" + sl, title=title, subtitle="Going Home · Alto Sax · solo section", instrument="alto", concert_key=ck, native=9, style="click", with_band=True, band="waltzb", keys="off",
                     hide=["chords", "solo", "names"], hear=True, first_bar=1, chart_tempo=TEMPO, tempo_presets=[66, TEMPO, 100], form=[], bars=chords,
                     sections=[dict(id="notes", title="Notes", tab="Notes", desc=desc, rh=ev, lh=[], abc=dict(rh=abc, marks=marks), learn=seq)],
                     notation=dict(key="Bb", staves="treble"), meter=[3, 4])
