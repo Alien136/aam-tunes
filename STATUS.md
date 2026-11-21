@@ -397,3 +397,12 @@ Everything needed to carry on from any conversation is in this repository and in
   funk style yet: a good next band style.
 - Recordings: only one recording of Cold Duck Time itself could be verified (Swiss Movement); its other four are alto players
   in the same style, and the page says so.
+
+## 2026-11-21 · Going Home (Mark Lockheart, arr. Pete Churchill): alto study of the 8-bar solo section, in 3/4
+- Built from a photo of the ABRSM Grade 3 alto part. `tools/study_going_home.py [--code XXX-0000 --publish <repo>]`: a
+  hand-written study, because `gen_study.py` is 4/4 only. Written key B flat (concert D flat), chord symbols as the part
+  prints them. Arpeggios (two lines), scale choices, scale chorus, three licks, a two-time lick chorus, a blank chorus.
+- Player: shelf `going-home-alto`, four 3/4 exercises (`-arpeggios`, `-arpeggios-7`, `-scales`, `-licks`), click only: the
+  band cannot play 3/4 yet and the student has the book's backing track.
+- The earlier note stands: the other three Grade 3 studies were built from standard changes and still need checking against
+  the book.

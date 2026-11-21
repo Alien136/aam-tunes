@@ -2346,6 +2346,28 @@
    }
   },
   {
+   "id": "going-home-alto",
+   "title": "Going Home · Alto Sax",
+   "hash": "e9b357c96bf70422a23e334d9049d1b4fe539e6274a533c240846eeae62e7bd5",
+   "tunes": [
+    "going-home-alto-arpeggios",
+    "going-home-alto-arpeggios-7",
+    "going-home-alto-scales",
+    "going-home-alto-licks"
+   ],
+   "contents": [
+    {
+     "title": "Solo section",
+     "items": [
+      "going-home-alto-arpeggios",
+      "going-home-alto-arpeggios-7",
+      "going-home-alto-scales",
+      "going-home-alto-licks"
+     ]
+    }
+   ]
+  },
+  {
    "id": "demo",
    "title": "Free demo",
    "free": true,
@@ -4433,6 +4455,22 @@
   "autumn-leaves-alto": {
    "title": "Autumn Leaves",
    "subtitle": "32 bars · Alto Sax · arpeggios, scales, licks"
+  },
+  "going-home-alto-arpeggios": {
+   "title": "Arpeggios · 1-3-5",
+   "subtitle": "Going Home · Alto Sax · solo section"
+  },
+  "going-home-alto-arpeggios-7": {
+   "title": "Arpeggios · with the top note",
+   "subtitle": "Going Home · Alto Sax · solo section"
+  },
+  "going-home-alto-scales": {
+   "title": "Scale Chorus",
+   "subtitle": "Going Home · Alto Sax · solo section"
+  },
+  "going-home-alto-licks": {
+   "title": "Lick Chorus",
+   "subtitle": "Going Home · Alto Sax · solo section"
   }
  }
 }
