@@ -89,6 +89,17 @@ FINGERINGS = [
     ("c'''", "Upper C", {"L1"} | E, "Thumb off"),
     ("cis''' des'''", "Upper C♯ / D♭", set(E), "Only the RH pinky"),
 ]
+# the third octave, for the Welcome Booklet's chart and the player (the Beginner Booklet stops at upper C sharp)
+HIGH = [
+    ("d'''", "High D", T | {"L2", "L3"} | E, "LH 2 and 3, no right-hand fingers"),
+    ("dis''' ees'''", "High D♯ / E♭", T | LH3 | {"Gs"} | RH3 | E, "Every finger, plus the G♯ key"),
+    ("e'''", "High E", T | {"L1", "L2"} | {"R1", "R2"} | E, ""),
+    ("f'''", "High F", T | {"L1", "L3"} | {"R1"} | E, "LH middle finger up"),
+    ("fis''' ges'''", "High F♯ / G♭", T | {"L1", "L3"} | {"R3"} | E, "LH middle finger up"),
+    ("g'''", "High G", LH3 | E, "Thumb off"),
+]
+ALTERNATES = {"A♯ / B♭": [("1 and 1", T | {"L1", "R1"} | E), ("Thumb", {"Tb", "T", "L1"} | E)],
+              "Upper A♯ / B♭": [("1 and 1", T | {"L1", "R1"} | E), ("Thumb", {"Tb", "T", "L1"} | E)]}
 # a second fingering shown on its own card, straight after the note it belongs to
 EXTRA = {"ais' bes'": ("B♭ with the thumb", {"Tb", "T", "L1"} | E, "Thumb on its B♭ lever")}
 
@@ -121,7 +132,7 @@ def key_map(c, x0, ytop, w, h):
               f"<font color='{AMBER}'><b>Amber keys</b></font>: the left thumb and the pinkies.",
               "<b>Filled = press it.</b> Hollow = leave it open.",
               "<b>Your right pinky</b> stays on its E♭ key for almost every note. It lifts for D.",
-              "<b>From upper E</b> the low fingerings repeat, with faster air."]:
+              "<b>Upper E to upper C♯</b> repeat the low fingerings, with faster air."]:
         items.append(Paragraph(t, small, bulletText="•"))
     Frame(tx, ytop - h + 6, x0 + w - tx - 12, h - 18, leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0).addFromList(items, c)
 
@@ -271,3 +282,35 @@ START = [("Put it together", ["The flute has three parts: the headjoint, the bod
                            "Roll the headjoint a little toward you or away until the sound is clear.",
                            "Start the note with your tongue: \"too\". Aim for four steady beats. If you feel dizzy, sit down and rest for a minute."])]
 CARE = ["Push a soft cloth through each part with the cleaning rod after every session.", "Wipe the fingerprints off the outside with a dry cloth.", "Keep the flute in its case: never on a chair, a bed or a music stand."]
+
+
+def welcome_chart(path):
+    """The Welcome Booklet's chart: low C to high G on three pages of twelve cards (the first row of page one is the key map), B flat with both fingerings."""
+    rows_ = FINGERINGS + HIGH; assert len(rows_) == 32
+    c = canvas.Canvas(path, pagesize=letter); cols, rows, gap = 3, 4, 10; gw = (W - 2 * M - (cols - 1) * gap) / cols; idx = 0
+    for page, (maprows, ncards) in enumerate([(1, 9), (0, 12), (0, 12)]):
+        y = B.header(c, "Reference", "Fingering Chart" + ("" if page == 0 else " (continued)")); gh = (y - 60 - (rows - 1) * gap) / rows
+        if maprows: key_map(c, M, y, W - 2 * M, gh)
+        for k in range(ncards):
+            col, row = k % cols, k // cols + maprows; x0 = M + col * (gw + gap); y1 = y - row * (gh + gap)
+            c.setFillColor(HexColor(TINT if (row + col) % 2 == 0 else "#F3F5F7")); c.roundRect(x0, y1 - gh, gw, gh, 8, fill=1, stroke=0)
+            if idx >= len(rows_):
+                c.setFillColor(HexColor(SLATE)); c.setFont("Pop-B", 11); c.drawString(x0 + 10, y1 - 18, "The third octave")
+                st = ParagraphStyle("tip", parent=B.body, fontSize=8.6, leading=11.8, spaceAfter=4)
+                tip = [Paragraph("From high D up, every note has its own fingering: nothing repeats from the octave below. Learn them one at a time with long tones.", st),
+                       Paragraph("<b>B♭</b> has two fingerings. Use the thumb lever in flat keys, and 1 and 1 (B plus the right index finger) when a B natural is close by.", st)]
+                Frame(x0 + 10, y1 - gh + 8, gw - 20, gh - 34, leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0).addFromList(tip, c); idx += 1; continue
+            ly, name, pressed, note = rows_[idx]; alts = ALTERNATES.get(name, [("", pressed)])
+            c.setFillColor(HexColor(SLATE)); B.draw_mixed(c, x0 + 10, y1 - 17, name, "Pop-B", 10.5)
+            top, bot = y1 - 25, y1 - gh + 17; u = (top - bot) / (KY_MAX - KY_MIN); dw = (KX_MAX - KX_MIN) * u; right = x0 + gw - 10; area_l = right - 2 * dw - 12
+            lefts = [area_l, right - dw] if len(alts) == 2 else [area_l + (right - area_l - dw) / 2]
+            for (label, keys), lx in zip(alts, lefts):
+                draw_keys(c, lx - KX_MIN * u, top, u, keys)
+                if label:
+                    c.setFillColor(HexColor("#A86F14")); tw_ = B.pdfmetrics.stringWidth(label.replace("♭", "b"), "Pop-M", 7.4); B.draw_mixed(c, lx + dw / 2 - tw_ / 2, y1 - gh + 7, label, "Pop-M", 7.4)
+            im = ImageReader(_note_png(ly, "w%d" % idx)); iw, ih = im.getSize(); tw = area_l - (x0 + 8) - 6; th = tw * ih / iw
+            c.drawImage(im, x0 + 7, (top + bot) / 2 - th / 2, tw, th, mask="auto")
+            if note and len(alts) == 1: c.setFillColor(HexColor("#A86F14")); B.draw_mixed(c, x0 + 10, y1 - gh + 7, note, "Pop-M", 7.4)
+            idx += 1
+        c.showPage()
+    c.save()

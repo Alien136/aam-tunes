@@ -13,11 +13,14 @@ sys.argv = [sys.argv[0], ED]
 import build_book as B                                             # noqa: E402
 import gen_study as g                                              # noqa: E402
 
-BELOW = {"alto": 9, "tenor": 14}[ED]
+FLUTE = ED == "flute"                                              # the Flute Welcome Booklet: concert pitch, low C to high G
+BELOW = {"alto": 9, "tenor": 14, "flute": 0}[ED]
 PCS = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"]
-NAME = {"alto": "Alto", "tenor": "Tenor"}[ED]
-PRE = "sax-welcome-" + ED + "-"
-PDF = {"id": "sax-welcome-" + ED, "title": "Saxophone Welcome Booklet · " + NAME, "code": CODE}
+NAME = {"alto": "Alto", "tenor": "Tenor", "flute": "Flute"}[ED]
+PRE = "flute-welcome-" if FLUTE else "sax-welcome-" + ED + "-"
+PDF = {"id": "flute-welcome", "title": "Flute Welcome Booklet", "code": CODE} if FLUTE else {"id": "sax-welcome-" + ED, "title": "Saxophone Welcome Booklet · " + NAME, "code": CODE}
+BASE = "F" if FLUTE else "Eb"                                      # the written key an exercise is stored in: the player moves it -5 .. +6 half steps, so F covers low C to B on the flute
+START = {"chromatic": -5, "fourths": -5} if FLUTE else {"chromatic": -5, "fourths": -3}     # both of the booklet's pages begin on C for flute; saxophone: B flat, then C
 DUR = {"8": .5, "4": 1, "4.": 1.5, "2": 2, "2.": 3, "2..": 3.5, "1": 4}
 
 
@@ -43,21 +46,21 @@ def to_bars(ly):
 
 
 def scale_item(slug, title, page, order, pattern, alters, minor, desc, tempo=60):
-    root = B.root_note("Eb")                                       # E♭4: twelve keys from here stay between low B♭ and high F
+    root = B.root_note(BASE)                                       # saxophone E♭4: twelve keys from here stay between low B♭ and high F
     rh = to_bars(pattern(root, alters).replace("\\break", ""))
     ck = concert(root.midi)
-    return dict(slug=PRE + slug, title=title, page=page, style="drone", keys=order, start_key=-5 if order == "chromatic" else -3,
+    return dict(slug=PRE + slug, title=title, page=page, style="drone", keys=order, start_key=START[order],
                 tempo=tempo, concert_key=ck + ("m" if minor else ""), hide=["chords", "solo", "names"], tab="Notes", desc=desc,
                 bars=[[ck + ("m6" if minor else "maj7")]] * len(rh), rh=rh)
 
 
 def arp_item(slug, title, page, order):
-    root = B.root_note("Eb")
+    root = B.root_note(BASE)
     def bar(alters):
         t = [B.deg(root, d, alters).ly() + "8" for d in (1, 3, 5, 8, 5, 3)]
         return "(3 " + " ".join(t[:3]) + " (3 " + " ".join(t[3:]) + " " + root.ly() + "2"
     ck = concert(root.midi)
-    return dict(slug=PRE + slug, title=title, page=page, style="drone", keys=order, start_key=-5 if order == "chromatic" else -3, tempo=60,
+    return dict(slug=PRE + slug, title=title, page=page, style="drone", keys=order, start_key=START[order], tempo=60,
                 concert_key=ck, hide=["chords", "solo", "names"], tab="Notes",
                 desc="A major arpeggio, then the minor arpeggio on the same root, in triplets. Each time through moves to the next key.",
                 bars=[[ck + "maj7"], [ck + "m6"]], rh=[bar(B.MAJOR), bar(B.HARM_MIN)])
@@ -81,11 +84,15 @@ CHROM_DOWN = ["e'''", "ees'''", "d'''", "des'''", "c'''", "b''", "bes''", "a''",
               "b'", "bes'", "a'", "aes'", "g'", "ges'", "f'", "e'", "ees'", "d'", "des'", "c'", "b"]
 
 
+if FLUTE: DOWN, UP, CHROM_UP, CHROM_DOWN = B.LT_DOWN, B.LT_UP, B.CHR_UP, B.CHR_DOWN
+LOWEST, BOTTOM, TOP = ("c'", "low C", "high G") if FLUTE else ("bes", "low B♭", "high F")
+
+
 def chromatic_item(page):
-    rh = to_bars(" ".join(n + "8" for n in CHROM_UP + CHROM_DOWN) + " bes4")
-    c = concert(midi("bes"))
+    rh = to_bars(" ".join(n + "8" for n in CHROM_UP + CHROM_DOWN) + " " + LOWEST + "4")
+    c = concert(midi(LOWEST))
     return dict(slug=PRE + "chromatic", title="Chromatic Scale", page=page, style="click", keys="off", tempo=60, concert_key=c, written_key="C",
-                hide=["chords", "solo", "names"], tab="Notes", desc="Low B♭ to high F and back: sharps on the way up, flats on the way down.",
+                hide=["chords", "solo", "names"], tab="Notes", desc=BOTTOM[0].upper() + BOTTOM[1:] + " to " + TOP + " and back: sharps on the way up, flats on the way down.",
                 bars=[[c]] * len(rh), rh=rh)
 
 
@@ -121,8 +128,8 @@ def booklet():
         return [scale_item(slug + "-" + s, title + " · " + oname, P[key][i], o, pattern, alters, minor, desc + loop) for i, (o, oname, s) in enumerate(orders)]
     return {"pdf": PDF, "instrument": ED, "contents": [
         {"title": "Part 1 · Long Tones", "items": [
-            long_tone_item("long-tones-down", "Long Tones · Down to the bottom", P["long"], DOWN, "Middle B down to low B♭. Hold each note for six beats, breathe, then two more beats. Finish with three long low B♭s."),
-            long_tone_item("long-tones-up", "Long Tones · Up to the top", P["long"], UP, "Middle B up to high F. Hold each note for six beats, breathe, then two more beats. Finish with three long high Fs.")]},
+            long_tone_item("long-tones-down", "Long Tones · Down to the bottom", P["long"], DOWN, "Middle B down to %s. Hold each note for six beats, breathe, then two more beats. Finish with three long %ss." % (BOTTOM, BOTTOM)),
+            long_tone_item("long-tones-up", "Long Tones · Up to the top", P["long"], UP, "Middle B up to %s. Hold each note for six beats, breathe, then two more beats. Finish with three long %ss." % (TOP, TOP))]},
         {"title": "Part 2 · Chromatic Scale", "items": [chromatic_item(P["chrom"])]},
         {"title": "Part 3 · Scales", "items": pair("major", "major", "Major Scales", B.pat_scale, B.MAJOR, False, "Up to the 9th, back down to the root, then the note below it.")
             + pair("minor", "minor", "Harmonic Minor Scales", B.pat_scale, B.HARM_MIN, True, "Harmonic minor: up to the 9th, back to the root, then the raised 7th below.")},

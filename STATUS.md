@@ -358,3 +358,26 @@ Everything needed to carry on from any conversation is in this repository and in
   FLUTE SKILL boxes as a flute teacher; (3) is low C in Unit 7 too early for a flute beginner (it needs the footjoint keys)?
   (4) play it through. Same open items as the saxophone book: duet part B and the finale's piano part are unplayed.
 - Not done: a flute Welcome Booklet (the last page says "your next book"); a MailerLite form and emails for the flute Starter Pack.
+
+## 2026-11-21 · Flute Welcome Booklet, first edition (same session, at Alex's request)
+- Alex: "similar to the sax book but altered slightly to fit an intermediate flute student... start on low C and go up to high G."
+- **How it is built.** No fork: `python3 tools/build_book.py flute` -> `tools/out/Flute_Welcome_Booklet.pdf` (27 pages, the same
+  page numbers as the saxophone book). `FLUTE` and `LOW` (60 = low C; saxophone 58) at the top of `build_book.py`; the flute's
+  long-tone and chromatic lists are `LT_DOWN`, `LT_UP`, `CHR_UP`, `CHR_DOWN`. Chromatic order starts on C. Long tones: middle B
+  down to low C, then up to high G (five cells to a line). Chromatic scale: low C to high G and back. Scales, thirds, fours and
+  arpeggios: one octave and a bit from each root between low C and B (C has no note below it, so it ends on the root, as B flat
+  does on saxophone). Arpeggio pages are one staff size smaller than the saxophone's to keep twelve keys on a page. Licks are
+  the same four; the blues is in F (concert pitch).
+- **Chart:** `welcome_chart()` in `tools/beginner_flute.py`: low C to high G on three pages, B flat with both fingerings; the
+  third octave is `HIGH` (high D to high G). `export_fingerings.py` now sends all 32 notes to the player.
+- **In the player:** shelf `flute-welcome`, 21 exercises `flute-welcome-<name>` published by `tools/book_player.py flute <code>
+  <repo>`. Exercises that go through the keys are stored in written F with `start_key` -5 (the player moves a pattern -5 to +6
+  half steps, so F covers C to B); both key orders begin on C. PDF on the `pdf` branch. Code in `tools/out/beginner_codes.json`,
+  the Build Desk Library and the project doc.
+- **The saxophone Welcome Booklet did not change** (alto built before and after, every page compared pixel for pixel), and no
+  saxophone tune file was rewritten.
+- Known: in the player, the C major and C minor loops show the note below the root (low B), which only a flute with a B foot
+  has; the printed page ends on the root. The saxophone booklet has the same quirk on B flat (low A).
+- Scales are one octave and a bit, as in the saxophone book. Two-octave scales to high G are not in this edition.
+- **Needs Alex:** check the third-octave fingerings (page 27) and say whether an intermediate flute student should have
+  two-octave scales in this book.

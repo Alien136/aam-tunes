@@ -2358,6 +2358,115 @@
     "demo-major-scale",
     "demo-blues-riff"
    ]
+  },
+  {
+   "id": "flute-welcome",
+   "title": "Flute Welcome Booklet",
+   "hash": "3813ae36b9684c78f7e1c9fa9d139ef1370eedcbdc63b21dc81add9113260d3e",
+   "tunes": [
+    "flute-welcome-long-tones-down",
+    "flute-welcome-long-tones-up",
+    "flute-welcome-chromatic",
+    "flute-welcome-major-chr",
+    "flute-welcome-major-4ths",
+    "flute-welcome-minor-chr",
+    "flute-welcome-minor-4ths",
+    "flute-welcome-thirds-major-chr",
+    "flute-welcome-thirds-major-4ths",
+    "flute-welcome-thirds-minor-chr",
+    "flute-welcome-thirds-minor-4ths",
+    "flute-welcome-arpeggios-chr",
+    "flute-welcome-arpeggios-4ths",
+    "flute-welcome-fours-chr",
+    "flute-welcome-fours-4ths",
+    "flute-welcome-lick-1",
+    "flute-welcome-lick-2",
+    "flute-welcome-lick-3",
+    "flute-welcome-lick-4",
+    "flute-welcome-lick-1-keys",
+    "flute-welcome-blues"
+   ],
+   "contents": [
+    {
+     "title": "Part 1 · Long Tones",
+     "items": [
+      "flute-welcome-long-tones-down",
+      "flute-welcome-long-tones-up"
+     ]
+    },
+    {
+     "title": "Part 2 · Chromatic Scale",
+     "items": [
+      "flute-welcome-chromatic"
+     ]
+    },
+    {
+     "title": "Part 3 · Scales",
+     "items": [
+      "flute-welcome-major-chr",
+      "flute-welcome-major-4ths",
+      "flute-welcome-minor-chr",
+      "flute-welcome-minor-4ths"
+     ]
+    },
+    {
+     "title": "Part 4 · Thirds",
+     "items": [
+      "flute-welcome-thirds-major-chr",
+      "flute-welcome-thirds-major-4ths",
+      "flute-welcome-thirds-minor-chr",
+      "flute-welcome-thirds-minor-4ths"
+     ]
+    },
+    {
+     "title": "Part 5 · Arpeggios",
+     "items": [
+      "flute-welcome-arpeggios-chr",
+      "flute-welcome-arpeggios-4ths"
+     ]
+    },
+    {
+     "title": "Part 6 · Four-Note Patterns",
+     "items": [
+      "flute-welcome-fours-chr",
+      "flute-welcome-fours-4ths"
+     ]
+    },
+    {
+     "title": "Part 7 · ii–V–I Licks",
+     "items": [
+      "flute-welcome-lick-1",
+      "flute-welcome-lick-2",
+      "flute-welcome-lick-3",
+      "flute-welcome-lick-4",
+      "flute-welcome-lick-1-keys"
+     ]
+    },
+    {
+     "title": "Part 7 · Blues",
+     "items": [
+      "flute-welcome-blues"
+     ]
+    }
+   ],
+   "file": {
+    "branch": "pdf",
+    "path": "flute-welcome-20261121030707.bin",
+    "name": "Flute_Welcome_Booklet.pdf",
+    "edition": "Edition 1 · November 2026",
+    "size": 5089196,
+    "iv": "192f7bb1223c59b086f866b2",
+    "keys": [
+     {
+      "iv": "326bf65e50a961b7c3bc0b71",
+      "ct": "72b258861020f5da05f0dfde562ccafee6c6cf04fef45d8825520435ec4183560ea54e677e40efd3f14d64c596ec5b15"
+     },
+     {
+      "iv": "4cf6537989ca70a9261a85ae",
+      "ct": "a1995db52b8652dea0903552f2e3b0977652151c12c311fc0c1ca6c72af85069059d99af490a4e237ca0bb3a2c2e449b"
+     }
+    ]
+   }
   }
  ],
  "tunes": {
@@ -4204,6 +4313,90 @@
   "flute-beginner-d-major-scale-and-arpeggio": {
    "title": "128 · D major scale and arpeggio",
    "subtitle": "Flute Beginner Booklet · Finish · Four scales"
+  },
+  "flute-welcome-blues": {
+   "title": "Blues",
+   "subtitle": "Flute Welcome Booklet · 12-bar jazz blues"
+  },
+  "flute-welcome-long-tones-down": {
+   "title": "Long Tones · Down to the bottom",
+   "subtitle": "Flute Welcome Booklet · Part 1 · Long Tones"
+  },
+  "flute-welcome-long-tones-up": {
+   "title": "Long Tones · Up to the top",
+   "subtitle": "Flute Welcome Booklet · Part 1 · Long Tones"
+  },
+  "flute-welcome-chromatic": {
+   "title": "Chromatic Scale",
+   "subtitle": "Flute Welcome Booklet · Part 2 · Chromatic Scale"
+  },
+  "flute-welcome-major-chr": {
+   "title": "Major Scales · Chromatic order",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Scales"
+  },
+  "flute-welcome-major-4ths": {
+   "title": "Major Scales · Circle of fourths",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Scales"
+  },
+  "flute-welcome-minor-chr": {
+   "title": "Harmonic Minor Scales · Chromatic order",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Scales"
+  },
+  "flute-welcome-minor-4ths": {
+   "title": "Harmonic Minor Scales · Circle of fourths",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Scales"
+  },
+  "flute-welcome-thirds-major-chr": {
+   "title": "Major Scales in Thirds · Chromatic order",
+   "subtitle": "Flute Welcome Booklet · Part 4 · Thirds"
+  },
+  "flute-welcome-thirds-major-4ths": {
+   "title": "Major Scales in Thirds · Circle of fourths",
+   "subtitle": "Flute Welcome Booklet · Part 4 · Thirds"
+  },
+  "flute-welcome-thirds-minor-chr": {
+   "title": "Harmonic Minor in Thirds · Chromatic order",
+   "subtitle": "Flute Welcome Booklet · Part 4 · Thirds"
+  },
+  "flute-welcome-thirds-minor-4ths": {
+   "title": "Harmonic Minor in Thirds · Circle of fourths",
+   "subtitle": "Flute Welcome Booklet · Part 4 · Thirds"
+  },
+  "flute-welcome-arpeggios-chr": {
+   "title": "Arpeggios · Chromatic order",
+   "subtitle": "Flute Welcome Booklet · Part 5 · Arpeggios"
+  },
+  "flute-welcome-arpeggios-4ths": {
+   "title": "Arpeggios · Circle of fourths",
+   "subtitle": "Flute Welcome Booklet · Part 5 · Arpeggios"
+  },
+  "flute-welcome-fours-chr": {
+   "title": "Four-Note Patterns · Chromatic order",
+   "subtitle": "Flute Welcome Booklet · Part 6 · Four-Note Patterns"
+  },
+  "flute-welcome-fours-4ths": {
+   "title": "Four-Note Patterns · Circle of fourths",
+   "subtitle": "Flute Welcome Booklet · Part 6 · Four-Note Patterns"
+  },
+  "flute-welcome-lick-1": {
+   "title": "Lick 1 · Step-down line",
+   "subtitle": "Flute Welcome Booklet · Part 7 · ii–V–I Licks"
+  },
+  "flute-welcome-lick-2": {
+   "title": "Lick 2 · Arpeggio to the 9th",
+   "subtitle": "Flute Welcome Booklet · Part 7 · ii–V–I Licks"
+  },
+  "flute-welcome-lick-3": {
+   "title": "Lick 3 · Scale down, arpeggio up",
+   "subtitle": "Flute Welcome Booklet · Part 7 · ii–V–I Licks"
+  },
+  "flute-welcome-lick-4": {
+   "title": "Lick 4 · Enclosure and ♭9",
+   "subtitle": "Flute Welcome Booklet · Part 7 · ii–V–I Licks"
+  },
+  "flute-welcome-lick-1-keys": {
+   "title": "Transposing a Lick · Lick 1 through the keys",
+   "subtitle": "Flute Welcome Booklet · Part 7 · ii–V–I Licks"
   }
  }
 }

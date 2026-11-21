@@ -15,8 +15,8 @@ assert len(notes) == 32 and B.FINGERINGS[0][0] == "bes" and B.FINGERINGS[-1][0] 
 import beginner_flute as FL                                        # the flute's chart: the same diagram as the Flute Beginner Booklet
 fkeys = [[k, shape, x, y, a, b, 1 if main else 0] for k, shape, x, y, a, b, main in FL.KEYS]
 fnotes = {}
-for i, (ly, name, pressed, line) in enumerate(FL.FINGERINGS): fnotes[60 + i] = [sorted(pressed), line]     # written pitch: low C = 60 ... upper C sharp = 85
-assert len(fnotes) == 26 and FL.FINGERINGS[0][0] == "c'" and FL.FINGERINGS[-1][0].split()[0] == "cis" + "'" * 3
+for i, (ly, name, pressed, line) in enumerate(FL.FINGERINGS + FL.HIGH): fnotes[60 + i] = [sorted(pressed), line]     # written pitch: low C = 60 ... high G = 91
+assert len(fnotes) == 32 and FL.FINGERINGS[0][0] == "c'" and FL.HIGH[-1][0] == "g" + "'" * 3
 block = ("/* FINGERINGS:BEGIN (written by tools/export_fingerings.py from tools/build_book.py and tools/beginner_flute.py: do not edit by hand) */\nvar SAX_KEYS = %s;\nvar SAX_BOX = %s;\nvar SAX_FING = %s;\n"
          "var FLUTE_KEYS = %s;\nvar FLUTE_BOX = %s;\nvar FLUTE_FING = %s;\n/* FINGERINGS:END */") % (
     json.dumps(keys, separators=(",", ":")), json.dumps([B.KX_MIN, B.KX_MAX, B.KY_MIN, B.KY_MAX]), json.dumps(notes, ensure_ascii=False, separators=(",", ":")),

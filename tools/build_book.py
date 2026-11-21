@@ -19,6 +19,8 @@ from reportlab.lib.styles import ParagraphStyle
 from pypdf import PdfReader, PdfWriter
 
 EDITION = sys.argv[1] if len(sys.argv) > 1 else "alto"
+FLUTE = EDITION == "flute"                 # the Flute Welcome Booklet: the same book from low C to high G (flute data: tools/beginner_flute.py)
+LOW = 60 if FLUTE else 58                   # the lowest written note: low C on the flute, low B flat on the saxophone
 OUT = os.path.join(HERE, "out")
 os.makedirs(OUT, exist_ok=True)
 
@@ -226,15 +228,18 @@ def cover(path):
     sw = 290
     sh = sw * ih / iw
     c.drawImage(im, M, H - band + (48 if clef != "grand" else 30), sw, sh, mask="auto")
-    draw_sax(c, 345, H - band + 36, 1.95, tenor=(EDITION == "tenor"))
+    if FLUTE:
+        import beginner_flute as FL; FL.draw_flute(c, 345, H - band + 36, 1.95)
+    else:
+        draw_sax(c, 345, H - band + 36, 1.95, tenor=(EDITION == "tenor"))
     c.setFillColor(HexColor(AMBER)); c.setFont("Pop-B", 11)
     c.drawString(M, H - 110, " ".join("ALEX ATTARD MUSIC"))
     c.setFillColor(white); c.setFont("Pop-B", 50)
-    c.drawString(M, H - 198, "Saxophone")
+    c.drawString(M, H - 198, "Flute" if FLUTE else "Saxophone")
     c.setFont("Pop-L", 38)
     c.drawString(M, H - 244, "Welcome Booklet")
     # edition under the title
-    ed = {"alto": "E♭ Alto Saxophone", "tenor": "B♭ Tenor Saxophone"}[EDITION]
+    ed = {"alto": "E♭ Alto Saxophone", "tenor": "B♭ Tenor Saxophone", "flute": "Flute in C"}[EDITION]
     c.setFillColor(HexColor(AMBER))
     draw_mixed(c, M, H - 284, ed, "Pop-M", 17)
     # welcome note (lower half)
@@ -285,6 +290,15 @@ TOC_INFO = {  # title -> (badge, description)
     "Blues": ("7", "A 12-bar jazz blues: chord tones, scales and your own chorus"),
     "Fingering Chart": ("?", "Every note from low B♭ to high F, with palm, side and pinky keys"),
 }
+
+
+if FLUTE:
+    TOC_INFO.update({
+        "Long Tones": ("1", "Sound, tuning and air: middle B down to low C, then up to high G"),
+        "Chromatic Scale": ("2", "Every note in this book, low C to high G and back"),
+        "Blues": ("7", "A 12-bar jazz blues in F: chord tones, scales and your own chorus"),
+        "Fingering Chart": ("?", "Every note from low C to high G, with the thumb and pinky keys"),
+    })
 
 
 def contents_page(c, toc):
@@ -344,15 +358,18 @@ def practice_pages(path, toc):
     # ---- How to Use This Book
     y = header(c, "Start here", "How to Use This Book")
     y = _para(c, "This booklet is your technique toolkit: long tones for a beautiful sound, scales and arpeggios in all 12 keys "
-                 "for fast, even fingers, and your first jazz vocabulary. Every saxophone reads the same written notes with the "
+                 "for fast, even fingers, and your first jazz vocabulary. " + (
+                 "The flute plays at concert pitch: the note you read is the note that sounds, so every page works with a piano, "
+                 "a tuner or a backing track in the same key. The book covers three octaves, from low C to high G." if FLUTE else
+                 "Every saxophone reads the same written notes with the "
                  "same fingerings, so these pages work on soprano, alto, tenor and baritone. Only the blues pages are written "
-                 "for your instrument.", body, M, y, W - 2 * M)
+                 "for your instrument."), body, M, y, W - 2 * M)
     y = tip_box(c, M, y - 2, W - 2 * M, "How each page works", [
         "<b>Start slow:</b> ♩ = 60, one note per beat, until every note passes the TEA test below.",
         "<b>Fill in the TEA tracker</b> at the top of each page with your best clean tempo.",
         "<b>Read it as written, count it your way.</b> The page never changes: one, two or four notes per beat happens in your head.",
         "<b>Play everything twice:</b> once slurred, once tongued.",
-        "<b>Two key orders.</b> Every exercise appears in <b>chromatic order</b> (B♭, B, C, D♭ …) and around the "
+        "<b>Two key orders.</b> Every exercise appears in <b>chromatic order</b> (" + ("C, D♭, D, E♭" if FLUTE else "B♭, B, C, D♭") + " …) and around the "
         "<b>circle of fourths</b> (C, F, B♭, E♭ … the order jazz tunes move through).",
     ])
     y -= 16
@@ -360,7 +377,7 @@ def practice_pages(path, toc):
     y = _para(c, "Every scale, pattern and arpeggio in this booklet has one goal: play it <b>as fast as you can</b> while it still "
                  "passes all three parts of TEA. If any one slips, slow down.", body, M, y, W - 2 * M)
     cw, ch = (W - 2 * M - 20) / 3, 92
-    for k, (l, word, txt) in enumerate([("T", "Tone", "A full, steady, in-tune sound on every note, from low B♭ to high F."),
+    for k, (l, word, txt) in enumerate([("T", "Tone", "A full, steady, in-tune sound on every note, from " + ("low C to high G." if FLUTE else "low B♭ to high F.")),
                                         ("E", "Even", "Every note the same length and volume, locked to the metronome click."),
                                         ("A", "Accurate", "The right notes with the right fingers, every time, with no slips.")]):
         tea_card(c, M + k * (cw + 10), y, cw, ch, l, word, txt)
@@ -477,6 +494,16 @@ def lily(n):
     return n.ly()
 
 
+# the flute's notes: long tones from middle B down to low C and up to high G; the chromatic scale from low C to high G and back
+LT_DOWN = ["b'", "bes'", "a'", "aes'", "g'", "ges'", "f'", "e'", "ees'", "d'", "des'", "c'"]
+LT_UP = ["b'", "c''", "cis''", "d''", "dis''", "e''", "f''", "fis''", "g''", "gis''", "a''", "ais''", "b''",
+         "c'''", "cis'''", "d'''", "dis'''", "e'''", "f'''", "fis'''", "g'''"]
+CHR_UP = ["c'", "cis'", "d'", "dis'", "e'", "f'", "fis'", "g'", "gis'", "a'", "ais'", "b'", "c''", "cis''", "d''", "dis''", "e''", "f''", "fis''", "g''",
+          "gis''", "a''", "ais''", "b''", "c'''", "cis'''", "d'''", "dis'''", "e'''", "f'''", "fis'''", "g'''"]
+CHR_DOWN = ["ges'''", "f'''", "e'''", "ees'''", "d'''", "des'''", "c'''", "b''", "bes''", "a''", "aes''", "g''", "ges''", "f''", "e''", "ees''", "d''",
+            "des''", "c''", "b'", "bes'", "a'", "aes'", "g'", "ges'", "f'", "e'", "ees'", "d'", "des'"]
+
+
 def long_tones():
     BAR = '\\bar "|."'
 
@@ -488,6 +515,7 @@ def long_tones():
     down = ["b'", "bes'", "a'", "aes'", "g'", "ges'", "f'", "e'", "ees'", "d'", "des'", "c'", "b", "bes"]
     up = ["b'", "c''", "cis''", "d''", "dis''", "e''", "f''", "fis''", "g''", "gis''", "a''", "ais''", "b''",
           "c'''", "cis'''", "d'''", "dis'''", "e'''", "f'''"]
+    if FLUTE: down, up = LT_DOWN, LT_UP
 
     def music(notes, per=4):
         return " ".join(cell(n, i, per) for i, n in enumerate(notes))
@@ -499,7 +527,7 @@ def long_tones():
 
     def score(notes):
         return ("\\score { \\new Staff { \\key c \\major \\time 4/4 \\omit Staff.TimeSignature \\accidentalStyle forget "
-                "\\tempo 4 = 60 " + music(notes) + finish(notes[-1]) + " " + BAR + " } \\layout { ragged-last = ##t } }\n")
+                "\\tempo 4 = 60 " + music(notes, 5 if FLUTE else 4) + finish(notes[-1]) + " " + BAR + " } \\layout { ragged-last = ##t } }\n")
 
     s = LY_HEAD.replace("#(set-global-staff-size 19)", "#(set-global-staff-size 19)").replace("ragged-bottom = ##t ragged-last-bottom = ##t", "ragged-bottom = ##f ragged-last-bottom = ##f")
     s += ly_header("Part 1 · Sound", "Long Tones",
@@ -507,9 +535,9 @@ def long_tones():
                    "Hold each note for 6 beats (six seconds), take a breath, play the same note again for 2 beats, then move to the next note "
                    "and repeat. Keep the sound full and steady, with no wobble in the pitch: check it with a tuner. "
                    "Finish each exercise on the fermatas: hold the last note as long as you can, three times.")
-    s += ly_label("1. Down to the bottom", "middle B to low B♭, then hold low B♭ ×3", "")
+    s += ly_label("1. Down to the bottom", "middle B to low C, then hold low C ×3" if FLUTE else "middle B to low B♭, then hold low B♭ ×3", "")
     s += score(down)
-    s += ly_label("2. Up to the top", "middle B to high F, then hold high F ×3", "")
+    s += ly_label("2. Up to the top", "middle B to high G, then hold high G ×3" if FLUTE else "middle B to high F, then hold high F ×3", "")
     s += score(up)
     return s
 
@@ -521,9 +549,12 @@ CHROMATIC_MIN = ["Bb", "B", "C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A"
 CIRCLE_MIN = ["A", "D", "G", "C", "F", "Bb", "Eb", "G#", "C#", "F#", "B", "E"]
 MAJOR = [0, 0, 0, 0, 0, 0, 0]
 HARM_MIN = [0, 0, -1, 0, 0, -1, 0]
+if FLUTE:                                   # chromatic order starts on the flute's lowest note
+    CHROMATIC = ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"]
+    CHROMATIC_MIN = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"]
 NAME = lambda k: k[0] + k[1:].replace("b", "♭").replace("#", "♯")
 ORDERS = {
-    "chromatic": ("Chromatic order", "Every key from low B♭ upward, a half step at a time (B♭, B, C, D♭ …). The advanced way: all 12 keys with no gaps."),
+    "chromatic": ("Chromatic order", ("Every key from low C upward, a half step at a time (C, D♭, D, E♭ …)." if FLUTE else "Every key from low B♭ upward, a half step at a time (B♭, B, C, D♭ …).") + " The advanced way: all 12 keys with no gaps."),
     "circle": ("Circle of fourths", "C, F, B♭, E♭ and on round the circle: the order jazz tunes move through, so it trains your ears as well as your fingers."),
 }
 TEMPO_LINE = ('\\markup \\fill-line { \\with-color "' + AMBER + '" \\sans \\bold "TEA GOAL  ♩ = 60–120" '
@@ -533,7 +564,7 @@ TEMPO_LINE = ('\\markup \\fill-line { \\with-color "' + AMBER + '" \\sans \\bold
 def root_note(name):
     """Lowest written root (at or above low B♭) for a one-octave exercise."""
     n = Note(name[0], name[1:].count("#") - name[1:].count("b"), 3)
-    while n.midi < 58:
+    while n.midi < LOW:
         n.octave += 1
     return n
 
@@ -551,7 +582,7 @@ def deg(root, d, alters):
 
 
 def loop_ok(root, alters):
-    return deg(root, 0, alters).midi >= 58  # the 7th below must exist (no low A on saxophone)
+    return deg(root, 0, alters).midi >= LOW  # the 7th below must exist (no low A on saxophone, no low B on this flute)
 
 
 def bars_fill(notes_8ths, final):
@@ -634,11 +665,12 @@ def chromatic_scale():
     down = ["e'''", "ees'''", "d'''", "des'''", "c'''", "b''", "bes''", "a''", "aes''", "g''", "ges''", "f''", "e''",
             "ees''", "d''", "des''", "c''", "b'", "bes'", "a'", "aes'", "g'", "ges'", "f'", "e'", "ees'", "d'", "des'",
             "c'", "b"]
-    seq = up + down  # 62 eighths, then low B♭ as a quarter = 8 bars
-    music = " ".join(n + "8" + (" \\break" if (i + 1) % 16 == 0 else "") for i, n in enumerate(seq)) + " bes4"
+    if FLUTE: up, down = CHR_UP, CHR_DOWN
+    seq = up + down  # 62 eighths, then the lowest note as a quarter = 8 bars
+    music = " ".join(n + "8" + (" \\break" if (i + 1) % 16 == 0 else "") for i, n in enumerate(seq)) + (" c'4" if FLUTE else " bes4")
     s = LY_HEAD
     s += ly_header("Part 2 · Fingers", "Chromatic Scale",
-                   "Every note on the saxophone, from low B♭ to high F and back down. Sharps on the way up, flats on the way down: "
+                   ("Three octaves, from low C to high G and back down. " if FLUTE else "Every note on the saxophone, from low B♭ to high F and back down. ") + "Sharps on the way up, flats on the way down: "
                    "same fingerings, different names. Keep your fingers close to the keys and the eighth notes perfectly even, "
                    "and check the fingering chart at the back for any note you're unsure of.")
     s += TEMPO_LINE.replace("\\markup \\fill-line", "\\markup \\fontsize #-2 \\fill-line")
@@ -677,6 +709,7 @@ def arp_page(order):
                    "Each line is a major arpeggio, then a minor arpeggio on the same root: 1-3-5 up to the octave and back down, in eighth-note "
                    "triplets, landing on the root. Keep the triplets even and the big leaps smooth. " + odesc)
     s += TEMPO_LINE
+    if FLUTE: s = s.replace("#(set-global-staff-size 17)", "#(set-global-staff-size 16)").replace("system-system-spacing.basic-distance = #10", "system-system-spacing.basic-distance = #9")   # higher notes, more ledger lines: one notch smaller keeps twelve keys on a page
     for k in keys:
         rM = root_note(k)
         mk = MINOR_NAME.get(k, k)
@@ -772,7 +805,7 @@ def blues_pages():
                     "top-margin = 19\\mm bottom-margin = 22\\mm left-margin = 19\\mm right-margin = 19\\mm")
     key = {"alto": "D", "tenor": "G"}.get(EDITION, "F")
     head = ly_header("Part 7 · Jazz", "Blues in " + key,
-                     "A 12-bar jazz blues, written in " + key + " for your saxophone (concert F, the key a band plays it in). "
+                     ("A 12-bar jazz blues in F, the key a band plays it in. " if FLUTE else "A 12-bar jazz blues, written in " + key + " for your saxophone (concert F, the key a band plays it in). ") +
                      "First learn the chord tones, then the scale for each chord, then write your own line over the changes.")
     first = ly.index("\\markup \\column {")
     ly = ly[:first] + head + ly[first:]
@@ -1061,6 +1094,12 @@ def footer_overlay(n_pages):
 
 def chromatic_tips():
     tips = [
+        "Learn it in three chunks first: low C to middle C♯ (the first octave), middle D to high C♯ (the same fingers, faster air), then high D to high G (new fingerings: learn them from the chart).",
+        "Slur it first so you can hear every finger change, then tongue it.",
+        "Keep your fingers close to the keys. Your right pinky stays on its E♭ key except for the Ds and the two lowest notes.",
+        "Low C and C♯: slide your pinky across the rollers, don't jump. High notes: faster air through a smaller opening, never more pressure.",
+        "Use the TEA system: ♩ = 60 to 120 at one note per beat, then two, then four.",
+    ] if FLUTE else [
         "Learn it in three chunks first: low B♭ to low D (the pinky keys), middle D to high C♯ (the octave key), then high D to high F (the palm keys).",
         "Slur it first so you can hear every finger change, then tongue it.",
         "Keep your fingers close to the keys and roll your thumb onto the octave key; don't lift it off the thumb rest.",
@@ -1089,7 +1128,10 @@ PARTS_TXT = {
 
 def main():
     cover(f"{OUT}/cover.pdf")
-    fingering_pages(f"{OUT}/fingering.pdf")
+    if FLUTE:
+        import beginner_flute as FL; FL.welcome_chart(f"{OUT}/fingering.pdf")
+    else:
+        fingering_pages(f"{OUT}/fingering.pdf")
     chrom = chromatic_scale().replace("#(set-global-staff-size 19)", "#(set-global-staff-size 22)") + chromatic_tips()
     chrom = chrom.replace("system-system-spacing.basic-distance = #12", "system-system-spacing.basic-distance = #17")
     P = "Part 3 · Scales"
@@ -1138,7 +1180,7 @@ def main():
     ov = footer_overlay(len(w.pages))
     for i, page in enumerate(w.pages):
         page.merge_page(ov.pages[i])
-    out = f"{OUT}/Sax_Welcome_Booklet_{EDITION.capitalize()}.pdf"
+    out = f"{OUT}/Flute_Welcome_Booklet.pdf" if FLUTE else f"{OUT}/Sax_Welcome_Booklet_{EDITION.capitalize()}.pdf"
     with open(out, "wb") as fh:
         w.write(fh)
     print(out, len(w.pages), "pages")
