@@ -16,6 +16,8 @@ moves that block under the new version when Alex says "ship".
 - The public demo on the lessons page uses the same instrument button, with trumpet added, in place of its small "I play" menu. The page changes at once, without reloading the tune, and Analytics records which instrument was chosen.
 
 ### Fixed
+- On an iPad or iPhone the microphone check could "pass" while the player heard nothing: Safari can leave the sound engine asleep when it is started after the permission question instead of during the tap, and a sleeping engine delivers pure silence. The engine is now started inside the tap, the listening chain reaches the speakers at zero volume (Safari only runs a chain that does), and the first-time check hands the same live microphone to Learn mode instead of closing it and opening a second one.
+- A microphone that is on but silent is no longer mistaken for a quiet room. The check stops and says so ("no sound is reaching the player"), the next tap anywhere wakes the engine, Learn mode shows the same message, and Analytics records it (`aam_mic_silent`).
 - Opened from the home screen, the play bar sat too close to the bottom edge of the phone and was partly cut off. It now keeps clear of the edge.
 - Beginner Booklet and Starter Pack, page 28 (alto and tenor): the green SCALE label on line 116, "C major arpeggio, two octaves", was printed over the line's tick box. The generator now sets a heading that is too long for its space slightly smaller, so it stops short of the box. Fixed in the generator; the PDFs students download still show the old page until the booklets are republished.
 

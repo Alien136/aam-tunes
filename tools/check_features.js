@@ -17,7 +17,7 @@
 
    The microphone is a sound file: saxophone-like tones are generated here and fed to the browser as a fake microphone.
 
-   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|flute|learn|cloud|contents|pdf|bar|style|apply|piano|install|demo]
+   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|mic|flute|learn|cloud|contents|pdf|bar|style|apply|piano|install|demo]
    Needs:  playwright, plus the tone and abcjs packages (tools/node_modules or $AAM_NODE_MODULES). Nothing is fetched from the internet. */
 const fs = require("fs"), path = require("path"), os = require("os");
 const { chromium, devices } = require("playwright");
@@ -93,6 +93,26 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     expect(note === "A", "flute: a piano A reads as A (got " + note + ")");
     expect(fg.all === 12 && fg.on === 4, "flute: the tuner shows the flute fingering for A: thumb, two fingers and the right pinky (" + JSON.stringify(fg) + ")");
   });
+
+  if (want("mic")) {
+    await withMic(wav("dead", [sil(9)], 0), {}, async page => {      // a microphone that is on but sends pure silence (an iPad whose sound engine never woke up)
+      await page.addInitScript(() => { window.__ev = []; window.gtag = function (a, n) { if (a === "event") window.__ev.push(n); }; });
+      await page.goto(URL_OF(HCB)); await page.waitForTimeout(1500); await page.click('[data-r="tuner-btn"]'); await page.waitForTimeout(4500);
+      const msg = await txt(page, "t-msg");
+      expect(/no sound is reaching the player/.test(msg) && !/Step 2|ready/.test(msg), "microphone check: a silent microphone is reported and never passes as a quiet room (\"" + msg.slice(0, 50) + "\")");
+      const ev = await page.evaluate(() => window.__ev);
+      expect(ev.includes("aam_mic_silent"), "microphone check: Analytics hears about a silent microphone");
+    });
+    await withMic(wav("handover", played(hcb, 0.55, 0.12)), {}, async page => {      // the first-time check hands the SAME live microphone to Learn mode: no second start
+      await page.addInitScript(() => { const g = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices); window.__gum = 0; navigator.mediaDevices.getUserMedia = c => { window.__gum++; return g(c); }; });
+      await page.addInitScript(() => { try { localStorage.setItem("aam-ear", JSON.stringify({ floor: 0.01, off: 0, at: 1 })); } catch (e) {} });
+      await page.goto(URL_OF(HCB)); await page.waitForTimeout(1500);
+      await page.click('[data-r="tuner-btn"]'); await page.waitForTimeout(900); await page.click('[data-r="t-close"]'); await page.waitForTimeout(150);
+      await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(1200);
+      const st = await page.evaluate(() => ({ gum: window.__gum, bar: !document.querySelector('[data-r="learn-bar"]').hidden }));
+      expect(st.gum === 1 && st.bar, "microphone: going from the tuner straight into Learn mode keeps one live microphone (" + JSON.stringify(st) + ")");
+    });
+  }
 
   if (want("learn")) {
     const withWrong = [sil(1.5)]; hcb.forEach((m, i) => { if (i === 1) withWrong.push(tone(63, 0.9), sil(0.15)); withWrong.push(tone(m, 0.55), sil(0.12)); }); withWrong.push(sil(3));

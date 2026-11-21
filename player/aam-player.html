@@ -1237,7 +1237,7 @@ function aamBoot(TUNE) {
   var NOTE_NAMES = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
   var noteName = function (m) { return NOTE_NAMES[((m % 12) + 12) % 12]; };
   var ear = (function () {
-    var ctx = null, an = null, buf = null, stream = null, timer = null, subs = [], cal = null, quietUntil = 0;
+    var ctx = null, an = null, buf = null, bytes = null, stream = null, timer = null, subs = [], cal = null, quietUntil = 0, deadAt = 0, wakeArmed = false, told = false, self;
     try { cal = JSON.parse(localStorage.getItem("aam-ear") || "null"); } catch (e) {}
     var lo = EAR_FIXED ? 58 - EAR_FIXED - 2 : 34, hi = EAR_FIXED ? 89 - EAR_FIXED + 7 : 100;      // sounding range in MIDI numbers
     var hz = function (m) { return 440 * Math.pow(2, (m - 69) / 12); };
@@ -1262,31 +1262,53 @@ function aamBoot(TUNE) {
     }
     function tick() {
       if (!an) return;
-      an.getFloatTimeDomainData(buf);
+      if (an.getFloatTimeDomainData) an.getFloatTimeDomainData(buf);
+      else { an.getByteTimeDomainData(bytes); for (var k = 0; k < buf.length; k++) buf[k] = (bytes[k] - 128) / 128; }      // older Safari
       var r = pitch(buf, ctx.sampleRate), floor = cal ? cal.floor : 0.01;
-      r.t = Date.now(); r.heard = r.rms > floor; r.ok = r.heard && r.clarity >= 0.8 && r.hz > 0 && r.t > quietUntil;
+      r.t = Date.now(); r.heard = r.rms > floor;
+      // A microphone that is "on" but sends nothing: the sound engine is asleep (iPad Safari does this when it was not started by a tap),
+      // or the stream is pure digital silence. A real room is never exactly silent, so this is never a quiet student.
+      if (ctx.state === "running" && r.rms > 0) deadAt = 0; else if (!deadAt) deadAt = r.t;
+      r.dead = !!deadAt && r.t - deadAt > 1500;
+      if (r.dead && !wakeArmed) {                         // the next tap anywhere wakes it: a tap is the one thing Safari accepts
+        wakeArmed = true;
+        var wake = function () { document.removeEventListener("pointerdown", wake, true); wakeArmed = false; if (ctx && ctx.state !== "running") { try { ctx.resume(); } catch (e) {} } };
+        document.addEventListener("pointerdown", wake, true);
+        if (!told) { told = true; AAM_TRACK.event("aam_mic_silent", { tune: TUNE.slug, instrument: TUNE.instrument || "", how: ctx.state }); }     // so a silent microphone shows up in Analytics
+      } r.ok = r.heard && r.clarity >= 0.8 && r.hz > 0 && r.t > quietUntil;
       if (r.ok) { r.midi = 69 + 12 * Math.log(r.hz / 440) / Math.LN2; r.note = Math.round(r.midi); r.cents = Math.round(100 * (r.midi - r.note)); }
       subs.slice().forEach(function (f) { f(r); });
     }
-    return {
-      on: function (f) { subs.push(f); }, off: function (f) { var n = subs.length; subs = subs.filter(function (g) { return g !== f; }); if (n && !subs.length) this.stop(); },
+    return self = {
+      on: function (f) { subs.push(f); },
+      off: function (f) {                                 // the last listener has gone: close the microphone, unless another one takes over at once (the check handing over to Learn mode keeps the same live microphone)
+        var n = subs.length; subs = subs.filter(function (g) { return g !== f; });
+        if (n && !subs.length) setTimeout(function () { if (!subs.length) self.stop(); }, 500);
+      },
       hz: hz, cal: function () { return cal; },
       setCal: function (c) { cal = c; try { localStorage.setItem("aam-ear", JSON.stringify(c)); } catch (e) {} },
       start: function () {
         if (stream) return Promise.resolve();
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !(window.AudioContext || window.webkitAudioContext)) return Promise.reject(new Error("nomic"));
+        // The sound engine is made and woken HERE, while the student's tap is still being handled. iPad and iPhone Safari leave an
+        // engine that is made later (after the permission question) asleep, and then the microphone delivers nothing.
+        var mine = ctx = new (window.AudioContext || window.webkitAudioContext)();
+        try { var w = mine.resume(); if (w && w.catch) w.catch(function () {}); } catch (e) {}
+        deadAt = 0; told = false;
         return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 } }).then(function (s) {
-          stream = s; ctx = new (window.AudioContext || window.webkitAudioContext)();
+          if (ctx !== mine) { s.getTracks().forEach(function (t) { t.stop(); }); return null; }      // closed again while the question was on screen
+          stream = s;
           an = ctx.createAnalyser(); an.fftSize = 4096; an.smoothingTimeConstant = 0; ctx.createMediaStreamSource(s).connect(an);
-          buf = new Float32Array(an.fftSize); timer = setInterval(tick, 40);
-          return ctx.state === "suspended" ? ctx.resume() : null;
-        });
+          var mute = ctx.createGain(); mute.gain.value = 0; an.connect(mute); mute.connect(ctx.destination);      // Safari only runs a chain that reaches the speakers; the volume of 0 keeps it silent
+          buf = new Float32Array(an.fftSize); bytes = new Uint8Array(an.fftSize); timer = setInterval(tick, 40);
+          return ctx.state !== "running" ? ctx.resume().catch(function () {}) : null;
+        }, function (e) { if (ctx === mine) { try { mine.close(); } catch (x) {} ctx = null; } throw e; });
       },
       stop: function () {
         clearInterval(timer); timer = null;
         if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
         if (ctx) { try { ctx.close(); } catch (e) {} }
-        stream = ctx = an = null;
+        stream = ctx = an = null; deadAt = 0;
       },
       beep: function (m, secs) {                          // play one note so the student can hear what to aim for; the microphone ignores it
         if (!ctx) return;
@@ -1312,6 +1334,7 @@ function aamBoot(TUNE) {
     return '<svg class="fg" viewBox="0 0 ' + w + " " + h + '" role="img" aria-label="Fingering for ' + noteName(written) + '">' + out + "</svg>";
   }
   var fingerNote = function (written) { var f = FG && FG.fing[written]; return f && f[1] ? f[1] : ""; };
+  var MIC_SILENT = "The microphone is on, but no sound is reaching the player. Tap anywhere on the screen once. If nothing changes: disconnect Bluetooth headphones, close other apps that use the microphone, then reload this page.";
   var micWhy = function (e) {
     return e && e.message === "nomic" ? "This browser can't use the microphone. Try Chrome or Safari."
       : "The microphone is blocked. Allow it for this site in your browser's settings, then try again.";
@@ -1332,6 +1355,8 @@ function aamBoot(TUNE) {
     }
     function heard(r) {
       var now = r.t, msg = $("t-msg");
+      if (r.dead) { if (!heard.dead) { heard.dead = msg.textContent; msg.textContent = MIC_SILENT; } if (phase === "quiet") { samples = []; t0 = now; } show(null); return; }
+      if (heard.dead) { msg.textContent = heard.dead; heard.dead = null; if (phase === "quiet") { samples = []; t0 = now; } }       // it woke up: carry on where the check was
       if (phase === "quiet") {                            // step 1: how loud is the room?
         samples.push(r.rms);
         if (now - t0 > 1800) {
@@ -1375,7 +1400,7 @@ function aamBoot(TUNE) {
         else { phase = "tune"; $("t-msg").textContent = "Hold any note and bring the marker to the middle."; $("t-go").hidden = !after; }
       }).catch(function (e) { $("t-msg").textContent = micWhy(e); });
     }
-    function close() { dlg.hidden = true; if (live) { ear.off(heard); live = false; } phase = ""; after = null; }
+    function close() { dlg.hidden = true; if (live) { ear.off(heard); live = false; } phase = ""; after = null; heard.dead = null; }
     openTuner = function (then) { if (state.playing) stop(); after = then || null; dlg.hidden = false; begin(false); AAM_TRACK.event("aam_tuner", { tune: TUNE.slug, instrument: TUNE.instrument || "", first_time: ear.cal() && ear.cal().at ? "no" : "yes" }); };
     $("tuner-btn").onclick = function () { openTuner(null); };
     $("t-close").onclick = close;
@@ -1514,6 +1539,8 @@ function aamBoot(TUNE) {
   }
   function learnHear(r) {
     var t = learnTarget(); if (t == null) return;
+    if (r.dead) { if (!learn.dead) { learn.dead = $("learn-msg").textContent; learnSay(MIC_SILENT, false); } return; }
+    if (learn.dead) { learnSay(learn.dead, false); learn.dead = null; }
     var c = ear.cal() || { off: 0 };
     var alt = learn.alts && learn.alts[learn.i];          // a chord: whichever of its notes is nearest to what was heard
     if (alt && r.ok) alt.forEach(function (m) { if (Math.abs(m + learn.key - r.midi) < Math.abs(t - r.midi)) t = m + learn.key; });

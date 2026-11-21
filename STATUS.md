@@ -406,3 +406,18 @@ Everything needed to carry on from any conversation is in this repository and in
   band cannot play 3/4 yet and the student has the book's backing track.
 - The earlier note stands: the other three Grade 3 studies were built from standard changes and still need checking against
   the book.
+
+## 2026-11-21 · Beta: the microphone on iPad (a student's check "passed" but Learn mode heard nothing)
+- Report from Alex: a student on an iPad tapped through the microphone check, then the player could not hear her saxophone.
+- Not reproduced on a device (no iPad here). Found by reading the code and confirmed with two new checks that FAIL on v1.2:
+  1. `ear.start()` made the AudioContext inside the getUserMedia promise, after the tap had ended. iPad and iPhone Safari can
+     leave such a context suspended; `resume()` outside a tap does not wake it. A suspended context reads as exact zeros.
+  2. Step 1 of the check ("stay quiet") accepted exact zeros as a quiet room, so a dead microphone passed step 1.
+  3. The first-time check closed the microphone and Learn mode opened a second one (second getUserMedia, second context).
+  4. The analyser was not connected to the destination; Safari may not process a chain that does not reach the speakers.
+- Fix (test copy): the context is created and resumed synchronously in `start()`; analyser -> gain 0 -> destination;
+  `off()` waits 500 ms before stopping so the check hands the live microphone to Learn mode; `tick()` marks `r.dead` after
+  1.5 s of a non-running context or exact zeros, arms a one-time `pointerdown` that calls `resume()`, and sends
+  `aam_mic_silent` (how = the context state). The tuner and Learn mode show `MIC_SILENT`. Older Safari without
+  `getFloatTimeDomainData` falls back to the byte version.
+- New check group `mic` in `tools/check_features.js`. Still unverified on a real iPad: ask the student to try the beta link.
