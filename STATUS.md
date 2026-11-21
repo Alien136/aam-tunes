@@ -473,4 +473,6 @@ Everything needed to carry on from any conversation is in this repository and in
 - Email sign-up before use (Alex's idea, 21 Nov): not built; recommendation given was one free deck, email for the rest. Needs MailerLite.
 - Checks: `--only cards` (8 instrument/card/level mixes draw and fit a phone; a 20-card round scores right; memory is kept).
 - Next: key-signature, interval and chord-symbol generators; the syllabus table is in the project doc for Alex to mark up.
-
+- 21 Nov, later: Alex wants theory on its own address, not the play page. `theory/loader.html` is the block to paste once into an Elementor
+  HTML widget on a new /theory page: it loads `release/cards.html` (404 = "Theory practice is coming soon") or, with `?beta`, the test copy
+  `theory/cards.html`. Steps are in the Computer session guide. Once /theory exists, remove the `?app=cards` hook from the player.

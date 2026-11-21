@@ -1,0 +1,40 @@
+<!-- Alex Attard Music theory: LOADER. Paste this once into an Elementor HTML widget on the /theory page; it never needs changing.
+     The theory app is loaded from the GitHub repository (release/cards.html), so an update is live as soon as it is released.
+     Add ?beta to the page address to load the test copy (theory/cards.html) instead: that is how Alex tries new work first. -->
+<div id="aam-theory-boot" style="min-height:60vh;display:grid;place-items:center;text-align:center;font:500 15px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif;color:#536471">Loading…</div>
+<script>
+(function () {
+  var REPO = ["https://raw.githubusercontent.com/Alien136/aam-tunes/main/", "https://cdn.jsdelivr.net/gh/Alien136/aam-tunes@main/"];
+  var test = /[?&]beta(=|&|$)/.test(location.search), file = test ? "theory/cards.html" : "release/cards.html";
+  var boot = document.getElementById("aam-theory-boot"), KEY = "aam-theory-copy";
+  function get(i) {                                         // each address in turn, 8 seconds each
+    if (i >= REPO.length) return Promise.reject(new Error("unreachable"));
+    var ctl = window.AbortController ? new AbortController() : null, timer = setTimeout(function () { if (ctl) ctl.abort(); }, 8000);
+    return fetch(REPO[i] + file, ctl ? { cache: "no-cache", signal: ctl.signal } : { cache: "no-cache" })
+      .then(function (r) { if (r.status === 404) { var e = new Error("none"); e.none = true; throw e; } if (!r.ok) throw new Error(r.status); return r.text(); })
+      .then(function (t) { clearTimeout(timer); if (t.indexOf('id="aam-cards"') < 0) throw new Error("not the theory app"); return t; })
+      .catch(function (e) { clearTimeout(timer); if (e && e.none) throw e; return get(i + 1); });
+  }
+  function run(html) {                                      // put the app on the page, then start its scripts in order
+    var t = document.createElement("template"); t.innerHTML = html;
+    var scripts = [].slice.call(t.content.querySelectorAll("script"));
+    scripts.forEach(function (s) { s.parentNode.removeChild(s); });
+    boot.parentNode.insertBefore(t.content, boot); boot.parentNode.removeChild(boot);
+    (function next(i) {
+      if (i >= scripts.length) return;
+      var s = document.createElement("script");
+      if (scripts[i].src) { s.src = scripts[i].src; s.onload = s.onerror = function () { next(i + 1); }; document.head.appendChild(s); }
+      else { s.textContent = scripts[i].textContent; document.body.appendChild(s); next(i + 1); }
+    })(0);
+  }
+  get(0).then(function (html) {
+    if (!test) { try { localStorage.setItem(KEY, html); } catch (e) {} }   // keep a copy for a day the repository can't be reached
+    run(html);
+  }, function (e) {
+    var saved = null; try { saved = test ? null : localStorage.getItem(KEY); } catch (x) {}
+    if (saved) run(saved);
+    else if (e && e.none) boot.innerHTML = 'Theory practice is coming soon.';      // nothing has been released yet
+    else boot.innerHTML = 'This page could not load.<br>Check your connection, then <a href="" style="color:#0f6fb5;font-weight:600">try again</a>.';
+  });
+})();
+</script>

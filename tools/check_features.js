@@ -307,6 +307,12 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       expect(ok, "flash cards " + inst + " / " + mode + " / level " + level + ": a picture, " + NEED[level] + " different answers, all on the screen " + why);
       await page.click('#aam-cards [data-c="quit"]'); await page.click('#aam-cards [data-c="change"]');
     }
+    await page.goto("https://alexattardmusic.com/theory/?beta"); await page.waitForTimeout(2500);        // the theory page of its own: the same cards, no player on the page
+    expect(!!(await page.$("#aam-cards")) && !(await page.$("#aam-play")), "theory page: /theory/?beta opens the test copy of the cards");
+    if (!fs.existsSync(path.join(ROOT, "release", "cards.html"))) {
+      const p2 = await ctx.newPage(); await p2.goto("https://alexattardmusic.com/theory/"); await p2.waitForTimeout(1500);
+      expect(/coming soon/i.test(await p2.textContent("body")) && !(await p2.$("#aam-cards")), "theory page: before a release, visitors see \"coming soon\" and not the test copy"); await p2.close();
+    }
     await pick("inst", "piano"); await pick("mode", "name"); await pick("clef", "treble"); await pick("level", 1); await pick("round", "calm"); await page.click('#aam-cards [data-c="start"]');
     let right = 0;
     for (let k = 0; k < 20; k++) {                            // a whole round, answered by reading the note off the staff the way a student would

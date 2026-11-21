@@ -13,6 +13,8 @@ async function wire(ctx) {
     const file = f => fs.existsSync(f) ? route.fulfill({ body: fs.readFileSync(f), contentType: TYPES[path.extname(f)] || "application/octet-stream", headers: { "access-control-allow-origin": "*" } }) : route.abort();
     if (u.hostname === "alexattardmusic.com" && u.pathname.startsWith("/lessons"))                      // a stand-in lessons page holding the demo card
       return route.fulfill({ contentType: "text/html", body: "<!doctype html><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><body style='margin:0'><div style='padding:24px 12px'>" + fs.readFileSync(path.join(ROOT, "player/demo-loader.html"), "utf8") + "</div>" });
+    if (u.hostname === "alexattardmusic.com" && u.pathname.startsWith("/theory"))                       // the theory page: its own loader
+      return route.fulfill({ contentType: "text/html", body: "<!doctype html><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><body style='margin:0'>" + fs.readFileSync(path.join(ROOT, "theory/loader.html"), "utf8") });
     if (u.hostname === "alexattardmusic.com" && u.pathname.startsWith("/play"))
       return route.fulfill({ contentType: "text/html", body: "<!doctype html><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><body style='margin:0'>" + fs.readFileSync(path.join(ROOT, "player/loader.html"), "utf8") });
     if (u.hostname === "raw.githubusercontent.com") {
@@ -23,6 +25,7 @@ async function wire(ctx) {
         try { return route.fulfill({ body: require("child_process").execFileSync("git", ["show", "origin/pdf:" + rel], { cwd: ROOT, maxBuffer: 1 << 28 }), contentType: "application/octet-stream", headers: { "access-control-allow-origin": "*" } }); }
         catch (e) { return route.abort(); }
       }
+      if (rel === "release/cards.html" && !fs.existsSync(path.join(ROOT, rel))) return route.fulfill({ status: 404, body: "", headers: { "access-control-allow-origin": "*" } });
       if (rel === "release/demo.html") return file(path.join(ROOT, "player/demo.html"));
       return file(rel === "release/player.html" ? FILE : path.join(ROOT, rel));       // the candidates stand in for the released copies
     }
