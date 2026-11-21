@@ -421,3 +421,11 @@ Everything needed to carry on from any conversation is in this repository and in
   `aam_mic_silent` (how = the context state). The tuner and Learn mode show `MIC_SILENT`. Older Safari without
   `getFloatTimeDomainData` falls back to the byte version.
 - New check group `mic` in `tools/check_features.js`. Still unverified on a real iPad: ask the student to try the beta link.
+
+## 2026-11-21 · v1.3
+- Alex said "ship". Released after the full check (489 tunes x 4 sizes, 117 feature checks): the iPad microphone fix, the
+  booklet PDF button first in the list and the `&pdf=1` link, flute fingerings in the tuner and Learn mode, the instrument
+  picker on concert-pitch tunes and in the demo, the play bar from the home screen. The four `beta: true` band styles stay in
+  the test copy only. The iPad fix is still unconfirmed on a real device: it is on the Needs Alex list.
+- Decided by Alex the same day: the Flute Welcome Booklet gets two-octave scales (welcome books are intermediate books). The
+  ABRSM pages for the other three studies are tabled (he does not have the books). MailerLite waits for a computer.

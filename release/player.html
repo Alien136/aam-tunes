@@ -34,6 +34,12 @@
 #aam-play .play svg { width: 24px; height: 24px; fill: currentColor; }
 #aam-play .apply-pill { position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); z-index: 1; height: 40px; padding: 0 20px; border-radius: 999px; background: var(--now); color: var(--now-ink); font: 600 15px/40px var(--body); white-space: nowrap; box-shadow: 0 6px 20px rgba(20,23,26,.28); }
 #aam-play .pend { outline: 2px dashed var(--accent); outline-offset: 2px; }
+#aam-play .inst-pill { margin-left: 0; display: inline-flex; align-items: center; gap: 6px; color: var(--ink); } #aam-play .inst-pill .inst-ic { font-size: 17px; }
+@media (max-width: 620px) { #aam-play .sub-rest { display: none; } }
+#aam-play .sub-rest { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-weight: 400; }
+#aam-play .st-list button b .inst-ic { font-size: 20px; vertical-align: -4px; margin-right: 4px; color: var(--accent-text); } #aam-play .st-list button[aria-pressed="true"] b .inst-ic { color: var(--now-ink); }
+#aam-play.is-app .pbar { padding-bottom: max(26px, calc(10px + env(safe-area-inset-bottom))); }
+#aam-play.is-app.is-open { padding-bottom: max(104px, calc(88px + env(safe-area-inset-bottom))); padding-top: max(14px, calc(8px + env(safe-area-inset-top))); }
 #aam-play .install-btn { display: block; margin: 16px 2px 0; height: 44px; padding: 0 18px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); color: var(--accent-text); font: 600 14.5px/41px var(--body); text-align: center; }
 #aam-play .in-steps { margin: 0; padding: 0 0 0 22px; display: grid; gap: 10px; font-size: 15px; line-height: 1.45; color: var(--ink); } #aam-play .in-steps b { font-weight: 600; }
 #aam-play .in-go { height: 46px; border-radius: 999px; background: var(--now); color: var(--now-ink); font: 600 15px/46px var(--body); text-align: center; }
@@ -359,7 +365,9 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 #aam-play .toc-list.nonum .toc-row { grid-template-columns: 1fr; } #aam-play .toc-list.nonum .toc-row i { display: none; }
 #aam-play .toc-none { margin: 18px 8px; font: 500 14px var(--body); color: var(--muted); text-align: center; }
 #aam-play .toc-foot { flex: none; display: grid; gap: 8px; }
+#aam-play .toc-top { flex: none; } #aam-play .toc-top:empty { display: none; }
 #aam-play .toc-dl { display: grid; gap: 4px; }
+#aam-play .toc-dl.hi button { background: var(--accent-text); border-color: var(--accent-text); color: var(--accent-ink); min-height: 48px; font-size: 16px; } #aam-play .toc-dl.hi button small { display: block; margin: 0; color: var(--accent-ink); opacity: .85; }
 #aam-play .toc-dl button { width: 100%; min-height: 40px; padding: 6px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); color: var(--accent-text); font: 600 14px var(--body); text-align: center; } #aam-play .toc-dl button:disabled { opacity: .5; }
 #aam-play .toc-dl button small { font: 500 12px var(--body); color: var(--muted); margin-left: 8px; } #aam-play .toc-dl > small { font: 500 12px var(--body); color: var(--ink); text-align: center; } #aam-play .toc-dl-msg:empty { display: none; }
 #aam-play .toc-nav { display: flex; gap: 8px; } #aam-play .toc-nav button { flex: 1; height: 40px; border-radius: 12px; background: var(--tint); color: var(--ink); font: 600 14px var(--body); text-align: center; }
@@ -612,6 +620,14 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
         <p class="k-note">Nothing is recorded. The sound is measured on this device and thrown away.</p>
       </div>
     </div>
+    <!-- a concert-pitch tune: what do you play? -->
+    <div class="kdlg" data-r="pdlg" hidden role="dialog" aria-label="Your instrument">
+      <div class="kcard">
+        <div class="khead"><h2>I play</h2><button class="btn-done" data-r="p-close">Done</button></div>
+        <div class="st-list" data-r="p-insts"></div>
+        <p class="k-note">The music on the page is rewritten for your instrument. The band stays in the same key.</p>
+      </div>
+    </div>
     <!-- install on the phone's home screen -->
     <div class="kdlg" data-r="idlg" hidden role="dialog" aria-label="Add to your home screen">
       <div class="kcard">
@@ -663,6 +679,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
     <div class="kdlg" data-r="toc" hidden role="dialog" aria-label="Contents">
       <div class="kcard toc-card">
         <div class="khead"><h2 data-r="toc-title">Contents</h2><button class="btn-done" data-r="toc-close">Done</button></div>
+        <div class="toc-top" data-r="toc-top"></div>
         <div class="toc-tools" data-r="toc-tools">
           <input type="search" data-r="toc-q" placeholder="Search a number or a name" aria-label="Search this booklet" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go">
           <div class="toc-chips" data-r="toc-chips"></div>
@@ -685,7 +702,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 
 <script>
 // >>> SETTINGS
-var PLAYER_VERSION = "v1.2 · 2026-11-20 12:34 UTC (after 8fd99cf)";    // stamped by tools/release.py when a version is released
+var PLAYER_VERSION = "v1.3 · 2026-11-21 04:55 UTC (after a24b618)";    // stamped by tools/release.py when a version is released
 var STUDENT_HOME = "https://alexattardmusic.com/student-login/";              // where the "back" link goes: put the address of your student login page here, e.g. "/student-login/"
 var STUDENT_HOME_LABEL = "Student home";         // what the link says. Leave "" for "Student login" (or "Website" while the address above is "/")
 var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    // folder with p36.mp3 ... d-ride.mp3 (keep the final "/")
@@ -702,10 +719,13 @@ var TUNE_SOURCES = [
 // The player for one tune. The library code at the bottom picks the tune and calls this once.
 // ---------- usage counts: what gets practiced, for how long and how fast. Anonymous: no names, codes or accounts.
 // Sent to the website's Google Analytics when it has one (gtag or Tag Manager); otherwise nothing is sent.
-/* FINGERINGS:BEGIN (written by tools/export_fingerings.py from tools/build_book.py: do not edit by hand) */
+/* FINGERINGS:BEGIN (written by tools/export_fingerings.py from tools/build_book.py and tools/beginner_flute.py: do not edit by hand) */
 var SAX_KEYS = [["oct","c",0,-0.55,0.4,0,0],["pEb","e",2.1,0.7,0.3,0.4,0],["pD","e",2.1,1.85,0.38,0.48,0],["pF","e",1.3,1.25,0.3,0.4,0],["L1","c",0,1.2,0.66,0,1],["bis","c",0,2.35,0.3,0,0],["L2","c",0,3.5,0.66,0,1],["L3","c",0,5.4,0.66,0,1],["Gs","r",1.85,5.4,1.2,0.5,0],["Cs","r",2.18,6.1,0.55,0.5,0],["B","r",1.52,6.1,0.55,0.5,0],["Bb","r",1.85,6.8,1.2,0.5,0],["sE","e",-1.75,7.0,0.3,0.4,0],["sC","e",-1.75,7.9,0.3,0.4,0],["sBb","e",-1.75,8.8,0.3,0.4,0],["R4","c",0,7.8,0.66,0,1],["R5","c",0,9.7,0.66,0,1],["fs","e",-0.98,10.65,0.27,0.37,0],["R6","c",0,11.6,0.66,0,1],["Eb","r",-1.6,12.4,1.0,0.5,0],["C","r",-1.6,13.1,1.0,0.5,0]];
 var SAX_BOX = [-2.1, 2.5, -0.95, 13.35];
 var SAX_FING = {"58":[["Bb","C","L1","L2","L3","R4","R5","R6"],"Pinkies: low B♭ + low C"],"59":[["B","C","L1","L2","L3","R4","R5","R6"],"Pinkies: low B + low C"],"60":[["C","L1","L2","L3","R4","R5","R6"],"RH pinky: low C"],"61":[["C","Cs","L1","L2","L3","R4","R5","R6"],"Pinkies: low C♯ + low C"],"62":[["L1","L2","L3","R4","R5","R6"],""],"63":[["Eb","L1","L2","L3","R4","R5","R6"],"RH pinky: E♭ key"],"64":[["L1","L2","L3","R4","R5"],""],"65":[["L1","L2","L3","R4"],""],"66":[["L1","L2","L3","R5"],""],"67":[["L1","L2","L3"],""],"68":[["Gs","L1","L2","L3"],"LH pinky: G♯ key"],"69":[["L1","L2"],""],"70":[["L1","bis"],""],"71":[["L1"],""],"72":[["L2"],""],"73":[[],"All keys open"],"74":[["L1","L2","L3","R4","R5","R6","oct"],"Octave key on"],"75":[["Eb","L1","L2","L3","R4","R5","R6","oct"],"RH pinky: E♭ key"],"76":[["L1","L2","L3","R4","R5","oct"],""],"77":[["L1","L2","L3","R4","oct"],""],"78":[["L1","L2","L3","R5","oct"],""],"79":[["L1","L2","L3","oct"],""],"80":[["Gs","L1","L2","L3","oct"],"LH pinky: G♯ key"],"81":[["L1","L2","oct"],""],"82":[["L1","bis","oct"],""],"83":[["L1","oct"],""],"84":[["L2","oct"],""],"85":[["oct"],"Octave key only"],"86":[["oct","pD"],"Palm D"],"87":[["oct","pD","pEb"],"Palm D + E♭"],"88":[["oct","pD","pEb","sE"],"Palm D + E♭ + side E"],"89":[["oct","pD","pEb","pF","sE"],"Palm D, E♭, F + side E"]};
+var FLUTE_KEYS = [["Tb","r",-1.55,1.0,0.9,0.5,0],["T","e",-1.55,2.15,0.5,0.62,0],["L1","c",0,1.2,0.66,0,1],["L2","c",0,3.1,0.66,0,1],["L3","c",0,5.0,0.66,0,1],["Gs","r",1.65,5.75,1.1,0.5,0],["R1","c",0,7.8,0.66,0,1],["R2","c",0,9.7,0.66,0,1],["R3","c",0,11.6,0.66,0,1],["Eb","r",1.65,12.2,1.1,0.5,0],["Cs","r",1.33,12.95,0.55,0.5,0],["C","r",1.97,12.95,0.55,0.5,0]];
+var FLUTE_BOX = [-2.1, 2.5, -0.95, 13.35];
+var FLUTE_FING = {"60":[["C","Cs","L1","L2","L3","R1","R2","R3","T"],"RH pinky: both low keys"],"61":[["Cs","L1","L2","L3","R1","R2","R3","T"],"RH pinky: low C♯ key"],"62":[["L1","L2","L3","R1","R2","R3","T"],"RH pinky up"],"63":[["Eb","L1","L2","L3","R1","R2","R3","T"],""],"64":[["Eb","L1","L2","L3","R1","R2","T"],""],"65":[["Eb","L1","L2","L3","R1","T"],""],"66":[["Eb","L1","L2","L3","R3","T"],"RH ring finger"],"67":[["Eb","L1","L2","L3","T"],""],"68":[["Eb","Gs","L1","L2","L3","T"],"LH pinky: G♯ key"],"69":[["Eb","L1","L2","T"],""],"70":[["Eb","L1","R1","T"],"B plus RH index"],"71":[["Eb","L1","T"],""],"72":[["Eb","L1"],"Thumb off"],"73":[["Eb"],"Only the RH pinky"],"74":[["L2","L3","R1","R2","R3","T"],"LH index up, pinky up"],"75":[["Eb","L2","L3","R1","R2","R3","T"],"LH index up"],"76":[["Eb","L1","L2","L3","R1","R2","T"],""],"77":[["Eb","L1","L2","L3","R1","T"],""],"78":[["Eb","L1","L2","L3","R3","T"],"RH ring finger"],"79":[["Eb","L1","L2","L3","T"],""],"80":[["Eb","Gs","L1","L2","L3","T"],"LH pinky: G♯ key"],"81":[["Eb","L1","L2","T"],""],"82":[["Eb","L1","R1","T"],"B plus RH index"],"83":[["Eb","L1","T"],""],"84":[["Eb","L1"],"Thumb off"],"85":[["Eb"],"Only the RH pinky"],"86":[["Eb","L2","L3","T"],"LH 2 and 3, no right-hand fingers"],"87":[["Eb","Gs","L1","L2","L3","R1","R2","R3","T"],"Every finger, plus the G♯ key"],"88":[["Eb","L1","L2","R1","R2","T"],""],"89":[["Eb","L1","L3","R1","T"],"LH middle finger up"],"90":[["Eb","L1","L3","R3","T"],"LH middle finger up"],"91":[["Eb","L1","L2","L3"],"Thumb off"]};
 /* FINGERINGS:END */
 var AAM_TRACK = (function () {
   var cur = null;
@@ -758,7 +778,6 @@ function aamBoot(TUNE) {
   })();
   var MINOR = /m$/.test(HOME), HOMEROOT = HOME.replace(/m$/, "");
   var keyState = { key: Math.max(-5, Math.min(6, TUNE.start_key | 0)), inst: NATIVE };   // start_key: an exercise that begins away from its written key (the booklet starts on B♭ or C)
-  if (window.AAM_DEMO) { try { keyState.inst = { "Alto sax": 9, "Tenor sax": 2, "Clarinet": 2, "Trumpet": 2 }[localStorage.getItem("aam-demo-inst")] || 0; } catch (e) {} }   // the demo's "I play" choice
   try { var kv = JSON.parse(localStorage.getItem("aam-keys") || "{}")[TUNE.slug]; if (kv) { keyState.key = kv[0] | 0; keyState.inst = [0, 2, 9].indexOf(kv[1]) >= 0 ? kv[1] : NATIVE; } } catch (e) {}
   function shownKey(inst) { return (MINOR ? MIN : MAJ)[(pcOf(HOMEROOT) + keyState.key + (inst == null ? keyState.inst : inst) + 120) % 12]; }
   function spell(sym) {                                    // a concert chord name -> the name to show
@@ -851,17 +870,55 @@ function aamBoot(TUNE) {
 
   // ---------- page text
   $("title").textContent = TUNE.title;
+  var showInst = function () {};
   (function () {                                              // under the title: the instrument's icon and name, so a student sees at a glance they have the right edition
     var S = '<svg viewBox="0 0 32 32" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">', D = '<g fill="currentColor" stroke="none">';
     var ICON = {
       sax: S + '<path d="M4.5 7.5 9 5.5"/><path d="M9 5.5c4-1.6 6.5.3 6.5 4V20a5 5 0 0 0 10 0v-5" stroke-width="2.6"/><path d="M23.7 15 21.3 9.6h8.4L27.3 15z" fill="currentColor" stroke-width="1.4"/>' + D + '<circle cx="11.6" cy="12" r="1.5"/><circle cx="11.6" cy="16" r="1.5"/><circle cx="11.6" cy="20" r="1.5"/></g></svg>',
       clarinet: S + '<g transform="rotate(32 16 16)"><path d="M16 1.5v3.5" stroke-width="2.4"/><rect x="13.6" y="5" width="4.8" height="18" rx="1.2"/><path d="M13.6 23 11 29.5h10L18.4 23" fill="currentColor" stroke-width="1.4"/>' + D + '<circle cx="16" cy="9" r="1.15"/><circle cx="16" cy="12.6" r="1.15"/><circle cx="16" cy="16.2" r="1.15"/><circle cx="16" cy="19.8" r="1.15"/></g></g></svg>',
       flute: S + '<g transform="rotate(-24 16 16)"><rect x="1" y="14" width="30" height="4.4" rx="2.2"/><path d="M5 14v4.4" stroke-width="1.4"/>' + D + '<ellipse cx="9" cy="13.2" rx="2" ry="1.1"/><circle cx="15" cy="16.2" r="1.15"/><circle cx="18.6" cy="16.2" r="1.15"/><circle cx="22.2" cy="16.2" r="1.15"/><circle cx="25.8" cy="16.2" r="1.15"/></g></g></svg>',
-      piano: S + '<rect x="3" y="7" width="26" height="18" rx="2.5"/><path d="M8.2 17v8M13.4 17v8M18.6 7v18M23.8 17v8" stroke-width="1.4"/>' + D + '<rect x="6.7" y="7" width="3" height="10.5" rx=".6"/><rect x="11.9" y="7" width="3" height="10.5" rx=".6"/><rect x="22.3" y="7" width="3" height="10.5" rx=".6"/></g></svg>'
+      piano: S + '<rect x="3" y="7" width="26" height="18" rx="2.5"/><path d="M8.2 17v8M13.4 17v8M18.6 7v18M23.8 17v8" stroke-width="1.4"/>' + D + '<rect x="6.7" y="7" width="3" height="10.5" rx=".6"/><rect x="11.9" y="7" width="3" height="10.5" rx=".6"/><rect x="22.3" y="7" width="3" height="10.5" rx=".6"/></g></svg>',
+      trumpet: S + '<path d="M3 12.2h17" stroke-width="2.4"/><path d="M2.6 10.2v4"/><path d="M20 12.2c3.6 0 5.8-2 7.6-5.2v10.4c-1.8-3.2-4-5.2-7.6-5.2z" fill="currentColor" stroke-width="1.4"/><rect x="7" y="12.2" width="12" height="7" rx="3.5"/><path d="M10 8v13M13.2 8v13M16.4 8v13" stroke-width="2.2"/></svg>'
     };
     var WHO = { alto: ["sax", "Alto saxophone"], tenor: ["sax", "Tenor saxophone"], soprano: ["sax", "Soprano saxophone"], bari: ["sax", "Baritone saxophone"],
-                clarinet: ["clarinet", "Clarinet"], flute: ["flute", "Flute"], piano: ["piano", "Piano"] }[TUNE.instrument || ""];
+                clarinet: ["clarinet", "Clarinet"], flute: ["flute", "Flute"], piano: ["piano", "Piano"], trumpet: ["trumpet", "Trumpet"] }[TUNE.instrument || ""];
     var el = $("subtitle");
+    if (!WHO && !TUNE.instrument && TUNE.keys !== "off") {  // a tune written at concert pitch (the free demo tunes): the reader says what they play, and the page is written for it
+      var AS = { piano: ["piano", "Piano", 0], flute: ["flute", "Flute", 0], clarinet: ["clarinet", "Clarinet", 2], trumpet: ["trumpet", "Trumpet", 2], tenor: ["sax", "Tenor saxophone", 2], alto: ["sax", "Alto saxophone", 9] };
+      var pick = null;
+      try {
+        pick = localStorage.getItem("aam-play-as");
+        var was = localStorage.getItem("aam-demo-inst");      // the demo's older "I play" list
+        if (!pick && was) { pick = { "Alto sax": "alto", "Tenor sax": "tenor", "Clarinet": "clarinet", "Trumpet": "trumpet", "Flute": "flute", "Piano": "piano" }[was] || null; if (pick) localStorage.setItem("aam-play-as", pick); }
+      } catch (e) {}
+      el.classList.add("inst");
+      el.innerHTML = '<button class="st-pill inst-pill" data-r="inst-btn" aria-haspopup="dialog" aria-label="Your instrument"><span class="inst-ic"></span><span data-r="inst-name"></span></button><span class="sub-rest"></span>';
+      el.lastChild.textContent = TUNE.subtitle;
+      var pill = el.firstChild;                             // the public demo moves it into its own bar, so it is always reached through this variable
+      showInst = function () {                              // the pill follows the reading in force (it can also be changed in the Key dialog)
+        EAR_SHIFT = keyState.inst;
+        var a = AS[pick] && AS[pick][2] === keyState.inst ? pick : keyState.inst === 9 ? "alto" : keyState.inst === 2 ? "tenor" : "piano";
+        pill.querySelector(".inst-ic").innerHTML = ICON[AS[a][0]]; pill.querySelector('[data-r="inst-name"]').textContent = AS[a][1]; el.setAttribute("data-inst", AS[a][0]);
+        [].forEach.call($("p-insts").children, function (b) { b.setAttribute("aria-pressed", b.dataset.as === a ? "true" : "false"); });
+      };
+      $("p-insts").innerHTML = Object.keys(AS).map(function (k) { return '<button data-as="' + k + '"><b><span class="inst-ic">' + ICON[AS[k][0]] + "</span> " + AS[k][1] + "</b><small>" + (AS[k][2] === 9 ? "The page is written for an E♭ instrument" : AS[k][2] === 2 ? "The page is written for a B♭ instrument" : "The page is written at concert pitch") + "</small></button>"; }).join("");
+      [].forEach.call($("p-insts").children, function (b) {
+        b.onclick = function () {
+          $("pdlg").hidden = true;
+          stage("inst", function () {
+            pick = b.dataset.as; keyState.inst = AS[pick][2];
+            try { localStorage.setItem("aam-play-as", pick); var all = JSON.parse(localStorage.getItem("aam-keys") || "{}"); all[TUNE.slug] = [keyState.key, keyState.inst]; localStorage.setItem("aam-keys", JSON.stringify(all)); } catch (e) {}
+            keyApply(); AAM_TRACK.event("aam_instrument", { tune: TUNE.slug, instrument: pick, where: window.AAM_DEMO ? "demo" : "player" });
+          }, b);
+        };
+      });
+      pill.onclick = function () { showInst(); $("pdlg").hidden = false; };
+      var slot = root.querySelector(".demo-inst"); if (slot) slot.appendChild(pill);                             // the public demo keeps it in its own bar, beside the tune buttons
+      $("p-close").onclick = function () { $("pdlg").hidden = true; };
+      $("pdlg").addEventListener("click", function (e) { if (e.target === $("pdlg")) $("pdlg").hidden = true; });
+      try { if (AS[pick] && !(JSON.parse(localStorage.getItem("aam-keys") || "{}")[TUNE.slug])) keyState.inst = AS[pick][2]; } catch (e) {}   // a new tune opens written for the instrument they chose last
+      return;
+    }
     if (!WHO) { el.classList.remove("inst"); el.textContent = TUNE.subtitle; return; }      // an instrument with no icon yet keeps the old line of text
     el.classList.add("inst"); el.innerHTML = '<span class="inst-ic">' + ICON[WHO[0]] + "</span><span data-r=\"inst-name\"></span>";
     el.lastChild.textContent = WHO[1]; el.setAttribute("data-inst", WHO[0]);
@@ -1011,6 +1068,7 @@ function aamBoot(TUNE) {
       $("key-btn").textContent = "Key: " + k + (keyState.inst ? " (" + (keyState.inst === 2 ? "B♭" : "E♭") + " instrument)" : "");
       [].forEach.call(grid.children, function (b) { b.setAttribute("aria-pressed", +b.dataset.pc === shown ? "true" : "false"); b.classList.toggle("home", +b.dataset.pc === home); });
       [].forEach.call($("k-insts").children, function (b) { b.setAttribute("aria-pressed", +b.dataset.inst === keyState.inst ? "true" : "false"); });
+      showInst();
       var band = nice(shownKey(0)) + tail;
       $("k-note").textContent = (keyState.key ? "The outlined key is the original. " : "This is the tune's original key. ") +
         (keyState.inst ? "You read in " + k + " while the band plays in concert " + band + "." : "");
@@ -1173,13 +1231,15 @@ function aamBoot(TUNE) {
   // The microphone is opened with the phone's speech processing off (it flattens held notes). Pitch comes from how often the wave
   // repeats (McLeod's method), searched only inside the instrument's range, with a clarity score so noise is never guessed at.
   // Nothing is recorded or sent anywhere: each slice of sound is measured and thrown away.
-  var EAR_SHIFT = ({ alto: 9, bari: 21, tenor: 14, soprano: 2, clarinet: 2, trumpet: 2 })[TUNE.instrument] || 0;   // written note = sounding note + this
+  var EAR_FIXED = ({ alto: 9, bari: 21, tenor: 14, soprano: 2, clarinet: 2, trumpet: 2 })[TUNE.instrument] || 0;   // written note = sounding note + this
+  var EAR_SHIFT = TUNE.instrument ? EAR_FIXED : keyState.inst;       // a concert-pitch tune is read as the instrument the reader chose (showInst keeps this in step)
+  var ANY_OCT = function () { return !TUNE.instrument && keyState.inst !== NATIVE; };   // ...and their instrument may sound it in another octave than the tune file
   var NOTE_NAMES = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
   var noteName = function (m) { return NOTE_NAMES[((m % 12) + 12) % 12]; };
   var ear = (function () {
-    var ctx = null, an = null, buf = null, stream = null, timer = null, subs = [], cal = null, quietUntil = 0;
+    var ctx = null, an = null, buf = null, bytes = null, stream = null, timer = null, subs = [], cal = null, quietUntil = 0, deadAt = 0, wakeArmed = false, told = false, self;
     try { cal = JSON.parse(localStorage.getItem("aam-ear") || "null"); } catch (e) {}
-    var lo = EAR_SHIFT ? 58 - EAR_SHIFT - 2 : 34, hi = EAR_SHIFT ? 89 - EAR_SHIFT + 7 : 100;      // sounding range in MIDI numbers
+    var lo = EAR_FIXED ? 58 - EAR_FIXED - 2 : 34, hi = EAR_FIXED ? 89 - EAR_FIXED + 7 : 100;      // sounding range in MIDI numbers
     var hz = function (m) { return 440 * Math.pow(2, (m - 69) / 12); };
     function pitch(x, sr) {                               // -> { hz, clarity, rms, clip }
       var N = 2048, o = x.length - N, i, t, sum = 0, peak = 0;
@@ -1202,31 +1262,53 @@ function aamBoot(TUNE) {
     }
     function tick() {
       if (!an) return;
-      an.getFloatTimeDomainData(buf);
+      if (an.getFloatTimeDomainData) an.getFloatTimeDomainData(buf);
+      else { an.getByteTimeDomainData(bytes); for (var k = 0; k < buf.length; k++) buf[k] = (bytes[k] - 128) / 128; }      // older Safari
       var r = pitch(buf, ctx.sampleRate), floor = cal ? cal.floor : 0.01;
-      r.t = Date.now(); r.heard = r.rms > floor; r.ok = r.heard && r.clarity >= 0.8 && r.hz > 0 && r.t > quietUntil;
+      r.t = Date.now(); r.heard = r.rms > floor;
+      // A microphone that is "on" but sends nothing: the sound engine is asleep (iPad Safari does this when it was not started by a tap),
+      // or the stream is pure digital silence. A real room is never exactly silent, so this is never a quiet student.
+      if (ctx.state === "running" && r.rms > 0) deadAt = 0; else if (!deadAt) deadAt = r.t;
+      r.dead = !!deadAt && r.t - deadAt > 1500;
+      if (r.dead && !wakeArmed) {                         // the next tap anywhere wakes it: a tap is the one thing Safari accepts
+        wakeArmed = true;
+        var wake = function () { document.removeEventListener("pointerdown", wake, true); wakeArmed = false; if (ctx && ctx.state !== "running") { try { ctx.resume(); } catch (e) {} } };
+        document.addEventListener("pointerdown", wake, true);
+        if (!told) { told = true; AAM_TRACK.event("aam_mic_silent", { tune: TUNE.slug, instrument: TUNE.instrument || "", how: ctx.state }); }     // so a silent microphone shows up in Analytics
+      } r.ok = r.heard && r.clarity >= 0.8 && r.hz > 0 && r.t > quietUntil;
       if (r.ok) { r.midi = 69 + 12 * Math.log(r.hz / 440) / Math.LN2; r.note = Math.round(r.midi); r.cents = Math.round(100 * (r.midi - r.note)); }
       subs.slice().forEach(function (f) { f(r); });
     }
-    return {
-      on: function (f) { subs.push(f); }, off: function (f) { var n = subs.length; subs = subs.filter(function (g) { return g !== f; }); if (n && !subs.length) this.stop(); },
+    return self = {
+      on: function (f) { subs.push(f); },
+      off: function (f) {                                 // the last listener has gone: close the microphone, unless another one takes over at once (the check handing over to Learn mode keeps the same live microphone)
+        var n = subs.length; subs = subs.filter(function (g) { return g !== f; });
+        if (n && !subs.length) setTimeout(function () { if (!subs.length) self.stop(); }, 500);
+      },
       hz: hz, cal: function () { return cal; },
       setCal: function (c) { cal = c; try { localStorage.setItem("aam-ear", JSON.stringify(c)); } catch (e) {} },
       start: function () {
         if (stream) return Promise.resolve();
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !(window.AudioContext || window.webkitAudioContext)) return Promise.reject(new Error("nomic"));
+        // The sound engine is made and woken HERE, while the student's tap is still being handled. iPad and iPhone Safari leave an
+        // engine that is made later (after the permission question) asleep, and then the microphone delivers nothing.
+        var mine = ctx = new (window.AudioContext || window.webkitAudioContext)();
+        try { var w = mine.resume(); if (w && w.catch) w.catch(function () {}); } catch (e) {}
+        deadAt = 0; told = false;
         return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 } }).then(function (s) {
-          stream = s; ctx = new (window.AudioContext || window.webkitAudioContext)();
+          if (ctx !== mine) { s.getTracks().forEach(function (t) { t.stop(); }); return null; }      // closed again while the question was on screen
+          stream = s;
           an = ctx.createAnalyser(); an.fftSize = 4096; an.smoothingTimeConstant = 0; ctx.createMediaStreamSource(s).connect(an);
-          buf = new Float32Array(an.fftSize); timer = setInterval(tick, 40);
-          return ctx.state === "suspended" ? ctx.resume() : null;
-        });
+          var mute = ctx.createGain(); mute.gain.value = 0; an.connect(mute); mute.connect(ctx.destination);      // Safari only runs a chain that reaches the speakers; the volume of 0 keeps it silent
+          buf = new Float32Array(an.fftSize); bytes = new Uint8Array(an.fftSize); timer = setInterval(tick, 40);
+          return ctx.state !== "running" ? ctx.resume().catch(function () {}) : null;
+        }, function (e) { if (ctx === mine) { try { mine.close(); } catch (x) {} ctx = null; } throw e; });
       },
       stop: function () {
         clearInterval(timer); timer = null;
         if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
         if (ctx) { try { ctx.close(); } catch (e) {} }
-        stream = ctx = an = null;
+        stream = ctx = an = null; deadAt = 0;
       },
       beep: function (m, secs) {                          // play one note so the student can hear what to aim for; the microphone ignores it
         if (!ctx) return;
@@ -1236,12 +1318,13 @@ function aamBoot(TUNE) {
       }
     };
   })();
-  // ---- saxophone fingering diagram: the same chart as the printed booklets, drawn as you look at the horn
-  var IS_SAX = /^(alto|tenor|soprano|bari)$/.test(TUNE.instrument || "");
-  function fingerSvg(written) {                           // written pitch as a MIDI number (low B flat = 58); "" when there is none
-    var f = SAX_FING[written]; if (!IS_SAX || !f) return "";
-    var u = 10, x0 = -SAX_BOX[0] * u + 2, y0 = -SAX_BOX[2] * u + 2, w = (SAX_BOX[1] - SAX_BOX[0]) * u + 4, h = (SAX_BOX[3] - SAX_BOX[2]) * u + 4, out = "";
-    out += '<line x1="' + (x0 - u) + '" x2="' + (x0 + u) + '" y1="' + (y0 + 6.6 * u) + '" y2="' + (y0 + 6.6 * u) + '" class="fg-split"/>';      // between the hands
+  // ---- fingering diagram (saxophone and flute): the same chart as the printed booklets
+  var IS_SAX = /^(alto|tenor|soprano|bari)$/.test(TUNE.instrument || ""), IS_FLUTE = TUNE.instrument === "flute";
+  var FG = IS_SAX ? { keys: SAX_KEYS, box: SAX_BOX, fing: SAX_FING, split: 6.6 } : IS_FLUTE ? { keys: FLUTE_KEYS, box: FLUTE_BOX, fing: FLUTE_FING, split: 6.4 } : null, HAS_FING = !!FG;
+  function fingerSvg(written) {                           // written pitch as a MIDI number (sax: low B flat = 58; flute: low C = 60); "" when there is none
+    var f = FG && FG.fing[written]; if (!f) return "";
+    var SAX_BOX = FG.box, SAX_KEYS = FG.keys, u = 10, x0 = -SAX_BOX[0] * u + 2, y0 = -SAX_BOX[2] * u + 2, w = (SAX_BOX[1] - SAX_BOX[0]) * u + 4, h = (SAX_BOX[3] - SAX_BOX[2]) * u + 4, out = "";
+    out += '<line x1="' + (x0 - u) + '" x2="' + (x0 + u) + '" y1="' + (y0 + FG.split * u) + '" y2="' + (y0 + FG.split * u) + '" class="fg-split"/>';      // between the hands
     SAX_KEYS.forEach(function (k) {
       var X = x0 + k[2] * u, Y = y0 + k[3] * u, cls = "fg-k" + (k[6] ? " fg-main" : "") + (f[0].indexOf(k[0]) >= 0 ? " on" : "");
       if (k[1] === "c") out += '<circle class="' + cls + '" cx="' + X + '" cy="' + Y + '" r="' + k[4] * u + '"/>';
@@ -1250,7 +1333,8 @@ function aamBoot(TUNE) {
     });
     return '<svg class="fg" viewBox="0 0 ' + w + " " + h + '" role="img" aria-label="Fingering for ' + noteName(written) + '">' + out + "</svg>";
   }
-  var fingerNote = function (written) { var f = SAX_FING[written]; return f && f[1] ? f[1] : ""; };
+  var fingerNote = function (written) { var f = FG && FG.fing[written]; return f && f[1] ? f[1] : ""; };
+  var MIC_SILENT = "The microphone is on, but no sound is reaching the player. Tap anywhere on the screen once. If nothing changes: disconnect Bluetooth headphones, close other apps that use the microphone, then reload this page.";
   var micWhy = function (e) {
     return e && e.message === "nomic" ? "This browser can't use the microphone. Try Chrome or Safari."
       : "The microphone is blocked. Allow it for this site in your browser's settings, then try again.";
@@ -1271,6 +1355,8 @@ function aamBoot(TUNE) {
     }
     function heard(r) {
       var now = r.t, msg = $("t-msg");
+      if (r.dead) { if (!heard.dead) { heard.dead = msg.textContent; msg.textContent = MIC_SILENT; } if (phase === "quiet") { samples = []; t0 = now; } show(null); return; }
+      if (heard.dead) { msg.textContent = heard.dead; heard.dead = null; if (phase === "quiet") { samples = []; t0 = now; } }       // it woke up: carry on where the check was
       if (phase === "quiet") {                            // step 1: how loud is the room?
         samples.push(r.rms);
         if (now - t0 > 1800) {
@@ -1314,7 +1400,7 @@ function aamBoot(TUNE) {
         else { phase = "tune"; $("t-msg").textContent = "Hold any note and bring the marker to the middle."; $("t-go").hidden = !after; }
       }).catch(function (e) { $("t-msg").textContent = micWhy(e); });
     }
-    function close() { dlg.hidden = true; if (live) { ear.off(heard); live = false; } phase = ""; after = null; }
+    function close() { dlg.hidden = true; if (live) { ear.off(heard); live = false; } phase = ""; after = null; heard.dead = null; }
     openTuner = function (then) { if (state.playing) stop(); after = then || null; dlg.hidden = false; begin(false); AAM_TRACK.event("aam_tuner", { tune: TUNE.slug, instrument: TUNE.instrument || "", first_time: ear.cal() && ear.cal().at ? "no" : "yes" }); };
     $("tuner-btn").onclick = function () { openTuner(null); };
     $("t-close").onclick = close;
@@ -1390,7 +1476,7 @@ function aamBoot(TUNE) {
   var IS_PIANO = /piano/.test(TUNE.instrument || "");
   function learnSeq(hand) {                               // the sounding pitch of each written note, in order (-1: tied on from the note before)
     var s = TUNE.sections.filter(function (x) { return x.id === state.view; })[0];
-    if (!s || keyState.inst !== NATIVE) return null;     // the page must show what this instrument reads; a key change moves page and sound together
+    if (!s || (keyState.inst !== NATIVE && TUNE.instrument)) return null;     // the page must show what this instrument reads (a concert-pitch tune is rewritten for the reader's instrument, so it always does)
     if (!IS_PIANO) {
       if (s.learn) return s.learn;
       if ((s.lh && s.lh.length) || !s.rh || !s.rh.length) return null;                                            // one line only
@@ -1431,8 +1517,8 @@ function aamBoot(TUNE) {
   var fingOn = false; try { fingOn = localStorage.getItem("aam-fing") === "1"; } catch (e) {}
   function learnFing() {                                  // the fingering for the note to play: always when the student asked for it, by itself after two misses
     var box = $("learn-fing"), bar = $("learn-bar"), h0 = bar.offsetHeight, t = learn.on ? learnTarget() : null;
-    var show = IS_SAX && t != null && (fingOn || learn.misses >= 2), svg = show ? fingerSvg(t + EAR_SHIFT) : "";
-    $("learn-fbtn").hidden = !IS_SAX || t == null; $("learn-fbtn").setAttribute("aria-pressed", fingOn ? "true" : "false");
+    var show = HAS_FING && t != null && (fingOn || learn.misses >= 2), svg = show ? fingerSvg(t + EAR_SHIFT) : "";
+    $("learn-fbtn").hidden = !HAS_FING || t == null; $("learn-fbtn").setAttribute("aria-pressed", fingOn ? "true" : "false");
     if (show && svg) { var cap = fingerNote(t + EAR_SHIFT); box.innerHTML = svg + "<small></small>"; box.lastChild.textContent = noteName(t + EAR_SHIFT) + (cap ? " · " + cap : ""); }
     box.hidden = !(show && svg);
     if (show && svg && !fingOn && !learn.autoFing) { learn.autoFing = true; AAM_TRACK.event("aam_fingering", { tune: TUNE.slug, how: "after misses" }); }
@@ -1453,6 +1539,8 @@ function aamBoot(TUNE) {
   }
   function learnHear(r) {
     var t = learnTarget(); if (t == null) return;
+    if (r.dead) { if (!learn.dead) { learn.dead = $("learn-msg").textContent; learnSay(MIC_SILENT, false); } return; }
+    if (learn.dead) { learnSay(learn.dead, false); learn.dead = null; }
     var c = ear.cal() || { off: 0 };
     var alt = learn.alts && learn.alts[learn.i];          // a chord: whichever of its notes is nearest to what was heard
     if (alt && r.ok) alt.forEach(function (m) { if (Math.abs(m + learn.key - r.midi) < Math.abs(t - r.midi)) t = m + learn.key; });
@@ -1462,7 +1550,8 @@ function aamBoot(TUNE) {
     if (!r.heard || r.clarity < 0.5 || (learn.level && r.rms < 0.45 * learn.level)) { learn.gap = true; learn.okRun = 0; learn.badRun = 0; return; }   // silence, breath or a tongued break: the dying end of a note never counts as the next one
     if (!r.ok) { learn.okRun = 0; learn.badRun = 0; return; }
     learn.level = learn.level ? learn.level + 0.2 * (r.rms - learn.level) : r.rms;
-    var d = 100 * (r.midi - t) - c.off;
+    var d = 100 * (r.midi - t) - c.off, anyOct = ANY_OCT();
+    if (anyOct) d = ((d % 1200) + 1800) % 1200 - 600;     // the right note in any octave
     if (Math.abs(d) <= 50) {
       learn.badRun = 0; learn.okRun++;
       var again = learn.prev === t && !learn.gap;         // the same note twice: wait for a new tongue stroke, or a clearly longer hold
@@ -1471,14 +1560,14 @@ function aamBoot(TUNE) {
     }
     learn.okRun = 0;
     var got = Math.round(r.midi - c.off / 100);
-    if (got === learn.prev && (!learn.gap || Date.now() - learn.since < 700)) return;                     // still holding the note before: not a mistake
+    if ((anyOct ? learn.prev != null && ((got - learn.prev) % 12 + 12) % 12 === 0 : got === learn.prev) && (!learn.gap || Date.now() - learn.since < 700)) return;                     // still holding the note before: not a mistake
     if (got !== learn.badNote) { learn.badNote = got; learn.badRun = 0; }
     if (++learn.badRun === 8) {
       learn.misses++; learn.wrong++;
       var el = learnEls()[learn.i]; if (el) { el.classList.add("lr-miss"); setTimeout(function () { el.classList.remove("lr-miss"); }, 900); }
       var oct = Math.abs(got - t) % 12 === 0;
-      learnSay(oct ? "Right note, wrong octave." + (IS_SAX ? " Check your octave key (left thumb)." : "") : "You played " + noteName(got + EAR_SHIFT) + ". This note is " + noteName(t + EAR_SHIFT) + "." +
-        (learn.misses >= 3 ? (IS_SAX ? " Check the fingering shown here, or tap Hear it." : IS_PIANO ? " Tap Hear it to listen to it." : " Look it up in your fingering chart, or tap Hear it.") : ""), learn.misses >= 2);
+      learnSay(oct ? "Right note, wrong octave." + (IS_SAX ? " Check your octave key (left thumb)." : IS_FLUTE ? " Same fingers: change the speed of your air." : "") : "You played " + noteName(got + EAR_SHIFT) + ". This note is " + noteName(t + EAR_SHIFT) + "." +
+        (learn.misses >= 3 ? (HAS_FING ? " Check the fingering shown here, or tap Hear it." : IS_PIANO ? " Tap Hear it to listen to it." : " Look it up in your fingering chart, or tap Hear it.") : ""), learn.misses >= 2);
       learnFing();
     }
   }
@@ -2640,6 +2729,11 @@ function aamLibrary() {
     if (DEMO) return;
     var APP = "https://raw.githubusercontent.com/Alien136/aam-tunes/main/player/app/", beta = PLAYER_VERSION === "test copy", h = document.head;
     var alone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+    try {                                                     // let the page know the phone's safe areas (the notch, the home bar), in the browser and from the home screen
+      var vp = document.querySelector('meta[name="viewport"]');
+      if (vp && !/viewport-fit/.test(vp.content)) vp.content += ", viewport-fit=cover";
+      if (alone) document.getElementById("aam-play").classList.add("is-app");   // opened from the home screen: the play bar keeps clear of the bottom edge even if the phone reports no safe area
+    } catch (e) {}
     try {
       [].forEach.call(h.querySelectorAll('link[rel="apple-touch-icon"], link[rel="apple-touch-icon-precomposed"], link[rel="manifest"]'), function (e) { e.parentNode.removeChild(e); });   // the website's own icon would win otherwise
       var add = function (tag, at) { var e = document.createElement(tag); Object.keys(at).forEach(function (k) { e.setAttribute(k, at[k]); }); e.setAttribute("data-aam", "1"); h.appendChild(e); };
@@ -2707,8 +2801,9 @@ function aamLibrary() {
   }
   codeForm($("add-form"), $("add-code"), $("add-err"), function (r) { go(r === "all" ? CAT.pdfs[0].tunes[0] : r.tunes[0]); });
 
+  var tocOpen = null, wantPdf = false;                   // wantPdf: the address asked for the booklet's PDF (&pdf=1)
   function contents(slug) {                              // a PDF with several exercises: the title opens its contents
-    var p = pdfOf(slug), h1 = $("title");
+    var p = pdfOf(slug), h1 = $("title"); tocOpen = null;
     if (!p || p.tunes.length < 2) return;
     var groups = p.contents || [{ title: "", items: p.tunes }], order = [];
     var plain = function (x) { x = String(x || "").toLowerCase(); return (x.normalize ? x.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : x); };
@@ -2727,9 +2822,10 @@ function aamLibrary() {
     html += '<p class="toc-none" hidden>Nothing matches. Try a number, or part of a name.</p>';
     var i = order.indexOf(slug), foot = "";
     foot += '<div class="toc-nav"><button data-go="' + esc(order[i - 1] || "") + '"' + (i > 0 ? "" : " disabled") + '>‹ Previous</button><button data-go="' + esc(order[i + 1] || "") + '"' + (i < order.length - 1 ? "" : " disabled") + ">Next ›</button></div>";
-    if (p.file && !DEMO) foot += '<div class="toc-dl"><button data-dl="1">Download the latest PDF<small>' + esc(p.file.edition + " · " + (p.file.size / 1048576).toFixed(1) + " MB") + '</small></button><small class="toc-dl-msg" aria-live="polite"></small></div>';
+    var top = "";                                        // the booklet's PDF comes first: nobody should have to look for it
+    if (p.file && !DEMO) top += '<div class="toc-dl"><button data-dl="1">Download the booklet (PDF)<small>' + esc(p.file.edition + " · " + (p.file.size / 1048576).toFixed(1) + " MB") + '</small></button><small class="toc-dl-msg" aria-live="polite"></small></div>';
     var list = $("toc-list"), q = $("toc-q"), big = order.length >= 12;
-    $("toc-title").textContent = p.title; list.innerHTML = html; $("toc-foot").innerHTML = foot;
+    $("toc-title").textContent = p.title; list.innerHTML = html; $("toc-foot").innerHTML = foot; $("toc-top").innerHTML = top;
     $("toc-tools").hidden = !big; $("toc-chips").innerHTML = groups.length >= 3 ? chips : ""; $("toc-chips").hidden = groups.length < 3;
     list.classList.toggle("nonum", !list.querySelector('.toc-row:not([data-n=""])'));      // a book without line numbers has no number column
     var rows = [].slice.call(list.querySelectorAll(".toc-row")), heads = [].slice.call(list.querySelectorAll(".lib-pdf"));
@@ -2758,17 +2854,19 @@ function aamLibrary() {
         if (to && to !== slug) go(to); else $("toc").hidden = true;
       };
     });
-    var open = function () {
+    var open = function (forPdf) {                         // forPdf: the "download the booklet" link in an email (&pdf=1) lands here
+      var box = $("toc-top").querySelector(".toc-dl"); forPdf = forPdf === true && !!box; viaLink = forPdf;
+      if (box) { box.classList.toggle("hi", forPdf); box.querySelector(".toc-dl-msg").textContent = forPdf ? "Tap the button to save your booklet. Then tap Done to play along." : ""; }
       q.value = ""; filter(); $("toc").hidden = false;
       var cur = list.querySelector('[aria-current="true"]'); if (cur) list.scrollTop = Math.max(0, cur.offsetTop - list.clientHeight / 2 + cur.offsetHeight / 2);   // start at the line you are on
       if (big && window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches) q.focus();   // not on phones: the keyboard would cover the list
     };
-    var dl = $("toc-foot").querySelector("[data-dl]");
+    var dl = $("toc-top").querySelector("[data-dl]"), viaLink = false;
     if (dl) dl.onclick = function () {
-      var msg = $("toc-foot").querySelector(".toc-dl-msg"); msg.textContent = "Getting the PDF…"; dl.disabled = true;
+      var msg = $("toc-top").querySelector(".toc-dl-msg"); msg.textContent = "Getting the PDF…"; dl.disabled = true;
       getPdf(p).then(function (blob) {
         var a = document.createElement("a"), url = URL.createObjectURL(blob); a.href = url; a.download = p.file.name; document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(function () { URL.revokeObjectURL(url); }, 60000); msg.textContent = "Downloaded: " + p.file.name; dl.disabled = false; AAM_TRACK.event("aam_pdf_download", { pdf: p.id, edition: p.file.edition });
+        setTimeout(function () { URL.revokeObjectURL(url); }, 60000); msg.textContent = "Downloaded: " + p.file.name; dl.disabled = false; AAM_TRACK.event("aam_pdf_download", { pdf: p.id, edition: p.file.edition, how: viaLink ? "link" : "list" });
       }).catch(function (e) {
         dl.disabled = false;
         msg.textContent = e.message === "nokey" ? "Scan a QR code in your booklet once (or type your code again under \"Add another PDF\"), then download."
@@ -2776,13 +2874,14 @@ function aamLibrary() {
       });
     };
     h1.classList.add("has-toc"); h1.setAttribute("role", "button"); h1.setAttribute("aria-haspopup", "dialog");
-    h1.onclick = open;
+    h1.onclick = open; tocOpen = open;
     $("toc-close").onclick = function () { $("toc").hidden = true; };
     $("toc").addEventListener("click", function (e) { if (e.target === $("toc")) $("toc").hidden = true; });
   }
   function start(slug) {
     var pd = pdfOf(slug); if (pd && pd.contents) { lib.at = lib.at || {}; lib.at[pd.id] = slug; }   // remember the place in a booklet
     lib.last = slug; save(); menu(slug); if (!DEMO) contents(slug);
+    if (wantPdf) { wantPdf = false; if (tocOpen) tocOpen(true); }
     AAM_TRACK.who = DEMO ? "visitor" : lib.all ? "teacher" : "student";
     if (DEMO) demoChrome(slug);
     var t = CAT.tunes[slug];
@@ -2799,14 +2898,12 @@ function aamLibrary() {
   function demoChrome(slug) {                            // the demo's own header: tune buttons, "I play", and the way to book a lesson
     var p = pdfOf(slug) || { tunes: [] }, short = function (t) { return t.title.replace(/,.*$/, "").replace(" Go Marching In", ""); };
     root.classList.add("is-demo");
-    var insts = [["Piano", 0], ["Flute", 0], ["Alto sax", 9], ["Tenor sax", 2], ["Clarinet", 2], ["Trumpet", 2]], mine = "Piano";
-    try { mine = localStorage.getItem("aam-demo-inst") || "Piano"; } catch (e) {}
     var bar = document.createElement("div"); bar.className = "demo-bar";
     bar.innerHTML = '<div class="demo-chips">' + p.tunes.map(function (s) { var t = CAT.tunes[s]; return t ? '<button data-slug="' + esc(s) + '"' + (s === slug ? ' aria-current="true"' : "") + ">" + esc(short(t)) + "</button>" : ""; }).join("") + "</div>" +
-      '<label class="demo-inst">I play <select>' + insts.map(function (x) { return "<option" + (x[0] === mine ? " selected" : "") + ">" + x[0] + "</option>"; }).join("") + "</select></label>";
+      '<span class="demo-inst">I play </span>';              // the instrument button (built with the page text of each tune) sits here
     var head = root.querySelector(".head"); head.parentNode.insertBefore(bar, head.nextSibling);
     [].forEach.call(bar.querySelectorAll("[data-slug]"), function (b) { b.onclick = function () { if (b.dataset.slug !== slug) go(b.dataset.slug); }; });
-    bar.querySelector("select").onchange = function (e) { try { localStorage.setItem("aam-demo-inst", e.target.value); localStorage.removeItem("aam-keys"); } catch (e2) {} go(slug); };
+    var ipill = root.querySelector('[data-r="inst-btn"]'); if (ipill) bar.querySelector(".demo-inst").appendChild(ipill);
     var cta = document.createElement("a"); cta.className = "demo-cta"; cta.target = "_top"; cta.href = DEMO.cta || "/contact/"; cta.textContent = DEMO.cta_label || "Book a free trial lesson";
     cta.onclick = function () { AAM_TRACK.event("aam_demo_cta", { tune: slug, where: "header" }); };
     head.appendChild(cta);
@@ -2841,7 +2938,7 @@ function aamLibrary() {
     location.replace("https://" + location.host + location.pathname + location.search + location.hash); return;
   }
   ready = loadSources();
-  var q = new URLSearchParams(location.search), want = (DEMO && DEMO.tune) || q.get("tune") || q.get("t"), code = DEMO ? null : q.get("code") || q.get("c");   // QR codes use the short t= and c=
+  var q = new URLSearchParams(location.search), want = (DEMO && DEMO.tune) || q.get("tune") || q.get("t"), code = DEMO ? null : q.get("code") || q.get("c"); wantPdf = !DEMO && q.get("pdf") === "1";   // QR codes use the short t= and c=
   ready.then(function () { return code ? check(code) : null; }).then(function (r) {
     if (r) { grant(r); keep(code, r); }
     if (!want && r && r !== "all") want = r.tunes[0];
