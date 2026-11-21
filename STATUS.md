@@ -457,3 +457,20 @@ Everything needed to carry on from any conversation is in this repository and in
   opens with Soul Jazz in the test copy and Bossa Nova in a released copy while the style is beta. Soul Jazz sits after Straight Ballad in the
   picker on purpose: the ballad check counts sounds in a fixed window and is sensitive to where in the tune it lands.
 - To release a style: delete its `beta: true`, then ship. Not done: `gen_study.py` still writes 4/4 only (Going Home is hand-written).
+
+## 2026-11-21 · Theory arm: note flash cards (beta)
+- Plan: project doc "Theory arm - game plan (2026-11-21)". One question engine (generators tagged by level and topic) feeds three things:
+  flash cards (built), random practice exams and fixed workbooks (not started). Levels: Prep (age 7), 1 (8), 2 (9) ... 6; adult-looking early.
+- `theory/cards.html` is the cards' TEST COPY: its own small app (`#aam-cards`), sharing only abcjs and the fingering data
+  (`tools/export_fingerings.py` now writes its FINGERINGS block too). No code screen, no network use beyond abcjs and fonts.
+- How it opens: the play page with `?app=cards`. The player's first lines (">>> OTHER APPS ON THIS PAGE") fetch the cards, put them in place
+  of `#aam-play`, then `throw` to stop the player's own script (the message says it is not a fault). The test copy loads `theory/cards.html`;
+  a released player loads `release/cards.html`, which does NOT exist yet, so students see "could not load" if they guess the address.
+  To release the cards: have `tools/release.py` copy `theory/cards.html` to `release/cards.html` (stamp CARDS_VERSION), after Alex says ship.
+  A page of its own (/theory, its own loader) is a computer job for later.
+- Cards: `KIND` holds the four kinds (name, key, fing, staff); `same` says when two notes are the same answer for that kind, so wrong answers
+  are always different pictures. `LEVELS` holds ranges and the number of answers. Memory: localStorage `aam-cards` (settings, best, miss).
+- Email sign-up before use (Alex's idea, 21 Nov): not built; recommendation given was one free deck, email for the rest. Needs MailerLite.
+- Checks: `--only cards` (8 instrument/card/level mixes draw and fit a phone; a 20-card round scores right; memory is kept).
+- Next: key-signature, interval and chord-symbol generators; the syllabus table is in the project doc for Alex to mark up.
+

@@ -17,7 +17,7 @@
 
    The microphone is a sound file: saxophone-like tones are generated here and fed to the browser as a fake microphone.
 
-   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|mic|flute|learn|cloud|contents|pdf|bar|style|apply|piano|install|demo]
+   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|mic|flute|learn|cloud|contents|pdf|bar|style|apply|piano|install|demo|cards]
    Needs:  playwright, plus the tone and abcjs packages (tools/node_modules or $AAM_NODE_MODULES). Nothing is fetched from the internet. */
 const fs = require("fs"), path = require("path"), os = require("os");
 const { chromium, devices } = require("playwright");
@@ -27,6 +27,7 @@ const URL_OF = slug => "https://alexattardmusic.com/play/?t=" + slug + "&c=" + e
 const tune = slug => JSON.parse(fs.readFileSync(path.join(ROOT, "tunes", slug + ".json"), "utf8"));
 const index = JSON.parse(fs.readFileSync(path.join(ROOT, "index.json"), "utf8"));
 const problems = [], ok = [];
+const FILE_OF = path.resolve(ROOT, process.argv.includes("--file") ? process.argv[process.argv.indexOf("--file") + 1] : "player/aam-player.html");
 const expect = (cond, what) => { (cond ? ok : problems).push(what); if (!cond) console.log("  FAIL: " + what); };
 
 // ---- sound: a reed-like tone (strong overtones, a little vibrato), silence, hiss
@@ -285,6 +286,37 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       }
       await page.click('[data-r="p-play"]');
     }
+    await ctx.close();
+  }
+  if (want("cards") && fs.existsSync(path.join(ROOT, "theory", "cards.html")) && fs.readFileSync(FILE_OF, "utf8").includes("app=cards") && /var PLAYER_VERSION = "test copy"/.test(fs.readFileSync(FILE_OF, "utf8"))) {
+    // theory flash cards: the play page steps aside for them; every kind of card draws, answers are counted, a round ends with a score
+    const ctx = await b.newContext({ ...devices["iPhone 13"] }); await wire(ctx); const page = await ctx.newPage();
+    page.on("pageerror", e => { if (!/not a fault/.test(e.message)) expect(false, "flash cards: script error: " + e.message); });
+    await page.goto("https://alexattardmusic.com/play/?player=test&app=cards"); await page.waitForTimeout(2500);
+    expect(!!(await page.$("#aam-cards")) && !(await page.$("#aam-play")), "flash cards: ?app=cards opens the cards in place of the player, with no code screen");
+    const pick = (g, id) => page.click('#aam-cards [data-c="' + g + '"] button[data-id="' + id + '"]');
+    const NEED = { 1: 2, 2: 3, 3: 4, 4: 4 };
+    for (const [inst, mode, clef, level] of [["piano", "name", "both", 1], ["piano", "key", "bass", 2], ["piano", "staff", "treble", 3], ["alto", "fing", "", 4], ["tenor", "staff", "", 2], ["flute", "fing", "", 3], ["flute", "name", "", 4], ["other", "name", "bass", 4]]) {
+      await pick("inst", inst); await pick("mode", mode); if (clef) await pick("clef", clef); await pick("level", level); await pick("round", "calm"); await page.click('#aam-cards [data-c="start"]'); await page.waitForTimeout(250);
+      let ok = true, why = "";
+      for (let k = 0; k < 6 && ok; k++) {
+        const st = await page.evaluate(() => { const r = document.getElementById("aam-cards"), o = [...r.querySelectorAll(".opt")]; return { n: o.length, pic: !!r.querySelector('[data-c="show"] svg'), faces: o.every(e => e.querySelector("svg") || e.textContent.trim()), fit: o.every(e => { const q = e.getBoundingClientRect(); return q.left >= 0 && q.right <= innerWidth + 1; }), same: new Set(o.map(e => e.innerHTML)).size }; });
+        if (st.n !== NEED[level] || !st.pic || !st.faces || !st.fit || st.same !== st.n) { ok = false; why = JSON.stringify(st); }
+        await page.click("#aam-cards .opt >> nth=" + (k % st.n)); await page.waitForTimeout(1250);
+      }
+      expect(ok, "flash cards " + inst + " / " + mode + " / level " + level + ": a picture, " + NEED[level] + " different answers, all on the screen " + why);
+      await page.click('#aam-cards [data-c="quit"]'); await page.click('#aam-cards [data-c="change"]');
+    }
+    await pick("inst", "piano"); await pick("mode", "name"); await pick("clef", "treble"); await pick("level", 1); await pick("round", "calm"); await page.click('#aam-cards [data-c="start"]');
+    let right = 0;
+    for (let k = 0; k < 20; k++) {                            // a whole round, answered by reading the note off the staff the way a student would
+      await page.waitForFunction(() => !document.querySelector("#aam-cards .opt.right") && document.querySelectorAll("#aam-cards .opt").length === 2);
+      await page.click("#aam-cards .opt >> nth=" + (k < 15 ? 0 : 1)); const hit = await page.evaluate(() => /Yes/.test(document.querySelector('#aam-cards [data-c="said"]').textContent)); if (hit) right++;
+    }
+    await page.waitForSelector('#aam-cards [data-c="done"]:not([hidden])', { timeout: 4000 }).catch(() => {});
+    const end = await page.evaluate(() => ({ shown: !document.querySelector('#aam-cards [data-c="done"]').hidden, score: +document.querySelector('#aam-cards [data-c="score"]').textContent, mem: JSON.parse(localStorage.getItem("aam-cards") || "{}") }));
+    expect(end.shown && end.score === right, "flash cards: 20 cards end the round and the score is the number answered right (" + end.score + " shown, " + right + " counted)");
+    expect(end.mem.best && end.mem.best["piano|name|treble|1|calm"] >= right && (right === 20 || Object.keys(end.mem.miss || {}).length > 0), "flash cards: the best score and the missed notes are remembered on the device");
     await ctx.close();
   }
   if (want("piano")) {                                      // Learn mode on a piano page: one hand at a time, chosen in a small dialog
