@@ -329,3 +329,32 @@ Everything needed to carry on from any conversation is in this repository and in
   4. Welcome Booklet music pages: the title sits closer to its kicker, and the amber rule lower, than on the text pages.
   5. Beginner cover: the signature "Alex" sits on or just under the bottom edge of the welcome box.
   6. Glossary: "Whole, half and quarter notes" wraps its "Unit 1" tag onto a line of its own.
+
+## 2026-11-21 · Flute Beginner Booklet, first edition (built in one session at Alex's request)
+- Alex asked for it "asap", so the six-night plan was done in one sitting. Nothing in it has been played or checked by a flute
+  teacher yet: see "Needs Alex" below.
+- **How it is built.** No fork. `python3 tools/build_beginner.py flute [--starter] --code XXX-0000 --publish <repo>`. The flute
+  reads the same written notes as the saxophone in the same range, so the curriculum is the saxophone book's, line for line (nine
+  units, 128 numbered lines, same sources). What differs is data in `tools/beginner_flute.py`: the key diagram (`KEYS`,
+  `draw_keys`, `key_map`), the fingerings low C to upper C sharp (`FINGERINGS`, B flat with the thumb as an extra card), the
+  two-page chart (`fingering_pages`), the cover drawing (`draw_flute`), the Getting started page (`START`, `CARE`) and the words
+  about fingers and air (`NOTE_TIPS`, `BOXES`, `SUBS`, `CHECKS`). `patch(UNITS)` swaps them in and refuses to build if a
+  saxophone word is left ("octave key", "reed", "strap", "mouthpiece", "jaw", "bite"...).
+- **Note order** is the saxophone book's: B A G; C and D; F E low D; F sharp; upper E F sharp G; B flat and upper F; low C;
+  C sharp; upper A B C. Checked against two flute sources that start B, A, G and then C: The Instrumentalist, "First Lessons
+  for the Beginning Flutist, part 2" (Oct 2015), and the 8notes Beginner Flute Method. B flat is taught as B plus the right index
+  finger; the thumb lever is on the chart only.
+- **The saxophone book did not change**: built before and after, every page compared pixel for pixel, text identical.
+- **In the player:** shelves `flute-beginner` (Flute Beginner Booklet) and `flute-starter` (Free Flute Starter Pack, a second
+  shelf over the same tunes, with the invitation page). 128 tunes `flute-beginner-<line>`, `instrument: "flute"`, concert pitch.
+  Both PDFs are on the `pdf` branch. Codes: only in `tools/out/beginner_codes.json` (git-ignored), the Build Desk Library and the
+  project doc "Flute Beginner Booklet - status and codes".
+- **Player (beta, not released):** the tuner and Learn mode draw the flute fingering (`FLUTE_KEYS`, `FLUTE_BOX`, `FLUTE_FING`,
+  written by `tools/export_fingerings.py`; `FG` picks the chart; `HAS_FING`). In the live player a flute line plays, shows the
+  cloud and Learn mode names the notes, but no fingering diagram appears until the next release.
+- Checks: every flute line at four screen sizes in the test copy and in the live copy (512 views each); new `flute` group in
+  `tools/check_features.js`; the PDF download with each code.
+- **Needs Alex:** (1) check every fingering on pages 35 and 36 and on the note cards; (2) read the Getting started page and the
+  FLUTE SKILL boxes as a flute teacher; (3) is low C in Unit 7 too early for a flute beginner (it needs the footjoint keys)?
+  (4) play it through. Same open items as the saxophone book: duet part B and the finale's piano part are unplayed.
+- Not done: a flute Welcome Booklet (the last page says "your next book"); a MailerLite form and emails for the flute Starter Pack.

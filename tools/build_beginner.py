@@ -3,6 +3,7 @@
 
   python3 tools/build_beginner.py                                   ->  tools/out/Sax_Beginner_Booklet.pdf (no QR codes)
   python3 tools/build_beginner.py alto --code SBA-0000 [--publish /path/to/aam-tunes]
+  python3 tools/build_beginner.py flute --code XXX-0000 [--publish /path/to/aam-tunes]             the Flute Beginner Booklet (tools/beginner_flute.py)
   python3 tools/build_beginner.py alto --starter --code XXX-0000 --publish /path/to/aam-tunes     the free Starter Pack edition (publish the
                                                                         Beginner Booklet itself first: the Starter Pack opens the same player lines)
                                                                     ->  tools/out/Sax_Beginner_Booklet_Alto.pdf, with a QR on the cover
@@ -21,14 +22,19 @@ from concurrent.futures import ThreadPoolExecutor
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 ARGS = sys.argv[1:]
-ED = ARGS[0] if ARGS and ARGS[0] in ("alto", "tenor") else None
+ED = ARGS[0] if ARGS and ARGS[0] in ("alto", "tenor", "flute") else None
+FLUTE = ED == "flute"                                                   # the flute book: the same curriculum, the flute's own diagrams and words (tools/beginner_flute.py)
+NAME = "Flute" if FLUTE else "Saxophone"
 CODE = ARGS[ARGS.index("--code") + 1] if "--code" in ARGS else None
 REPO = ARGS[ARGS.index("--publish") + 1] if "--publish" in ARGS else None
 STARTER = "--starter" in ARGS                                           # the free Starter Pack: the same book and the same player lines, its own code, a last page inviting the free first lesson
-BOOK_ID = "sax-starter-" if STARTER else "sax-beginner-"                # the shelf in the player (the tunes themselves are always the Beginner Booklet's)
-sys.argv = [sys.argv[0], ED or "alto"]
+BOOK_ID = ("flute-starter" if STARTER else "flute-beginner") if FLUTE else "sax-starter-" if STARTER else "sax-beginner-"                # the shelf in the player (the tunes themselves are always the Beginner Booklet's)
+sys.argv = [sys.argv[0], ED if ED in ("alto", "tenor") else "alto"]
 import build_book as B                                              # fonts, colours, key diagram, drawn saxophone
 import publish_exercise as PX                                       # ABC spelling for the player
+if FLUTE: import beginner_flute as FL
+K = FL if FLUTE else B                                              # whose key diagram and fingering chart this book prints
+def pdf_id(): return BOOK_ID if FLUTE else BOOK_ID + ED              # the booklet's shelf in the player
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.colors import HexColor, white
@@ -43,10 +49,10 @@ CW = W - 2 * M
 SLATE, AMBER, TINT, MUTED, RULE = B.SLATE, B.AMBER, B.TINT, B.MUTED, B.RULE
 KIND = {"note": (AMBER, "#FBF1E1", "NEW NOTE"), "rhythm": ("#4A78B0", "#EAF1F8", "NEW RHYTHM"),
         "key": ("#3E8E7E", "#E6F3F0", "NEW KEY"), "word": ("#B5533C", "#F8EAE6", "NEW WORD"),
-        "symbol": ("#7A5AA6", "#F0EBF7", "NEW SYMBOL"), "skill": ("#2E8C9E", "#E4F2F5", "SAX SKILL")}
+        "symbol": ("#7A5AA6", "#F0EBF7", "NEW SYMBOL"), "skill": ("#2E8C9E", "#E4F2F5", "FLUTE SKILL" if FLUTE else "SAX SKILL")}
 PILL = {"CLAP": "#4A78B0", "WRITE": "#B5533C", "DUET": "#7A5AA6", "SCALE": "#3E8E7E", "ROUND": "#7A5AA6"}
 CACHE = os.path.join(B.OUT, "beg"); os.makedirs(CACHE, exist_ok=True)
-EDITION = "Edition 4 · November 2026"                               # printed in the footer and shown beside the download in the player
+EDITION = "Edition 1 · November 2026" if FLUTE else "Edition 4 · November 2026"                               # printed in the footer and shown beside the download in the player
 STAFF = 18
 LINE_MM = 176.0
 HALF_MM = 85.0                                                      # two short lines share a row
@@ -421,6 +427,7 @@ def order_unit(u):
         elif it.get("b") and seg and it["title"].split()[0] == seg[-1][0]["title"].split()[0]: seg[-1].append(it)
         else: seg.append([it])
     close(); u["lines"] = out
+if FLUTE: FL.patch(UNITS)
 for _u_ in UNITS: order_unit(_u_)
 
 # ---------------------------------------------------------------- the finale: a solo with piano accompaniment
@@ -540,9 +547,9 @@ def note_png(ly):
     return render(src, "note", transparent=True)
 
 FING = {}
-for _ly, _name, _keys, _n in B.FINGERINGS:
+for _ly, _name, _keys, _n in K.FINGERINGS:
     for part in _ly.split(): FING[part] = _keys
-FING["bes'"] = {"L1", "bis"}
+if not FLUTE: FING["bes'"] = {"L1", "bis"}
 
 # ---------------------------------------------------------------- drawing
 P_BODY = ParagraphStyle("pb", parent=B.body, fontSize=9.6, leading=13.4, spaceAfter=0)
@@ -597,11 +604,11 @@ class Page:
 class Book:
     def __init__(self, path):
         self.c = canvas.Canvas(path, pagesize=letter); self.n = 1; self.line_no = 0; self.toc = []; self.fill = []
-        self.c.setTitle("Saxophone Beginner Booklet"); self.c.setAuthor("Alex Attard Music")
+        self.c.setTitle(NAME + " Beginner Booklet"); self.c.setAuthor("Alex Attard Music")
     def footer(self):
         c = self.c
         c.setStrokeColor(HexColor(RULE)); c.setLineWidth(0.6); c.line(M, 40, W - M, 40)
-        c.setFont("Pop-M", 8.5); c.setFillColor(HexColor(SLATE)); c.drawString(M, 28, "Alex Attard Music  ·  Saxophone Beginner Booklet"); c.setFont("Pop", 7.5); c.setFillColor(HexColor(MUTED)); c.drawString(M + 232, 28, EDITION)
+        c.setFont("Pop-M", 8.5); c.setFillColor(HexColor(SLATE)); c.drawString(M, 28, "Alex Attard Music  ·  %s Beginner Booklet" % NAME); c.setFont("Pop", 7.5); c.setFillColor(HexColor(MUTED)); c.drawString(M + (203 if FLUTE else 232), 28, EDITION)
         c.setFont("Pop-B", 9); c.setFillColor(HexColor(AMBER)); c.drawRightString(W - M, 28, str(self.n)); self.n += 1
 
 def note_card(c, x0, ytop, w, h, ly, name, tip, tint=TINT):
@@ -609,9 +616,9 @@ def note_card(c, x0, ytop, w, h, ly, name, tip, tint=TINT):
     c.setFillColor(HexColor(AMBER)); c.setFont("Pop-B", 6.8); c.drawString(x0 + 10, ytop - 14, " ".join("NEW NOTE"))
     c.setFillColor(HexColor(SLATE)); B.draw_mixed(c, x0 + 10, ytop - 31, name, "Pop-B", 15)
     top, bot = ytop - 10, ytop - h + (30 if tip else 10)
-    u = (top - bot) / (B.KY_MAX - B.KY_MIN); dw = (B.KX_MAX - B.KX_MIN) * u
+    u = (top - bot) / (K.KY_MAX - K.KY_MIN); dw = (K.KX_MAX - K.KX_MIN) * u
     right = x0 + w - 12
-    B.draw_keys(c, right - dw - B.KX_MIN * u, top, u, FING[ly])
+    K.draw_keys(c, right - dw - K.KX_MIN * u, top, u, FING[ly])
     im = ImageReader(note_png(ly)); iw, ih = im.getSize(); tw = 58; th = tw * ih / iw; room = (ytop - 36) - (bot + 2)
     if th > room: th = room; tw = th * iw / ih
     c.drawImage(im, x0 + 8, bot + 2 + (room - th) / 2, tw, th, mask="auto")
@@ -754,12 +761,12 @@ def manuscript(c, y, room):
 
 # ---------------------------------------------------------------- the player: one tune per numbered line
 PLAY = "https://alexattardmusic.com/play/"
-BELOW = {"alto": 9, "tenor": 14}
+BELOW = {"alto": 9, "tenor": 14, "flute": 0}
 PCS = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"]
 SLUGS = {}
 def slug_of(it):
     if id(it) not in SLUGS:
-        base = "sax-beginner-%s-" % ED + re.sub(r"[^a-z0-9]+", "-", (it.get("slug") or it["title"]).lower().replace("♯", " sharp").replace("♭", " flat").replace("è", "e")).strip("-")
+        base = ("flute-beginner-" if FLUTE else "sax-beginner-%s-" % ED) + re.sub(r"[^a-z0-9]+", "-", (it.get("slug") or it["title"]).lower().replace("♯", " sharp").replace("♭", " flat").replace("è", "e")).strip("-")
         s, k = base, 2
         while s in SLUGS.values(): s = "%s-%d" % (base, k); k += 1
         SLUGS[id(it)] = s
@@ -851,7 +858,7 @@ def to_tune(it, chapter):
         chords.append([dict(sym=PCS[rr], beats=bpb, root=rr, degs=[0, 2, 4, 5, 7, 9, 11], scale="Ionian (major)")])
     T = it.get("tempo") or (60 if drone else (84 if bpb == 3 else 76) if tune_like else 66)   # the player opens at this tempo; the presets go up from it
     sec = dict(id="notes", title="Notes", tab="Notes", desc=(it.get("about") or it.get("sub") or "").rstrip("."), rh=ev, lh=[], abc=dict(rh=abc, marks=marks), learn=seq)
-    tune = dict(format="aam-tune/1", slug=slug_of(it), title="%d · %s" % (it["_no"], it["title"]), subtitle="Saxophone Beginner Booklet · " + chapter,
+    tune = dict(format="aam-tune/1", slug=slug_of(it), title="%d · %s" % (it["_no"], it["title"]), subtitle=NAME + " Beginner Booklet · " + chapter,
                 instrument=ED, concert_key=PCS[(wk.pc - below) % 12], native=g.INSTRUMENTS[ED][1] % 12, style="drone" if drone else "click", keys="off",
                 hide=["chords", "solo", "names"], hear=True, first_bar=1, chart_tempo=T, tempo_presets=[T, T + 20, T + 40], form=[], bars=chords, sections=[sec],
                 notation=dict(key=wkey, staves="treble"), page=it["_page"])
@@ -859,15 +866,15 @@ def to_tune(it, chapter):
         evb, abcb, _, _ = parse_part(it, it["b"], bpb, wk, below)
         sec["lh"] = evb; sec["abc"]["lh"] = abcb; tune["notation"].update(lh=["z" + PX.LEN[float(bpb)]] * len(abc), lh_clef="treble"); tune["hand_labels"] = ["Part A", "Part B"]
     if it is FINALE_LINE:                                            # the solo: the piano accompaniment plays under the written saxophone part
-        sec["lh"] = piano_events(FINALE["rh"], bpb, {"alto": 3, "tenor": -2}[ED]) + piano_events(FINALE["lh"], bpb, {"alto": 3, "tenor": -2}[ED])
-        sec["lh"].sort(); tune["hand_labels"] = ["Saxophone", "Piano"]
-        sec["desc"] = "Switch off Saxophone to play with the piano alone. The piano plays two bars first"
+        sh = {"alto": 3, "tenor": -2, "flute": 0}[ED]; sec["lh"] = piano_events(FINALE["rh"], bpb, sh) + piano_events(FINALE["lh"], bpb, sh)
+        sec["lh"].sort(); tune["hand_labels"] = [NAME, "Piano"]
+        sec["desc"] = "Switch off %s to play with the piano alone. The piano plays two bars first" % NAME
     if bpb != 4: tune["meter"] = [bpb, 4]
     if it.get("src"): tune["source"] = it["src"]
     return tune
 
 def publish(repo):
-    pdf_id = BOOK_ID + ED; title = ("Free Saxophone Starter Pack · " if STARTER else "Saxophone Beginner Booklet · ") + {"alto": "Alto", "tenor": "Tenor"}[ED]
+    pdf_id = globals()["pdf_id"](); title = ("Free Flute Starter Pack" if STARTER else "Flute Beginner Booklet") if FLUTE else ("Free Saxophone Starter Pack · " if STARTER else "Saxophone Beginner Booklet · ") + {"alto": "Alto", "tenor": "Tenor"}[ED]
     ip = os.path.join(repo, "index.json"); idx = json.load(open(ip))
     h = hashlib.sha256(("aam:" + re.sub(r"[^A-Z0-9]", "", CODE.upper())).encode()).hexdigest()
     clash = [p["id"] for p in idx["pdfs"] if p.get("hash") == h and p["id"] != pdf_id]; assert not clash, "that code is already used by " + clash[0]
@@ -897,11 +904,12 @@ def cover(book):
     c.setFillColor(HexColor(SLATE)); c.rect(0, H - band, W, band, fill=1, stroke=0)
     png, clef = B.cover_staff_png(); im = ImageReader(png); iw, ih = im.getSize(); sw = 290
     c.drawImage(im, M, H - band + 48, sw, sw * ih / iw, mask="auto")
-    B.draw_sax(c, 345, H - band + 36, 1.95)
+    if FLUTE: FL.draw_flute(c, 345, H - band + 36, 1.95)
+    else: B.draw_sax(c, 345, H - band + 36, 1.95)
     c.setFillColor(HexColor(AMBER)); c.setFont("Pop-B", 11); c.drawString(M, H - 110, " ".join("ALEX ATTARD MUSIC") + ("     ·     " + " ".join("FREE STARTER PACK") if STARTER else ""))
-    c.setFillColor(white); c.setFont("Pop-B", 50); c.drawString(M, H - 198, "Saxophone")
+    c.setFillColor(white); c.setFont("Pop-B", 50); c.drawString(M, H - 198, NAME)
     c.setFont("Pop-L", 38); c.drawString(M, H - 244, "Beginner Booklet")
-    c.setFillColor(HexColor(AMBER)); c.setFont("Pop-M", 17); B.draw_mixed(c, M, H - 284, {"alto": "E♭ Alto Saxophone", "tenor": "B♭ Tenor Saxophone", None: "Alto and Tenor Saxophone"}[ED], "Pop-M", 17)
+    c.setFillColor(HexColor(AMBER)); c.setFont("Pop-M", 17); B.draw_mixed(c, M, H - 284, {"alto": "E♭ Alto Saxophone", "tenor": "B♭ Tenor Saxophone", "flute": "Flute in C", None: "Alto and Tenor Saxophone"}[ED], "Pop-M", 17)
     top, bot = H - band - 44, 92
     c.setFillColor(HexColor(TINT)); c.roundRect(M, bot, CW, top - bot, 10, fill=1, stroke=0)
     c.setFillColor(HexColor(AMBER)); c.rect(M, bot, 5, top - bot, fill=1, stroke=0)
@@ -934,7 +942,7 @@ def how_page(book):
             ("key", "A new key signature or scale", "Tells you which notes are sharp or flat for the whole piece."),
             ("symbol", "A new sign in the music", "Marks such as repeat signs, dynamics, slurs and fermatas."),
             ("word", "A new word", "The musical terms you need, in plain English. They are all in the glossary at the back."),
-            ("skill", "A saxophone skill", "How to do something on the instrument: tonguing, low notes, high notes.")]
+            ("skill", "A %s skill" % NAME.lower(), "How to do something on the instrument: tonguing, low notes, high notes.")]
     for r in range(0, 6, 2):
         hh = max(concept_h(bw, d[2]) for d in demo[r:r + 2])
         for i, d in enumerate(demo[r:r + 2]): concept(c, M + i * (bw + 10), y, bw, *d)
@@ -985,6 +993,7 @@ def start_page(book):
             ("Make a sound", ["Rest your top teeth on the mouthpiece, about a fingernail's width from the tip.", "Roll your bottom lip slightly over your bottom teeth as a cushion.",
                               "Close your lips around the mouthpiece like a drawstring bag, as if saying \"oo\".", "Breathe in low and deep. Blow fast, steady air.",
                               "Start the note by touching the tip of your tongue to the reed and letting go: \"too\".", "Try it first with just the mouthpiece and neck. Aim for four steady beats."])]
+    if FLUTE: cols = FL.START
     cw = (CW - 20) / 3; ymin = y
     for i, (title, steps) in enumerate(cols):
         x = M + i * (cw + 10); yy = y
@@ -997,9 +1006,9 @@ def start_page(book):
         ymin = min(ymin, yy)
     y = ymin - 12
     c.setFillColor(HexColor(SLATE)); c.setFont("Pop-B", 13); c.drawString(M, y, "How to read a fingering diagram"); y -= 10
-    mh = y - 150
-    B.key_map(c, M, y, CW, mh); y -= mh + 12
-    B.tip_box(c, M, y, CW, "Look after it", ["Pull a swab through the body and the neck after every session.", "Take the reed off, dry it and keep it flat in a reed case.", "Never lift the saxophone by its neck or its keys."])
+    mh = y - (164 if FLUTE else 150)
+    K.key_map(c, M, y, CW, mh); y -= mh + 12
+    B.tip_box(c, M, y, CW, "Look after it", FL.CARE if FLUTE else ["Pull a swab through the body and the neck after every session.", "Take the reed off, dry it and keep it flat in a reed case.", "Never lift the saxophone by its neck or its keys."])
     book.footer(); c.showPage()
 
 def reading_page(book):
@@ -1024,8 +1033,8 @@ def reading_page(book):
 
 def scales_page(book):
     c = book.c; pg = Page(c, book); pg.head("Finish", "Four scales, and what comes next", toc="Finish")
-    p, ph = para_h("You now know every note in four major scales. Play one each day as part of your warm-up: the scale up and down, then its <b>arpeggio</b> (notes 1, 3, 5 and 8). "
-                   "When all four are easy at ♩ = 80, you are ready for the <b>Saxophone Welcome Booklet</b>: every key, faster fingers and your first jazz.", CW, ParagraphStyle("sb", parent=B.body, fontSize=10.4, leading=15))
+    p, ph = para_h("You now know every note in four major scales. Play one each day as part of your warm-up: the scale up and down, then its <b>arpeggio</b> (notes 1, 3, 5 and 8). " +
+                   ("When all four are easy at ♩ = 80, you are ready for your next book: every key, faster fingers and your first jazz." if FLUTE else "When all four are easy at ♩ = 80, you are ready for the <b>Saxophone Welcome Booklet</b>: every key, faster fingers and your first jazz."), CW, ParagraphStyle("sb", parent=B.body, fontSize=10.4, leading=15))
     pg.add(ph, lambda c, y: p.drawOn(c, M, y - ph), gap=14)
     for it in SCALE_LINES: music_block(book, pg, it, render(ly_line(it), "line"))
     def cert(c, y):
@@ -1060,7 +1069,7 @@ def finale_pages(book):
     pg.flush()
     # the pianist's score
     y = B.header(c, "For the pianist", FINALE["title"] + ": piano accompaniment")
-    ed = {"alto": "E♭ alto saxophone", "tenor": "B♭ tenor saxophone", None: "E♭ alto saxophone"}[ED]
+    ed = {"alto": "E♭ alto saxophone", "tenor": "B♭ tenor saxophone", "flute": "flute", None: "E♭ alto saxophone"}[ED]
     p2, ph2 = para_h("The top staff is the solo part as the student reads it, for %s. The piano part is in concert pitch. %s" % (ed.replace("♭", "<font name='DJ'>♭</font>"), FINALE["sub"] + "."), CW, P_BODY)
     p2.drawOn(c, M, y - ph2); y -= ph2 + 12
     im = ImageReader(render(piano_score_ly(), "piano")); iw, ih = im.getSize(); w = CW; h = w * ih / iw
@@ -1068,7 +1077,7 @@ def finale_pages(book):
     c.drawImage(im, M, y - h, w, h); book.footer(); c.showPage()
 
 def piano_score_ly():
-    tr = {"alto": "ees", "tenor": "bes,", None: "ees"}[ED]; it = dict(FINALE_LINE); it["bpl"] = 4
+    tr = {"alto": "ees", "tenor": "bes,", "flute": "c", None: "ees"}[ED]; it = dict(FINALE_LINE); it["bpl"] = 4
     sax, _ = _part(it["music"], it)
     return r"""\version "2.24.0"
 #(set-global-staff-size 16.5)
@@ -1076,12 +1085,12 @@ def piano_score_ly():
 \paper { indent = 12\mm short-indent = 0 line-width = 176\mm ragged-last = ##f system-system-spacing.basic-distance = #22 system-system-spacing.padding = #5 }
 \layout { \context { \Score \override BarNumber.font-size = #-1 } }
 \score { <<
-  \new Staff \with { instrumentName = "Sax" fontSize = #-2 \override StaffSymbol.staff-space = #(magstep -2) } { \clef treble \key c \major \time 3/4 \tempo "%s" 4 = %d %s \bar "|." }
+  \new Staff \with { instrumentName = "%s" fontSize = #-2 \override StaffSymbol.staff-space = #(magstep -2) } { \clef treble \key c \major \time 3/4 \tempo "%s" 4 = %d %s \bar "|." }
   \new PianoStaff \with { instrumentName = "Piano" } <<
     \new Staff { \clef treble \transpose c %s { \key c \major %s } }
     \new Staff { \clef bass \transpose c %s { \key c \major %s } } >>
 >> }
-""" % (FINALE["tempo_word"], FINALE["tempo"], sax, tr, " | ".join(FINALE["rh"]), tr, " | ".join(FINALE["lh"]))
+""" % ("Flute" if FLUTE else "Sax", FINALE["tempo_word"], FINALE["tempo"], sax, tr, " | ".join(FINALE["rh"]), tr, " | ".join(FINALE["lh"]))
 
 def rhythm_page(book):
     c = book.c; pg = Page(c, book); pg.head("Practice", "Rhythm gym", toc="Practice")
@@ -1104,7 +1113,7 @@ def glossary_page(book):
     c = book.c; y = B.header(c, "Reference", "Glossary"); book.toc.append(("Reference", "Glossary", book.n))
     ents = [(t, re.sub(r"<[^>]+>", "", x), k + 1) for k, u in enumerate(UNITS) for kind, t, x in u["boxes"]]
     ents += [("Solo", "A piece for one player.", 0), ("Arpeggio", "The notes of a chord played one at a time: notes 1, 3, 5 and 8 of a scale.", 5), ("Duet", "A piece for two players.", 1),
-             ("Transposing", "Playing the same tune starting on a different note.", 6), ("Embouchure", "The way your mouth holds the mouthpiece.", 0), ("Metronome", "A device that clicks a steady beat at the tempo you set.", 0)]
+             ("Transposing", "Playing the same tune starting on a different note.", 6), ("Embouchure", "The way your lips shape the air as it crosses the flute." if FLUTE else "The way your mouth holds the mouthpiece.", 0), ("Metronome", "A device that clicks a steady beat at the tempo you set.", 0)]
     seen = set(); ents = [e for e in sorted(ents, key=lambda e: e[0].lower()) if not (e[0] in seen or seen.add(e[0]))]
     cols = 3; gw = (CW - 18 * (cols - 1)) / cols; st = ParagraphStyle("gl", parent=P_BODY, fontSize=7.5, leading=9.7)
     paras = [para_h("<font name='Pop-B' size='8.8' color='%s'>%s</font>%s<br/>%s" % (SLATE, t.replace("♯", "<font name='DJ-B'>♯</font>").replace("♭", "<font name='DJ-B'>♭</font>"),
@@ -1126,8 +1135,8 @@ def chart_page(book):
         col, row = k % cols, k // cols; x0 = M + col * (gw + gap); y1 = y - row * (gh + gap)
         c.setFillColor(HexColor(TINT if (row + col) % 2 == 0 else "#F3F5F7")); c.roundRect(x0, y1 - gh, gw, gh, 8, fill=1, stroke=0)
         c.setFillColor(HexColor(SLATE)); B.draw_mixed(c, x0 + 10, y1 - 19, names[ly], "Pop-B", 12)
-        top, bot = y1 - 12, y1 - gh + 10; u = (top - bot) / (B.KY_MAX - B.KY_MIN); dw = (B.KX_MAX - B.KX_MIN) * u; right = x0 + gw - 10
-        B.draw_keys(c, right - dw - B.KX_MIN * u, top, u, FING[ly])
+        top, bot = y1 - 12, y1 - gh + 10; u = (top - bot) / (K.KY_MAX - K.KY_MIN); dw = (K.KX_MAX - K.KX_MIN) * u; right = x0 + gw - 10
+        K.draw_keys(c, right - dw - K.KX_MIN * u, top, u, FING[ly])
         im = ImageReader(note_png(ly)); iw, ih = im.getSize(); tw = right - dw - 8 - (x0 + 6); th = tw * ih / iw
         c.drawImage(im, x0 + 6, (top + bot) / 2 - th / 2 - 6, tw, th, mask="auto")
     book.footer(); c.showPage()
@@ -1136,13 +1145,13 @@ def full_chart(path, book):
     """The Welcome Booklet's complete fingering chart (low B flat to high F, three pages) goes at the back, with this book's footer."""
     import io
     from pypdf import PdfReader, PdfWriter
-    chart = os.path.join(CACHE, "fingering.pdf"); B.fingering_pages(chart)
+    chart = os.path.join(CACHE, "fingering.pdf"); K.fingering_pages(chart)
     w = PdfWriter()
     for pg in PdfReader(path).pages: w.add_page(pg)
     for pg in PdfReader(chart).pages:
         buf = io.BytesIO(); c = canvas.Canvas(buf, pagesize=letter); book.c = c; book.footer(); c.save(); buf.seek(0)
         pg.merge_page(PdfReader(buf).pages[0]); w.add_page(pg)
-    w.add_metadata({"/Title": "Saxophone Beginner Booklet", "/Author": "Alex Attard Music"})
+    w.add_metadata({"/Title": NAME + " Beginner Booklet", "/Author": "Alex Attard Music"})
     with open(path, "wb") as fh: w.write(fh)
 
 BOOKING = "https://alexattardmusic.com/contact/#book"
@@ -1175,7 +1184,7 @@ def invite_page(path, book):
     w = PdfWriter()
     for pg in PdfReader(path).pages: w.add_page(pg)
     w.add_page(PdfReader(buf).pages[0])
-    w.add_metadata({"/Title": "Free Saxophone Starter Pack", "/Author": "Alex Attard Music"})
+    w.add_metadata({"/Title": "Free %s Starter Pack" % NAME, "/Author": "Alex Attard Music"})
     with open(path, "wb") as fh: w.write(fh)
 
 def sources_text():
@@ -1192,7 +1201,7 @@ def main():
     with ThreadPoolExecutor(8) as ex:
         for it, png in zip(items, ex.map(lambda it: render(ly_line(it), "line"), items)): PNGS[id(it)] = png
     assert not (CODE or REPO) or ED, "give the edition (alto or tenor) with --code or --publish"
-    out = os.path.join(B.OUT, ("Sax_Starter_Pack%s.pdf" if STARTER else "Sax_Beginner_Booklet%s.pdf") % ("_" + ED.capitalize() if ED else ""))
+    out = os.path.join(B.OUT, ("Flute_Starter_Pack.pdf" if STARTER else "Flute_Beginner_Booklet.pdf") if FLUTE else ("Sax_Starter_Pack%s.pdf" if STARTER else "Sax_Beginner_Booklet%s.pdf") % ("_" + ED.capitalize() if ED else ""))
     # two passes: the first finds the page numbers for the progress table
     toc = []
     for final in (False, True):
@@ -1211,7 +1220,7 @@ def main():
     if REPO:
         publish(REPO)
         if os.environ.get("AAM_CODE"):
-            import publish_pdf; publish_pdf.publish_pdf(out, BOOK_ID + ED, CODE, EDITION, repo=REPO)
+            import publish_pdf; publish_pdf.publish_pdf(out, pdf_id(), CODE, EDITION, repo=REPO)
         else: print("AAM_CODE not set: the PDF in the player was NOT updated")
     if "--sources" in ARGS:
         for t, s in sources_text(): print("  %-34s %s" % (t, s))

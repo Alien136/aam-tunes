@@ -1670,6 +1670,682 @@
    }
   },
   {
+   "id": "flute-beginner",
+   "title": "Flute Beginner Booklet",
+   "hash": "338cb9724919db0d1f862ae442b5156bd9ad1212d33e639a4bdfe0957cfe3ec5",
+   "tunes": [
+    "flute-beginner-count-then-play",
+    "flute-beginner-long-tones-b-a-and-g",
+    "flute-beginner-stepping-down-stepping-up",
+    "flute-beginner-quarter-notes",
+    "flute-beginner-hot-cross-buns",
+    "flute-beginner-au-clair-de-la-lune",
+    "flute-beginner-sunrise",
+    "flute-beginner-stepping-stones",
+    "flute-beginner-echo-song",
+    "flute-beginner-three-note-march",
+    "flute-beginner-hot-cross-buns-duet",
+    "flute-beginner-long-tone-c",
+    "flute-beginner-b-to-c",
+    "flute-beginner-over-the-break",
+    "flute-beginner-five-notes-up-and-down",
+    "flute-beginner-ode-to-joy-duet",
+    "flute-beginner-mary-had-a-little-lamb",
+    "flute-beginner-buzz-buzz-buzz",
+    "flute-beginner-dansons-la-capucine",
+    "flute-beginner-lightly-row",
+    "flute-beginner-jingle-bells",
+    "flute-beginner-long-tones-f-and-e",
+    "flute-beginner-right-hand-walk",
+    "flute-beginner-left-hand-to-right-hand",
+    "flute-beginner-down-the-stairs",
+    "flute-beginner-three-beats",
+    "flute-beginner-two-ds",
+    "flute-beginner-coming-in-on-four",
+    "flute-beginner-low-tide",
+    "flute-beginner-when-the-saints-go-marching-in",
+    "flute-beginner-old-macdonald-had-a-farm",
+    "flute-beginner-old-macdonald-duet",
+    "flute-beginner-morning-bells",
+    "flute-beginner-long-tone-f-sharp",
+    "flute-beginner-f-or-f-sharp",
+    "flute-beginner-five-notes-from-d",
+    "flute-beginner-smooth-pairs",
+    "flute-beginner-f-sharp-ladder",
+    "flute-beginner-skips",
+    "flute-beginner-ode-to-joy-from-f-sharp",
+    "flute-beginner-aura-lee",
+    "flute-beginner-aura-lee-duet",
+    "flute-beginner-twinkle-twinkle-little-star",
+    "flute-beginner-twinkle-duet",
+    "flute-beginner-au-clair-de-la-lune-complete",
+    "flute-beginner-yankee-doodle",
+    "flute-beginner-all-my-clothes-are-green",
+    "flute-beginner-old-hundredth",
+    "flute-beginner-fox-you-stole-the-goose",
+    "flute-beginner-octaves",
+    "flute-beginner-long-tones-going-up",
+    "flute-beginner-crossing-to-upper-e",
+    "flute-beginner-up-the-ladder",
+    "flute-beginner-g-major-scale",
+    "flute-beginner-g-major-arpeggio",
+    "flute-beginner-taler-taler",
+    "flute-beginner-one-and-two-and",
+    "flute-beginner-eighths-on-the-scale",
+    "flute-beginner-running-eighths",
+    "flute-beginner-all-my-little-ducklings",
+    "flute-beginner-rain-rain-go-away",
+    "flute-beginner-twinkle-up-high",
+    "flute-beginner-twinkle-up-high-duet",
+    "flute-beginner-let-us-be-glad-and-cheerful",
+    "flute-beginner-frere-jacques",
+    "flute-beginner-bake-bake-a-cake",
+    "flute-beginner-long-tone-b-flat",
+    "flute-beginner-a-b-flat-c",
+    "flute-beginner-f-major-scale",
+    "flute-beginner-f-major-arpeggio",
+    "flute-beginner-three-in-a-bar",
+    "flute-beginner-mary-moves-to-f",
+    "flute-beginner-cuckoo",
+    "flute-beginner-cuckoo-duet",
+    "flute-beginner-lightly-row-in-f",
+    "flute-beginner-holy-god-we-praise-thy-name",
+    "flute-beginner-on-the-wall",
+    "flute-beginner-a-bird-comes-flying",
+    "flute-beginner-a-mother-had-four-children",
+    "flute-beginner-a-la-claire-fontaine",
+    "flute-beginner-oranges-and-lemons",
+    "flute-beginner-long-tone-low-c",
+    "flute-beginner-pinky-push-ups",
+    "flute-beginner-c-major-scale",
+    "flute-beginner-c-major-arpeggio",
+    "flute-beginner-long-short",
+    "flute-beginner-alouette",
+    "flute-beginner-michael-row-the-boat-ashore",
+    "flute-beginner-london-bridge",
+    "flute-beginner-london-bridge-duet",
+    "flute-beginner-my-bonnie-lies-over-the-ocean",
+    "flute-beginner-little-snowflake",
+    "flute-beginner-all-the-birds-are-here",
+    "flute-beginner-o-sanctissima",
+    "flute-beginner-ode-to-joy",
+    "flute-beginner-away-in-a-manger",
+    "flute-beginner-thoughts-are-free",
+    "flute-beginner-long-tone-c-sharp",
+    "flute-beginner-b-c-sharp-d",
+    "flute-beginner-d-major-scale",
+    "flute-beginner-d-major-arpeggio",
+    "flute-beginner-slur-two-tongue-two",
+    "flute-beginner-every-year-again",
+    "flute-beginner-now-thank-we-all-our-god",
+    "flute-beginner-happy-birthday-to-you",
+    "flute-beginner-amazing-grace",
+    "flute-beginner-surprise-symphony",
+    "flute-beginner-praise-to-the-lord-the-almighty",
+    "flute-beginner-auld-lang-syne",
+    "flute-beginner-o-come-all-ye-faithful",
+    "flute-beginner-o-come-little-children",
+    "flute-beginner-long-tones-a-b-and-c",
+    "flute-beginner-octaves-again",
+    "flute-beginner-steps-up-high",
+    "flute-beginner-c-major-scale-two-octaves",
+    "flute-beginner-c-major-arpeggio-two-octaves",
+    "flute-beginner-skips-up-high",
+    "flute-beginner-fox-up-high",
+    "flute-beginner-frere-jacques-up-high",
+    "flute-beginner-all-the-birds-up-high",
+    "flute-beginner-o-sanctissima-up-high",
+    "flute-beginner-angels-we-have-heard-on-high",
+    "flute-beginner-hark-the-herald-angels-sing",
+    "flute-beginner-jupiter",
+    "flute-beginner-g-major-scale-and-arpeggio",
+    "flute-beginner-f-major-scale-and-arpeggio",
+    "flute-beginner-c-major-scale-and-arpeggio",
+    "flute-beginner-d-major-scale-and-arpeggio"
+   ],
+   "contents": [
+    {
+     "title": "Unit 1 · Your first three notes",
+     "items": [
+      "flute-beginner-count-then-play",
+      "flute-beginner-long-tones-b-a-and-g",
+      "flute-beginner-stepping-down-stepping-up",
+      "flute-beginner-quarter-notes",
+      "flute-beginner-hot-cross-buns",
+      "flute-beginner-au-clair-de-la-lune",
+      "flute-beginner-sunrise",
+      "flute-beginner-stepping-stones",
+      "flute-beginner-echo-song",
+      "flute-beginner-three-note-march",
+      "flute-beginner-hot-cross-buns-duet"
+     ]
+    },
+    {
+     "title": "Unit 2 · C and D: five notes",
+     "items": [
+      "flute-beginner-long-tone-c",
+      "flute-beginner-b-to-c",
+      "flute-beginner-over-the-break",
+      "flute-beginner-five-notes-up-and-down",
+      "flute-beginner-ode-to-joy-duet",
+      "flute-beginner-mary-had-a-little-lamb",
+      "flute-beginner-buzz-buzz-buzz",
+      "flute-beginner-dansons-la-capucine",
+      "flute-beginner-lightly-row",
+      "flute-beginner-jingle-bells"
+     ]
+    },
+    {
+     "title": "Unit 3 · The right hand: F, E and D",
+     "items": [
+      "flute-beginner-long-tones-f-and-e",
+      "flute-beginner-right-hand-walk",
+      "flute-beginner-left-hand-to-right-hand",
+      "flute-beginner-down-the-stairs",
+      "flute-beginner-three-beats",
+      "flute-beginner-two-ds",
+      "flute-beginner-coming-in-on-four",
+      "flute-beginner-low-tide",
+      "flute-beginner-when-the-saints-go-marching-in",
+      "flute-beginner-old-macdonald-had-a-farm",
+      "flute-beginner-old-macdonald-duet",
+      "flute-beginner-morning-bells"
+     ]
+    },
+    {
+     "title": "Unit 4 · F sharp and the key of G",
+     "items": [
+      "flute-beginner-long-tone-f-sharp",
+      "flute-beginner-f-or-f-sharp",
+      "flute-beginner-five-notes-from-d",
+      "flute-beginner-smooth-pairs",
+      "flute-beginner-f-sharp-ladder",
+      "flute-beginner-skips",
+      "flute-beginner-ode-to-joy-from-f-sharp",
+      "flute-beginner-aura-lee",
+      "flute-beginner-aura-lee-duet",
+      "flute-beginner-twinkle-twinkle-little-star",
+      "flute-beginner-twinkle-duet",
+      "flute-beginner-au-clair-de-la-lune-complete",
+      "flute-beginner-yankee-doodle",
+      "flute-beginner-all-my-clothes-are-green",
+      "flute-beginner-old-hundredth",
+      "flute-beginner-fox-you-stole-the-goose"
+     ]
+    },
+    {
+     "title": "Unit 5 · Higher: E, F sharp and G",
+     "items": [
+      "flute-beginner-octaves",
+      "flute-beginner-long-tones-going-up",
+      "flute-beginner-crossing-to-upper-e",
+      "flute-beginner-up-the-ladder",
+      "flute-beginner-g-major-scale",
+      "flute-beginner-g-major-arpeggio",
+      "flute-beginner-taler-taler",
+      "flute-beginner-one-and-two-and",
+      "flute-beginner-eighths-on-the-scale",
+      "flute-beginner-running-eighths",
+      "flute-beginner-all-my-little-ducklings",
+      "flute-beginner-rain-rain-go-away",
+      "flute-beginner-twinkle-up-high",
+      "flute-beginner-twinkle-up-high-duet",
+      "flute-beginner-let-us-be-glad-and-cheerful",
+      "flute-beginner-frere-jacques",
+      "flute-beginner-bake-bake-a-cake"
+     ]
+    },
+    {
+     "title": "Unit 6 · B flat and the key of F",
+     "items": [
+      "flute-beginner-long-tone-b-flat",
+      "flute-beginner-a-b-flat-c",
+      "flute-beginner-f-major-scale",
+      "flute-beginner-f-major-arpeggio",
+      "flute-beginner-three-in-a-bar",
+      "flute-beginner-mary-moves-to-f",
+      "flute-beginner-cuckoo",
+      "flute-beginner-cuckoo-duet",
+      "flute-beginner-lightly-row-in-f",
+      "flute-beginner-holy-god-we-praise-thy-name",
+      "flute-beginner-on-the-wall",
+      "flute-beginner-a-bird-comes-flying",
+      "flute-beginner-a-mother-had-four-children",
+      "flute-beginner-a-la-claire-fontaine",
+      "flute-beginner-oranges-and-lemons"
+     ]
+    },
+    {
+     "title": "Unit 7 · Low C and the dotted quarter",
+     "items": [
+      "flute-beginner-long-tone-low-c",
+      "flute-beginner-pinky-push-ups",
+      "flute-beginner-c-major-scale",
+      "flute-beginner-c-major-arpeggio",
+      "flute-beginner-long-short",
+      "flute-beginner-alouette",
+      "flute-beginner-michael-row-the-boat-ashore",
+      "flute-beginner-london-bridge",
+      "flute-beginner-london-bridge-duet",
+      "flute-beginner-my-bonnie-lies-over-the-ocean",
+      "flute-beginner-little-snowflake",
+      "flute-beginner-all-the-birds-are-here",
+      "flute-beginner-o-sanctissima",
+      "flute-beginner-ode-to-joy",
+      "flute-beginner-away-in-a-manger",
+      "flute-beginner-thoughts-are-free"
+     ]
+    },
+    {
+     "title": "Unit 8 · C sharp and the key of D",
+     "items": [
+      "flute-beginner-long-tone-c-sharp",
+      "flute-beginner-b-c-sharp-d",
+      "flute-beginner-d-major-scale",
+      "flute-beginner-d-major-arpeggio",
+      "flute-beginner-slur-two-tongue-two",
+      "flute-beginner-every-year-again",
+      "flute-beginner-now-thank-we-all-our-god",
+      "flute-beginner-happy-birthday-to-you",
+      "flute-beginner-amazing-grace",
+      "flute-beginner-surprise-symphony",
+      "flute-beginner-praise-to-the-lord-the-almighty",
+      "flute-beginner-auld-lang-syne",
+      "flute-beginner-o-come-all-ye-faithful",
+      "flute-beginner-o-come-little-children"
+     ]
+    },
+    {
+     "title": "Unit 9 · The top of the staff: A, B and C",
+     "items": [
+      "flute-beginner-long-tones-a-b-and-c",
+      "flute-beginner-octaves-again",
+      "flute-beginner-steps-up-high",
+      "flute-beginner-c-major-scale-two-octaves",
+      "flute-beginner-c-major-arpeggio-two-octaves",
+      "flute-beginner-skips-up-high",
+      "flute-beginner-fox-up-high",
+      "flute-beginner-frere-jacques-up-high",
+      "flute-beginner-all-the-birds-up-high",
+      "flute-beginner-o-sanctissima-up-high",
+      "flute-beginner-angels-we-have-heard-on-high",
+      "flute-beginner-hark-the-herald-angels-sing"
+     ]
+    },
+    {
+     "title": "Finale · A solo with piano",
+     "items": [
+      "flute-beginner-jupiter"
+     ]
+    },
+    {
+     "title": "Finish · Four scales",
+     "items": [
+      "flute-beginner-g-major-scale-and-arpeggio",
+      "flute-beginner-f-major-scale-and-arpeggio",
+      "flute-beginner-c-major-scale-and-arpeggio",
+      "flute-beginner-d-major-scale-and-arpeggio"
+     ]
+    }
+   ],
+   "file": {
+    "branch": "pdf",
+    "path": "flute-beginner-20261121023458.bin",
+    "name": "Flute_Beginner_Booklet.pdf",
+    "edition": "Edition 1 · November 2026",
+    "size": 3843960,
+    "iv": "d0329589d4d4e0ab28d83f6f",
+    "keys": [
+     {
+      "iv": "722a10e9ce3c25257c79ccbc",
+      "ct": "18a167b47de45a19ae29f5bad003c8dc3198e39018fb7821325f6ecd9b0be63d7aed55a7e1f0072298b6cccd4f0c7671"
+     },
+     {
+      "iv": "df232fa64a4e08f9913bc1e8",
+      "ct": "d3c1f60471c30ef8b91539115106a6b94756023ec2297a0f9e1602b67e22ad679122238a18013e5a29a1978dd1904ec5"
+     }
+    ]
+   }
+  },
+  {
+   "id": "flute-starter",
+   "title": "Free Flute Starter Pack",
+   "hash": "da48b4459d0fd2e79bdf0b3da0ca84e1aadf3f3b67d431efd224e3caa2290355",
+   "tunes": [
+    "flute-beginner-count-then-play",
+    "flute-beginner-long-tones-b-a-and-g",
+    "flute-beginner-stepping-down-stepping-up",
+    "flute-beginner-quarter-notes",
+    "flute-beginner-hot-cross-buns",
+    "flute-beginner-au-clair-de-la-lune",
+    "flute-beginner-sunrise",
+    "flute-beginner-stepping-stones",
+    "flute-beginner-echo-song",
+    "flute-beginner-three-note-march",
+    "flute-beginner-hot-cross-buns-duet",
+    "flute-beginner-long-tone-c",
+    "flute-beginner-b-to-c",
+    "flute-beginner-over-the-break",
+    "flute-beginner-five-notes-up-and-down",
+    "flute-beginner-ode-to-joy-duet",
+    "flute-beginner-mary-had-a-little-lamb",
+    "flute-beginner-buzz-buzz-buzz",
+    "flute-beginner-dansons-la-capucine",
+    "flute-beginner-lightly-row",
+    "flute-beginner-jingle-bells",
+    "flute-beginner-long-tones-f-and-e",
+    "flute-beginner-right-hand-walk",
+    "flute-beginner-left-hand-to-right-hand",
+    "flute-beginner-down-the-stairs",
+    "flute-beginner-three-beats",
+    "flute-beginner-two-ds",
+    "flute-beginner-coming-in-on-four",
+    "flute-beginner-low-tide",
+    "flute-beginner-when-the-saints-go-marching-in",
+    "flute-beginner-old-macdonald-had-a-farm",
+    "flute-beginner-old-macdonald-duet",
+    "flute-beginner-morning-bells",
+    "flute-beginner-long-tone-f-sharp",
+    "flute-beginner-f-or-f-sharp",
+    "flute-beginner-five-notes-from-d",
+    "flute-beginner-smooth-pairs",
+    "flute-beginner-f-sharp-ladder",
+    "flute-beginner-skips",
+    "flute-beginner-ode-to-joy-from-f-sharp",
+    "flute-beginner-aura-lee",
+    "flute-beginner-aura-lee-duet",
+    "flute-beginner-twinkle-twinkle-little-star",
+    "flute-beginner-twinkle-duet",
+    "flute-beginner-au-clair-de-la-lune-complete",
+    "flute-beginner-yankee-doodle",
+    "flute-beginner-all-my-clothes-are-green",
+    "flute-beginner-old-hundredth",
+    "flute-beginner-fox-you-stole-the-goose",
+    "flute-beginner-octaves",
+    "flute-beginner-long-tones-going-up",
+    "flute-beginner-crossing-to-upper-e",
+    "flute-beginner-up-the-ladder",
+    "flute-beginner-g-major-scale",
+    "flute-beginner-g-major-arpeggio",
+    "flute-beginner-taler-taler",
+    "flute-beginner-one-and-two-and",
+    "flute-beginner-eighths-on-the-scale",
+    "flute-beginner-running-eighths",
+    "flute-beginner-all-my-little-ducklings",
+    "flute-beginner-rain-rain-go-away",
+    "flute-beginner-twinkle-up-high",
+    "flute-beginner-twinkle-up-high-duet",
+    "flute-beginner-let-us-be-glad-and-cheerful",
+    "flute-beginner-frere-jacques",
+    "flute-beginner-bake-bake-a-cake",
+    "flute-beginner-long-tone-b-flat",
+    "flute-beginner-a-b-flat-c",
+    "flute-beginner-f-major-scale",
+    "flute-beginner-f-major-arpeggio",
+    "flute-beginner-three-in-a-bar",
+    "flute-beginner-mary-moves-to-f",
+    "flute-beginner-cuckoo",
+    "flute-beginner-cuckoo-duet",
+    "flute-beginner-lightly-row-in-f",
+    "flute-beginner-holy-god-we-praise-thy-name",
+    "flute-beginner-on-the-wall",
+    "flute-beginner-a-bird-comes-flying",
+    "flute-beginner-a-mother-had-four-children",
+    "flute-beginner-a-la-claire-fontaine",
+    "flute-beginner-oranges-and-lemons",
+    "flute-beginner-long-tone-low-c",
+    "flute-beginner-pinky-push-ups",
+    "flute-beginner-c-major-scale",
+    "flute-beginner-c-major-arpeggio",
+    "flute-beginner-long-short",
+    "flute-beginner-alouette",
+    "flute-beginner-michael-row-the-boat-ashore",
+    "flute-beginner-london-bridge",
+    "flute-beginner-london-bridge-duet",
+    "flute-beginner-my-bonnie-lies-over-the-ocean",
+    "flute-beginner-little-snowflake",
+    "flute-beginner-all-the-birds-are-here",
+    "flute-beginner-o-sanctissima",
+    "flute-beginner-ode-to-joy",
+    "flute-beginner-away-in-a-manger",
+    "flute-beginner-thoughts-are-free",
+    "flute-beginner-long-tone-c-sharp",
+    "flute-beginner-b-c-sharp-d",
+    "flute-beginner-d-major-scale",
+    "flute-beginner-d-major-arpeggio",
+    "flute-beginner-slur-two-tongue-two",
+    "flute-beginner-every-year-again",
+    "flute-beginner-now-thank-we-all-our-god",
+    "flute-beginner-happy-birthday-to-you",
+    "flute-beginner-amazing-grace",
+    "flute-beginner-surprise-symphony",
+    "flute-beginner-praise-to-the-lord-the-almighty",
+    "flute-beginner-auld-lang-syne",
+    "flute-beginner-o-come-all-ye-faithful",
+    "flute-beginner-o-come-little-children",
+    "flute-beginner-long-tones-a-b-and-c",
+    "flute-beginner-octaves-again",
+    "flute-beginner-steps-up-high",
+    "flute-beginner-c-major-scale-two-octaves",
+    "flute-beginner-c-major-arpeggio-two-octaves",
+    "flute-beginner-skips-up-high",
+    "flute-beginner-fox-up-high",
+    "flute-beginner-frere-jacques-up-high",
+    "flute-beginner-all-the-birds-up-high",
+    "flute-beginner-o-sanctissima-up-high",
+    "flute-beginner-angels-we-have-heard-on-high",
+    "flute-beginner-hark-the-herald-angels-sing",
+    "flute-beginner-jupiter",
+    "flute-beginner-g-major-scale-and-arpeggio",
+    "flute-beginner-f-major-scale-and-arpeggio",
+    "flute-beginner-c-major-scale-and-arpeggio",
+    "flute-beginner-d-major-scale-and-arpeggio"
+   ],
+   "contents": [
+    {
+     "title": "Unit 1 · Your first three notes",
+     "items": [
+      "flute-beginner-count-then-play",
+      "flute-beginner-long-tones-b-a-and-g",
+      "flute-beginner-stepping-down-stepping-up",
+      "flute-beginner-quarter-notes",
+      "flute-beginner-hot-cross-buns",
+      "flute-beginner-au-clair-de-la-lune",
+      "flute-beginner-sunrise",
+      "flute-beginner-stepping-stones",
+      "flute-beginner-echo-song",
+      "flute-beginner-three-note-march",
+      "flute-beginner-hot-cross-buns-duet"
+     ]
+    },
+    {
+     "title": "Unit 2 · C and D: five notes",
+     "items": [
+      "flute-beginner-long-tone-c",
+      "flute-beginner-b-to-c",
+      "flute-beginner-over-the-break",
+      "flute-beginner-five-notes-up-and-down",
+      "flute-beginner-ode-to-joy-duet",
+      "flute-beginner-mary-had-a-little-lamb",
+      "flute-beginner-buzz-buzz-buzz",
+      "flute-beginner-dansons-la-capucine",
+      "flute-beginner-lightly-row",
+      "flute-beginner-jingle-bells"
+     ]
+    },
+    {
+     "title": "Unit 3 · The right hand: F, E and D",
+     "items": [
+      "flute-beginner-long-tones-f-and-e",
+      "flute-beginner-right-hand-walk",
+      "flute-beginner-left-hand-to-right-hand",
+      "flute-beginner-down-the-stairs",
+      "flute-beginner-three-beats",
+      "flute-beginner-two-ds",
+      "flute-beginner-coming-in-on-four",
+      "flute-beginner-low-tide",
+      "flute-beginner-when-the-saints-go-marching-in",
+      "flute-beginner-old-macdonald-had-a-farm",
+      "flute-beginner-old-macdonald-duet",
+      "flute-beginner-morning-bells"
+     ]
+    },
+    {
+     "title": "Unit 4 · F sharp and the key of G",
+     "items": [
+      "flute-beginner-long-tone-f-sharp",
+      "flute-beginner-f-or-f-sharp",
+      "flute-beginner-five-notes-from-d",
+      "flute-beginner-smooth-pairs",
+      "flute-beginner-f-sharp-ladder",
+      "flute-beginner-skips",
+      "flute-beginner-ode-to-joy-from-f-sharp",
+      "flute-beginner-aura-lee",
+      "flute-beginner-aura-lee-duet",
+      "flute-beginner-twinkle-twinkle-little-star",
+      "flute-beginner-twinkle-duet",
+      "flute-beginner-au-clair-de-la-lune-complete",
+      "flute-beginner-yankee-doodle",
+      "flute-beginner-all-my-clothes-are-green",
+      "flute-beginner-old-hundredth",
+      "flute-beginner-fox-you-stole-the-goose"
+     ]
+    },
+    {
+     "title": "Unit 5 · Higher: E, F sharp and G",
+     "items": [
+      "flute-beginner-octaves",
+      "flute-beginner-long-tones-going-up",
+      "flute-beginner-crossing-to-upper-e",
+      "flute-beginner-up-the-ladder",
+      "flute-beginner-g-major-scale",
+      "flute-beginner-g-major-arpeggio",
+      "flute-beginner-taler-taler",
+      "flute-beginner-one-and-two-and",
+      "flute-beginner-eighths-on-the-scale",
+      "flute-beginner-running-eighths",
+      "flute-beginner-all-my-little-ducklings",
+      "flute-beginner-rain-rain-go-away",
+      "flute-beginner-twinkle-up-high",
+      "flute-beginner-twinkle-up-high-duet",
+      "flute-beginner-let-us-be-glad-and-cheerful",
+      "flute-beginner-frere-jacques",
+      "flute-beginner-bake-bake-a-cake"
+     ]
+    },
+    {
+     "title": "Unit 6 · B flat and the key of F",
+     "items": [
+      "flute-beginner-long-tone-b-flat",
+      "flute-beginner-a-b-flat-c",
+      "flute-beginner-f-major-scale",
+      "flute-beginner-f-major-arpeggio",
+      "flute-beginner-three-in-a-bar",
+      "flute-beginner-mary-moves-to-f",
+      "flute-beginner-cuckoo",
+      "flute-beginner-cuckoo-duet",
+      "flute-beginner-lightly-row-in-f",
+      "flute-beginner-holy-god-we-praise-thy-name",
+      "flute-beginner-on-the-wall",
+      "flute-beginner-a-bird-comes-flying",
+      "flute-beginner-a-mother-had-four-children",
+      "flute-beginner-a-la-claire-fontaine",
+      "flute-beginner-oranges-and-lemons"
+     ]
+    },
+    {
+     "title": "Unit 7 · Low C and the dotted quarter",
+     "items": [
+      "flute-beginner-long-tone-low-c",
+      "flute-beginner-pinky-push-ups",
+      "flute-beginner-c-major-scale",
+      "flute-beginner-c-major-arpeggio",
+      "flute-beginner-long-short",
+      "flute-beginner-alouette",
+      "flute-beginner-michael-row-the-boat-ashore",
+      "flute-beginner-london-bridge",
+      "flute-beginner-london-bridge-duet",
+      "flute-beginner-my-bonnie-lies-over-the-ocean",
+      "flute-beginner-little-snowflake",
+      "flute-beginner-all-the-birds-are-here",
+      "flute-beginner-o-sanctissima",
+      "flute-beginner-ode-to-joy",
+      "flute-beginner-away-in-a-manger",
+      "flute-beginner-thoughts-are-free"
+     ]
+    },
+    {
+     "title": "Unit 8 · C sharp and the key of D",
+     "items": [
+      "flute-beginner-long-tone-c-sharp",
+      "flute-beginner-b-c-sharp-d",
+      "flute-beginner-d-major-scale",
+      "flute-beginner-d-major-arpeggio",
+      "flute-beginner-slur-two-tongue-two",
+      "flute-beginner-every-year-again",
+      "flute-beginner-now-thank-we-all-our-god",
+      "flute-beginner-happy-birthday-to-you",
+      "flute-beginner-amazing-grace",
+      "flute-beginner-surprise-symphony",
+      "flute-beginner-praise-to-the-lord-the-almighty",
+      "flute-beginner-auld-lang-syne",
+      "flute-beginner-o-come-all-ye-faithful",
+      "flute-beginner-o-come-little-children"
+     ]
+    },
+    {
+     "title": "Unit 9 · The top of the staff: A, B and C",
+     "items": [
+      "flute-beginner-long-tones-a-b-and-c",
+      "flute-beginner-octaves-again",
+      "flute-beginner-steps-up-high",
+      "flute-beginner-c-major-scale-two-octaves",
+      "flute-beginner-c-major-arpeggio-two-octaves",
+      "flute-beginner-skips-up-high",
+      "flute-beginner-fox-up-high",
+      "flute-beginner-frere-jacques-up-high",
+      "flute-beginner-all-the-birds-up-high",
+      "flute-beginner-o-sanctissima-up-high",
+      "flute-beginner-angels-we-have-heard-on-high",
+      "flute-beginner-hark-the-herald-angels-sing"
+     ]
+    },
+    {
+     "title": "Finale · A solo with piano",
+     "items": [
+      "flute-beginner-jupiter"
+     ]
+    },
+    {
+     "title": "Finish · Four scales",
+     "items": [
+      "flute-beginner-g-major-scale-and-arpeggio",
+      "flute-beginner-f-major-scale-and-arpeggio",
+      "flute-beginner-c-major-scale-and-arpeggio",
+      "flute-beginner-d-major-scale-and-arpeggio"
+     ]
+    }
+   ],
+   "file": {
+    "branch": "pdf",
+    "path": "flute-starter-20261121023517.bin",
+    "name": "Flute_Starter_Pack.pdf",
+    "edition": "Edition 1 · November 2026",
+    "size": 3905246,
+    "iv": "12a1626875b8c5e4ce5084d3",
+    "keys": [
+     {
+      "iv": "9e1626fc4cf987b86c44439c",
+      "ct": "0e020d38b6c02a4ceb73e50fb7862d1cfde41cf626acc4899408f9591b3cdfe321aac6b770896632c90328ab36ee022e"
+     },
+     {
+      "iv": "e65389af291d5f14a24a793a",
+      "ct": "6435acc005e42b15910772c8e60e648d012d71b5d048d605f25e8e68483652b2efd9e800d9eb6482b7c75faab0e87da8"
+     }
+    ]
+   }
+  },
+  {
    "id": "demo",
    "title": "Free demo",
    "free": true,
@@ -3016,6 +3692,518 @@
   "sax-beginner-tenor-hark-the-herald-angels-sing": {
    "title": "123 · Hark! The Herald Angels Sing",
    "subtitle": "Saxophone Beginner Booklet · Unit 9 · The top of the staff: A, B and C"
+  },
+  "flute-beginner-count-then-play": {
+   "title": "1 · Count, then play",
+   "subtitle": "Flute Beginner Booklet · Unit 1 · Your first three notes"
+  },
+  "flute-beginner-long-tones-b-a-and-g": {
+   "title": "2 · Long tones: B, A and G",
+   "subtitle": "Flute Beginner Booklet · Unit 1 · Your first three notes"
+  },
+  "flute-beginner-stepping-down-stepping-up": {
+   "title": "3 · Stepping down, stepping up",
+   "subtitle": "Flute Beginner Booklet · Unit 1 · Your first three notes"
+  },
+  "flute-beginner-quarter-notes": {
+   "title": "4 · Quarter notes",
+   "subtitle": "Flute Beginner Booklet · Unit 1 · Your first three notes"
+  },
+  "flute-beginner-hot-cross-buns": {
+   "title": "5 · Hot Cross Buns",
+   "subtitle": "Flute Beginner Booklet · Unit 1 · Your first three notes"
+  },
+  "flute-beginner-au-clair-de-la-lune": {
+   "title": "6 · Au Clair de la Lune",
+   "subtitle": "Flute Beginner Booklet · Unit 1 · Your first three notes"
+  },
+  "flute-beginner-sunrise": {
+   "title": "7 · Sunrise",
+   "subtitle": "Flute Beginner Booklet · Unit 1 · Your first three notes"
+  },
+  "flute-beginner-stepping-stones": {
+   "title": "8 · Stepping Stones",
+   "subtitle": "Flute Beginner Booklet · Unit 1 · Your first three notes"
+  },
+  "flute-beginner-echo-song": {
+   "title": "9 · Echo Song",
+   "subtitle": "Flute Beginner Booklet · Unit 1 · Your first three notes"
+  },
+  "flute-beginner-three-note-march": {
+   "title": "10 · Three-Note March",
+   "subtitle": "Flute Beginner Booklet · Unit 1 · Your first three notes"
+  },
+  "flute-beginner-hot-cross-buns-duet": {
+   "title": "11 · Hot Cross Buns duet",
+   "subtitle": "Flute Beginner Booklet · Unit 1 · Your first three notes"
+  },
+  "flute-beginner-long-tone-c": {
+   "title": "12 · Long tones: C and D",
+   "subtitle": "Flute Beginner Booklet · Unit 2 · C and D: five notes"
+  },
+  "flute-beginner-b-to-c": {
+   "title": "13 · B to C",
+   "subtitle": "Flute Beginner Booklet · Unit 2 · C and D: five notes"
+  },
+  "flute-beginner-over-the-break": {
+   "title": "14 · Over the break",
+   "subtitle": "Flute Beginner Booklet · Unit 2 · C and D: five notes"
+  },
+  "flute-beginner-five-notes-up-and-down": {
+   "title": "15 · Five notes up and down",
+   "subtitle": "Flute Beginner Booklet · Unit 2 · C and D: five notes"
+  },
+  "flute-beginner-ode-to-joy-duet": {
+   "title": "16 · Ode to Joy duet",
+   "subtitle": "Flute Beginner Booklet · Unit 2 · C and D: five notes"
+  },
+  "flute-beginner-mary-had-a-little-lamb": {
+   "title": "17 · Mary Had a Little Lamb",
+   "subtitle": "Flute Beginner Booklet · Unit 2 · C and D: five notes"
+  },
+  "flute-beginner-buzz-buzz-buzz": {
+   "title": "18 · Buzz, Buzz, Buzz",
+   "subtitle": "Flute Beginner Booklet · Unit 2 · C and D: five notes"
+  },
+  "flute-beginner-dansons-la-capucine": {
+   "title": "19 · Dansons la Capucine",
+   "subtitle": "Flute Beginner Booklet · Unit 2 · C and D: five notes"
+  },
+  "flute-beginner-lightly-row": {
+   "title": "20 · Lightly Row",
+   "subtitle": "Flute Beginner Booklet · Unit 2 · C and D: five notes"
+  },
+  "flute-beginner-jingle-bells": {
+   "title": "21 · Jingle Bells",
+   "subtitle": "Flute Beginner Booklet · Unit 2 · C and D: five notes"
+  },
+  "flute-beginner-long-tones-f-and-e": {
+   "title": "22 · Long tones: F, E and low D",
+   "subtitle": "Flute Beginner Booklet · Unit 3 · The right hand: F, E and D"
+  },
+  "flute-beginner-right-hand-walk": {
+   "title": "23 · Right-hand walk",
+   "subtitle": "Flute Beginner Booklet · Unit 3 · The right hand: F, E and D"
+  },
+  "flute-beginner-left-hand-to-right-hand": {
+   "title": "24 · Left hand to right hand",
+   "subtitle": "Flute Beginner Booklet · Unit 3 · The right hand: F, E and D"
+  },
+  "flute-beginner-down-the-stairs": {
+   "title": "25 · Down the stairs",
+   "subtitle": "Flute Beginner Booklet · Unit 3 · The right hand: F, E and D"
+  },
+  "flute-beginner-three-beats": {
+   "title": "26 · Three beats",
+   "subtitle": "Flute Beginner Booklet · Unit 3 · The right hand: F, E and D"
+  },
+  "flute-beginner-two-ds": {
+   "title": "27 · Two Ds",
+   "subtitle": "Flute Beginner Booklet · Unit 3 · The right hand: F, E and D"
+  },
+  "flute-beginner-coming-in-on-four": {
+   "title": "28 · Coming in on four",
+   "subtitle": "Flute Beginner Booklet · Unit 3 · The right hand: F, E and D"
+  },
+  "flute-beginner-low-tide": {
+   "title": "29 · Low Tide",
+   "subtitle": "Flute Beginner Booklet · Unit 3 · The right hand: F, E and D"
+  },
+  "flute-beginner-when-the-saints-go-marching-in": {
+   "title": "30 · When the Saints Go Marching In",
+   "subtitle": "Flute Beginner Booklet · Unit 3 · The right hand: F, E and D"
+  },
+  "flute-beginner-old-macdonald-had-a-farm": {
+   "title": "31 · Old MacDonald Had a Farm",
+   "subtitle": "Flute Beginner Booklet · Unit 3 · The right hand: F, E and D"
+  },
+  "flute-beginner-old-macdonald-duet": {
+   "title": "32 · Old MacDonald duet",
+   "subtitle": "Flute Beginner Booklet · Unit 3 · The right hand: F, E and D"
+  },
+  "flute-beginner-morning-bells": {
+   "title": "33 · Morning Bells",
+   "subtitle": "Flute Beginner Booklet · Unit 3 · The right hand: F, E and D"
+  },
+  "flute-beginner-long-tone-f-sharp": {
+   "title": "34 · Long tone: F sharp",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-f-or-f-sharp": {
+   "title": "35 · F or F sharp?",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-five-notes-from-d": {
+   "title": "36 · Five notes from D",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-smooth-pairs": {
+   "title": "37 · Smooth pairs",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-f-sharp-ladder": {
+   "title": "38 · F sharp ladder",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-skips": {
+   "title": "39 · Skips",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-ode-to-joy-from-f-sharp": {
+   "title": "40 · Ode to Joy, from F sharp",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-aura-lee": {
+   "title": "41 · Aura Lee",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-aura-lee-duet": {
+   "title": "42 · Aura Lee duet",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-twinkle-twinkle-little-star": {
+   "title": "43 · Twinkle, Twinkle, Little Star",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-twinkle-duet": {
+   "title": "44 · Twinkle duet",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-au-clair-de-la-lune-complete": {
+   "title": "45 · Au Clair de la Lune (complete)",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-yankee-doodle": {
+   "title": "46 · Yankee Doodle",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-all-my-clothes-are-green": {
+   "title": "47 · All My Clothes Are Green",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-old-hundredth": {
+   "title": "48 · Old Hundredth",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-fox-you-stole-the-goose": {
+   "title": "49 · Fox, You Stole the Goose",
+   "subtitle": "Flute Beginner Booklet · Unit 4 · F sharp and the key of G"
+  },
+  "flute-beginner-octaves": {
+   "title": "50 · Octaves",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-long-tones-going-up": {
+   "title": "51 · Long tones going up",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-crossing-to-upper-e": {
+   "title": "52 · Crossing to upper E",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-up-the-ladder": {
+   "title": "53 · Up the ladder",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-g-major-scale": {
+   "title": "54 · G major scale",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-g-major-arpeggio": {
+   "title": "55 · G major arpeggio",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-taler-taler": {
+   "title": "56 · Taler, Taler",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-one-and-two-and": {
+   "title": "57 · One and two and",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-eighths-on-the-scale": {
+   "title": "58 · Eighths on the scale",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-running-eighths": {
+   "title": "59 · Running eighths",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-all-my-little-ducklings": {
+   "title": "60 · All My Little Ducklings",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-rain-rain-go-away": {
+   "title": "61 · Rain, Rain, Go Away",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-twinkle-up-high": {
+   "title": "62 · Twinkle, up high",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-twinkle-up-high-duet": {
+   "title": "63 · Twinkle, up high duet",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-let-us-be-glad-and-cheerful": {
+   "title": "64 · Let Us Be Glad and Cheerful",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-frere-jacques": {
+   "title": "65 · Frère Jacques",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-bake-bake-a-cake": {
+   "title": "66 · Bake, Bake a Cake",
+   "subtitle": "Flute Beginner Booklet · Unit 5 · Higher: E, F sharp and G"
+  },
+  "flute-beginner-long-tone-b-flat": {
+   "title": "67 · Long tones: B flat and upper F",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-a-b-flat-c": {
+   "title": "68 · A, B flat, C",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-f-major-scale": {
+   "title": "69 · F major scale",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-f-major-arpeggio": {
+   "title": "70 · F major arpeggio",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-three-in-a-bar": {
+   "title": "71 · Three in a bar",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-mary-moves-to-f": {
+   "title": "72 · Mary Moves to F",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-cuckoo": {
+   "title": "73 · Cuckoo",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-cuckoo-duet": {
+   "title": "74 · Cuckoo duet",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-lightly-row-in-f": {
+   "title": "75 · Lightly Row in F",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-holy-god-we-praise-thy-name": {
+   "title": "76 · Holy God, We Praise Thy Name",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-on-the-wall": {
+   "title": "77 · On the Wall",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-a-bird-comes-flying": {
+   "title": "78 · A Bird Comes Flying",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-a-mother-had-four-children": {
+   "title": "79 · A Mother Had Four Children",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-a-la-claire-fontaine": {
+   "title": "80 · À la Claire Fontaine",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-oranges-and-lemons": {
+   "title": "81 · Oranges and Lemons",
+   "subtitle": "Flute Beginner Booklet · Unit 6 · B flat and the key of F"
+  },
+  "flute-beginner-long-tone-low-c": {
+   "title": "82 · Long tone: low C",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-pinky-push-ups": {
+   "title": "83 · Pinky push-ups",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-c-major-scale": {
+   "title": "84 · C major scale",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-c-major-arpeggio": {
+   "title": "85 · C major arpeggio",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-long-short": {
+   "title": "86 · Long, short",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-alouette": {
+   "title": "87 · Alouette",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-michael-row-the-boat-ashore": {
+   "title": "88 · Michael, Row the Boat Ashore",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-london-bridge": {
+   "title": "89 · London Bridge",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-london-bridge-duet": {
+   "title": "90 · London Bridge duet",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-my-bonnie-lies-over-the-ocean": {
+   "title": "91 · My Bonnie Lies over the Ocean",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-little-snowflake": {
+   "title": "92 · Little Snowflake",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-all-the-birds-are-here": {
+   "title": "93 · All the Birds Are Here",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-o-sanctissima": {
+   "title": "94 · O Sanctissima",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-ode-to-joy": {
+   "title": "95 · Ode to Joy",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-away-in-a-manger": {
+   "title": "96 · Away in a Manger",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-thoughts-are-free": {
+   "title": "97 · Thoughts Are Free",
+   "subtitle": "Flute Beginner Booklet · Unit 7 · Low C and the dotted quarter"
+  },
+  "flute-beginner-long-tone-c-sharp": {
+   "title": "98 · Long tone: C sharp",
+   "subtitle": "Flute Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "flute-beginner-b-c-sharp-d": {
+   "title": "99 · B, C sharp, D",
+   "subtitle": "Flute Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "flute-beginner-d-major-scale": {
+   "title": "100 · D major scale",
+   "subtitle": "Flute Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "flute-beginner-d-major-arpeggio": {
+   "title": "101 · D major arpeggio",
+   "subtitle": "Flute Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "flute-beginner-slur-two-tongue-two": {
+   "title": "102 · Slur two, tongue two",
+   "subtitle": "Flute Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "flute-beginner-every-year-again": {
+   "title": "103 · Every Year Again",
+   "subtitle": "Flute Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "flute-beginner-now-thank-we-all-our-god": {
+   "title": "104 · Now Thank We All Our God",
+   "subtitle": "Flute Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "flute-beginner-happy-birthday-to-you": {
+   "title": "105 · Happy Birthday to You",
+   "subtitle": "Flute Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "flute-beginner-amazing-grace": {
+   "title": "106 · Amazing Grace",
+   "subtitle": "Flute Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "flute-beginner-surprise-symphony": {
+   "title": "107 · Surprise Symphony",
+   "subtitle": "Flute Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "flute-beginner-praise-to-the-lord-the-almighty": {
+   "title": "108 · Praise to the Lord, the Almighty",
+   "subtitle": "Flute Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "flute-beginner-auld-lang-syne": {
+   "title": "109 · Auld Lang Syne",
+   "subtitle": "Flute Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "flute-beginner-o-come-all-ye-faithful": {
+   "title": "110 · O Come, All Ye Faithful",
+   "subtitle": "Flute Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "flute-beginner-o-come-little-children": {
+   "title": "111 · O Come, Little Children",
+   "subtitle": "Flute Beginner Booklet · Unit 8 · C sharp and the key of D"
+  },
+  "flute-beginner-long-tones-a-b-and-c": {
+   "title": "112 · Long tones: A, B and C",
+   "subtitle": "Flute Beginner Booklet · Unit 9 · The top of the staff: A, B and C"
+  },
+  "flute-beginner-octaves-again": {
+   "title": "113 · Octaves again",
+   "subtitle": "Flute Beginner Booklet · Unit 9 · The top of the staff: A, B and C"
+  },
+  "flute-beginner-steps-up-high": {
+   "title": "114 · Steps up high",
+   "subtitle": "Flute Beginner Booklet · Unit 9 · The top of the staff: A, B and C"
+  },
+  "flute-beginner-c-major-scale-two-octaves": {
+   "title": "115 · C major scale, two octaves",
+   "subtitle": "Flute Beginner Booklet · Unit 9 · The top of the staff: A, B and C"
+  },
+  "flute-beginner-c-major-arpeggio-two-octaves": {
+   "title": "116 · C major arpeggio, two octaves",
+   "subtitle": "Flute Beginner Booklet · Unit 9 · The top of the staff: A, B and C"
+  },
+  "flute-beginner-skips-up-high": {
+   "title": "117 · Skips up high",
+   "subtitle": "Flute Beginner Booklet · Unit 9 · The top of the staff: A, B and C"
+  },
+  "flute-beginner-fox-up-high": {
+   "title": "118 · Fox, up high",
+   "subtitle": "Flute Beginner Booklet · Unit 9 · The top of the staff: A, B and C"
+  },
+  "flute-beginner-frere-jacques-up-high": {
+   "title": "119 · Frère Jacques, up high",
+   "subtitle": "Flute Beginner Booklet · Unit 9 · The top of the staff: A, B and C"
+  },
+  "flute-beginner-all-the-birds-up-high": {
+   "title": "120 · All the Birds, up high",
+   "subtitle": "Flute Beginner Booklet · Unit 9 · The top of the staff: A, B and C"
+  },
+  "flute-beginner-o-sanctissima-up-high": {
+   "title": "121 · O Sanctissima, up high",
+   "subtitle": "Flute Beginner Booklet · Unit 9 · The top of the staff: A, B and C"
+  },
+  "flute-beginner-angels-we-have-heard-on-high": {
+   "title": "122 · Angels We Have Heard on High",
+   "subtitle": "Flute Beginner Booklet · Unit 9 · The top of the staff: A, B and C"
+  },
+  "flute-beginner-hark-the-herald-angels-sing": {
+   "title": "123 · Hark! The Herald Angels Sing",
+   "subtitle": "Flute Beginner Booklet · Unit 9 · The top of the staff: A, B and C"
+  },
+  "flute-beginner-jupiter": {
+   "title": "124 · Jupiter",
+   "subtitle": "Flute Beginner Booklet · Finale · A solo with piano"
+  },
+  "flute-beginner-g-major-scale-and-arpeggio": {
+   "title": "125 · G major scale and arpeggio",
+   "subtitle": "Flute Beginner Booklet · Finish · Four scales"
+  },
+  "flute-beginner-f-major-scale-and-arpeggio": {
+   "title": "126 · F major scale and arpeggio",
+   "subtitle": "Flute Beginner Booklet · Finish · Four scales"
+  },
+  "flute-beginner-c-major-scale-and-arpeggio": {
+   "title": "127 · C major scale and arpeggio",
+   "subtitle": "Flute Beginner Booklet · Finish · Four scales"
+  },
+  "flute-beginner-d-major-scale-and-arpeggio": {
+   "title": "128 · D major scale and arpeggio",
+   "subtitle": "Flute Beginner Booklet · Finish · Four scales"
   }
  }
 }

@@ -17,7 +17,7 @@
 
    The microphone is a sound file: saxophone-like tones are generated here and fed to the browser as a fake microphone.
 
-   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|learn|cloud|contents|pdf|bar|style|apply|piano|install|demo]
+   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|flute|learn|cloud|contents|pdf|bar|style|apply|piano|install|demo]
    Needs:  playwright, plus the tone and abcjs packages (tools/node_modules or $AAM_NODE_MODULES). Nothing is fetched from the internet. */
 const fs = require("fs"), path = require("path"), os = require("os");
 const { chromium, devices } = require("playwright");
@@ -83,6 +83,15 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     expect(/^Flat/.test(word) && cents >= 15 && cents <= 25, "tuner: 20 cents flat is shown as flat by 15 to 25 (got \"" + word + "\")");
     expect(await page.evaluate(() => document.querySelectorAll('[data-r="t-fing"] .fg-k.on').length) === 2, "tuner: shows the fingering of the note being played (written A: two keys down)");
     expect(/ready/.test(msg), "tuner: the microphone check finishes (\"" + msg.slice(0, 40) + "\")");
+  });
+
+  if (want("flute")) await withMic(wav("flute", [sil(2.4), tone(69, 7), sil(1)]), {}, async page => {      // a flute booklet line: the flute's own fingering chart, read at concert pitch
+    await page.goto(URL_OF("flute-beginner-hot-cross-buns")); await page.waitForTimeout(1500);
+    expect(/Flute/.test(await page.evaluate(() => (document.querySelector(".who") || document.querySelector('[data-r="who"]') || document.body).textContent)), "flute: the page says it is a flute tune");
+    await page.click('[data-r="tuner-btn"]'); await page.waitForTimeout(6500);
+    const note = await txt(page, "t-note"), fg = await page.evaluate(() => ({ on: document.querySelectorAll('[data-r="t-fing"] .fg-k.on').length, all: document.querySelectorAll('[data-r="t-fing"] .fg-k').length }));
+    expect(note === "A", "flute: a piano A reads as A (got " + note + ")");
+    expect(fg.all === 12 && fg.on === 4, "flute: the tuner shows the flute fingering for A: thumb, two fingers and the right pinky (" + JSON.stringify(fg) + ")");
   });
 
   if (want("learn")) {
