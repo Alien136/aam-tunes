@@ -381,3 +381,19 @@ Everything needed to carry on from any conversation is in this repository and in
 - Scales are one octave and a bit, as in the saxophone book. Two-octave scales to high G are not in this edition.
 - **Needs Alex:** check the third-octave fingerings (page 27) and say whether an intermediate flute student should have
   two-octave scales in this book.
+
+## 2026-11-21 · Three alto studies for a student preparing ABRSM Grade 3 Jazz
+- Cold Duck Time (`cold-duck-time-alto`), Mercy, Mercy, Mercy (`mercy-mercy-mercy-alto`) and Autumn Leaves
+  (`autumn-leaves-alto`): chord and scale studies with licks, each its own PDF, code and tune. Codes in
+  `tools/out/beginner_codes.json` and the project doc "ABRSM Grade 3 Jazz studies - codes".
+- **Built from the standard changes, not from the ABRSM book** (Alex did not have the pages to hand): Cold Duck Time in concert
+  F (12 bars: F7 Bb7 x4, Dbmaj7, Ebmaj7, F7, F7), Mercy in concert B flat (20 bars; the plain B flat and E flat chords in bars 9
+  and 11 are written as 6 chords, F7sus as F7), Autumn Leaves in concert G minor. The ABRSM arrangements may be in other keys
+  with shorter solo sections: rebuild from the book's pages when Alex sends them. "Going Home" (arr. Pete Churchill) is not
+  built: the chart is needed.
+- `gen_study.py`: new spec key `licks_title` (default "ii-V-I Licks") for tunes with no ii-V-I; these two use "Soul Licks" with
+  `voice_leading: false`.
+- The two soul tunes carry `"band": "bossa"` in their tune files so the band plays even eighth notes. The player has no soul or
+  funk style yet: a good next band style.
+- Recordings: only one recording of Cold Duck Time itself could be verified (Swiss Movement); its other four are alto players
+  in the same style, and the page says so.

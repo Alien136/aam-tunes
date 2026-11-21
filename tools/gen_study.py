@@ -465,7 +465,7 @@ def build_licks(spec, bars, arp_c, sc_c, chord_ly, music, lines, marked, steps, 
     acc = "\\accidentalStyle Score.piano" if piano else "\\accidentalStyle Score.modern"
     common = f"\\clef treble \\key {key_ly} \\time 4/4 {acc}"
     s4_size = spec.get("s4_staff_size") or 17
-    out = ["\\pageBreak", section(nums[0], "ii–V–I Licks", spec.get("licks_intro", ""))]
+    out = ["\\pageBreak", section(nums[0], spec.get("licks_title", "ii–V–I Licks"), spec.get("licks_intro", ""))]
     if spec.get("voice_leading", True):   # how a ii-V-I connects: 7 -> 3 and 3 -> 1, shown on the home key's ii-V-I
         rows_vl = [("How the changes connect:", "every chord has two guide tones, its 3rd and 7th."),
                    ("7 → 3:", "the 7th of each chord falls a step to the 3rd of the next."),

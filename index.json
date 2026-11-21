@@ -2467,6 +2467,30 @@
      }
     ]
    }
+  },
+  {
+   "id": "cold-duck-time-alto",
+   "title": "Cold Duck Time · Alto Sax",
+   "hash": "e1d6c248a9235951daa7df8fe41e3e62112d9eb833748f74e7472e96a14361b7",
+   "tunes": [
+    "cold-duck-time-alto"
+   ]
+  },
+  {
+   "id": "mercy-mercy-mercy-alto",
+   "title": "Mercy, Mercy, Mercy · Alto Sax",
+   "hash": "bfae368878976d38de6c99ddd373ab033e3ce84ecf1355e6bfb2bfecde012ed1",
+   "tunes": [
+    "mercy-mercy-mercy-alto"
+   ]
+  },
+  {
+   "id": "autumn-leaves-alto",
+   "title": "Autumn Leaves · Alto Sax",
+   "hash": "1f17b78a120464a044ae6cd5af012aa7ff12f95ff1b2ea5973a85d5c739ecf91",
+   "tunes": [
+    "autumn-leaves-alto"
+   ]
   }
  ],
  "tunes": {
@@ -4397,6 +4421,18 @@
   "flute-welcome-lick-1-keys": {
    "title": "Transposing a Lick · Lick 1 through the keys",
    "subtitle": "Flute Welcome Booklet · Part 7 · ii–V–I Licks"
+  },
+  "cold-duck-time-alto": {
+   "title": "Cold Duck Time",
+   "subtitle": "12 bars · Alto Sax · arpeggios, scales, licks"
+  },
+  "mercy-mercy-mercy-alto": {
+   "title": "Mercy, Mercy, Mercy",
+   "subtitle": "20 bars · Alto Sax · arpeggios, scales, licks"
+  },
+  "autumn-leaves-alto": {
+   "title": "Autumn Leaves",
+   "subtitle": "32 bars · Alto Sax · arpeggios, scales, licks"
   }
  }
 }
