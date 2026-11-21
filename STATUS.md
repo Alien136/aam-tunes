@@ -429,3 +429,13 @@ Everything needed to carry on from any conversation is in this repository and in
   the test copy only. The iPad fix is still unconfirmed on a real device: it is on the Needs Alex list.
 - Decided by Alex the same day: the Flute Welcome Booklet gets two-octave scales (welcome books are intermediate books). The
   ABRSM pages for the other three studies are tabled (he does not have the books). MailerLite waits for a computer.
+
+## 2026-11-21 · Flute Welcome Booklet, edition 2: two-octave scales
+- Alex: "the welcome book for flute should get two octave scales: welcome books are intermediate books".
+- Two new pages after the harmonic minor scales (pages 11 and 12; the book is now 29 pages): Two-Octave Major Scales and
+  Two-Octave Harmonic Minor Scales, chromatic order. `pat_two_oct` in `build_book.py`: two octaves up and back where the key
+  fits under high G (C to G); from A flat to B the scale climbs to the highest note of the key below high G and returns to
+  the root. `HIGH` = 91 on flute. Only the flute edition prints them (`if FLUTE` in `main`).
+- Player: 24 new exercises, one per key (`flute-welcome-2oct-major-c` ... `-minor-b`), because each key has its own length.
+  `page_map()` in `book_player.py` has its own flute numbering; the other 20 exercises kept their slugs.
+- The saxophone Welcome Booklet is unchanged (alto compared page by page).

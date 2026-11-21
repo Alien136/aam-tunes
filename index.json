@@ -2382,6 +2382,30 @@
    ]
   },
   {
+   "id": "cold-duck-time-alto",
+   "title": "Cold Duck Time · Alto Sax",
+   "hash": "e1d6c248a9235951daa7df8fe41e3e62112d9eb833748f74e7472e96a14361b7",
+   "tunes": [
+    "cold-duck-time-alto"
+   ]
+  },
+  {
+   "id": "mercy-mercy-mercy-alto",
+   "title": "Mercy, Mercy, Mercy · Alto Sax",
+   "hash": "bfae368878976d38de6c99ddd373ab033e3ce84ecf1355e6bfb2bfecde012ed1",
+   "tunes": [
+    "mercy-mercy-mercy-alto"
+   ]
+  },
+  {
+   "id": "autumn-leaves-alto",
+   "title": "Autumn Leaves · Alto Sax",
+   "hash": "1f17b78a120464a044ae6cd5af012aa7ff12f95ff1b2ea5973a85d5c739ecf91",
+   "tunes": [
+    "autumn-leaves-alto"
+   ]
+  },
+  {
    "id": "flute-welcome",
    "title": "Flute Welcome Booklet",
    "hash": "3813ae36b9684c78f7e1c9fa9d139ef1370eedcbdc63b21dc81add9113260d3e",
@@ -2393,6 +2417,30 @@
     "flute-welcome-major-4ths",
     "flute-welcome-minor-chr",
     "flute-welcome-minor-4ths",
+    "flute-welcome-2oct-major-c",
+    "flute-welcome-2oct-major-d-flat",
+    "flute-welcome-2oct-major-d",
+    "flute-welcome-2oct-major-e-flat",
+    "flute-welcome-2oct-major-e",
+    "flute-welcome-2oct-major-f",
+    "flute-welcome-2oct-major-f-sharp",
+    "flute-welcome-2oct-major-g",
+    "flute-welcome-2oct-major-a-flat",
+    "flute-welcome-2oct-major-a",
+    "flute-welcome-2oct-major-b-flat",
+    "flute-welcome-2oct-major-b",
+    "flute-welcome-2oct-minor-c",
+    "flute-welcome-2oct-minor-c-sharp",
+    "flute-welcome-2oct-minor-d",
+    "flute-welcome-2oct-minor-e-flat",
+    "flute-welcome-2oct-minor-e",
+    "flute-welcome-2oct-minor-f",
+    "flute-welcome-2oct-minor-f-sharp",
+    "flute-welcome-2oct-minor-g",
+    "flute-welcome-2oct-minor-g-sharp",
+    "flute-welcome-2oct-minor-a",
+    "flute-welcome-2oct-minor-b-flat",
+    "flute-welcome-2oct-minor-b",
     "flute-welcome-thirds-major-chr",
     "flute-welcome-thirds-major-4ths",
     "flute-welcome-thirds-minor-chr",
@@ -2429,6 +2477,35 @@
       "flute-welcome-major-4ths",
       "flute-welcome-minor-chr",
       "flute-welcome-minor-4ths"
+     ]
+    },
+    {
+     "title": "Part 3 · Two-Octave Scales",
+     "items": [
+      "flute-welcome-2oct-major-c",
+      "flute-welcome-2oct-major-d-flat",
+      "flute-welcome-2oct-major-d",
+      "flute-welcome-2oct-major-e-flat",
+      "flute-welcome-2oct-major-e",
+      "flute-welcome-2oct-major-f",
+      "flute-welcome-2oct-major-f-sharp",
+      "flute-welcome-2oct-major-g",
+      "flute-welcome-2oct-major-a-flat",
+      "flute-welcome-2oct-major-a",
+      "flute-welcome-2oct-major-b-flat",
+      "flute-welcome-2oct-major-b",
+      "flute-welcome-2oct-minor-c",
+      "flute-welcome-2oct-minor-c-sharp",
+      "flute-welcome-2oct-minor-d",
+      "flute-welcome-2oct-minor-e-flat",
+      "flute-welcome-2oct-minor-e",
+      "flute-welcome-2oct-minor-f",
+      "flute-welcome-2oct-minor-f-sharp",
+      "flute-welcome-2oct-minor-g",
+      "flute-welcome-2oct-minor-g-sharp",
+      "flute-welcome-2oct-minor-a",
+      "flute-welcome-2oct-minor-b-flat",
+      "flute-welcome-2oct-minor-b"
      ]
     },
     {
@@ -2473,46 +2550,22 @@
    ],
    "file": {
     "branch": "pdf",
-    "path": "flute-welcome-20261121030707.bin",
+    "path": "flute-welcome-20261121045909.bin",
     "name": "Flute_Welcome_Booklet.pdf",
-    "edition": "Edition 1 · November 2026",
-    "size": 5089196,
-    "iv": "192f7bb1223c59b086f866b2",
+    "edition": "Edition 2 · November 2026",
+    "size": 5680887,
+    "iv": "6342820d79b5909b601a89b6",
     "keys": [
      {
-      "iv": "326bf65e50a961b7c3bc0b71",
-      "ct": "72b258861020f5da05f0dfde562ccafee6c6cf04fef45d8825520435ec4183560ea54e677e40efd3f14d64c596ec5b15"
+      "iv": "31d310d1e18fb35dff1328a4",
+      "ct": "7d281ede415187c625f2221e0542688af180a3197667f3a64055fc263ece97d99cf14d92a20f4bf5026463625d1c50d1"
      },
      {
-      "iv": "4cf6537989ca70a9261a85ae",
-      "ct": "a1995db52b8652dea0903552f2e3b0977652151c12c311fc0c1ca6c72af85069059d99af490a4e237ca0bb3a2c2e449b"
+      "iv": "e52070e8bb31d51dbfdb9d6d",
+      "ct": "8880cb2aceaab7b8e802995c6064baa26d69fbac81f1bd9ddb8cbe6236521f4736147334189369a23d69c76ad3659e78"
      }
     ]
    }
-  },
-  {
-   "id": "cold-duck-time-alto",
-   "title": "Cold Duck Time · Alto Sax",
-   "hash": "e1d6c248a9235951daa7df8fe41e3e62112d9eb833748f74e7472e96a14361b7",
-   "tunes": [
-    "cold-duck-time-alto"
-   ]
-  },
-  {
-   "id": "mercy-mercy-mercy-alto",
-   "title": "Mercy, Mercy, Mercy · Alto Sax",
-   "hash": "bfae368878976d38de6c99ddd373ab033e3ce84ecf1355e6bfb2bfecde012ed1",
-   "tunes": [
-    "mercy-mercy-mercy-alto"
-   ]
-  },
-  {
-   "id": "autumn-leaves-alto",
-   "title": "Autumn Leaves · Alto Sax",
-   "hash": "1f17b78a120464a044ae6cd5af012aa7ff12f95ff1b2ea5973a85d5c739ecf91",
-   "tunes": [
-    "autumn-leaves-alto"
-   ]
   }
  ],
  "tunes": {
@@ -4471,6 +4524,102 @@
   "going-home-alto-licks": {
    "title": "Lick Chorus",
    "subtitle": "Going Home · Alto Sax · solo section"
+  },
+  "flute-welcome-2oct-major-c": {
+   "title": "Two Octaves · C Major",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-major-d-flat": {
+   "title": "Two Octaves · D♭ Major",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-major-d": {
+   "title": "Two Octaves · D Major",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-major-e-flat": {
+   "title": "Two Octaves · E♭ Major",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-major-e": {
+   "title": "Two Octaves · E Major",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-major-f": {
+   "title": "Two Octaves · F Major",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-major-f-sharp": {
+   "title": "Two Octaves · F♯ Major",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-major-g": {
+   "title": "Two Octaves · G Major",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-major-a-flat": {
+   "title": "Two Octaves · A♭ Major",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-major-a": {
+   "title": "Two Octaves · A Major",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-major-b-flat": {
+   "title": "Two Octaves · B♭ Major",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-major-b": {
+   "title": "Two Octaves · B Major",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-minor-c": {
+   "title": "Two Octaves · C Harmonic Minor",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-minor-c-sharp": {
+   "title": "Two Octaves · C♯ Harmonic Minor",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-minor-d": {
+   "title": "Two Octaves · D Harmonic Minor",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-minor-e-flat": {
+   "title": "Two Octaves · E♭ Harmonic Minor",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-minor-e": {
+   "title": "Two Octaves · E Harmonic Minor",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-minor-f": {
+   "title": "Two Octaves · F Harmonic Minor",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-minor-f-sharp": {
+   "title": "Two Octaves · F♯ Harmonic Minor",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-minor-g": {
+   "title": "Two Octaves · G Harmonic Minor",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-minor-g-sharp": {
+   "title": "Two Octaves · G♯ Harmonic Minor",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-minor-a": {
+   "title": "Two Octaves · A Harmonic Minor",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-minor-b-flat": {
+   "title": "Two Octaves · B♭ Harmonic Minor",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "flute-welcome-2oct-minor-b": {
+   "title": "Two Octaves · B Harmonic Minor",
+   "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
   }
  }
 }

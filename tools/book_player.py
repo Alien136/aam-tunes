@@ -114,8 +114,24 @@ def lick_item(k, page, keys="off", slug=None, title=None, desc=None):
                 bars=[[two + "m7"], [five + "7"], [ck + "maj7"], [ck + "maj7"]], rh=rh)
 
 
+def two_oct_items(page_major, page_minor):
+    """The flute book's two-octave scales: one exercise per key (each key has its own length, so the player cannot move one pattern through the keys)."""
+    out = []
+    for keys, alters, minor, word, page in ((B.CHROMATIC, B.MAJOR, False, "Major", page_major), (B.CHROMATIC_MIN, B.HARM_MIN, True, "Harmonic Minor", page_minor)):
+        for k in keys:
+            root = B.root_note(k); rh = to_bars(B.pat_two_oct(root, alters)); ck = k + ("m" if minor else "")
+            full = B.two_oct_top(root, alters) == 15
+            out.append(dict(slug=PRE + "2oct-" + ("minor-" if minor else "major-") + k[0].lower() + {"": "", "b": "-flat", "#": "-sharp"}[k[1:]],
+                            title="Two Octaves · " + B.NAME(k) + " " + word, page=page, style="drone", keys="off", tempo=60, concert_key=ck,
+                            hide=["chords", "solo", "names"], tab="Notes",
+                            desc=("Two octaves up and back" if full else "Up to the highest note of the key below high G, and back") + ". Slur it, then tongue it.",
+                            bars=[[k + ("m6" if minor else "maj7")]] * len(rh), rh=rh))
+    return out
+
+
 def page_map():
     """First page of each section, counted the way build_book.py assembles the book."""
+    if FLUTE: return dict(long=5, chrom=6, major=(7, 8), minor=(9, 10), two=(11, 12), th_maj=(13, 14), th_min=(15, 16), arps=(17, 18), fours=(19, 21), licks=23, transpose=24, blues=25)
     return dict(long=5, chrom=6, major=(7, 8), minor=(9, 10), th_maj=(11, 12), th_min=(13, 14), arps=(15, 16), fours=(17, 19), licks=21, transpose=22, blues=23)
 
 
@@ -133,6 +149,7 @@ def booklet():
         {"title": "Part 2 · Chromatic Scale", "items": [chromatic_item(P["chrom"])]},
         {"title": "Part 3 · Scales", "items": pair("major", "major", "Major Scales", B.pat_scale, B.MAJOR, False, "Up to the 9th, back down to the root, then the note below it.")
             + pair("minor", "minor", "Harmonic Minor Scales", B.pat_scale, B.HARM_MIN, True, "Harmonic minor: up to the 9th, back to the root, then the raised 7th below.")},
+    ] + ([{"title": "Part 3 · Two-Octave Scales", "items": two_oct_items(*P["two"])}] if FLUTE else []) + [
         {"title": "Part 4 · Thirds", "items": pair("th_maj", "thirds-major", "Major Scales in Thirds", B.pat_thirds, B.MAJOR, False, "1-3, 2-4, 3-5 up to the 9th, then back down in thirds.")
             + pair("th_min", "thirds-minor", "Harmonic Minor in Thirds", B.pat_thirds, B.HARM_MIN, True, "The harmonic minor scale in thirds.")},
         {"title": "Part 5 · Arpeggios", "items": [arp_item("arpeggios-" + s, "Arpeggios · " + oname, P["arps"][i], o) for i, (o, oname, s) in enumerate(orders)]},
@@ -171,6 +188,7 @@ def main():
     qr = {P["long"]: PRE + "long-tones-down", P["chrom"]: PRE + "chromatic", P["licks"]: PRE + "lick-1", P["transpose"]: PRE + "lick-1-keys", P["blues"]: blues_slug}
     for key, slug in (("major", "major"), ("minor", "minor"), ("th_maj", "thirds-major"), ("th_min", "thirds-minor"), ("arps", "arpeggios"), ("fours", "fours")):
         qr[P[key][0]] = PRE + slug + "-chr"; qr[P[key][1]] = PRE + slug + "-4ths"
+    if FLUTE: qr[P["two"][0]] = PRE + "2oct-major-c"; qr[P["two"][1]] = PRE + "2oct-minor-c"
     json.dump({"code": CODE, "first": PRE + "long-tones-down", "pages": qr}, open(os.path.join(HERE, "out", "qr_%s.json" % ED), "w"), indent=1)
     print("booklet published:", PDF["title"], CODE)
 

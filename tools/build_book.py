@@ -298,6 +298,7 @@ if FLUTE:
         "Chromatic Scale": ("2", "Every note in this book, low C to high G and back"),
         "Blues": ("7", "A 12-bar jazz blues in F: chord tones, scales and your own chorus"),
         "Fingering Chart": ("?", "Every note from low C to high G, with the thumb and pinky keys"),
+        "Two-Octave Scales": ("3", "Major and harmonic minor over two octaves, up to high G"),
     })
 
 
@@ -598,6 +599,24 @@ def pat_scale(root, alters):
         seq.append(0)
     else:
         seq = seq[:-1]  # no 7th below (low B♭): the final held note is the root
+    return bars_fill([deg(root, d, alters) for d in seq], root)
+
+
+HIGH = 91 if FLUTE else 89                   # the highest written note: high G on the flute, high F on the saxophone
+
+
+def two_oct_top(root, alters):
+    """How far a two-octave scale can climb: degree 15 (two octaves) when it fits, else the highest scale note the instrument has."""
+    top = 15
+    while deg(root, top, alters).midi > HIGH:
+        top -= 1
+    return top
+
+
+def pat_two_oct(root, alters):
+    """Two octaves up and back in eighth notes (or to the top of the instrument, where two octaves do not fit), ending on the root."""
+    top = two_oct_top(root, alters)
+    seq = list(range(1, top + 1)) + list(range(top - 1, 1, -1))
     return bars_fill([deg(root, d, alters) for d in seq], root)
 
 
@@ -1121,6 +1140,10 @@ PARTS_TXT = {
     "thirds_maj": ("The major scale in thirds: 1-3, 2-4, 3-5 up to the 9th, then 8-6, 7-5 back down to the 7th below and home. Thirds train "
                    "your fingers to skip and your ears to hear chords inside the scale."),
     "thirds_min": ("The harmonic minor scale in thirds, same shape as the major page. Watch the raised 7th: it appears in the 5-7 and 7-9 pairs."),
+    "two_maj": ("The whole flute: two octaves up and back where the key allows it (C to G). From A♭ to B the scale climbs to the highest note of the key "
+                "below high G, then comes home to the root. This is where the third octave becomes familiar. Slur it, then tongue it."),
+    "two_min": ("The harmonic minor over two octaves, the same way: two full octaves from C to G, and to the top of the flute from G♯ to B. "
+                "Keep the raised 7th in both octaves."),
     "fours": ("Four-note groups through each major scale: 1-2-3-4, 2-3-4-5 up to 6-7-8-9, then 8-7-6-5 back down to 3-2-1 and the 7th below. "
               "Accent the first note of each group so you can feel the beat."),
 }
@@ -1145,6 +1168,11 @@ def main():
         sections.append(("Harmonic Minor Scales" if i == 0 else None, run_ly(f"minor_{order}", pattern_page(P, "Harmonic Minor Scales", order,
                                                            CHROMATIC_MIN if order == "chromatic" else CIRCLE_MIN,
                                                            "minor", pat_scale, HARM_MIN, PARTS_TXT["minor"]))))
+    if FLUTE:                                            # an intermediate flute book covers the whole instrument: two-octave scales, chromatic order
+        sections.append(("Two-Octave Scales", run_ly("two_oct_major", pattern_page(P, "Two-Octave Major Scales", "chromatic", CHROMATIC, "major", pat_two_oct, MAJOR, PARTS_TXT["two_maj"])
+                                                     .replace("#(set-global-staff-size 17)", "#(set-global-staff-size 16)"))))
+        sections.append((None, run_ly("two_oct_minor", pattern_page(P, "Two-Octave Harmonic Minor Scales", "chromatic", CHROMATIC_MIN, "minor", pat_two_oct, HARM_MIN, PARTS_TXT["two_min"])
+                                      .replace("#(set-global-staff-size 17)", "#(set-global-staff-size 16)"))))
     for i, order in enumerate(("chromatic", "circle")):
         sections.append(("Scales in Thirds" if i == 0 else None, run_ly(f"thirds_maj_{order}", pattern_page("Part 4 · Thirds", "Major Scales in Thirds", order,
                                                                 CHROMATIC if order == "chromatic" else CIRCLE,
