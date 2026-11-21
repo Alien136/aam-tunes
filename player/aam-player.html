@@ -538,7 +538,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
         <button class="chip" data-r="learn-btn" aria-pressed="false" hidden><span class="lg">Learn the notes</span><span class="sm">Learn</span></button>
         <button class="chip" data-r="tuner-btn">Tuner</button>
       </div>
-      <div class="learn-bar" data-r="learn-bar" hidden><div class="learn-fing" data-r="learn-fing" hidden></div><b data-r="learn-msg" aria-live="polite"></b><span><button data-r="learn-hear" hidden>Hear it</button><button data-r="learn-fbtn" aria-pressed="false" hidden>Fingering</button><button data-r="learn-skip">Skip note</button><button data-r="learn-again">Start again</button><button data-r="learn-stop">Stop</button></span></div>
+      <div class="learn-bar" data-r="learn-bar" hidden><div class="learn-fing" data-r="learn-fing" hidden></div><b data-r="learn-msg" aria-live="polite"></b><span><button data-r="learn-hear" hidden>Hear it</button><button data-r="learn-fbtn" aria-pressed="false" hidden>Fingering</button><button data-r="learn-lvl" hidden>Level: Forgiving</button><button data-r="learn-skip">Skip note</button><button data-r="learn-again">Start again</button><button data-r="learn-stop">Stop</button></span></div>
 
       <div class="row" data-r="row-loop" style="justify-content:space-between">
         <div class="row" style="gap:10px">
@@ -1436,8 +1436,10 @@ function aamBoot(TUNE) {
         if (secs > 1.2 && samples.length > 20) {
           var offs = samples.map(function (s) { return s[1]; }).sort(function (a, b) { return a - b; }), lv = samples.map(function (s) { return s[0]; }).sort(function (a, b) { return a - b; });
           var c = { floor: Math.max(cal0.floor, Math.min(0.25 * lv[Math.floor(lv.length / 2)], 0.05)), off: Math.max(-35, Math.min(35, Math.round(offs[Math.floor(offs.length / 2)]))), at: Date.now() };
+          // How steady was the long note? A steady note in a quiet room starts Learn mode on Strict; a wavering note or a noisy room on Forgiving.
+          c.spread = Math.round(offs[Math.floor(offs.length * 0.9)] - offs[Math.floor(offs.length * 0.1)]); c.lvl = c.spread <= LVL_STEADY && !cal0.noisy ? "strict" : "easy";
           ear.setCal(c); phase = "tune";
-          msg.textContent = "Your microphone is ready. Hold any note and bring the marker to the middle.";
+          msg.textContent = "Your microphone is ready. " + (c.lvl === "strict" ? "That was a steady note: Learn mode starts on Strict. " : "") + "Hold any note and bring the marker to the middle.";
           $("t-go").hidden = !after;
         }
       }
@@ -1462,6 +1464,10 @@ function aamBoot(TUNE) {
     if (window.AAM_DEMO) $("tuner-btn").hidden = true;
   })();
   var openTuner;
+  // Learn mode has two levels. Forgiving: any clear note within half a step's reach of the right one counts after a short moment.
+  // Strict: the note must also be in tune and held twice as long. The microphone check picks one (see c.lvl above); the student can change it.
+  var LVL_STEADY = 20, LVL = { easy: { name: "Forgiving", cents: 50, frames: 4 }, strict: { name: "Strict", cents: 30, frames: 8 } };
+  var lvlPick = null; try { lvlPick = localStorage.getItem("aam-lvl"); } catch (e) {}
 
   // ---- Learn mode: no band and no tempo; each note turns green when it is played, and the marker waits for the next one
   var learn = { on: false, hand: "rh", alts: {}, key: 0, i: 0, seq: null, okRun: 0, badRun: 0, badNote: null, misses: 0, gap: true, since: 0, level: 0 };
@@ -1565,6 +1571,12 @@ function aamBoot(TUNE) {
     cloudAt(el);
     var a = el.getBoundingClientRect(), b = score.getBoundingClientRect(); if (a.bottom > b.bottom - 8 || a.top < b.top + 8) score.scrollTop += a.top - b.top - 40;
   }
+  function learnLvl() {                                   // the student's own choice first, else what the microphone check found; a piano cannot play out of tune and its notes die away
+    if (IS_PIANO) return "easy";
+    if (lvlPick === "strict" || lvlPick === "easy") return lvlPick;
+    var c = ear.cal(); return c && c.lvl === "strict" ? "strict" : "easy";
+  }
+  function learnLvlShow() { var b = $("learn-lvl"); b.hidden = IS_PIANO || !learn.on || !!learn.done; b.textContent = "Level: " + LVL[learnLvl()].name; }
   function learnSay(text, hint) { $("learn-msg").textContent = text; $("learn-hear").hidden = !hint; }
   var fingOn = false; try { fingOn = localStorage.getItem("aam-fing") === "1"; } catch (e) {}
   function learnFing() {                                  // the fingering for the note to play: always when the student asked for it, by itself after two misses
@@ -1579,14 +1591,14 @@ function aamBoot(TUNE) {
   function learnTrack(name) {
     var notes = learn.seq.filter(function (m) { return m >= 0; }).length, secs = Math.round((Date.now() - learn.t0) / 1000);
     AAM_TRACK.event(name, { tune: TUNE.slug, tune_title: TUNE.title, instrument: TUNE.instrument || "", notes: notes, reached: learn.seq.slice(0, learn.i).filter(function (m) { return m >= 0; }).length,
-      seconds: Math.min(secs, 3600), skipped: learn.skips, wrong_notes: learn.wrong, content_type: "learn", content_id: TUNE.slug, value: Math.round(Math.min(secs, 3600) / 6) / 10 });
+      seconds: Math.min(secs, 3600), skipped: learn.skips, wrong_notes: learn.wrong, level: learnLvl(), out_of_tune: learn.tuned || 0, content_type: "learn", content_id: TUNE.slug, value: Math.round(Math.min(secs, 3600) / 6) / 10 });
   }
   function learnTarget() { while (learn.i < learn.seq.length && learn.seq[learn.i] < 0) learn.i++; return learn.i < learn.seq.length ? learn.seq[learn.i] : null; }   // tied notes ride along
   function learnNext(skipped) {
     if (skipped) learn.skips++;
-    learn.prev = learn.seq[learn.i]; learn.i++; learn.okRun = learn.badRun = learn.misses = 0; learn.badNote = null; learn.gap = false; learn.since = Date.now();
+    learn.prev = learn.seq[learn.i]; learn.i++; learn.okRun = learn.badRun = learn.offRun = learn.misses = 0; learn.badNote = null; learn.gap = false; learn.since = Date.now();
     var t = learnTarget(); learnPaint();
-    if (t == null) { learnSay("You played every note. Now try it with the metronome.", false); $("learn-skip").hidden = true; ear.off(learnHear); learn.done = true; learnTrack("aam_learn_done"); learnFing(); return; }
+    if (t == null) { learnSay("You played every note. Now try it with the metronome.", false); $("learn-skip").hidden = true; ear.off(learnHear); learn.done = true; learnTrack("aam_learn_done"); learnFing(); learnLvlShow(); return; }
     learnSay(skipped ? "Skipped. Next note: " + noteName(t + EAR_SHIFT) + "." : "Next: " + noteName(t + EAR_SHIFT), false); learnFing();
   }
   function learnHear(r) {
@@ -1599,18 +1611,25 @@ function aamBoot(TUNE) {
     learn.clip = r.clip && !r.ok ? (learn.clip || 0) + 1 : 0;                                          // distorted AND unreadable for a quarter of a second
     if (learn.clip === 6) { learn.said = $("learn-msg").textContent; learnSay("Too loud for the microphone: move it a little further away.", false); }
     else if (!r.clip && learn.said && r.ok) { if (/^Too loud/.test($("learn-msg").textContent)) learnSay(learn.said, false); learn.said = null; }
-    if (!r.heard || r.clarity < 0.5 || (learn.level && r.rms < 0.45 * learn.level)) { learn.gap = true; learn.okRun = 0; learn.badRun = 0; return; }   // silence, breath or a tongued break: the dying end of a note never counts as the next one
+    if (!r.heard || r.clarity < 0.5 || (learn.level && r.rms < 0.45 * learn.level)) { learn.gap = true; learn.okRun = 0; learn.badRun = 0; learn.offRun = 0; return; }   // silence, breath or a tongued break: the dying end of a note never counts as the next one
     if (!r.ok) { learn.okRun = 0; learn.badRun = 0; return; }
     learn.level = learn.level ? learn.level + 0.2 * (r.rms - learn.level) : r.rms;
     var d = 100 * (r.midi - t) - c.off, anyOct = ANY_OCT();
     if (anyOct) d = ((d % 1200) + 1800) % 1200 - 600;     // the right note in any octave
+    var L = LVL[learnLvl()];
     if (Math.abs(d) <= 50) {
-      learn.badRun = 0; learn.okRun++;
+      learn.badRun = 0;
+      if (Math.abs(d) > L.cents) {                        // Strict: the right note, but out of tune. Never a wrong note; say which way after most of a second
+        learn.okRun = 0;
+        if (++learn.offRun === 18) { learn.tuned++; learnSay("Right note, but " + (d < 0 ? "flat: bring it up a little." : "sharp: bring it down a little."), false); }
+        return;
+      }
+      learn.offRun = 0; learn.okRun++;
       var again = learn.prev === t && !learn.gap;         // the same note twice: wait for a new tongue stroke, or a clearly longer hold
-      if (learn.okRun >= 4 && (!again || Date.now() - learn.since > 1100)) learnNext(false);
+      if (learn.okRun >= L.frames && (!again || Date.now() - learn.since > 1100)) learnNext(false);
       return;
     }
-    learn.okRun = 0;
+    learn.okRun = 0; learn.offRun = 0;
     var got = Math.round(r.midi - c.off / 100);
     if ((anyOct ? learn.prev != null && ((got - learn.prev) % 12 + 12) % 12 === 0 : got === learn.prev) && (!learn.gap || Date.now() - learn.since < 700)) return;                     // still holding the note before: not a mistake
     if (got !== learn.badNote) { learn.badNote = got; learn.badRun = 0; }
@@ -1642,8 +1661,8 @@ function aamBoot(TUNE) {
     if (state.playing) stop();
     var go = function () {
       ear.start().then(function () {
-        learn.on = true; learn.key = keyState.key; learn.alts = seq.alts || {}; learn.seq = seq.map(function (m) { return m < 0 ? m : m + keyState.key; }); learn.i = 0; learn.prev = null; learn.okRun = learn.badRun = learn.misses = 0; learn.skips = learn.wrong = 0; learn.t0 = Date.now(); learn.done = false; learn.autoFing = false; learn.gap = true; learn.level = 0; learn.since = Date.now();
-        $("learn-bar").hidden = false; $("learn-skip").hidden = false; $("learn-btn").setAttribute("aria-pressed", "true");
+        learn.on = true; learn.key = keyState.key; learn.alts = seq.alts || {}; learn.seq = seq.map(function (m) { return m < 0 ? m : m + keyState.key; }); learn.i = 0; learn.prev = null; learn.okRun = learn.badRun = learn.offRun = learn.misses = 0; learn.skips = learn.wrong = learn.tuned = 0; learn.t0 = Date.now(); learn.done = false; learn.autoFing = false; learn.gap = true; learn.level = 0; learn.since = Date.now();
+        $("learn-bar").hidden = false; $("learn-skip").hidden = false; $("learn-btn").setAttribute("aria-pressed", "true"); learnLvlShow();
         var t = learnTarget(); learnSay((IS_PIANO ? (learn.hand === "lh" ? "Left hand. " : "Right hand. ") : "") + "Play the note in the blue cloud: " + noteName(t + EAR_SHIFT) + ". Take your time." + (EAR_SHIFT ? " (On this instrument it sounds as " + noteName(t) + " on a piano.)" : ""), false); learnFing(); AAM_TRACK.event("aam_learn_start", { tune: TUNE.slug, tune_title: TUNE.title, instrument: TUNE.instrument || "", notes: learn.seq.filter(function (m) { return m >= 0; }).length }); perShown = 0; drawScore(); ear.off(learnHear); ear.on(learnHear);
       }).catch(function (e) { $("learn-bar").hidden = false; learnSay(micWhy(e), false); $("learn-skip").hidden = true; perShown = 0; drawScore(); });
     };
@@ -1657,6 +1676,14 @@ function aamBoot(TUNE) {
   $("learn-stop").onclick = learnStop;
   $("learn-again").onclick = function () { learnStop(); learnStart(); };
   $("learn-skip").onclick = function () { if (learn.on && learnTarget() != null) learnNext(true); };
+  $("learn-lvl").onclick = function () {                   // the student's own choice of level, kept on this device
+    if (!learn.on || learn.done) return;
+    lvlPick = learnLvl() === "strict" ? "easy" : "strict"; try { localStorage.setItem("aam-lvl", lvlPick); } catch (e) {}
+    learn.okRun = learn.offRun = 0; learnLvlShow();
+    var t = learnTarget();
+    learnSay((lvlPick === "strict" ? "Strict: each note must be in tune and held a little longer." : "Forgiving: a clear note counts, even a little flat or sharp.") + (t != null ? " Next: " + noteName(t + EAR_SHIFT) + "." : ""), false);
+    AAM_TRACK.event("aam_learn_level", { tune: TUNE.slug, instrument: TUNE.instrument || "", how: lvlPick });
+  };
   $("learn-hear").onclick = function () { var t = learnTarget(); if (t != null) ear.beep(t, 1.2); };
   $("learn-fbtn").onclick = function () {
     fingOn = !fingOn; try { localStorage.setItem("aam-fing", fingOn ? "1" : "0"); } catch (e) {}

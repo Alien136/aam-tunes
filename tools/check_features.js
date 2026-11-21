@@ -11,13 +11,15 @@
                       the instrument icon and name sit under the title
      demo             a concert-pitch tune shows an instrument, the reader can change it, and Learn follows it in any octave
      install          the home-screen icon, manifest and full-screen flag are on the page; Practice settings explains how to add it
+     level            Learn mode's two levels: the microphone check picks Strict for a steady note and Forgiving for a wavering one; Strict
+                      asks for a note in tune, Forgiving lets it pass; the student's own choice is remembered; a piano page has no levels
      piano            Learn mode on a piano page: asks which hand, follows that hand to the end, green notes on its staff
      apply            repeats, key and instrument changes wait for "Apply changes" while the band plays; the page-turn copy has no cloud
      style            the style picker lists the band styles, each one sounds, the choice is remembered, exercises have none
 
    The microphone is a sound file: saxophone-like tones are generated here and fed to the browser as a fake microphone.
 
-   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|mic|flute|learn|cloud|contents|pdf|bar|style|apply|piano|install|demo|cards]
+   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|mic|flute|learn|level|cloud|contents|pdf|bar|style|apply|piano|install|demo|cards]
    Needs:  playwright, plus the tone and abcjs packages (tools/node_modules or $AAM_NODE_MODULES). Nothing is fetched from the internet. */
 const fs = require("fs"), path = require("path"), os = require("os");
 const { chromium, devices } = require("playwright");
@@ -324,6 +326,57 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     expect(end.shown && end.score === right, "flash cards: 20 cards end the round and the score is the number answered right (" + end.score + " shown, " + right + " counted)");
     expect(end.mem.best && end.mem.best["piano|name|treble|1|calm"] >= right && (right === 20 || Object.keys(end.mem.miss || {}).length > 0), "flash cards: the best score and the missed notes are remembered on the device");
     await ctx.close();
+  }
+  const HAS_LEVELS = fs.readFileSync(FILE_OF, "utf8").includes('data-r="learn-lvl"');
+  if (want("level") && !HAS_LEVELS) console.log("  (level checks skipped: this copy of the player has no Learn mode levels)");
+  if (want("level") && HAS_LEVELS) {                        // Learn mode's two levels
+    const waver = (midi, secs, wide) => { const n = Math.round(SR * secs), x = new Float32Array(n), H = [1, .9, .7, .5, .35, .25, .15]; let ph = 0;      // a beginner's long note: the pitch drifts up and down
+      for (let i = 0; i < n; i++) { const t = i / SR, f = 440 * Math.pow(2, (midi - 69) / 12 + wide * Math.sin(2 * Math.PI * 1.5 * t) / 1200); ph += 2 * Math.PI * f / SR; let v = 0; for (let k = 0; k < H.length; k++) v += H[k] * Math.sin((k + 1) * ph); x[i] = 0.25 * v / 3 * Math.min(1, t / 0.03) * Math.min(1, (secs - t) / 0.04); } return x; };
+    for (const [name, sound, lvl] of [["steady", tone(60, 7), "strict"], ["wavering", waver(60, 7, 28), "easy"]])
+      await withMic(wav("lvl-" + name, [sil(2.4), sound, sil(1)]), {}, async page => {      // the first-time microphone check chooses the level
+        await page.goto(URL_OF(HCB)); await page.waitForTimeout(1500); await page.click('[data-r="tuner-btn"]'); await page.waitForTimeout(6500);
+        const c = await page.evaluate(() => JSON.parse(localStorage.getItem("aam-ear") || "{}")), msg = await txt(page, "t-msg");
+        expect(/ready/.test(msg) && c.lvl === lvl, "levels: a " + name + " long note in the microphone check sets Learn mode to " + (lvl === "strict" ? "Strict" : "Forgiving") + " (got " + c.lvl + ", spread " + c.spread + " cents)");
+        if (lvl === "strict") expect(/Strict/.test(msg), "levels: the check tells the student that Learn mode starts on Strict");
+      });
+    const cal = lvl => page => page.addInitScript(lvl => { try { if (!localStorage.getItem("aam-ear")) localStorage.setItem("aam-ear", JSON.stringify({ floor: 0.01, off: 0, at: 1, lvl: lvl })); } catch (e) {} }, lvl);
+    const flat = [sil(1.5)]; hcb.forEach((m, i) => { if (i === 1) flat.push(tone(m, 1.6, { cents: -40 }), sil(0.15)); flat.push(tone(m, 0.7), sil(0.12)); }); flat.push(sil(3));     // the second note is played 40 cents flat first, then in tune
+    const run = async (page, ms) => { const said = [], t0 = Date.now(); while (Date.now() - t0 < ms) { await page.waitForTimeout(150); const m = await txt(page, "learn-msg"); if (said[said.length - 1] !== m) said.push(m); if (/every note/.test(m)) break; } return said; };
+    await withMic(wav("lvl-flat", flat), {}, async page => {
+      await cal("strict")(page); await page.goto(URL_OF(HCB)); await page.waitForTimeout(1600); await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(250);
+      expect((await txt(page, "learn-lvl")) === "Level: Strict" && await page.evaluate(() => !document.querySelector('[data-r="learn-lvl"]').hidden), "levels: the Learn bar shows the level the check chose (Strict)");
+      const said = await run(page, 20000);
+      expect(said.some(m => /^Right note, but flat/.test(m)), "levels, Strict: a note 40 cents flat is not accepted, and the player says it is flat (" + said.slice(0, 4).join(" / ").slice(0, 120) + ")");
+      expect(!said.some(m => WRONG.test(m)), "levels, Strict: an out-of-tune note is never called a wrong note");
+      expect(/every note/.test(said[said.length - 1] || ""), "levels, Strict: once the note is in tune the line carries on to the end");
+      expect(await page.evaluate(() => document.querySelector('[data-r="learn-lvl"]').hidden), "levels: the level button goes away when the line is finished");
+    });
+    await withMic(wav("lvl-flat2", flat), {}, async page => {
+      await cal("easy")(page); await page.goto(URL_OF(HCB)); await page.waitForTimeout(1600); await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(250);
+      expect((await txt(page, "learn-lvl")) === "Level: Forgiving", "levels: after a wavering check the Learn bar shows Forgiving");
+      const said = await run(page, 20000);
+      expect(!said.some(m => /^Right note, but/.test(m)) && /every note/.test(said[said.length - 1] || ""), "levels, Forgiving: the same playing, 40 cents flat, is accepted without a remark (as before levels existed)");
+    });
+    await withMic(wav("lvl-pick", [sil(20)]), { ...devices["iPhone 13"] }, async page => {      // the student's own choice, on a phone
+      await page.addInitScript(() => { window.__ev = []; window.gtag = function (a, n, p) { if (a === "event") window.__ev.push(n + ":" + (p && p.how || "")); }; });
+      await cal("strict")(page); await page.goto(URL_OF(HCB)); await page.waitForTimeout(1800); await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(400);
+      await page.click('[data-r="learn-lvl"]'); await page.waitForTimeout(200);
+      const a = await page.evaluate(() => { const bar = document.querySelector('[data-r="learn-bar"]'), r = bar.getBoundingClientRect(), bs = [].slice.call(bar.querySelectorAll("button")).filter(b => !b.hidden).map(b => b.getBoundingClientRect());
+        return { label: document.querySelector('[data-r="learn-lvl"]').textContent, msg: document.querySelector('[data-r="learn-msg"]').textContent, kept: localStorage.getItem("aam-lvl"), fits: bs.every(b => b.left >= r.left - 0.5 && b.right <= r.right + 0.5 && b.width > 40) && r.right <= innerWidth + 0.5, ev: window.__ev }; });
+      expect(a.label === "Level: Forgiving" && a.kept === "easy", "levels: tapping the level button changes Strict to Forgiving and keeps the choice on the device (" + a.label + ", " + a.kept + ")");
+      expect(/^Forgiving: /.test(a.msg) && /Next: \S+\./.test(a.msg), "levels: the change is explained in a sentence and the next note is still named (\"" + a.msg.slice(0, 60) + "\")");
+      expect(a.fits, "levels: every button of the Learn bar fits inside the bar on a phone");
+      expect(a.ev.includes("aam_learn_level:easy"), "levels: Analytics hears which level a student chose");
+      await page.reload(); await page.waitForTimeout(1800); await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(400);
+      expect((await txt(page, "learn-lvl")) === "Level: Forgiving", "levels: the student's choice wins over the microphone check the next time");
+    });
+    await withMic(wav("lvl-piano", [sil(12)]), {}, async page => {      // a piano cannot play out of tune and its notes die away: no levels there
+      await page.addInitScript(() => { try { localStorage.setItem("aam-lvl", "strict"); } catch (e) {} });
+      await cal("strict")(page); await page.goto(URL_OF("gr1-mozart-theme-k265")); await page.waitForTimeout(1800); await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(300);
+      await page.click('[data-r="h-hands"] button[data-hand="rh"]'); await page.waitForTimeout(500);
+      const p = await page.evaluate(() => ({ bar: !document.querySelector('[data-r="learn-bar"]').hidden, lvl: document.querySelector('[data-r="learn-lvl"]').hidden }));
+      expect(p.bar && p.lvl, "levels: a piano page has no level button (" + JSON.stringify(p) + ")");
+    });
   }
   if (want("piano")) {                                      // Learn mode on a piano page: one hand at a time, chosen in a small dialog
     const handSeq = (slug, h) => { const at = {}; tune(slug).sections[0][h].forEach(e => { const k = Math.round(e[0] * 48); at[k] = Math.min(at[k] == null ? 999 : at[k], e[1]); }); return Object.keys(at).map(Number).sort((x, y) => x - y).map(k => at[k]); };

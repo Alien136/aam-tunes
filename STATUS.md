@@ -476,3 +476,18 @@ Everything needed to carry on from any conversation is in this repository and in
 - 21 Nov, later: Alex wants theory on its own address, not the play page. `theory/loader.html` is the block to paste once into an Elementor
   HTML widget on a new /theory page: it loads `release/cards.html` (404 = "Theory practice is coming soon") or, with `?beta`, the test copy
   `theory/cards.html`. Steps are in the Computer session guide. Once /theory exists, remove the `?app=cards` hook from the player.
+
+## 2026-11-22 · Beta: Learn mode levels, Forgiving and Strict (nightly builder)
+- `LVL` in the player: `easy` (shown as "Forgiving": within 50 cents, 4 frames = 0.16 s, exactly the old behavior) and `strict` (within 30
+  cents after the player's own offset, 8 frames = 0.32 s). `learnLvl()` decides: a piano page is always `easy`; else the student's own
+  choice (localStorage `aam-lvl`); else `lvl` in the saved microphone check (`aam-ear`); else `easy`.
+- The microphone check (tuner, step 2) now also saves `spread` (90th minus 10th percentile of the long note's cents) and `lvl`:
+  `strict` when the spread is at most `LVL_STEADY` (20 cents) and the room was not noisy. A check saved before today has no `lvl`, so
+  nobody's Learn mode changes until they tap "Check my microphone again" or the Level button.
+- Strict, right note but 31 to 50 cents off: not counted, never a wrong note; after 18 frames (0.7 s) the bar says "Right note, but
+  flat: bring it up a little." (or sharp). There is no automatic let-through: Skip note and the Level button are the ways on.
+- Button `learn-lvl` in the Learn bar ("Level: Forgiving" / "Level: Strict"), hidden on piano pages and when the line is finished.
+  Analytics: `aam_learn_level` (how = easy or strict); `level` and `out_of_tune` ride on the learn stop and done events.
+- Check group `level` in `tools/check_features.js` (16 checks; skipped for a copy of the player without the button, like `style`).
+- NOT judged with a real instrument: 20 cents (who gets Strict) and 30 cents (what Strict accepts) are first guesses. A real
+  saxophone's long note may waver more than 20 cents and never be given Strict; Alex to try, then tune the two numbers.
