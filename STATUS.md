@@ -532,4 +532,10 @@ Everything needed to carry on from any conversation is in this repository and in
   be edited on the free plan), the form's own success message rewritten, Email 1 reduced to one linked sentence to the download card. He
   tested it: works. **Beta:** `tuner-btn` and `hear` are now `.p-ic` icon buttons in `.pbar` (same data-r, so nothing else changed); Learn
   and Next sit at the right of `.music-row`. The bar is sized for 360 px phones; the tempo slider is hidden between 621 and 1099 px.
+- 22 Nov, **beta: one-tap Learn** (Alex: the long-note check is too much for a newcomer). `learnStart` no longer calls `openTuner`. In `ear`:
+  with no saved check, `autoFloor` = 1.6 x the quietest tenth of the first 2.4 s (0.006 to 0.02). In `learnHear`: after four accepted notes
+  the median deviation is saved as `{off, floor, at, auto: true, lvl: "easy"}` (so the next visit skips nothing and the Tuner opens ready);
+  twelve seconds with no pitched sound shows "I can't hear a note yet" and `learn-check`, which clears the saved check and opens the full
+  two-step one, then returns to Learn. Checks (`--only learn`): fresh device clean, fresh device weak and 25 cents flat, fresh silent room.
+  NOT tried on a real instrument and phone yet: Alex to test with his saxophone.
 

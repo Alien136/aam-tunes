@@ -64,8 +64,8 @@ async function withMic(file, opts, fn) {
 }
 const calibrated = page => page.addInitScript(() => { try { localStorage.setItem("aam-ear", JSON.stringify({ floor: 0.01, off: 0, at: 1 })); } catch (e) {} });
 const txt = (page, r) => page.evaluate(r => document.querySelector('[data-r="' + r + '"]').textContent, r);
-async function learnRun(page, slug, ms) {                 // start Learn mode and collect what it says until it finishes
-  await calibrated(page); await page.goto(URL_OF(slug)); await page.waitForTimeout(1600);
+async function learnRun(page, slug, ms, fresh) {          // start Learn mode and collect what it says until it finishes. fresh: a device that has never done the microphone check
+  if (!fresh) await calibrated(page); await page.goto(URL_OF(slug)); await page.waitForTimeout(1600);
   await page.click('[data-r="learn-btn"]'); const said = [], t0 = Date.now(); let green = 0;
   while (Date.now() - t0 < ms) {
     await page.waitForTimeout(150); const m = await txt(page, "learn-msg"); green = await page.evaluate(() => document.querySelectorAll(".score .lr-ok").length);
@@ -130,6 +130,29 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       const r = await learnRun(page, HCB, 20000);
       expect(r.done, "Learn, weak noisy microphone, 25 cents flat, repeated notes slurred: the line is finished");
       expect(!r.said.some(m => WRONG.test(m)), "Learn, weak microphone: no false wrong-note message");
+    });
+    // One tap: Learn starts with no microphone check, and works out the room and the player's tuning by itself.
+    await withMic(wav("fresh", played(hcb, 0.55, 0.12)), {}, async page => {
+      const r = await learnRun(page, HCB, 15000, true);
+      const st = await page.evaluate(() => ({ dlg: document.querySelector('[data-r="tdlg"]').hidden, cal: JSON.parse(localStorage.getItem("aam-ear") || "null") }));
+      expect(r.done && st.dlg && !r.said.some(m => /Step 1|stay quiet/.test(m)), "one-tap Learn: a new device goes straight into Learn, no microphone check, and finishes the line");
+      expect(st.cal && st.cal.auto && st.cal.at > 0 && Math.abs(st.cal.off) <= 8 && st.cal.floor >= 0.006 && st.cal.floor <= 0.02, "one-tap Learn: the level and tuning it worked out are kept for next time (" + JSON.stringify(st.cal) + ")");
+    });
+    await withMic(wav("freshpoor", held, 0.012), {}, async page => {
+      const r = await learnRun(page, HCB, 20000, true);
+      const cal = await page.evaluate(() => JSON.parse(localStorage.getItem("aam-ear") || "null"));
+      expect(r.done && !r.said.some(m => WRONG.test(m)), "one-tap Learn, weak noisy microphone, 25 cents flat: finished with no false wrong-note message");
+      expect(cal && cal.auto && cal.off <= -12 && cal.off >= -35, "one-tap Learn: it notices the player sits flat (" + (cal && cal.off) + " cents)");
+    });
+    await withMic(wav("freshsilent", [sil(20)], 0.004), {}, async page => {      // a room where nothing is played: after twelve seconds the check is offered, never before
+      await page.goto(URL_OF(HCB)); await page.waitForTimeout(1600); await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(6000);
+      const early = await page.evaluate(() => !document.querySelector('[data-r="learn-check"]').hidden);
+      await page.waitForTimeout(8500);
+      const late = await page.evaluate(() => ({ btn: !document.querySelector('[data-r="learn-check"]').hidden, msg: document.querySelector('[data-r="learn-msg"]').textContent }));
+      expect(!early && late.btn && /can't hear a note yet/.test(late.msg), "one-tap Learn: silence for twelve seconds brings \"I can't hear a note yet\" and a Check microphone button (" + late.msg.slice(0, 40) + ")");
+      await page.click('[data-r="learn-check"]'); await page.waitForTimeout(900);
+      const t = await page.evaluate(() => ({ dlg: !document.querySelector('[data-r="tdlg"]').hidden, msg: document.querySelector('[data-r="t-msg"]').textContent, bar: document.querySelector('[data-r="learn-bar"]').hidden }));
+      expect(t.dlg && /Step 1 of 2/.test(t.msg) && t.bar, "one-tap Learn: Check microphone opens the full two-step check");
     });
     const LOW = "sax-beginner-tenor-pinky-push-ups", low = tune(LOW).sections[0].learn.filter(m => m >= 0);
     await withMic(wav("low", played(low, 0.6, 0.12)), {}, async page => { const r = await learnRun(page, LOW, 14000); expect(r.done, "Learn, tenor low notes (down to written low C): the line is finished"); });

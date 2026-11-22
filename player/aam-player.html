@@ -564,7 +564,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
         <div class="seg" role="group" aria-label="Music on screen" data-r="views"></div>
         <button class="chip" data-r="learn-btn" aria-pressed="false" hidden><span class="lg">Learn the notes</span><span class="sm">Learn</span></button>
       </div>
-      <div class="learn-bar" data-r="learn-bar" hidden><div class="learn-fing" data-r="learn-fing" hidden></div><b data-r="learn-msg" aria-live="polite"></b><span><button data-r="learn-hear" hidden>Hear it</button><button data-r="learn-fbtn" aria-pressed="false" hidden>Fingering</button><button data-r="learn-lvl" hidden>Level: Forgiving</button><button data-r="learn-skip">Skip note</button><button data-r="learn-again">Start again</button><button data-r="learn-stop">Stop</button></span></div>
+      <div class="learn-bar" data-r="learn-bar" hidden><div class="learn-fing" data-r="learn-fing" hidden></div><b data-r="learn-msg" aria-live="polite"></b><span><button data-r="learn-hear" hidden>Hear it</button><button data-r="learn-fbtn" aria-pressed="false" hidden>Fingering</button><button data-r="learn-lvl" hidden>Level: Forgiving</button><button data-r="learn-check" hidden>Check microphone</button><button data-r="learn-skip">Skip note</button><button data-r="learn-again">Start again</button><button data-r="learn-stop">Stop</button></span></div>
 
       <div class="row" data-r="row-loop" style="justify-content:space-between">
         <div class="row" style="gap:10px">
@@ -1292,7 +1292,7 @@ function aamBoot(TUNE) {
   var NOTE_NAMES = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
   var noteName = function (m) { return NOTE_NAMES[((m % 12) + 12) % 12]; };
   var ear = (function () {
-    var ctx = null, an = null, buf = null, bytes = null, stream = null, timer = null, subs = [], cal = null, quietUntil = 0, deadAt = 0, wakeArmed = false, told = false, self;
+    var ctx = null, an = null, buf = null, bytes = null, stream = null, timer = null, subs = [], cal = null, quietUntil = 0, deadAt = 0, wakeArmed = false, told = false, self, autoN = [], autoFloor = 0;
     try { cal = JSON.parse(localStorage.getItem("aam-ear") || "null"); } catch (e) {}
     var lo = EAR_FIXED ? 58 - EAR_FIXED - 2 : 34, hi = EAR_FIXED ? 89 - EAR_FIXED + 7 : 100;      // sounding range in MIDI numbers
     var hz = function (m) { return 440 * Math.pow(2, (m - 69) / 12); };
@@ -1319,7 +1319,12 @@ function aamBoot(TUNE) {
       if (!an) return;
       if (an.getFloatTimeDomainData) an.getFloatTimeDomainData(buf);
       else { an.getByteTimeDomainData(bytes); for (var k = 0; k < buf.length; k++) buf[k] = (bytes[k] - 128) / 128; }      // older Safari
-      var r = pitch(buf, ctx.sampleRate), floor = cal ? cal.floor : 0.01;
+      var r = pitch(buf, ctx.sampleRate), checked = cal && cal.at;
+      // No microphone check yet (Learn starts in one tap): the room's level is worked out while the student gets ready. The quietest tenth of
+      // the first two and a half seconds is the room, even if they are already playing some of the time.
+      // The level is kept low on purpose: a quiet beginner must still be heard, and a hiss has no pitch to mistake for a note.
+      if (!checked && autoN.length < 60) { autoN.push(r.rms); if (autoN.length >= 20 && autoN.length % 5 === 0) { var q = autoN.slice().sort(function (a, b) { return a - b; }); autoFloor = Math.min(0.02, Math.max(0.006, 1.6 * q[Math.floor(q.length * 0.1)])); } }
+      var floor = checked ? cal.floor : cal && cal.floor && !autoFloor ? cal.floor : autoFloor || 0.01;
       r.t = Date.now(); r.heard = r.rms > floor;
       // A microphone that is "on" but sends nothing: the sound engine is asleep (iPad Safari does this when it was not started by a tap),
       // or the stream is pure digital silence. A real room is never exactly silent, so this is never a quiet student.
@@ -1340,13 +1345,14 @@ function aamBoot(TUNE) {
         var n = subs.length; subs = subs.filter(function (g) { return g !== f; });
         if (n && !subs.length) setTimeout(function () { if (!subs.length) self.stop(); }, 500);
       },
-      hz: hz, cal: function () { return cal; },
+      hz: hz, cal: function () { return cal; }, autoFloor: function () { return autoFloor; },
       setCal: function (c) { cal = c; try { localStorage.setItem("aam-ear", JSON.stringify(c)); } catch (e) {} },
       start: function () {
         if (stream) return Promise.resolve();
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !(window.AudioContext || window.webkitAudioContext)) return Promise.reject(new Error("nomic"));
         // The sound engine is made and woken HERE, while the student's tap is still being handled. iPad and iPhone Safari leave an
         // engine that is made later (after the permission question) asleep, and then the microphone delivers nothing.
+        autoN = []; autoFloor = 0;
         var mine = ctx = new (window.AudioContext || window.webkitAudioContext)();
         try { var w = mine.resume(); if (w && w.catch) w.catch(function () {}); } catch (e) {}
         deadAt = 0; told = false;
@@ -1609,6 +1615,10 @@ function aamBoot(TUNE) {
     if (r.dead) { if (!learn.dead) { learn.dead = $("learn-msg").textContent; learnSay(MIC_SILENT, false); } return; }
     if (learn.dead) { learnSay(learn.dead, false); learn.dead = null; }
     var c = ear.cal() || { off: 0 };
+    if (r.ok) { learn.heardAt = r.t; if (learn.help) { learn.help = false; $("learn-check").hidden = true; learnSay("That's it, I can hear you. Play the note in the blue cloud: " + noteName(t + EAR_SHIFT) + ".", false); } }
+    else if (!learn.help && r.t - learn.heardAt > 12000) {  // twelve seconds and not one clear note: now is the time to offer the microphone check
+      learn.help = true; $("learn-check").hidden = false; learnSay("I can't hear a note yet. Play a little louder, or move closer to your " + (/Mobi|Android|iPhone/i.test(navigator.userAgent) ? "phone" : "microphone") + ".", false); learnTrack("aam_learn_cant_hear");
+    }
     var alt = learn.alts && learn.alts[learn.i];          // a chord: whichever of its notes is nearest to what was heard
     if (alt && r.ok) alt.forEach(function (m) { if (Math.abs(m + learn.key - r.midi) < Math.abs(t - r.midi)) t = m + learn.key; });
     learn.clip = r.clip && !r.ok ? (learn.clip || 0) + 1 : 0;                                          // distorted AND unreadable for a quarter of a second
@@ -1629,7 +1639,13 @@ function aamBoot(TUNE) {
       }
       learn.offRun = 0; learn.okRun++;
       var again = learn.prev === t && !learn.gap;         // the same note twice: wait for a new tongue stroke, or a clearly longer hold
-      if (learn.okRun >= L.frames && (!again || Date.now() - learn.since > 1100)) learnNext(false);
+      if (learn.okRun >= L.frames && (!again || Date.now() - learn.since > 1100)) {
+        if (!c.at && learn.devs) {                        // no check has been done: after four right notes we know how sharp or flat this player sits, and keep it
+          learn.devs.push(d);
+          if (learn.devs.length >= 4) { var dv = learn.devs.slice().sort(function (a, b) { return a - b; }); ear.setCal({ floor: ear.autoFloor() || 0.01, off: Math.max(-35, Math.min(35, Math.round((dv[1] + dv[2]) / 2))), at: Date.now(), auto: true, lvl: "easy" }); }
+        }
+        learnNext(false);
+      }
       return;
     }
     learn.okRun = 0; learn.offRun = 0;
@@ -1664,15 +1680,16 @@ function aamBoot(TUNE) {
     if (state.playing) stop();
     var go = function () {
       ear.start().then(function () {
+        learn.devs = []; learn.heardAt = Date.now(); learn.help = false; $("learn-check").hidden = true;
         learn.on = true; learn.key = keyState.key; learn.alts = seq.alts || {}; learn.seq = seq.map(function (m) { return m < 0 ? m : m + keyState.key; }); learn.i = 0; learn.prev = null; learn.okRun = learn.badRun = learn.offRun = learn.misses = 0; learn.skips = learn.wrong = learn.tuned = 0; learn.t0 = Date.now(); learn.done = false; learn.autoFing = false; learn.gap = true; learn.level = 0; learn.since = Date.now();
         $("learn-bar").hidden = false; $("learn-skip").hidden = false; $("learn-btn").setAttribute("aria-pressed", "true"); learnLvlShow();
         var t = learnTarget(); learnSay((IS_PIANO ? (learn.hand === "lh" ? "Left hand. " : "Right hand. ") : "") + "Play the note in the blue cloud: " + noteName(t + EAR_SHIFT) + ". Take your time." + (EAR_SHIFT ? " (On this instrument it sounds as " + noteName(t) + " on a piano.)" : ""), false); learnFing(); AAM_TRACK.event("aam_learn_start", { tune: TUNE.slug, tune_title: TUNE.title, instrument: TUNE.instrument || "", notes: learn.seq.filter(function (m) { return m >= 0; }).length }); perShown = 0; drawScore(); ear.off(learnHear); ear.on(learnHear);
       }).catch(function (e) { $("learn-bar").hidden = false; learnSay(micWhy(e), false); $("learn-skip").hidden = true; perShown = 0; drawScore(); });
     };
-    var c = ear.cal();
-    if (!c || !c.at) openTuner(go); else go();           // first time: the ten-second microphone check comes first
+    go();                                                // one tap: no microphone check first. The level and the tuning are worked out while they play (learnHear), and the check is offered only if nothing can be heard
   }
   $("learn-btn").onclick = function () { if (learn.on) learnStop(); else learnStart(); };
+  $("learn-check").onclick = function () { var h = learn.hand; learnStop(); ear.setCal(null); openTuner(function () { learnStart(h); }); };      // the full two-step check, then straight back into Learn
   [].forEach.call($("h-hands").children, function (b) { b.onclick = function () { $("hdlg").hidden = true; learnStart(b.dataset.hand); }; });
   $("h-close").onclick = function () { $("hdlg").hidden = true; };
   $("hdlg").addEventListener("click", function (e) { if (e.target === $("hdlg")) $("hdlg").hidden = true; });
