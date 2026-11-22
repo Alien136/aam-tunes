@@ -508,4 +508,6 @@ Everything needed to carry on from any conversation is in this repository and in
   blocks call `need(h)`, a section heading waits for its first block, `finish(filler, checks)` adds seeded "More practice" rows until the
   unit's last page is full and puts the checklist at its foot. New cover (keyboard with E G B lit, the same three notes on a staff) and a
   contents / how-to-use page. 19 pages. `LEVEL_K` holds the scale for later levels.
+- Edition 2, second pass (Alex: "going in the right direction, fit maybe 20% more on each page"): K = 0.71 (type about 10.3 pt), tighter gaps
+  between blocks, the checklist may dip into the foot margin sooner than go alone to a new page. 18 pages. He likes the new cover and design.
 

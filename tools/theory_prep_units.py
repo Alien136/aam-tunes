@@ -88,10 +88,10 @@ def ex_name(p, n, text, kind, poss, sp=16, done=0, groups=None):
         for g in groups[:-1]: k += g; edges.append(k)
     for k, pos in enumerate(poss):
         x = x0 + step * (k + 0.5); note(p, x, pos)
-        if k < done: label(p, x, p.base - 34, name_of(kind, pos), 14, True)
-        else: p.blank(x, p.base - 34, min(26, step * 0.6))
+        if k < done: label(p, x, p.base - 30, name_of(kind, pos), 14, True)
+        else: p.blank(x, p.base - 30, min(26, step * 0.6))
         if k in edges: bar(p, x0 + step * k)
-    p.gap(4 * sp + (50 if sp > 14 else 42))
+    p.gap(4 * sp + 43)
 
 
 def ex_draw(p, n, text, kind, labels, sp=16):
@@ -100,7 +100,7 @@ def ex_draw(p, n, text, kind, labels, sp=16):
     x0 = M + sp * 4.6; step = (W - M - x0 - 10) / len(labels)
     for k, t in enumerate(labels):
         x = x0 + step * (k + 0.5); box(p, x, min(52, step - 12)); label(p, x, p.base - 30, t, 12 if len(t) > 3 else 15, True)
-    p.gap(4 * sp + 46)
+    p.gap(4 * sp + 40)
 
 
 def rhythm(p, measures, top=4, counts=None, bars=True, sp=15, blanks=True):
@@ -118,7 +118,7 @@ def rhythm(p, measures, top=4, counts=None, bars=True, sp=15, blanks=True):
             b += beats(s)
         if bars and mi < len(measures) - 1: bar(p, x0 + bw * b - bw * 0.08)
     bar(p, W - M - 6, final=True)
-    p.gap(4 * sp + (48 if counts is not None else 22))
+    p.gap(4 * sp + (42 if counts is not None else 18))
 
 
 def pairs(p, n, text, items, sp=16, hint=None):
@@ -127,10 +127,10 @@ def pairs(p, n, text, items, sp=16, hint=None):
     x0 = M + sp * 4.2; step = (W - M - x0 - 10) / len(items)
     for k, (a, b) in enumerate(items):
         x = x0 + step * (k + 0.5); note(p, x - sp * 1.1, a); note(p, x + sp * 1.1, b)
-        if k == 0 and hint: label(p, x, p.base - 34, hint, 14, True)
-        else: p.blank(x, p.base - 34, 34)
+        if k == 0 and hint: label(p, x, p.base - 30, hint, 14, True)
+        else: p.blank(x, p.base - 30, 34)
         if k < len(items) - 1: bar(p, x0 + step * (k + 1))
-    p.gap(4 * sp + 50)
+    p.gap(4 * sp + 43)
 
 
 def figure(p, rows, h=64):
@@ -300,7 +300,7 @@ def build(c, first_page):
     rhythm(p, [["q", "q", "h"], ["h", "hr"], ["q", "qr", "q", "q"], ["w"]], counts=0, bars=False, sp=16)
     pairs(p, 4, "Step, skip or repeat?", ((3, 4), (2, 4), (5, 5), (7, 6), (6, 4), (1, 3)), sp=16)
     fs = [fill_keys, fill_beats, fill_counts, fill_ls, fill_name("treble"), fill_name("bass")]; k = 0
-    while p.y - BOTTOM - 90 > 168 and k < 10: fs[k % len(fs)](p); k += 1
+    while p.y - BOTTOM - 90 > 150 and k < 10: fs[k % len(fs)](p); k += 1
     p.y = min(p.y, BOTTOM + 70); c.setStrokeColor(HexColor(INK)); c.setLineWidth(1.4); c.setFillColor(HexColor(TINT)); c.rect(M, p.y - 66, W - 2 * M, 66, fill=1, stroke=0)
     c.setFillColor(HexColor(ACC)); c.rect(M, p.y - 66, 5, 66, fill=1, stroke=0)
     c.setFillColor(HexColor(INK)); c.setFont("Pop-B", 15); c.drawString(M + 20, p.y - 26, "I finished Prep. Next: Level 1.")

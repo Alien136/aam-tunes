@@ -24,11 +24,11 @@ for n, p in [("Pop-B", GF + "Poppins-Bold.ttf"), ("Pop-M", GF + "Poppins-Medium.
     pdfmetrics.registerFont(TTFont(n, p))
 pdfmetrics.registerFontFamily("Pop", normal="Pop", bold="Pop-B")
 RW, RH = letter
-K = 0.76                                               # everything inside a page is drawn on a larger sheet and scaled down by K: type 14.5 -> 11 pt, the staff to 12 pt spaces
+K = 0.71                                               # everything inside a page is drawn on a larger sheet and scaled down by K: type 14.5 -> 10.3 pt, the staff to 11 pt spaces (0.76 at first; Alex asked for 20% more on a page)
 W, H = RW / K, RH / K; M = 50                          # (Alex, 22 Nov: the first draft's type was too big; size it like the Beginner Booklets and fit more on a page)
 BOTTOM = 62
 # Type and staff size by level (Alex, 22 Nov): Level 1 steps up QUICKLY to a mature page. Lower K for later levels.
-LEVEL_K = {"Prep": 0.76, "Level 1": 0.68, "Level 2": 0.64, "Level 3": 0.6}
+LEVEL_K = {"Prep": 0.71, "Level 1": 0.66, "Level 2": 0.63, "Level 3": 0.6}
 BODY = 14.5
 P = ParagraphStyle("p", fontName="Pop", fontSize=BODY, leading=BODY * 1.42, textColor=HexColor(INK))
 
@@ -63,17 +63,17 @@ class Page:
         self.pending = title
 
     def learn(self, text):                                 # the one box that teaches; everything else on the page is doing
-        c = self.c; p = Paragraph(text, P); w = W - 2 * M - 32; _, h = p.wrap(w, 400); bh = h + 40; self.need(bh + 215)
+        c = self.c; p = Paragraph(text, P); w = W - 2 * M - 32; _, h = p.wrap(w, 400); bh = h + 40; self.need(bh + 186)
         c.setFillColor(HexColor(TINT)); c.rect(M, self.y - bh, W - 2 * M, bh, fill=1, stroke=0)
         c.setFillColor(HexColor(ACC)); c.rect(M, self.y - bh, 5, bh, fill=1, stroke=0)
         c.setFillColor(HexColor(ACC_TEXT)); c.setFont("Pop-B", 10); c.drawString(M + 18, self.y - 18, "L E A R N")
-        p.drawOn(c, M + 18, self.y - 28 - h); self.y -= bh + 20
+        p.drawOn(c, M + 18, self.y - 28 - h); self.y -= bh + 15
 
-    def ask(self, n, text, reserve=150):                   # a numbered instruction (numbered by the unit, whatever n says)
-        p = Paragraph(text, P); _, h = p.wrap(W - 2 * M - 34, 200); self.need(max(h, 22) + 12 + reserve); self.num += 1
+    def ask(self, n, text, reserve=140):                   # a numbered instruction (numbered by the unit, whatever n says)
+        p = Paragraph(text, P); _, h = p.wrap(W - 2 * M - 34, 200); self.need(max(h, 22) + 9 + reserve); self.num += 1
         c = self.c; c.setFillColor(HexColor(INK)); c.circle(M + 11, self.y - 9, 11, fill=1, stroke=0)
         c.setFillColor(white); c.setFont("Pop-B", 12); c.drawCentredString(M + 11, self.y - 13.5, str(self.num))
-        p.drawOn(c, M + 32, self.y - h + 3); self.y -= max(h, 22) + 12
+        p.drawOn(c, M + 32, self.y - h + 3); self.y -= max(h, 22) + 9
 
     def gap(self, h): self.y -= h
 
@@ -102,7 +102,7 @@ class Page:
         c = self.c; c.setStrokeColor(HexColor(INK)); c.setLineWidth(1); c.line(x - w / 2, y, x + w / 2, y)
 
     def checks(self, items):
-        self.need(30 + 26 * len(items))
+        self.need(26 * len(items) - 6)                    # the checklist may sit a little into the foot margin sooner than go alone onto a new page
         c = self.c; c.setStrokeColor(HexColor(INK)); c.setLineWidth(1.4); c.setFont("Pop-B", 10); c.setFillColor(HexColor(ACC_TEXT)); c.drawString(M, self.y, "C H E C K")
         self.y -= 24
         for t in items:
@@ -110,7 +110,7 @@ class Page:
 
     def finish(self, filler, items):                       # end of a unit: more practice until the page is full, then the checklist
         room = 30 + 26 * len(items); k = 0
-        while filler and self.y - BOTTOM - room > 168 and k < 10: filler(self); k += 1
+        while filler and self.y - BOTTOM - room > 150 and k < 10: filler(self); k += 1
         self.y = min(self.y, BOTTOM + room + 2)           # the checklist sits at the foot of the unit's last page
         self.checks(items)
 
