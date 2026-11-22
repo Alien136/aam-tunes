@@ -528,4 +528,8 @@ Everything needed to carry on from any conversation is in this repository and in
   tempo, Next, title. A booklet's lines cannot change instrument (only concert-pitch demo tunes have `inst-btn`), so on a booklet the first
   note says to reply to the email for a different pack. Idea not built: let a newcomer switch between the alto, tenor and flute Starter
   Packs from the player; it needs the tenor and flute sign-ups (or their codes in the player, which the code rule forbids).
+- 22 Nov (Alex at his computer): MailerLite double opt-in turned OFF for the Starter Pack Alto form (the confirmation email and page cannot
+  be edited on the free plan), the form's own success message rewritten, Email 1 reduced to one linked sentence to the download card. He
+  tested it: works. **Beta:** `tuner-btn` and `hear` are now `.p-ic` icon buttons in `.pbar` (same data-r, so nothing else changed); Learn
+  and Next sit at the right of `.music-row`. The bar is sized for 360 px phones; the tempo slider is hidden between 621 and 1099 px.
 

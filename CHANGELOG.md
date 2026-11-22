@@ -10,6 +10,7 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- Beta (test copy only): the Tuner and "hear the notes" have moved to the play bar as icons: a gauge with a needle beside the metronome, and a speaker that is blue when on and struck through when off. Learn stays above the music, on the right beside Next.
 - Beta (test copy only): a **Next** button beside Hear it, Learn and Tuner on every booklet line: one tap goes to the next line of the booklet.
 - Beta (test copy only): the tour is now six notes in practice order: the instrument the booklet is written for (and how to get another), Learn, Play, tempo, Next, the title.
 

@@ -408,6 +408,20 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 #aam-play .tp-list button { display: block; width: 100%; height: 44px; scroll-snap-align: center; background: none; text-align: center; font: 600 20px var(--display); color: var(--muted); font-variant-numeric: tabular-nums; }
 #aam-play .tp-list button.on { color: var(--ink); font-size: 26px; }
 @media (max-width: 430px) { #aam-play .p-key small { display: none; } #aam-play .p-key { min-width: 40px; justify-items: center; } }
+/* the tuner (a gauge with a needle) and "hear the notes" (a speaker, struck through when it is off) live on the play bar, shaped like the metronome button */
+#aam-play .p-ic { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: 14px; border: 1px solid #d5dade; background: #eceff2; color: #5d6873; }
+#aam-play .p-ic[hidden] { display: none; }
+#aam-play .p-ic svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; } #aam-play .p-ic svg circle { fill: currentColor; stroke: none; }
+#aam-play .p-ic[data-r="tuner-btn"] { background: var(--surface); border-color: var(--line); color: var(--accent-text); }
+#aam-play .p-hear .on { display: none; } #aam-play .p-hear[aria-pressed="true"] .on { display: inline; } #aam-play .p-hear[aria-pressed="true"] .off { display: none; }
+#aam-play .p-hear[aria-pressed="true"] { background: var(--now); color: var(--now-ink); border-color: var(--now); }
+#aam-play .p-hear:disabled { opacity: .45; }
+@media (max-width: 620px) { #aam-play .p-ic { width: 36px; height: 40px; border-radius: 12px; } #aam-play .p-ic svg { width: 22px; height: 22px; }
+  #aam-play .pbar { gap: 4px; padding-left: 8px; padding-right: 8px; } #aam-play .p-left, #aam-play .p-right { gap: 4px; } #aam-play .pbar .play { width: 52px; height: 52px; }
+  #aam-play .p-bpm { min-width: 58px; padding: 0 6px; font-size: 18px; gap: 3px; } #aam-play .p-met { width: 36px; } #aam-play .p-key { min-width: 36px; padding: 0 6px; } #aam-play .p-reps { min-width: 38px; padding: 0 4px; } #aam-play .p-gear { width: 36px; height: 40px; border-radius: 12px; } }
+@media (max-width: 380px) { #aam-play .p-ic, #aam-play .p-met, #aam-play .p-gear { width: 32px; } #aam-play .p-key { min-width: 32px; padding: 0 4px; } #aam-play .p-reps { min-width: 36px; } #aam-play .pbar, #aam-play .p-left, #aam-play .p-right { gap: 3px; } #aam-play .p-bpm { min-width: 54px; padding: 0 4px; } }
+@media (min-width: 621px) and (max-width: 1099px) { #aam-play .pbar .p-range { display: none; } }      /* a tablet: the two step buttons are enough once the tuner sits beside the metronome */
+#aam-play .music-row [data-r="learn-btn"] { margin-left: auto; } #aam-play .music-row [data-r="learn-btn"] + .chip.next-line, #aam-play .music-row [data-r="learn-btn"]:not([hidden]) ~ .chip.next-line { margin-left: 0; }
 #aam-play .p-met svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 #aam-play .p-met svg circle { fill: currentColor; stroke: none; }
 #aam-play .p-met[aria-pressed="true"] { background: var(--now); color: var(--now-ink); border-color: var(--now); }
@@ -548,9 +562,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
       <div class="row music-row" data-r="row-music">
         <span class="lbl">Music</span>
         <div class="seg" role="group" aria-label="Music on screen" data-r="views"></div>
-        <button class="chip" data-r="hear" aria-pressed="false"><span class="lg">Hear it played</span><span class="sm">Hear it</span></button>
         <button class="chip" data-r="learn-btn" aria-pressed="false" hidden><span class="lg">Learn the notes</span><span class="sm">Learn</span></button>
-        <button class="chip" data-r="tuner-btn">Tuner</button>
       </div>
       <div class="learn-bar" data-r="learn-bar" hidden><div class="learn-fing" data-r="learn-fing" hidden></div><b data-r="learn-msg" aria-live="polite"></b><span><button data-r="learn-hear" hidden>Hear it</button><button data-r="learn-fbtn" aria-pressed="false" hidden>Fingering</button><button data-r="learn-lvl" hidden>Level: Forgiving</button><button data-r="learn-skip">Skip note</button><button data-r="learn-again">Start again</button><button data-r="learn-stop">Stop</button></span></div>
 
@@ -593,10 +605,12 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
         <button class="step" data-r="p-faster" aria-label="Faster by 5">+</button>
       </div>
         <button class="p-met" data-r="p-met" aria-haspopup="dialog" aria-pressed="false" aria-label="Metronome"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l4 18H5z"/><path d="M12 16.5L17.5 6"/><circle cx="16.4" cy="8.1" r="1.5"/><path d="M7.2 16.5h9.6"/></svg></button>
+        <button class="p-ic" data-r="tuner-btn" aria-haspopup="dialog" aria-label="Tuner"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 17.5a8.5 8.5 0 0 1 17 0"/><path d="M12 5.5v2M5.6 9.6l1.5 1.3M18.4 9.6l-1.5 1.3"/><path d="M12 17.5l3.6-7"/><circle cx="12" cy="17.5" r="1.6"/></svg></button>
       </div>
       <button class="apply-pill" data-r="apply" hidden>Apply changes</button>
       <button class="play" data-r="p-play" aria-label="Play"><svg viewBox="0 0 24 24" data-r="p-play-ic"><path d="M7 4v16l13-8z"/></svg></button>
       <div class="p-right">
+        <button class="p-ic p-hear" data-r="hear" aria-pressed="false" aria-label="Hear the notes played"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.2l4.8 4V5.5l-4.8 4z"/><path class="on" d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11"/><path class="off" d="M4 4l16 16"/></svg></button>
         <button class="p-key" data-r="p-key" aria-haspopup="dialog" aria-label="Key and instrument"><b data-r="p-key-k">C</b><small data-r="p-key-i">Concert</small></button>
         <button class="p-reps" data-r="p-reps" aria-haspopup="true" aria-label="Number of repeats">1×</button>
         <div class="p-reps-pop" data-r="p-reps-pop" hidden></div>
