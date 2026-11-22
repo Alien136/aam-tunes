@@ -12,7 +12,7 @@ moves that block under the new version when Alex says "ship".
 ### Added
 - Beta (test copy only): a cleaner Learn bar. It starts with one short line and one button, Fingering. The Learn button reads Stop while Learn is on. Skip note appears only for a note that will not go (three wrong tries, twenty seconds on it, or nothing heard). Start again and Next line appear when the line is finished. Level (Forgiving or Strict) has moved into the settings.
 - Beta (test copy only): **Learn starts in one tap.** No microphone check first: the player works out the room's level and how sharp or flat the student sits while they play, and keeps it. If it hears no clear note for twelve seconds it says so and offers a **Check microphone** button, which runs the full two-step check. The Tuner still has the full check.
-- Beta (test copy only): the Tuner and "hear the notes" have moved to the play bar as icons: a gauge with a needle beside the metronome, and a speaker that is blue when on and struck through when off. Learn stays above the music, on the right beside Next.
+- Beta (test copy only): the Tuner and "hear the notes" have moved to the play bar as icons: a gauge with a needle beside the metronome, and a speaker that is blue when on and struck through when off (the speaker then moved to the foot of the music, on the right). Learn stays above the music, on the right beside Next.
 - Beta (test copy only): a **Next** button beside Hear it, Learn and Tuner on every booklet line: one tap goes to the next line of the booklet.
 - Beta (test copy only): the tour is now six notes in practice order: the instrument the booklet is written for (and how to get another), Learn, Play, tempo, Next, the title.
 

@@ -543,4 +543,6 @@ Everything needed to carry on from any conversation is in this repository and in
   on one note, or the can't-hear message; `learn-again` and the new `learn-next` (clicks the `next-line` chip) show when the line is done;
   `learn-lvl` moved to the Band chips row (settings sheet on phones), still shown only while Learn is on. The opening line no longer says
   what the note sounds as on a piano. Checks: `--only learn` (21). Not built: the two stars and the Unit 1 invitation (not yet approved).
+- 22 Nov: the speaker (`hear`) moved again at Alex's request, from the play bar to `.key-row` at the foot of the music card, right-hand end,
+  beside the line's description. The tuner stays on the bar beside the metronome.
 

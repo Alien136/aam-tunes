@@ -414,6 +414,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 #aam-play .p-ic[hidden] { display: none; }
 #aam-play .p-ic svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; } #aam-play .p-ic svg circle { fill: currentColor; stroke: none; }
 #aam-play .p-ic[data-r="tuner-btn"] { background: var(--surface); border-color: var(--line); color: var(--accent-text); }
+#aam-play .key-row { display: flex; align-items: center; gap: 10px; } #aam-play .key-row .key { flex: 1 1 auto; min-width: 0; } #aam-play .key-row .p-hear { margin-left: auto; }      /* "hear the notes" sits at the foot of the music, on the right (Alex, 22 Nov) */
 #aam-play .p-hear .on { display: none; } #aam-play .p-hear[aria-pressed="true"] .on { display: inline; } #aam-play .p-hear[aria-pressed="true"] .off { display: none; }
 #aam-play .p-hear[aria-pressed="true"] { background: var(--now); color: var(--now-ink); border-color: var(--now); }
 #aam-play .p-hear:disabled { opacity: .45; }
@@ -582,7 +583,8 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
       <p class="hint" data-r="hint"></p>
       <div class="form" data-r="form" aria-label="The form, bar by bar"></div>
       <div class="score" data-r="score" aria-label="The music, bar by bar" hidden><div data-r="score-in"></div></div>
-      <div class="key" data-r="key" hidden></div>
+      <div class="key-row"><div class="key" data-r="key" hidden></div>
+        <button class="p-ic p-hear" data-r="hear" aria-pressed="false" aria-label="Hear the notes played"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.2l4.8 4V5.5l-4.8 4z"/><path class="on" d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11"/><path class="off" d="M4 4l16 16"/></svg></button></div>
     </section>
 
     <section class="panel tips-panel" data-r="tips">
@@ -612,7 +614,6 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
       <button class="apply-pill" data-r="apply" hidden>Apply changes</button>
       <button class="play" data-r="p-play" aria-label="Play"><svg viewBox="0 0 24 24" data-r="p-play-ic"><path d="M7 4v16l13-8z"/></svg></button>
       <div class="p-right">
-        <button class="p-ic p-hear" data-r="hear" aria-pressed="false" aria-label="Hear the notes played"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.2l4.8 4V5.5l-4.8 4z"/><path class="on" d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11"/><path class="off" d="M4 4l16 16"/></svg></button>
         <button class="p-key" data-r="p-key" aria-haspopup="dialog" aria-label="Key and instrument"><b data-r="p-key-k">C</b><small data-r="p-key-i">Concert</small></button>
         <button class="p-reps" data-r="p-reps" aria-haspopup="true" aria-label="Number of repeats">1×</button>
         <div class="p-reps-pop" data-r="p-reps-pop" hidden></div>
