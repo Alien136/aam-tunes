@@ -2566,6 +2566,288 @@
      }
     ]
    }
+  },
+  {
+   "id": "be1-alto",
+   "title": "Blues Études Vol. 1 · Alto Sax",
+   "hash": "f0b91633a45b0fbb42f9e41039bc4ced1807fc1c36f06aaf51047e4ba10c7399",
+   "tunes": [
+    "be1-1-alto",
+    "be1-2-alto",
+    "be1-3-alto",
+    "be1-4-alto",
+    "be1-5-alto",
+    "be1-6-alto",
+    "be1-7-alto",
+    "be1-8-alto"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be1-1-alto",
+      "be1-2-alto",
+      "be1-3-alto",
+      "be1-4-alto",
+      "be1-5-alto",
+      "be1-6-alto",
+      "be1-7-alto",
+      "be1-8-alto"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be1-alto-sample",
+   "title": "Blues Études Vol. 1 · Free Sample · Alto Sax",
+   "hash": "6a3452ad5be8684dae1c96efeaa2e921b0c0663c7df47dc84079e522d887d241",
+   "tunes": [
+    "be1-4-alto"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be1-4-alto"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be1-tenor",
+   "title": "Blues Études Vol. 1 · Tenor Sax",
+   "hash": "34f271870ed5aea6adb7fee9847b33605c52c772ee2fbdc98c7362bc52eb6c5e",
+   "tunes": [
+    "be1-1-tenor",
+    "be1-2-tenor",
+    "be1-3-tenor",
+    "be1-4-tenor",
+    "be1-5-tenor",
+    "be1-6-tenor",
+    "be1-7-tenor",
+    "be1-8-tenor"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be1-1-tenor",
+      "be1-2-tenor",
+      "be1-3-tenor",
+      "be1-4-tenor",
+      "be1-5-tenor",
+      "be1-6-tenor",
+      "be1-7-tenor",
+      "be1-8-tenor"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be1-tenor-sample",
+   "title": "Blues Études Vol. 1 · Free Sample · Tenor Sax",
+   "hash": "ec676520dff2c3797e86a7bf4f91db3aebf1ea241fc4404abddcff73894fb68d",
+   "tunes": [
+    "be1-4-tenor"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be1-4-tenor"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be1-flute",
+   "title": "Blues Études Vol. 1 · Flute",
+   "hash": "bfac7563acdd348326ce68acf6de883b11af44926fed872fa4684bfbf654fb5f",
+   "tunes": [
+    "be1-1-flute",
+    "be1-2-flute",
+    "be1-3-flute",
+    "be1-4-flute",
+    "be1-5-flute",
+    "be1-6-flute",
+    "be1-7-flute",
+    "be1-8-flute"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be1-1-flute",
+      "be1-2-flute",
+      "be1-3-flute",
+      "be1-4-flute",
+      "be1-5-flute",
+      "be1-6-flute",
+      "be1-7-flute",
+      "be1-8-flute"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be1-flute-sample",
+   "title": "Blues Études Vol. 1 · Free Sample · Flute",
+   "hash": "958f728f93c86b0abf57f139a8341b1f0e6650e828125468faef330ea3770988",
+   "tunes": [
+    "be1-4-flute"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be1-4-flute"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be2-alto",
+   "title": "Blues Études Vol. 2 · Alto Sax",
+   "hash": "7e69e23ca9fb1c45e0883eedd24250e51c367226c5b0d11f754c7b1ef138ea8b",
+   "tunes": [
+    "be2-1-alto",
+    "be2-2-alto",
+    "be2-3-alto",
+    "be2-4-alto",
+    "be2-5-alto",
+    "be2-6-alto",
+    "be2-7-alto",
+    "be2-8-alto"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be2-1-alto",
+      "be2-2-alto",
+      "be2-3-alto",
+      "be2-4-alto",
+      "be2-5-alto",
+      "be2-6-alto",
+      "be2-7-alto",
+      "be2-8-alto"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be2-alto-sample",
+   "title": "Blues Études Vol. 2 · Free Sample · Alto Sax",
+   "hash": "e0b2edb504da58ab984dceec357d14aefac1028654375778368d6d2c307481cb",
+   "tunes": [
+    "be2-3-alto",
+    "be2-4-alto"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be2-3-alto",
+      "be2-4-alto"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be2-tenor",
+   "title": "Blues Études Vol. 2 · Tenor Sax",
+   "hash": "36248ae889af5dbe2af575f0e3b7c868eb4a497e8d024e9f76701966ecfbc868",
+   "tunes": [
+    "be2-1-tenor",
+    "be2-2-tenor",
+    "be2-3-tenor",
+    "be2-4-tenor",
+    "be2-5-tenor",
+    "be2-6-tenor",
+    "be2-7-tenor",
+    "be2-8-tenor"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be2-1-tenor",
+      "be2-2-tenor",
+      "be2-3-tenor",
+      "be2-4-tenor",
+      "be2-5-tenor",
+      "be2-6-tenor",
+      "be2-7-tenor",
+      "be2-8-tenor"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be2-tenor-sample",
+   "title": "Blues Études Vol. 2 · Free Sample · Tenor Sax",
+   "hash": "491decd2f3b69c32679e13f8514e19b1af5180f20eae1044c98e1bbab2b111d9",
+   "tunes": [
+    "be2-3-tenor",
+    "be2-4-tenor"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be2-3-tenor",
+      "be2-4-tenor"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be2-flute",
+   "title": "Blues Études Vol. 2 · Flute",
+   "hash": "760880944ba15e840de250adac6392f82fd317b1c905c00ee226f0e394025adb",
+   "tunes": [
+    "be2-1-flute",
+    "be2-2-flute",
+    "be2-3-flute",
+    "be2-4-flute",
+    "be2-5-flute",
+    "be2-6-flute",
+    "be2-7-flute",
+    "be2-8-flute"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be2-1-flute",
+      "be2-2-flute",
+      "be2-3-flute",
+      "be2-4-flute",
+      "be2-5-flute",
+      "be2-6-flute",
+      "be2-7-flute",
+      "be2-8-flute"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be2-flute-sample",
+   "title": "Blues Études Vol. 2 · Free Sample · Flute",
+   "hash": "ce74f3c5f8c8fb4b7a2802a1636b34fc4bc57cb66a53bb5ba821a39431639db1",
+   "tunes": [
+    "be2-3-flute",
+    "be2-4-flute"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be2-3-flute",
+      "be2-4-flute"
+     ]
+    }
+   ]
   }
  ],
  "tunes": {
@@ -4620,6 +4902,198 @@
   "flute-welcome-2oct-minor-b": {
    "title": "Two Octaves · B Harmonic Minor",
    "subtitle": "Flute Welcome Booklet · Part 3 · Two-Octave Scales"
+  },
+  "be1-1-alto": {
+   "title": "Étude 1: Savoy Steps",
+   "subtitle": "Blues Études Vol. 1 · Alto Sax · in the style of Charlie Parker"
+  },
+  "be1-2-alto": {
+   "title": "Étude 2: Long Lines",
+   "subtitle": "Blues Études Vol. 1 · Alto Sax · in the style of Sonny Stitt"
+  },
+  "be1-3-alto": {
+   "title": "Étude 3: Lay It Back",
+   "subtitle": "Blues Études Vol. 1 · Alto Sax · in the style of Dexter Gordon"
+  },
+  "be1-4-alto": {
+   "title": "Étude 4: Blue Motif",
+   "subtitle": "Blues Études Vol. 1 · Alto Sax · in the style of Sonny Rollins"
+  },
+  "be1-5-alto": {
+   "title": "Étude 5: Middleweight",
+   "subtitle": "Blues Études Vol. 1 · Alto Sax · in the style of Hank Mobley"
+  },
+  "be1-6-alto": {
+   "title": "Étude 6: Sunday Shout",
+   "subtitle": "Blues Études Vol. 1 · Alto Sax · in the style of Cannonball Adderley"
+  },
+  "be1-7-alto": {
+   "title": "Étude 7: Sharp Edge",
+   "subtitle": "Blues Études Vol. 1 · Alto Sax · in the style of Jackie McLean"
+  },
+  "be1-8-alto": {
+   "title": "Étude 8: Fast Lane",
+   "subtitle": "Blues Études Vol. 1 · Alto Sax · in the style of Johnny Griffin"
+  },
+  "be1-1-tenor": {
+   "title": "Étude 1: Savoy Steps",
+   "subtitle": "Blues Études Vol. 1 · Tenor Sax · in the style of Charlie Parker"
+  },
+  "be1-2-tenor": {
+   "title": "Étude 2: Long Lines",
+   "subtitle": "Blues Études Vol. 1 · Tenor Sax · in the style of Sonny Stitt"
+  },
+  "be1-3-tenor": {
+   "title": "Étude 3: Lay It Back",
+   "subtitle": "Blues Études Vol. 1 · Tenor Sax · in the style of Dexter Gordon"
+  },
+  "be1-4-tenor": {
+   "title": "Étude 4: Blue Motif",
+   "subtitle": "Blues Études Vol. 1 · Tenor Sax · in the style of Sonny Rollins"
+  },
+  "be1-5-tenor": {
+   "title": "Étude 5: Middleweight",
+   "subtitle": "Blues Études Vol. 1 · Tenor Sax · in the style of Hank Mobley"
+  },
+  "be1-6-tenor": {
+   "title": "Étude 6: Sunday Shout",
+   "subtitle": "Blues Études Vol. 1 · Tenor Sax · in the style of Cannonball Adderley"
+  },
+  "be1-7-tenor": {
+   "title": "Étude 7: Sharp Edge",
+   "subtitle": "Blues Études Vol. 1 · Tenor Sax · in the style of Jackie McLean"
+  },
+  "be1-8-tenor": {
+   "title": "Étude 8: Fast Lane",
+   "subtitle": "Blues Études Vol. 1 · Tenor Sax · in the style of Johnny Griffin"
+  },
+  "be1-1-flute": {
+   "title": "Étude 1: Savoy Steps",
+   "subtitle": "Blues Études Vol. 1 · Flute · in the style of Charlie Parker"
+  },
+  "be1-2-flute": {
+   "title": "Étude 2: Long Lines",
+   "subtitle": "Blues Études Vol. 1 · Flute · in the style of Sonny Stitt"
+  },
+  "be1-3-flute": {
+   "title": "Étude 3: Lay It Back",
+   "subtitle": "Blues Études Vol. 1 · Flute · in the style of Dexter Gordon"
+  },
+  "be1-4-flute": {
+   "title": "Étude 4: Blue Motif",
+   "subtitle": "Blues Études Vol. 1 · Flute · in the style of Sonny Rollins"
+  },
+  "be1-5-flute": {
+   "title": "Étude 5: Middleweight",
+   "subtitle": "Blues Études Vol. 1 · Flute · in the style of Hank Mobley"
+  },
+  "be1-6-flute": {
+   "title": "Étude 6: Sunday Shout",
+   "subtitle": "Blues Études Vol. 1 · Flute · in the style of Cannonball Adderley"
+  },
+  "be1-7-flute": {
+   "title": "Étude 7: Sharp Edge",
+   "subtitle": "Blues Études Vol. 1 · Flute · in the style of Jackie McLean"
+  },
+  "be1-8-flute": {
+   "title": "Étude 8: Fast Lane",
+   "subtitle": "Blues Études Vol. 1 · Flute · in the style of Johnny Griffin"
+  },
+  "be2-1-alto": {
+   "title": "Étude 1: Night Sheets",
+   "subtitle": "Blues Études Vol. 2 · Alto Sax · in the style of John Coltrane"
+  },
+  "be2-2-alto": {
+   "title": "Étude 2: Fourth Floor",
+   "subtitle": "Blues Études Vol. 2 · Alto Sax · in the style of John Coltrane"
+  },
+  "be2-3-alto": {
+   "title": "Étude 3: Quiet Riddle",
+   "subtitle": "Blues Études Vol. 2 · Alto Sax · in the style of Wayne Shorter"
+  },
+  "be2-4-alto": {
+   "title": "Étude 4: Open Window",
+   "subtitle": "Blues Études Vol. 2 · Alto Sax · in the style of Wayne Shorter"
+  },
+  "be2-5-alto": {
+   "title": "Étude 5: Half-Life",
+   "subtitle": "Blues Études Vol. 2 · Alto Sax · in the style of Joe Henderson"
+  },
+  "be2-6-alto": {
+   "title": "Étude 6: Final Lap",
+   "subtitle": "Blues Études Vol. 2 · Alto Sax · in the style of Joe Henderson"
+  },
+  "be2-7-alto": {
+   "title": "Étude 7: Easy Money",
+   "subtitle": "Blues Études Vol. 2 · Alto Sax · in the style of Cannonball Adderley"
+  },
+  "be2-8-alto": {
+   "title": "Étude 8: Fast Company",
+   "subtitle": "Blues Études Vol. 2 · Alto Sax · in the style of Cannonball Adderley"
+  },
+  "be2-1-tenor": {
+   "title": "Étude 1: Night Sheets",
+   "subtitle": "Blues Études Vol. 2 · Tenor Sax · in the style of John Coltrane"
+  },
+  "be2-2-tenor": {
+   "title": "Étude 2: Fourth Floor",
+   "subtitle": "Blues Études Vol. 2 · Tenor Sax · in the style of John Coltrane"
+  },
+  "be2-3-tenor": {
+   "title": "Étude 3: Quiet Riddle",
+   "subtitle": "Blues Études Vol. 2 · Tenor Sax · in the style of Wayne Shorter"
+  },
+  "be2-4-tenor": {
+   "title": "Étude 4: Open Window",
+   "subtitle": "Blues Études Vol. 2 · Tenor Sax · in the style of Wayne Shorter"
+  },
+  "be2-5-tenor": {
+   "title": "Étude 5: Half-Life",
+   "subtitle": "Blues Études Vol. 2 · Tenor Sax · in the style of Joe Henderson"
+  },
+  "be2-6-tenor": {
+   "title": "Étude 6: Final Lap",
+   "subtitle": "Blues Études Vol. 2 · Tenor Sax · in the style of Joe Henderson"
+  },
+  "be2-7-tenor": {
+   "title": "Étude 7: Easy Money",
+   "subtitle": "Blues Études Vol. 2 · Tenor Sax · in the style of Cannonball Adderley"
+  },
+  "be2-8-tenor": {
+   "title": "Étude 8: Fast Company",
+   "subtitle": "Blues Études Vol. 2 · Tenor Sax · in the style of Cannonball Adderley"
+  },
+  "be2-1-flute": {
+   "title": "Étude 1: Night Sheets",
+   "subtitle": "Blues Études Vol. 2 · Flute · in the style of John Coltrane"
+  },
+  "be2-2-flute": {
+   "title": "Étude 2: Fourth Floor",
+   "subtitle": "Blues Études Vol. 2 · Flute · in the style of John Coltrane"
+  },
+  "be2-3-flute": {
+   "title": "Étude 3: Quiet Riddle",
+   "subtitle": "Blues Études Vol. 2 · Flute · in the style of Wayne Shorter"
+  },
+  "be2-4-flute": {
+   "title": "Étude 4: Open Window",
+   "subtitle": "Blues Études Vol. 2 · Flute · in the style of Wayne Shorter"
+  },
+  "be2-5-flute": {
+   "title": "Étude 5: Half-Life",
+   "subtitle": "Blues Études Vol. 2 · Flute · in the style of Joe Henderson"
+  },
+  "be2-6-flute": {
+   "title": "Étude 6: Final Lap",
+   "subtitle": "Blues Études Vol. 2 · Flute · in the style of Joe Henderson"
+  },
+  "be2-7-flute": {
+   "title": "Étude 7: Easy Money",
+   "subtitle": "Blues Études Vol. 2 · Flute · in the style of Cannonball Adderley"
+  },
+  "be2-8-flute": {
+   "title": "Étude 8: Fast Company",
+   "subtitle": "Blues Études Vol. 2 · Flute · in the style of Cannonball Adderley"
   }
  }
 }

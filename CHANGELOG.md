@@ -10,6 +10,8 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- Blues Études Vol. 1 and Vol. 2 are in the player's library: 8 études each, for alto sax, tenor sax and flute (48 tunes), written for each instrument as the PDF prints them, with the band, and locked by a code per edition (nobody has the codes yet). Made by the new `tools/publish_etudes.py`, which the product bots now use for every étude volume.
+- Beta (test copy only): Learn mode follows lines with long runs of triplets or sixteenth notes. Before, a bar of triplets drifted by a hair and Learn was not offered on 20 of the 48 études.
 - Beta (test copy only): **less on the screen.** A line printed in a booklet no longer shows the key button or "Through the keys" (it is played in the key on the page). The repeats button has left the play bar: the number of repeats is in the settings, with the one-line hint about tapping and looping bars. **My tunes** is a small icon. The "How it works" list is replaced by one button, **Show me around**, which replays the tour.
 - Beta (test copy only): the three speeds in the tempo popup carry their musical term, worked out from the number (for example Andante · 76, Moderato · 96, Allegro · 116). Under 60 Largo, 60 Adagio, 72 Andante, 92 Moderato, 112 Allegro, 140 Vivace, 168 Presto.
 - Beta (test copy only): every line now plays **twice** by default (it was once). The repeats button still changes it.

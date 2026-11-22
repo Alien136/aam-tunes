@@ -1521,7 +1521,7 @@ function aamBoot(TUNE) {
       [].forEach.call(svg.querySelectorAll(sel + ".abcjs-note, " + sel + ".abcjs-rest"), function (el) {
         var c = el.getAttribute("class"), mm = /abcjs-mm(\d+)/.exec(c), d = /abcjs-d(\d+)-?(\d*)/.exec(c); if (!mm || !d) return;
         var k = +mm[1], beat = pos[k] || 0, it = { k: k, beat: beat, el: el, rest: /abcjs-rest/.test(c) };
-        pos[k] = beat + 4 * parseFloat(d[1] + "." + (d[2] || "0"));
+        pos[k] = beat + Math.round(4 * parseFloat(d[1] + "." + (d[2] || "0")) * 48) / 48;      // the drawing gives a length to three decimals (a triplet eighth is 0.083): snapped to 48ths of a beat so a bar of triplets or sixteenths still adds up
         (into[k] = into[k] || []).push(it); if (list && !it.rest) list.push(it);
       });
     };

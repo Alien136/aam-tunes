@@ -104,6 +104,24 @@ tip-box and unit-opener system in every book; no page with a large empty band; n
 inconsistency at its source (the shared code, not one book), rebuild every edition it touches, and keep every code and QR link the
 same. If a rebuilt PDF changes what a student sees, republish it with a new edition date. Log before and after.
 
+## Étude volumes and other PDF products from the product bots
+The CPO bot (AAM Board, AAM Playbook) writes the paid PDF products: Blues Études now, other series later. Since 22 Nov 2026 every
+one of them reaches the player through this repository, in today's tune format, or it is not finished.
+- `tools/publish_etudes.py <etude_data.py> . --check` builds every étude for every edition in memory and prints problems (a bar
+  that is not four beats, a note outside the instrument). It writes nothing. A product PDF may not go to Alex until this passes.
+- `--links` prints the link for each étude page's QR code: `?t=<prefix><volume>-<n>-<edition>` (for example `be2-4-tenor`).
+- `--codes codes.json` publishes: one tune per étude per edition (written pitch for that instrument, `keys: "off"`), one library
+  entry per edition and one per free sample. Each edition has its own code (Alex: the editions are sold separately). Codes are
+  never committed: they live in the AAM Playbook's Catalog roadmap. Then `node tools/check_release.js --only <prefix><volume>-`,
+  `node tools/check_features.js --only etudes`, the guard, commit, push. The tunes are in the library but locked by their codes,
+  so nothing reaches a student until Alex sells or gives out a code.
+- The CPO bot runs `--check`, publishes and runs the guard, but has no master code: when `git log` shows a commit of étude tunes
+  since your last run, the nightly Builder and the Sunday review run `node tools/check_release.js --only <prefix><volume>-` and
+  `node tools/check_features.js --only etudes` on it and log a failure as Prevented (and fix the tool, not the tune by hand).
+- The volume's `etude_data.py` is not committed here (it is the product's source and lives with the build kit and the review doc).
+- A new kind of product (a workbook, a duet book) gets its own small publisher on the model of `publish_exercise.py`; do not
+  invent a second tune format. Grace notes, falls and trills stay in the PDF: the player shows and listens for the main notes.
+
 ## Checks
 
 - Changed the player, `index.json` or anything in `tunes/`: `node tools/check_release.js` then `node tools/check_features.js`

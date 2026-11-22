@@ -19,7 +19,7 @@
 
    The microphone is a sound file: saxophone-like tones are generated here and fed to the browser as a fake microphone.
 
-   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|mic|flute|learn|level|cloud|contents|pdf|bar|style|apply|piano|install|demo|cards]
+   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|mic|flute|learn|level|cloud|contents|pdf|bar|style|apply|etudes|piano|install|demo|cards]
    Needs:  playwright, plus the tone and abcjs packages (tools/node_modules or $AAM_NODE_MODULES). Nothing is fetched from the internet. */
 const fs = require("fs"), path = require("path"), os = require("os");
 const { chromium, devices } = require("playwright");
@@ -549,6 +549,16 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     const ls = await open({ ...devices["iPhone 13"] }, "f-blues-piano");
     expect(await ls.evaluate(() => !document.querySelector('[data-r="p-key"]').hidden && !document.querySelector('[data-r="cycle"]').hidden), "a lead sheet keeps its key button and \"Through the keys\"");
     await ls.context().close();
+  }
+  if (want("etudes") && fs.existsSync(path.join(ROOT, "tunes", "be1-1-alto.json"))) {      // étude volumes (tools/publish_etudes.py): written for one instrument, Learn mode follows every note, sixteenths and triplets included
+    for (const slug of ["be1-1-alto", "be1-4-tenor", "be1-8-flute"]) {
+      const page = await open({ ...devices["iPhone 13"] }, slug);
+      await page.click('[data-r="views"] button:last-child'); await page.waitForTimeout(1200);
+      const st = await page.evaluate(() => { const q = r => document.querySelector('[data-r="' + r + '"]'); return [!q("learn-btn").hidden, q("p-key").hidden, q("cycle").hidden, q("next-line") && !q("next-line").hidden || /-8-/.test(location.search), document.querySelectorAll(".score .abcjs-note").length > 60].join(); });
+      expect(st === "true,true,true,true,true", slug + ": Learn is offered, the key is fixed, Next leads on, and the music is drawn (" + st + ")");
+      expect((await txt(page, "inst-name")).toLowerCase().indexOf(slug.split("-")[2].slice(0, 4)) >= 0, slug + ": the page says which instrument it is written for");
+      await page.context().close();
+    }
   }
   if (want("apply")) {                                      // changes made while the band plays wait for "Apply changes"; the page-turn copy carries no cloud
     const page = await open({ ...devices["iPhone 13"] }, "f-blues-piano");

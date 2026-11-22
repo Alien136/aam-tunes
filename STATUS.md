@@ -564,3 +564,24 @@ Everything needed to carry on from any conversation is in this repository and in
   the document event `aam-tour` (the library answers with `tour(true)`); the tempo chips are labelled by `term(bpm)`. Checks: the
   second "bar" block and `setReps` in "apply". Still to do from that talk: goal tempos printed in the booklet and linked to the
   player (next booklet edition). While playing, the "1/2" pass count is no longer visible on a phone: say so if Alex misses it.
+
+## 2026-11-22 · The product bots now build for today's player (étude volumes)
+- Alex: "fix the workflow so that all the work done by the bots is up to speed and ties into the newest versions". Found: the CPO
+  bot's Blues Études kit exported an old tune shape (one concert tune per étude, `instrument: "woodwind"`, an `editions` field the
+  player never read, a `catalog_src.json` that no longer exists), nothing was published, and the bot had no access to this repository.
+- New `tools/publish_etudes.py` (see BUILDER.md, "Étude volumes"): reads the kit's `etude_data.py`, writes one tune per étude per
+  edition (`be<vol>-<n>-<alto|tenor|flute>`), written pitch, `keys: "off"`, chord scales chosen here (gen_study has no dim7), ties
+  merged, grace notes and falls left to the PDF. `--check` writes nothing; `--links` prints QR links; `--codes` publishes.
+- Published: Vol. 1 (from the kit's data) and Vol. 2 (from the review doc's music source, 21 Nov state), 48 tunes, 12 library
+  entries (`be1-alto`, `be1-alto-sample`, ...). One code per edition and one per sample (Alex rejected "one purchase for all
+  editions"). The codes are in the AAM Playbook (Catalog roadmap) and the project doc; the older single codes per volume are retired
+  (never printed for anyone). The études' data files are not in this repository.
+- A straight-sixteenths beat: the note on the "and" is written 0.0102 beats late so the player's swing (which moves only a note
+  within 0.01 of the "and") leaves the run even, and Learn mode (48ths of a beat) still finds it.
+- Player, beta: `beats()` snaps each drawn length to 48ths of a beat. abcjs prints lengths to three decimals, so eight triplet
+  eighths ended at 2.656 instead of 2.667 and `learnSeq` found no written note for the sound. In the LIVE player (v1.4) 20 of the
+  48 études therefore show no Learn button until the next release. Check group "etudes".
+- Known and unchanged: tune files in this public repository are readable by anyone who looks; the code only gates the player.
+  Before real money depends on it, codes need checking on a server (roadmap step 9).
+- Outside the repository, same day: the Build Kit artifact (v7: `play_export.py` now calls this tool; per-edition codes and slugs;
+  sample list from `VOLUME["sample"]`), the CPO scheduled tasks' instructions, the aam-csuite skill and the Playbook rules.
