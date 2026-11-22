@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Alex Attard Music · Theory workbooks. FIRST SAMPLE: Prep, Units 1 and 2 (four pages), to settle the look before the whole book is written.
+"""Alex Attard Music · Theory workbooks. The Prep book (age 7 to 8, piano): a cover, eight units and a review, 18 pages.
+Units 1 and 2 are in this file; Units 3 to 8 are in theory_prep_units.py.
 
-  python3 tools/build_theory.py            writes tools/out/Theory_Prep_sample.pdf
+  python3 tools/build_theory.py            writes tools/out/Theory_Prep.pdf
 
 The look (Alex, 21-22 Nov 2026): cut to the chase, never kiddy. A short "Learn" box, then exercises straight away. Black and white
 with one accent color (the website's blue), no cartoons. Prep (age 7) uses large type and a large staff; each level steps down. Piano first. US terms only.
 Everything on these pages is drawn here (keyboards, staves, notes): no music engraver is needed until the clefs arrive in Unit 3."""
-import os
+import os, sys
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
@@ -15,7 +16,7 @@ from reportlab.lib.colors import HexColor, white, black
 from reportlab.platypus import Paragraph
 from reportlab.lib.styles import ParagraphStyle
 
-HERE = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(HERE, "out"); os.makedirs(OUT, exist_ok=True)
+HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE); OUT = os.path.join(HERE, "out"); os.makedirs(OUT, exist_ok=True)
 INK, ACC, TINT, MUTED, RULE = "#1B2430", "#428AD2", "#EAF2FB", "#5F6B78", "#C9D1D9"      # ACC is the blue of alexattardmusic.com (Alex, 22 Nov)
 ACC_TEXT = "#2466B0"                                   # the same blue, deepened so small labels stay readable in print
 GF, DJ = "/usr/share/fonts/truetype/google-fonts/", "/usr/share/fonts/truetype/dejavu/"
@@ -85,8 +86,20 @@ class Page:
 
 
 def build():
-    out = os.path.join(OUT, "Theory_Prep_sample.pdf"); c = canvas.Canvas(out, pagesize=letter); c.setTitle("Theory · Prep · sample"); c.setAuthor("Alex Attard Music")
+    out = os.path.join(OUT, "Theory_Prep.pdf"); c = canvas.Canvas(out, pagesize=letter); c.setTitle("Theory · Prep"); c.setAuthor("Alex Attard Music")
     kbx = lambda n, kw: (W - n * kw) / 2
+
+    # ------------------------------------------------ cover
+    c.setFillColor(HexColor(ACC)); c.rect(0, H - 300, W, 300, fill=1, stroke=0)
+    c.setFillColor(white); c.setFont("Pop-B", 13); c.drawString(M, H - 80, "A L E X   A T T A R D   M U S I C")
+    c.setFont("Pop-B", 64); c.drawString(M, H - 190, "Theory"); c.setFont("Pop-M", 30); c.drawString(M, H - 240, "Prep  ·  Piano")
+    c.setFillColor(HexColor(INK)); c.setFont("Pop-B", 15); c.drawString(M, H - 350, "In this book")
+    c.setFont("Pop", 14)
+    for k, t in enumerate(("1   The keyboard and the musical alphabet", "2   The staff: lines and spaces", "3   The treble clef", "4   The bass clef",
+                           "5   How long notes last, and rests", "6   Measures and counting in 4/4 and 3/4", "7   Steps and skips", "8   Loud and soft, fast and slow")):
+        c.drawString(M, H - 384 - k * 27, t)
+    c.setFont("Pop", 13); c.drawString(M, 150, "This book belongs to  ______________________________________")
+    c.setFillColor(HexColor(MUTED)); c.setFont("Pop", 10); c.drawString(M, 60, "Edition 1  ·  November 2026  ·  alexattardmusic.com/theory"); c.showPage()
 
     # ------------------------------------------------ Unit 1, page 1
     p = Page(c, "Prep", 1, "The keyboard", 1)
@@ -155,7 +168,10 @@ def build():
         if k < 3: c.setStrokeColor(HexColor(INK)); c.setLineWidth(1.2); c.line(x + 62, p.base, x + 62, p.base + 4 * 18)
     p.gap(4 * 18 + 40)
     p.checks(["I can find groups of 2 and 3 black keys, and every C and F.", "I can say the musical alphabet forward from any letter.", "I can number the lines and spaces of the staff from the bottom."])
-    c.showPage(); c.save(); print(out)
+    c.showPage()
+    import theory_prep_units as U                          # Units 3 to 8 and the review
+    U.setup(sys.modules[__name__]); U.build(c, 5)
+    c.save(); print(out)
 
 
 if __name__ == "__main__":

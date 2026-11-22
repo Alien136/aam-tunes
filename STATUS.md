@@ -495,3 +495,12 @@ Everything needed to carry on from any conversation is in this repository and in
   equal buttons per choice so it fits a phone screen (check: Start is on screen without scrolling). Alex's decisions the same day: the
   Level 1 blues is the real 12-bar blues with a V-IV turnaround and no ii-V; theory material is piano-focused first; US terms only
   (quarter, half, whole note), no British terms. See project doc "Theory decisions (2026-11-22)".
+
+## 2026-11-22 · Theory workbooks: the Prep book, first full draft
+- `python3 tools/build_theory.py` writes `tools/out/Theory_Prep.pdf` (18 pages: cover, 8 units, review). Units 1-2 are in build_theory.py,
+  Units 3-8 in theory_prep_units.py. Everything is drawn with ReportLab; clefs and the quarter rest are FreeSerif's music glyphs.
+- Alex approved the look on the 4-page sample: Learn box then exercises, the website's blue (#428AD2) as the one accent, large type for Prep.
+  `LEVEL_TYPE` in build_theory.py holds the type and staff size per level: Level 1 steps up quickly to a mature page.
+- Piano first, US terms only. Finger numbers are NOT in Prep (asked twice, no answer: left out). Not yet read by Alex page by page.
+- Not done: answer key, QR codes to the flash-card decks, publishing (it is a file only), Level 1.
+
