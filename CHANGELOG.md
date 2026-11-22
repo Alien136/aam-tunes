@@ -17,6 +17,9 @@ moves that block under the new version when Alex says "ship".
 - Beta (test copy only): the tour is now six notes in practice order: the instrument the booklet is written for (and how to get another), Learn, Play, tempo, Next, the title.
 
 ### Fixed
+- Beta only: the test copy now stays the test copy when you move to another line (Next, the contents list, My tunes). It used to drop back to the released player.
+- Beta only: the music is laid out again whenever the Learn bar changes height, so the last line is no longer cut off when the finished message appears.
+- Beta only: the Learn level (Forgiving or Strict) is in the settings whenever a line has Learn, not only while Learn is running.
 
 ### Prevented
 

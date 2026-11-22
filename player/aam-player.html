@@ -1573,7 +1573,7 @@ function aamBoot(TUNE) {
   function learnEls() { var svg = score.querySelector("svg"); return svg ? [].slice.call(svg.querySelectorAll(".abcjs-note" + (IS_PIANO && learn.hand === "lh" ? ".abcjs-v1" : ".abcjs-v0"))) : []; }
   function learnPaint() {                                 // colour the notes again (the music is redrawn when the window changes)
     var svg0 = score.querySelector("svg"); if (svg0) softFilter(svg0);
-    $("learn-btn").hidden = !!window.AAM_DEMO || !learnAny();
+    $("learn-btn").hidden = !!window.AAM_DEMO || !learnAny(); learnLvlShow();
     if (learn.on && learn.key !== keyState.key) { learnStop(); return; }                                         // the key was changed: start again in the new key
     if (!learn.on) return;
     var els = learnEls(); if (els.length !== learn.seq.length) return;
@@ -1588,7 +1588,7 @@ function aamBoot(TUNE) {
     if (lvlPick === "strict" || lvlPick === "easy") return lvlPick;
     var c = ear.cal(); return c && c.lvl === "strict" ? "strict" : "easy";
   }
-  function learnLvlShow() { var b = $("learn-lvl"); b.hidden = IS_PIANO || !learn.on || !!learn.done; b.textContent = "Level: " + LVL[learnLvl()].name; }
+  function learnLvlShow() { var b = $("learn-lvl"); b.hidden = IS_PIANO || $("learn-btn").hidden; b.textContent = "Learn level: " + LVL[learnLvl()].name; }      // in the settings, there whenever this tune has Learn
   function learnSay(text, hint) { $("learn-msg").textContent = text; $("learn-hear").hidden = !hint; }
   var fingOn = false; try { fingOn = localStorage.getItem("aam-fing") === "1"; } catch (e) {}
   function learnFing() {                                  // the fingering for the note to play: always when the student asked for it, by itself after two misses
@@ -1696,6 +1696,9 @@ function aamBoot(TUNE) {
     go();                                                // one tap: no microphone check first. The level and the tuning are worked out while they play (learnHear), and the check is offered only if nothing can be heard
   }
   $("learn-btn").onclick = function () { if (learn.on) learnStop(); else learnStart(); };
+  // The Learn bar grows and shrinks (a longer message, Skip appearing, Start again and Next line at the end). Whenever its height
+  // changes the music below is laid out again, or its last line is cut off.
+  if (window.ResizeObserver) { var lbH = 0; new ResizeObserver(function () { var h = $("learn-bar").offsetHeight; if (!h) { lbH = 0; return; } if (learn && learn.on && h !== lbH) { lbH = h; perShown = 0; drawScore(); } }).observe($("learn-bar")); }
   $("learn-check").onclick = function () { var h = learn.hand; learnStop(); ear.setCal(null); openTuner(function () { learnStart(h); }); };      // the full two-step check, then straight back into Learn
   [].forEach.call($("h-hands").children, function (b) { b.onclick = function () { $("hdlg").hidden = true; learnStart(b.dataset.hand); }; });
   $("h-close").onclick = function () { $("hdlg").hidden = true; };
@@ -1705,9 +1708,9 @@ function aamBoot(TUNE) {
   $("learn-again").onclick = function () { learnStop(); learnStart(); };
   $("learn-skip").onclick = function () { if (learn.on && learnTarget() != null) learnNext(true); };
   $("learn-lvl").onclick = function () {                   // the student's own choice of level, kept on this device
-    if (!learn.on || learn.done) return;
     lvlPick = learnLvl() === "strict" ? "easy" : "strict"; try { localStorage.setItem("aam-lvl", lvlPick); } catch (e) {}
-    learn.okRun = learn.offRun = 0; learnLvlShow();
+    learnLvlShow(); if (!learn || !learn.on || learn.done) return;      // set from the settings before starting: nothing more to do
+    learn.okRun = learn.offRun = 0;
     var t = learnTarget();
     learnSay((lvlPick === "strict" ? "Strict: each note must be in tune and held a little longer." : "Forgiving: a clear note counts, even a little flat or sharp.") + (t != null ? " Next: " + noteName(t + EAR_SHIFT) + "." : ""), false);
     AAM_TRACK.event("aam_learn_level", { tune: TUNE.slug, instrument: TUNE.instrument || "", how: lvlPick });
@@ -2842,7 +2845,8 @@ function aamLibrary() {
   };
   var mine = function (slug) { return !!CAT.tunes[slug] && myPdfs().some(function (p) { return p.tunes.indexOf(slug) >= 0; }); };
   var sessionCode = "", canStore = (function () { try { localStorage.setItem("aam-t", "1"); localStorage.removeItem("aam-t"); return true; } catch (e) { return false; } })();
-  var urlFor = function (slug) { return location.pathname + "?tune=" + encodeURIComponent(slug) + (!canStore && sessionCode ? "&c=" + sessionCode : ""); };   // no storage: the code rides along
+  var TESTQ = PLAYER_VERSION === "test copy" ? "&player=test" : "";      // the test copy stays the test copy from line to line (it used to drop back to the released player on the first Next)
+  var urlFor = function (slug) { return location.pathname + "?tune=" + encodeURIComponent(slug) + (!canStore && sessionCode ? "&c=" + sessionCode : "") + TESTQ; };   // no storage: the code rides along
   // ---------- install on the phone: the page gets an icon, a name and "open full screen", and a short how-to in Practice settings.
   // Nothing here needs an app store. Offline is a separate file on the website (player/app/sw.js -> /aam-sw.js); it is asked for
   // only by the test copy until it has been tried on real phones.
@@ -3109,7 +3113,7 @@ function aamLibrary() {
     if (!want && r && r !== "all") want = r.tunes[0];
     if (!want) want = lib.last && mine(lib.last) ? lib.last : (myPdfs()[0] || {}).tunes ? myPdfs()[0].tunes[0] : null;
     if (code && r) sessionCode = norm(code);
-    if (code && canStore) { try { history.replaceState(null, "", location.pathname + (want ? "?tune=" + encodeURIComponent(want) : "")); } catch (e) {} }   // the code doesn't stay in the address bar
+    if (code && canStore) { try { history.replaceState(null, "", location.pathname + (want ? "?tune=" + encodeURIComponent(want) + TESTQ : TESTQ ? "?" + TESTQ.slice(1) : "")); } catch (e) {} }   // the code doesn't stay in the address bar
     if (DEMO && !(want && mine(want))) want = (myPdfs()[0] || { tunes: [] }).tunes[0];
     if (want && mine(want)) start(want); else gate(want);
   }).catch(function (e) { $("err").textContent = "Something went wrong opening the player (" + ((e && e.message) || e) + "). Reload the page and try again."; });

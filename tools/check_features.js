@@ -165,10 +165,18 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       expect(!!skipAt && /This note is A/.test(skipAt), "Learn bar: Skip note appears after three wrong tries at the same note (" + (skipAt || "never").slice(0, 40) + ")");
       let end = null; t0 = Date.now(); while (Date.now() - t0 < 14000 && !end) { await page.waitForTimeout(250); if (/every note/.test(await txt(page, "learn-msg"))) end = await seen(); }
       expect(!!end && end.includes("Start again") && end.includes("Next line ›") && !end.includes("Skip note") && !end.includes("Stop"), "Learn bar: when the line is finished it offers Start again and Next line (" + (end || []).join(", ") + ")");
+      await page.waitForTimeout(400);
+      const cut = await page.evaluate(() => { const sc = document.querySelector("#aam-play .score"), box = sc.getBoundingClientRect(); return [...sc.querySelectorAll(".abcjs-note, .abcjs-staff")].filter(n => { const r = n.getBoundingClientRect(); return r.height > 0 && (r.bottom > box.bottom + 1 || r.top < box.top - 1); }).length + (sc.scrollHeight > sc.clientHeight + 2 ? 100 : 0); });
+      expect(cut === 0, "Learn bar: when the finished message makes the bar taller, no line of music is cut off (" + cut + ")");
       const t1 = await txt(page, "title"); await page.click('[data-r="learn-next"]'); await page.waitForTimeout(2500); const t2 = await txt(page, "title");
       expect(t1 !== t2 && /^6 /.test(t2.trim()) && await page.evaluate(() => document.querySelector('[data-r="learn-bar"]').hidden), "Learn bar: Next line opens the next line of the booklet and closes Learn (" + t2.trim() + ")");
       await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(700); await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(300);
       expect(await page.evaluate(() => document.querySelector('[data-r="learn-bar"]').hidden && document.querySelector('[data-r="learn-btn"]').getAttribute("aria-pressed") === "false"), "Learn bar: tapping the Learn button again (now Stop) stops Learn");
+    });
+    await withMic(wav("cleanphone", played(hcb, 0.55, 0.12)), { ...devices["iPhone 13"] }, async page => {      // as Alex played it: no wrong notes, so nothing else has laid the page out again
+      const r = await learnRun(page, HCB, 15000); await page.waitForTimeout(500);
+      const cut = await page.evaluate(() => { const sc = document.querySelector("#aam-play .score"), svg = sc.querySelector("svg"), box = sc.getBoundingClientRect(), g = svg.getBoundingClientRect(); return { svgCut: Math.round(g.bottom - box.bottom), scroll: sc.scrollHeight - sc.clientHeight }; });
+      expect(r.done && cut.svgCut <= 1 && cut.scroll <= 2, "Learn bar: after a clean run on a phone the finished message does not cut off the music (" + JSON.stringify(cut) + ")");
     });
     const LOW = "sax-beginner-tenor-pinky-push-ups", low = tune(LOW).sections[0].learn.filter(m => m >= 0);
     await withMic(wav("low", played(low, 0.6, 0.12)), {}, async page => { const r = await learnRun(page, LOW, 14000); expect(r.done, "Learn, tenor low notes (down to written low C): the line is finished"); });
@@ -408,31 +416,31 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     const run = async (page, ms) => { const said = [], t0 = Date.now(); while (Date.now() - t0 < ms) { await page.waitForTimeout(150); const m = await txt(page, "learn-msg"); if (said[said.length - 1] !== m) said.push(m); if (/every note/.test(m)) break; } return said; };
     await withMic(wav("lvl-flat", flat), {}, async page => {
       await cal("strict")(page); await page.goto(URL_OF(HCB)); await page.waitForTimeout(1600); await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(250);
-      expect((await txt(page, "learn-lvl")) === "Level: Strict" && await page.evaluate(() => !document.querySelector('[data-r="learn-lvl"]').hidden), "levels: the Learn bar shows the level the check chose (Strict)");
+      expect((await txt(page, "learn-lvl")) === "Learn level: Strict" && await page.evaluate(() => !document.querySelector('[data-r="learn-lvl"]').hidden), "levels: the Learn bar shows the level the check chose (Strict)");
       const said = await run(page, 20000);
       expect(said.some(m => /^Right note, but flat/.test(m)), "levels, Strict: a note 40 cents flat is not accepted, and the player says it is flat (" + said.slice(0, 4).join(" / ").slice(0, 120) + ")");
       expect(!said.some(m => WRONG.test(m)), "levels, Strict: an out-of-tune note is never called a wrong note");
       expect(/every note/.test(said[said.length - 1] || ""), "levels, Strict: once the note is in tune the line carries on to the end");
-      expect(await page.evaluate(() => document.querySelector('[data-r="learn-lvl"]').hidden), "levels: the level button goes away when the line is finished");
+      expect(await page.evaluate(() => !document.querySelector('[data-r="learn-lvl"]').hidden), "levels: the level stays in the settings when the line is finished");
     });
     await withMic(wav("lvl-flat2", flat), {}, async page => {
       await cal("easy")(page); await page.goto(URL_OF(HCB)); await page.waitForTimeout(1600); await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(250);
-      expect((await txt(page, "learn-lvl")) === "Level: Forgiving", "levels: after a wavering check the Learn bar shows Forgiving");
+      expect((await txt(page, "learn-lvl")) === "Learn level: Forgiving", "levels: after a wavering check the Learn bar shows Forgiving");
       const said = await run(page, 20000);
       expect(!said.some(m => /^Right note, but/.test(m)) && /every note/.test(said[said.length - 1] || ""), "levels, Forgiving: the same playing, 40 cents flat, is accepted without a remark (as before levels existed)");
     });
     await withMic(wav("lvl-pick", [sil(20)]), { ...devices["iPhone 13"] }, async page => {      // the student's own choice, on a phone
       await page.addInitScript(() => { window.__ev = []; window.gtag = function (a, n, p) { if (a === "event") window.__ev.push(n + ":" + (p && p.how || "")); }; });
       await cal("strict")(page); await page.goto(URL_OF(HCB)); await page.waitForTimeout(1800); await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(400);
-      await page.click('[data-r="learn-lvl"]'); await page.waitForTimeout(200);
+      await page.click('[data-r="p-gear"]'); await page.waitForTimeout(300); await page.click('[data-r="learn-lvl"]'); await page.waitForTimeout(200);      // the level lives in the settings sheet now
       const a = await page.evaluate(() => { const bar = document.querySelector('[data-r="learn-bar"]'), r = bar.getBoundingClientRect(), bs = [].slice.call(bar.querySelectorAll("button")).filter(b => !b.hidden).map(b => b.getBoundingClientRect());
         return { label: document.querySelector('[data-r="learn-lvl"]').textContent, msg: document.querySelector('[data-r="learn-msg"]').textContent, kept: localStorage.getItem("aam-lvl"), fits: bs.every(b => b.left >= r.left - 0.5 && b.right <= r.right + 0.5 && b.width > 40) && r.right <= innerWidth + 0.5, ev: window.__ev }; });
-      expect(a.label === "Level: Forgiving" && a.kept === "easy", "levels: tapping the level button changes Strict to Forgiving and keeps the choice on the device (" + a.label + ", " + a.kept + ")");
+      expect(a.label === "Learn level: Forgiving" && a.kept === "easy", "levels: tapping the level button changes Strict to Forgiving and keeps the choice on the device (" + a.label + ", " + a.kept + ")");
       expect(/^Forgiving: /.test(a.msg) && /Next: \S+\./.test(a.msg), "levels: the change is explained in a sentence and the next note is still named (\"" + a.msg.slice(0, 60) + "\")");
       expect(a.fits, "levels: every button of the Learn bar fits inside the bar on a phone");
       expect(a.ev.includes("aam_learn_level:easy"), "levels: Analytics hears which level a student chose");
       await page.reload(); await page.waitForTimeout(1800); await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(400);
-      expect((await txt(page, "learn-lvl")) === "Level: Forgiving", "levels: the student's choice wins over the microphone check the next time");
+      expect((await txt(page, "learn-lvl")) === "Learn level: Forgiving", "levels: the student's choice wins over the microphone check the next time");
     });
     await withMic(wav("lvl-piano", [sil(12)]), {}, async page => {      // a piano cannot play out of tune and its notes die away: no levels there
       await page.addInitScript(() => { try { localStorage.setItem("aam-lvl", "strict"); } catch (e) {} });

@@ -545,4 +545,10 @@ Everything needed to carry on from any conversation is in this repository and in
   what the note sounds as on a piano. Checks: `--only learn` (21). Not built: the two stars and the Unit 1 invitation (not yet approved).
 - 22 Nov: the speaker (`hear`) moved again at Alex's request, from the play bar to `.key-row` at the foot of the music card, right-hand end,
   beside the line's description. The tuner stays on the bar beside the metronome.
+- 22 Nov, three beta fixes from Alex's phone: (1) `TESTQ` keeps `&player=test` in `urlFor` and in the address after the code is removed:
+  before, the FIRST move to another line loaded the released player, which is why "the changes disappeared" on Au Clair de la Lune (every
+  change is app-wide, none is tied to one tune). (2) a ResizeObserver on `learn-bar` calls `drawScore()` when the bar's height changes
+  (the music was cut off under the finished message on his iPhone; headless Chromium does not reproduce the cut, so the check
+  "after a clean run on a phone" passes with or without the fix: only his phone proves it). (3) `learn-lvl` shows in the settings whenever
+  the line has Learn, labelled "Learn level: ...", and can be set before starting.
 
