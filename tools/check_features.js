@@ -530,15 +530,36 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     const d = await one.evaluate(() => document.querySelectorAll(".score .lr-line").length); expect(d === 1, "a saxophone duet: one cloud, on the top part only (" + d + ")");
     await one.context().close();
   }
+  if (want("bar")) {                                        // less on the screen (Alex, 22 Nov): a printed line has no key controls, the repeats and the tour are in the settings
+    const page = await open({ ...devices["iPhone 13"] }, "sax-beginner-alto-hot-cross-buns");
+    const lean = await page.evaluate(() => { const q = r => document.querySelector('[data-r="' + r + '"]'), l = q("lib-btn").getBoundingClientRect();
+      return [q("p-key").hidden, q("cycle").hidden, getComputedStyle(q("p-reps")).display === "none", l.width <= 44 && q("lib-btn").getAttribute("aria-label") === "My tunes", !document.querySelector("ol.tips")].join(); });
+    expect(lean === "true,true,true,true,true", "a booklet line: no key button, no \"Through the keys\", no repeats on the bar, My tunes is an icon, no list of tips (" + lean + ")");
+    await page.click('[data-r="p-bpm"]'); await page.waitForTimeout(400);
+    const chips = await page.evaluate(() => [].map.call(document.querySelectorAll('[data-r="tp-chips"] button'), b => b.textContent).join(" | "));
+    expect(chips === "Andante · 76 | Moderato · 96 | Allegro · 116", "tempo: the three speeds carry their musical terms (" + chips + ")");
+    await page.click('[data-r="tp-chips"] button:nth-child(2)'); await page.waitForTimeout(300); expect((await txt(page, "p-bpm")).indexOf("96") === 0, "tempo: a tap on Moderato sets 96");
+    await page.click('[data-r="tp-close"]'); await page.waitForTimeout(200);
+    await page.evaluate(() => [].forEach.call(document.querySelectorAll(".tour"), t => t.remove()));
+    await page.click('[data-r="p-gear"]'); await page.waitForTimeout(300);
+    expect(await page.evaluate(() => { const r = document.querySelector('[data-r="reps"]').getBoundingClientRect(); return r.width > 0 && document.querySelector('[data-r="reps"]').textContent === "Play 2×"; }), "settings: the repeats are here, and a line plays twice");
+    await page.click('[data-r="tour-btn"]'); await page.waitForTimeout(500);
+    expect(await page.evaluate(() => !!document.querySelector(".tour") && /1 of 6/.test(document.querySelector(".tour").textContent) && !document.querySelector('[data-r="sheet"]').classList.contains("open")), "settings: \"Show me around\" closes the settings and starts the tour");
+    await page.context().close();
+    const ls = await open({ ...devices["iPhone 13"] }, "f-blues-piano");
+    expect(await ls.evaluate(() => !document.querySelector('[data-r="p-key"]').hidden && !document.querySelector('[data-r="cycle"]').hidden), "a lead sheet keeps its key button and \"Through the keys\"");
+    await ls.context().close();
+  }
   if (want("apply")) {                                      // changes made while the band plays wait for "Apply changes"; the page-turn copy carries no cloud
     const page = await open({ ...devices["iPhone 13"] }, "f-blues-piano");
     const pill = () => page.evaluate(() => { const b = document.querySelector('[data-r="apply"]'); return b.hidden ? "" : b.textContent; });
-    expect((await page.evaluate(() => document.querySelector('[data-r="p-reps"]').getAttribute("aria-label"))) === "Number of repeats", "repeats: the button is called \"Number of repeats\"");
-    await page.click('[data-r="p-reps"]'); await page.click('[data-r="p-reps-pop"] button[data-n="3"]'); await page.waitForTimeout(200);
+    const setReps = async n => { await page.click('[data-r="p-gear"]'); await page.waitForTimeout(300); await page.click('[data-r="reps"]'); await page.click('[data-r="reps-list"] li[data-n="' + n + '"]'); await page.waitForTimeout(150); await page.evaluate(() => document.querySelector('[data-r="backdrop"]').click()); await page.waitForTimeout(250); };      // the repeats are set in the settings
+    expect(await page.evaluate(() => { const b = document.querySelector('[data-r="p-reps"]'); return getComputedStyle(b).display === "none" && document.querySelector('[data-r="reps"]').getAttribute("aria-label") === "Number of repeats"; }), "repeats: no button on the play bar; the settings have \"Number of repeats\"");
+    await setReps(3);
     expect((await pill()) === "" && (await txt(page, "p-reps")) === "3×", "stopped: a new number of repeats applies at once, with no prompt");
     await page.click('[data-r="views"] button:nth-child(3)'); await page.waitForTimeout(500);
     await page.click('[data-r="p-play"]'); await page.waitForTimeout(6000);
-    await page.click('[data-r="p-reps"]'); await page.click('[data-r="p-reps-pop"] button[data-n="5"]'); await page.waitForTimeout(300);
+    await setReps(5); await page.waitForTimeout(300);
     expect((await pill()) === "Apply changes" && /\/3$/.test(await txt(page, "p-reps")), "playing: a new number of repeats waits, and \"Apply changes\" appears (" + (await txt(page, "p-reps")) + ")");
     const fit = await page.evaluate(() => { const a = document.querySelector('[data-r="apply"]').getBoundingClientRect(), pl = document.querySelector('[data-r="p-play"]').getBoundingClientRect(); return Math.abs(a.left + a.width / 2 - pl.left - pl.width / 2) <= 2 && a.bottom <= pl.top && a.left >= 0 && a.right <= innerWidth; });
     expect(fit, "\"Apply changes\" sits just above the Play button");
@@ -550,7 +571,7 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     expect(over === "none" || /^0,0,0,/.test(over), "page turn: the copy of the next page carries no cloud, no blue note and no second filter (" + over + ")");
     await page.click('[data-r="apply"]'); await page.waitForTimeout(700);
     expect((await pill()) === "" && /\/5$/.test(await txt(page, "p-reps")) && (await txt(page, "p-key-k")) !== keyBefore, "Apply changes: the repeats and the key change together, and the prompt goes away");
-    await page.click('[data-r="p-reps"]'); await page.click('[data-r="p-reps-pop"] button[data-n="2"]'); await page.waitForTimeout(200);
+    await setReps(2); await page.waitForTimeout(200);
     await page.click('[data-r="p-play"]'); await page.waitForTimeout(500);
     expect((await pill()) === "" && (await txt(page, "p-reps")) === "2×", "stopping applies what was waiting");
     await page.context().close();

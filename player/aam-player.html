@@ -229,7 +229,9 @@
   #aam-play .sheet-head .done { background: var(--now); color: var(--now-ink); font: 600 14px var(--body); padding: 8px 16px; border-radius: 999px; }
   #aam-play .sheet-body { display: grid; gap: 18px; }
   #aam-play .sheet-body .reps-list { right: auto; left: 0; }
-  #aam-play .sheet-body [data-r="row-tempo"], #aam-play .sheet-body [data-r="row-loop"], #aam-play .sheet-body .hint { display: none; }   /* tempo and repeats are on the play bar; looping is done on the music */
+  #aam-play .sheet-body [data-r="row-tempo"] { display: none; }   /* tempo is on the play bar. Repeats, the key and the one-line hint about bars and loops are here (they left the bar and the tips, 22 Nov) */
+  #aam-play .sheet-body .hint { font-size: 13px; color: var(--muted); margin: 0; }
+  #aam-play .sheet-body .key-btn { display: none; }      /* the key has its own button on the play bar */
   #aam-play .sheet-body .tips-panel { border: 0; padding: 0; background: transparent; gap: 10px; }
   #aam-play .sheet-body .tips-panel h2 { font-size: 16px; }
   #aam-play .sheet-body .tips { font-size: 14px; }
@@ -400,6 +402,11 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
   #aam-play .p-bpm::after { content: "bpm"; font: 600 11px/1 var(--body); color: var(--muted); padding-top: 5px; }
 }
 @media (max-width: 1099px) { #aam-play .p-left .p-now { display: none; } }   /* with Play in the middle there is only room for the bar-and-chord readout on wide screens */
+#aam-play .lib-btn { width: 40px !important; height: 40px !important; padding: 0 !important; display: grid; place-items: center; background-image: none !important; color: var(--accent-text); flex: none; }
+#aam-play .lib-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+#aam-play .lib-btn[aria-expanded="true"] { background-color: var(--now); color: var(--now-ink); }
+#aam-play .pbar .p-reps { display: none !important; }      /* the number of repeats is set in the settings (Alex, 22 Nov: less on the bar) */
+#aam-play .tips-panel .tour-btn { justify-self: start; }
 #aam-play .tp-chips { display: flex; gap: 6px; flex-wrap: wrap; } #aam-play .tp-chips:empty { display: none; }
 #aam-play .tp-chips button { flex: 1 1 0; height: 38px; padding: 0 10px; border-radius: 999px; background: var(--tint); color: var(--ink); font: 600 13px var(--body); white-space: nowrap; text-align: center; }
 #aam-play .tp-wheel { position: relative; height: 220px; border-radius: 16px; background: var(--tint); overflow: hidden; }
@@ -486,7 +493,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
     </div>
     <a class="x-site" data-r="home-a" href="/">← Website</a>
     <div class="lib" data-r="lib" hidden>
-      <button class="lib-btn" data-r="lib-btn" aria-haspopup="true" aria-expanded="false">My tunes</button>
+      <button class="lib-btn" data-r="lib-btn" aria-haspopup="true" aria-expanded="false" aria-label="My tunes" title="My tunes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h12M4 11.5h9M4 16.5h6"/><path d="M17.6 17.2V9.4l3.2-1"/><circle cx="15.6" cy="17.3" r="2.1" fill="currentColor" stroke="none"/></svg></button>
       <div class="lib-menu" data-r="lib-menu" hidden>
         <div data-r="lib-list"></div>
         <div class="lib-add">
@@ -589,14 +596,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
     </section>
 
     <section class="panel tips-panel" data-r="tips">
-      <h2>How it works</h2>
-      <ol class="tips">
-        <li><b>Start anywhere:</b> tap a bar and the band starts from there.</li>
-        <li><b>Loop a tricky spot:</b> press and hold its first bar, slide to its last bar and let go (on a computer, drag across the bars). Tap the round loop button to go back to the whole tune.</li>
-        <li><b>Repeats:</b> the <b>×</b> button sets how many times the band plays through.</li>
-        <li><b>Build speed:</b> start slow, and switch on <b>Speed up +5 each time</b> to get a little faster every time through.</li>
-        <li><b>Hear it</b> plays the written notes along with the band.</li>
-      </ol>
+      <button class="chip tour-btn" data-r="tour-btn">Show me around</button>
     </section>
 
     <!-- phones only: a play bar pinned to the bottom, and a settings sheet that slides up from it -->
@@ -1111,6 +1111,7 @@ function aamBoot(TUNE) {
     document.addEventListener("click", function (e) { if (!pop.contains(e.target)) open(false); });
   })();
   // ---------- key and instrument dialog
+  var FIXED_KEY = TUNE.keys === "off" && !!TUNE.instrument;      // a line printed in a booklet for one instrument: it is played in the key on the page, so the key controls are not shown
   var keyLabels = function () {}, keyApply = function () {};
   (function () {
     var dlg = $("kdlg"), grid = $("k-keys"), names = MINOR ? MIN : MAJ, tail = MINOR ? "m" : "";
@@ -1143,6 +1144,7 @@ function aamBoot(TUNE) {
     $("p-key").onclick = $("key-btn").onclick = function (e) { e.stopPropagation(); keyLabels(); open(true); };
     $("k-close").onclick = function () { open(false); };
     dlg.addEventListener("click", function (e) { if (e.target === dlg) open(false); });
+    if (FIXED_KEY) $("p-key").hidden = $("key-btn").hidden = true;
     keyLabels();
   })();
   // ---------- count-in circles (and short messages) in the middle of the screen
@@ -2046,8 +2048,9 @@ function aamBoot(TUNE) {
     for (var v = 240; v >= 40; v--) html += '<button data-v="' + v + '">' + v + "</button>";      // faster is up, slower is down
     list.innerHTML = html;
     var mark = function () { [].forEach.call(list.children, function (b) { b.classList.toggle("on", +b.dataset.v === state.tempo); }); };
-    var names = ["Slow", "Medium", "Goal"], pres = (TUNE.tempo_presets || []).filter(function (x, i, a) { return a.indexOf(x) === i; });
-    $("tp-chips").innerHTML = pres.map(function (x, i) { return '<button data-v="' + x + '">' + (pres.length === 3 ? names[i] + " · " : "") + x + "</button>"; }).join("");
+    var term = function (v) { return v < 60 ? "Largo" : v < 72 ? "Adagio" : v < 92 ? "Andante" : v < 112 ? "Moderato" : v < 140 ? "Allegro" : v < 168 ? "Vivace" : "Presto"; };
+    var pres = (TUNE.tempo_presets || []).filter(function (x, i, a) { return a.indexOf(x) === i; });
+    $("tp-chips").innerHTML = pres.map(function (x, i) { return '<button data-v="' + x + '">' + term(x) + " · " + x + "</button>"; }).join("");
     var to = function (v, smooth) { busy = true; list.scrollTo({ top: (240 - v) * H, behavior: smooth ? "smooth" : "auto" }); setTimeout(function () { busy = false; }, smooth ? 450 : 60); };
     list.addEventListener("scroll", function () {
       if (busy) return;
@@ -2105,6 +2108,7 @@ function aamBoot(TUNE) {
     var c = CYCLES.filter(function (x) { return x[0] === state.cycle; })[0];
     $("cycle").textContent = c[1]; $("cycle").setAttribute("aria-pressed", state.cycle ? "true" : "false");
   }
+  $("cycle").hidden = FIXED_KEY;
   $("cycle").onclick = function () {
     var i = CYCLES.map(function (x) { return x[0]; }).indexOf(state.cycle);
     state.cycle = CYCLES[(i + 1) % CYCLES.length][0];
@@ -2679,6 +2683,7 @@ function aamBoot(TUNE) {
     var el = $(r), mark = document.createComment(r); el.parentNode.insertBefore(mark, el); return [el, mark];
   });
   function openSheet(on) { $("sheet").classList.toggle("open", on); $("backdrop").classList.toggle("open", on); }
+  $("tour-btn").onclick = function () { openSheet(false); document.dispatchEvent(new CustomEvent("aam-tour")); };      // replaces the list of tips: the tour shows the same things on the page itself
   function fitChords() {                                   // a bar whose chords don't fit gets the smaller size
     if ($("form").hidden) return;
     cells.forEach(function (c) {
@@ -2930,6 +2935,7 @@ function aamLibrary() {
   var tocOpen = null, wantPdf = false;                   // wantPdf: the address asked for the booklet's PDF (&pdf=1)
   var wantTour = false;                                  // &tour=1: show the tour whoever is visiting (how Alex looks at it)
   // The first-visit tour, for someone who arrives with a free Starter Pack and has no teacher beside them. Once for each device.
+  document.addEventListener("aam-tour", function () { tour(true); });      // "Show me around" in the settings
   function tour(force) {
     try { if (!force && localStorage.getItem("aam-tour")) return; localStorage.setItem("aam-tour", "1"); } catch (e) {}
     if (root.querySelector(".tour")) return;

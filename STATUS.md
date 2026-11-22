@@ -557,3 +557,10 @@ Everything needed to carry on from any conversation is in this repository and in
   tunes, the How it works text) was given in chat and is waiting for his choices. Tempo popup idea (Italian terms, a goal linked to the
   booklet) also discussed, not built.
 
+- 22 Nov (evening), Alex said "go ahead" on the whole review. Built in beta: `FIXED_KEY` (`TUNE.keys === "off"` and the tune has an
+  `instrument`: a printed booklet line) hides `p-key`, `key-btn` and `cycle`; `.pbar .p-reps` is never displayed (its text is still
+  written, the checks read it) and `row-loop` (range, repeats) plus the `hint` line are shown in the settings sheet again;
+  `lib-btn` is an icon with the label "My tunes"; the `tips` section holds one button, `tour-btn`, which closes the sheet and fires
+  the document event `aam-tour` (the library answers with `tour(true)`); the tempo chips are labelled by `term(bpm)`. Checks: the
+  second "bar" block and `setReps` in "apply". Still to do from that talk: goal tempos printed in the booklet and linked to the
+  player (next booklet edition). While playing, the "1/2" pass count is no longer visible on a phone: say so if Alex misses it.

@@ -10,6 +10,8 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- Beta (test copy only): **less on the screen.** A line printed in a booklet no longer shows the key button or "Through the keys" (it is played in the key on the page). The repeats button has left the play bar: the number of repeats is in the settings, with the one-line hint about tapping and looping bars. **My tunes** is a small icon. The "How it works" list is replaced by one button, **Show me around**, which replays the tour.
+- Beta (test copy only): the three speeds in the tempo popup carry their musical term, worked out from the number (for example Andante · 76, Moderato · 96, Allegro · 116). Under 60 Largo, 60 Adagio, 72 Andante, 92 Moderato, 112 Allegro, 140 Vivace, 168 Presto.
 - Beta (test copy only): every line now plays **twice** by default (it was once). The repeats button still changes it.
 - Beta (test copy only): the **Tuner** has moved off the play bar into the settings, since it is used once or twice in a practice session.
 - Beta (test copy only): a cleaner Learn bar. It starts with one short line and one button, Fingering. The Learn button reads Stop while Learn is on. Skip note appears only for a note that will not go (three wrong tries, twenty seconds on it, or nothing heard). Start again and Next line appear when the line is finished. Level (Forgiving or Strict) has moved into the settings.
