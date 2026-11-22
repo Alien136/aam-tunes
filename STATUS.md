@@ -521,4 +521,6 @@ Everything needed to carry on from any conversation is in this repository and in
   Shown by itself only when the tune's booklet id contains "starter" and the device has no master code (`newcomer`), or after the download
   card; localStorage `aam-tour` makes it once per device. Analytics: `aam_tour {how: done|skip, step}`.
 - Checks: `--only pdf` (22). `AAM_STARTER=<a Starter Pack code>` on the command line adds the real-newcomer check; the code is never stored.
+- 22 Nov: **v1.4 released** (Alex: "ship both"): the download card and the first-visit tour are live. Still test-only: the seven beta band
+  styles (each `beta: true`) and the theory cards (`release/cards.html` does not exist, so /theory says "coming soon").
 

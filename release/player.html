@@ -366,6 +366,19 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 #aam-play .toc-none { margin: 18px 8px; font: 500 14px var(--body); color: var(--muted); text-align: center; }
 #aam-play .toc-foot { flex: none; display: grid; gap: 8px; }
 #aam-play .toc-top { flex: none; } #aam-play .toc-top:empty { display: none; }
+/* the "download the booklet" link in an email: only the booklet's name, the download button and the way on to the player */
+#aam-play .toc-card.pdf-only { height: auto; gap: 16px; padding-bottom: 20px; } #aam-play .toc-card.pdf-only .toc-tools, #aam-play .toc-card.pdf-only .toc-list, #aam-play .toc-card.pdf-only .toc-foot { display: none !important; }
+#aam-play .toc-dl .toc-next, #aam-play .toc-dl .toc-all { display: none; }
+#aam-play .toc-card.pdf-only .toc-dl { gap: 12px; } #aam-play .toc-card.pdf-only .toc-dl button[data-dl] { min-height: 64px; font-size: 18px; }
+#aam-play .toc-card.pdf-only .toc-dl .toc-next { display: block; min-height: 52px; background: var(--surface); border: 2px solid var(--accent-text); color: var(--accent-text); font-size: 16px; }
+#aam-play .toc-card.pdf-only .toc-dl .toc-next.go { background: var(--accent-text); color: var(--accent-ink); }
+#aam-play .toc-card.pdf-only .toc-dl .toc-all { display: block; min-height: 44px; background: transparent; border: 0; color: var(--muted); font-weight: 500; text-decoration: underline; }
+/* the first-visit tour: a small note beside one control at a time. It never covers the page or blocks a tap. */
+#aam-play .tour { position: fixed; z-index: 99996; width: min(300px, calc(100vw - 24px)); background: var(--ink); color: #fff; border-radius: 14px; padding: 14px 16px 12px; box-shadow: 0 10px 30px rgba(0,0,0,.28); font: 500 15px/1.45 var(--body); display: grid; gap: 10px; }
+#aam-play .tour p { margin: 0; color: #fff; max-width: none; } #aam-play .tour .tour-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#aam-play .tour .tour-n { font-size: 12px; opacity: .7; } #aam-play .tour .tour-skip { color: #fff; opacity: .8; min-height: 40px; padding: 0 8px; font: 500 14px var(--body); text-decoration: underline; }
+#aam-play .tour .tour-next { background: #fff; color: var(--ink); min-height: 40px; padding: 0 18px; border-radius: 999px; font: 700 14px var(--body); }
+#aam-play .tour-on { outline: 3px solid #f6b73c !important; outline-offset: 3px; }
 #aam-play .toc-dl { display: grid; gap: 4px; }
 #aam-play .toc-dl.hi button { background: var(--accent-text); border-color: var(--accent-text); color: var(--accent-ink); min-height: 48px; font-size: 16px; } #aam-play .toc-dl.hi button small { display: block; margin: 0; color: var(--accent-ink); opacity: .85; }
 #aam-play .toc-dl button { width: 100%; min-height: 40px; padding: 6px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); color: var(--accent-text); font: 600 14px var(--body); text-align: center; } #aam-play .toc-dl button:disabled { opacity: .5; }
@@ -538,7 +551,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
         <button class="chip" data-r="learn-btn" aria-pressed="false" hidden><span class="lg">Learn the notes</span><span class="sm">Learn</span></button>
         <button class="chip" data-r="tuner-btn">Tuner</button>
       </div>
-      <div class="learn-bar" data-r="learn-bar" hidden><div class="learn-fing" data-r="learn-fing" hidden></div><b data-r="learn-msg" aria-live="polite"></b><span><button data-r="learn-hear" hidden>Hear it</button><button data-r="learn-fbtn" aria-pressed="false" hidden>Fingering</button><button data-r="learn-skip">Skip note</button><button data-r="learn-again">Start again</button><button data-r="learn-stop">Stop</button></span></div>
+      <div class="learn-bar" data-r="learn-bar" hidden><div class="learn-fing" data-r="learn-fing" hidden></div><b data-r="learn-msg" aria-live="polite"></b><span><button data-r="learn-hear" hidden>Hear it</button><button data-r="learn-fbtn" aria-pressed="false" hidden>Fingering</button><button data-r="learn-lvl" hidden>Level: Forgiving</button><button data-r="learn-skip">Skip note</button><button data-r="learn-again">Start again</button><button data-r="learn-stop">Stop</button></span></div>
 
       <div class="row" data-r="row-loop" style="justify-content:space-between">
         <div class="row" style="gap:10px">
@@ -702,7 +715,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 
 <script>
 // >>> SETTINGS
-var PLAYER_VERSION = "v1.3 · 2026-11-21 04:55 UTC (after a24b618)";    // stamped by tools/release.py when a version is released
+var PLAYER_VERSION = "v1.4 · 2026-11-22 05:29 UTC (after a7edc1d)";    // stamped by tools/release.py when a version is released
 var STUDENT_HOME = "https://alexattardmusic.com/student-login/";              // where the "back" link goes: put the address of your student login page here, e.g. "/student-login/"
 var STUDENT_HOME_LABEL = "Student home";         // what the link says. Leave "" for "Student login" (or "Website" while the address above is "/")
 var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    // folder with p36.mp3 ... d-ride.mp3 (keep the final "/")
@@ -789,9 +802,9 @@ function aamBoot(TUNE) {
     if (Math.abs(acc) > 1 || /^(Cb|Fb|E#|B#)$/.test(name)) name = (/#/.test(tk) || "GDAEB".indexOf(tk) >= 0 ? SHARP : MAJ)[pc];   // no double sharps or C flats
     return name + m[3];
   }
-  var STYLE = TUNE.style || "swing";                           // "swing": the band. "drone": a held root and fifth with a click. "click": a click only.
+  var STYLE = TUNE.style || "swing";                                  // changed to "swing" below for a "with_band" tune                           // "swing": the band. "drone": a held root and fifth with a click. "click": a click only.
   // Time signature: quarter-note beats in a bar (2, 3 or 4). The band styles are 4/4 only; "solo" pieces, clicks and drones can be 2/4 or 3/4.
-  var BPB = (TUNE.style && TUNE.style !== "swing" && TUNE.meter && [2, 3, 4].indexOf(+TUNE.meter[0]) >= 0 && +TUNE.meter[1] === 4) ? +TUNE.meter[0] : 4;
+  var BPB = (TUNE.meter && [2, 3, 4].indexOf(+TUNE.meter[0]) >= 0 && +TUNE.meter[1] === 4 && (+TUNE.meter[0] !== 2 || (TUNE.style && TUNE.style !== "swing"))) ? +TUNE.meter[0] : 4;   // the band plays in 4 and in 3
   var NB = TUNE.bars.length, PPQ = 192, BAR = BPB * PPQ, LEAD = 2;      // music bar k starts at tick (k + LEAD) * BAR
   // The band's styles. A style is DATA: how much the eighths swing, a drum grid, a bass rule and a bank of comping rhythms.
   // "swing" and "ballad" are the two the player was born with and keep their own hand-tuned code below; every other style is
@@ -802,6 +815,7 @@ function aamBoot(TUNE) {
   //                              comp   one list per bar for a chord that lasts the bar, cycled: [beat, length]
   //   half   the same for a chord that lasts half a bar   kit    extra drum sounds this style needs loaded
   //   beta   true = in the picker of the test copy only. Remove it when Alex has listened and said yes.
+  //   m      beats in a bar this style is written for (3 = a waltz). Left out = 4. A tune is offered only the styles in its own meter.
   var BAND = {
     swing:  { name: "Medium Swing", group: "Jazz", sw: Math.round(PPQ / 6), note: "Walking bass, ride cymbal, swung eighths" },
     two:    { name: "Two-Feel", group: "Jazz", sw: Math.round(PPQ / 6), note: "Bass in two, lighter drums: the head of a standard",
@@ -853,14 +867,40 @@ function aamBoot(TUNE) {
                        ["snare", 1, 0.66, null], ["snare", 3, 0.7, null], ["hh", 1, 0.7, -3], ["hh", 3, 0.7, -3], ["kick", 0, 0.6, -9], ["kick", 2, 0.56, -10], ["kick", 3.5, 0.4, -14, 0.3]]],
               comp: [[[0, 0.5], [1.5, 0.5], [3.5, 0.4]], [[1, 0.5], [2.5, 0.5]]],
               half: [[[0, 0.5], [1.5, 0.4]]] },
-    ballad: { name: "Straight Ballad", group: "Pop", sw: 0, note: "Even eighths, held chords, bass on 1 and 3" }
+    waltz:  { name: "Jazz Waltz", beta: true, m: 3, group: "Jazz", sw: Math.round(PPQ / 6), note: "Three in a bar: ride cymbal, hi-hat on 2, swung eighths",
+              bass: "waltz",
+              drums: [[["ride", 0, 0.56, -3], ["ride", 1, 0.7, -2], ["ride", 1.5, 0.36, -8, 0.6], ["ride", 2, 0.6, -3], ["hh", 1, 0.66, -4], ["kick", 0, 0.34, -16]],
+                      [["ride", 0, 0.56, -3], ["ride", 1, 0.7, -2], ["ride", 2, 0.6, -3], ["ride", 2.5, 0.36, -8], ["hh", 1, 0.66, -4], ["hh", 2, 0.5, -6], ["kick", 0, 0.34, -16], ["snare", 2.5, 0.28, null, 0.2]]],
+              comp: [[[0, 1.3], [1.5, 1.2]], [[1, 0.9]], [[0, 0.6], [2, 0.8]], [[1.5, 1.3]]],
+              half: [[[0, 0.9]], [[0, 0.6]]] },
+    waltzb: { name: "Ballad in 3", beta: true, m: 3, group: "Pop", sw: 0, note: "Three in a bar, even eighths, held chords: a slow straight ballad",
+              bass: "waltz",
+              drums: [[["ride", 0, 0.4, -8], ["ride", 1, 0.3, -10], ["ride", 2, 0.32, -10], ["kick", 0, 0.52, -11], ["stick", 2, 0.32, -10]],
+                      [["ride", 0, 0.4, -8], ["ride", 1, 0.3, -10], ["ride", 2, 0.32, -10], ["kick", 0, 0.5, -11], ["stick", 1, 0.3, -10], ["stick", 2, 0.3, -10, 0.5]]],
+              comp: [[[0, 2.8]], [[0, 1.8], [2, 0.9]]],
+              half: [[[0, 1.7]], [[0, 0.9]]] },
+    ballad: { name: "Straight Ballad", group: "Pop", sw: 0, note: "Even eighths, held chords, bass on 1 and 3" },
+    soul:   { name: "Soul Jazz", beta: true, group: "Pop", sw: 0, note: "Even eighths, a backbeat on 2 and 4, a bass riff that pushes into beat 3", kit: ["hhc"],
+              bass: "soul",
+              drums: [[["hhc", 0, 0.5, null], ["hhc", 0.5, 0.34, null], ["hhc", 1, 0.48, null], ["hhc", 1.5, 0.34, null], ["hhc", 2, 0.5, null], ["hhc", 2.5, 0.34, null], ["hhc", 3, 0.48, null], ["hhc", 3.5, 0.36, null],
+                       ["hh", 1, 0.6, -3], ["hh", 3, 0.6, -3], ["kick", 0, 0.62, -9], ["kick", 1.5, 0.46, -13], ["kick", 2.5, 0.4, -14, 0.6], ["snare", 1, 0.66, null], ["snare", 3, 0.7, null]],
+                      [["hhc", 0, 0.5, null], ["hhc", 0.5, 0.34, null], ["hhc", 1, 0.48, null], ["hhc", 1.5, 0.34, null], ["hhc", 2, 0.5, null], ["hhc", 2.5, 0.34, null], ["hhc", 3, 0.48, null], ["hhc", 3.5, 0.36, null],
+                       ["hh", 1, 0.6, -3], ["hh", 3, 0.6, -3], ["kick", 0, 0.62, -9], ["kick", 1.5, 0.46, -13], ["kick", 2, 0.5, -11], ["snare", 1, 0.66, null], ["snare", 3, 0.7, null], ["snare", 3.5, 0.3, null, 0.3]]],
+              comp: [[[1.5, 0.4], [2.5, 0.4]], [[0, 0.5], [1.5, 0.4], [3.5, 0.4]]],
+              half: [[[0, 0.45], [1.5, 0.4]]] }
   };
+  var bandFits = function (id) { return !!BAND[id] && (BAND[id].m || 4) === BPB; };          // a style and a tune must count the same number of beats
   var BAND_GROUPS = ["Jazz", "Latin", "Blues", "Pop"];
   // A tune names its own style ("band" in the tune file; the older "feel": "straight" means the ballad); the student's choice is remembered per tune.
-  var band = BAND[TUNE.band] ? TUNE.band : (TUNE.feel === "straight" || TUNE.style === "solo" ? "ballad" : "swing");
+  var bandLive = function (id) { return bandFits(id) && (!BAND[id].beta || PLAYER_VERSION === "test copy"); };      // a style students may hear: beta styles sound in the test copy only
+  // "with_band": a tune that older players show with a click (its "style") gets the band here, once its style is released (the 3/4 tunes).
+  // "band_new": a style to use in place of "band" once it is released; older players do not know it and keep "band".
+  if (TUNE.with_band && bandLive(TUNE.band)) STYLE = "swing";
+  if (bandLive(TUNE.band_new)) TUNE.band = TUNE.band_new;
+  var band = bandFits(TUNE.band) ? TUNE.band : BPB === 3 ? (TUNE.feel === "straight" ? "waltzb" : "waltz") : (TUNE.feel === "straight" || TUNE.style === "solo" ? "ballad" : "swing");
   try {
     var bv = JSON.parse(localStorage.getItem("aam-band") || "{}")[TUNE.slug], fv = JSON.parse(localStorage.getItem("aam-feel") || "{}")[TUNE.slug];
-    if (BAND[bv]) band = bv; else if (fv === "straight") band = "ballad"; else if (fv === "swing") band = "swing";      // "aam-feel" is the choice made before there were styles
+    if (bandFits(bv)) band = bv; else if (BPB === 4 && fv === "straight") band = "ballad"; else if (BPB === 4 && fv === "swing") band = "swing";      // "aam-feel" is the choice made before there were styles
   } catch (e) {}
   var feel = BAND[band].sw ? "swing" : "straight";                                       // do the written eighths swing?
   var SW = BAND[band].sw;                                                                // how late an off-beat eighth is, in ticks, in the style playing now
@@ -934,7 +974,7 @@ function aamBoot(TUNE) {
       [].forEach.call(list.querySelectorAll("button"), function (b) { b.setAttribute("aria-pressed", b.dataset.id === band ? "true" : "false"); });
     };
     list.innerHTML = BAND_GROUPS.map(function (g) {
-      var ids = Object.keys(BAND).filter(function (id) { return BAND[id].group === g && (!BAND[id].beta || PLAYER_VERSION === "test copy"); });   // a style marked beta is offered in the test copy only, until Alex has heard it
+      var ids = Object.keys(BAND).filter(function (id) { return BAND[id].group === g && bandLive(id); });   // a style marked beta is offered in the test copy only, until Alex has heard it
       return ids.length ? "<h3>" + g + "</h3>" + ids.map(function (id) { return '<button data-id="' + id + '"><b>' + BAND[id].name + "</b><small>" + BAND[id].note + "</small></button>"; }).join("") : "";
     }).join("");
     list.addEventListener("click", function (e) {
@@ -1384,8 +1424,10 @@ function aamBoot(TUNE) {
         if (secs > 1.2 && samples.length > 20) {
           var offs = samples.map(function (s) { return s[1]; }).sort(function (a, b) { return a - b; }), lv = samples.map(function (s) { return s[0]; }).sort(function (a, b) { return a - b; });
           var c = { floor: Math.max(cal0.floor, Math.min(0.25 * lv[Math.floor(lv.length / 2)], 0.05)), off: Math.max(-35, Math.min(35, Math.round(offs[Math.floor(offs.length / 2)]))), at: Date.now() };
+          // How steady was the long note? A steady note in a quiet room starts Learn mode on Strict; a wavering note or a noisy room on Forgiving.
+          c.spread = Math.round(offs[Math.floor(offs.length * 0.9)] - offs[Math.floor(offs.length * 0.1)]); c.lvl = c.spread <= LVL_STEADY && !cal0.noisy ? "strict" : "easy";
           ear.setCal(c); phase = "tune";
-          msg.textContent = "Your microphone is ready. Hold any note and bring the marker to the middle.";
+          msg.textContent = "Your microphone is ready. " + (c.lvl === "strict" ? "That was a steady note: Learn mode starts on Strict. " : "") + "Hold any note and bring the marker to the middle.";
           $("t-go").hidden = !after;
         }
       }
@@ -1410,6 +1452,10 @@ function aamBoot(TUNE) {
     if (window.AAM_DEMO) $("tuner-btn").hidden = true;
   })();
   var openTuner;
+  // Learn mode has two levels. Forgiving: any clear note within half a step's reach of the right one counts after a short moment.
+  // Strict: the note must also be in tune and held twice as long. The microphone check picks one (see c.lvl above); the student can change it.
+  var LVL_STEADY = 20, LVL = { easy: { name: "Forgiving", cents: 50, frames: 4 }, strict: { name: "Strict", cents: 30, frames: 8 } };
+  var lvlPick = null; try { lvlPick = localStorage.getItem("aam-lvl"); } catch (e) {}
 
   // ---- Learn mode: no band and no tempo; each note turns green when it is played, and the marker waits for the next one
   var learn = { on: false, hand: "rh", alts: {}, key: 0, i: 0, seq: null, okRun: 0, badRun: 0, badNote: null, misses: 0, gap: true, since: 0, level: 0 };
@@ -1513,6 +1559,12 @@ function aamBoot(TUNE) {
     cloudAt(el);
     var a = el.getBoundingClientRect(), b = score.getBoundingClientRect(); if (a.bottom > b.bottom - 8 || a.top < b.top + 8) score.scrollTop += a.top - b.top - 40;
   }
+  function learnLvl() {                                   // the student's own choice first, else what the microphone check found; a piano cannot play out of tune and its notes die away
+    if (IS_PIANO) return "easy";
+    if (lvlPick === "strict" || lvlPick === "easy") return lvlPick;
+    var c = ear.cal(); return c && c.lvl === "strict" ? "strict" : "easy";
+  }
+  function learnLvlShow() { var b = $("learn-lvl"); b.hidden = IS_PIANO || !learn.on || !!learn.done; b.textContent = "Level: " + LVL[learnLvl()].name; }
   function learnSay(text, hint) { $("learn-msg").textContent = text; $("learn-hear").hidden = !hint; }
   var fingOn = false; try { fingOn = localStorage.getItem("aam-fing") === "1"; } catch (e) {}
   function learnFing() {                                  // the fingering for the note to play: always when the student asked for it, by itself after two misses
@@ -1527,14 +1579,14 @@ function aamBoot(TUNE) {
   function learnTrack(name) {
     var notes = learn.seq.filter(function (m) { return m >= 0; }).length, secs = Math.round((Date.now() - learn.t0) / 1000);
     AAM_TRACK.event(name, { tune: TUNE.slug, tune_title: TUNE.title, instrument: TUNE.instrument || "", notes: notes, reached: learn.seq.slice(0, learn.i).filter(function (m) { return m >= 0; }).length,
-      seconds: Math.min(secs, 3600), skipped: learn.skips, wrong_notes: learn.wrong, content_type: "learn", content_id: TUNE.slug, value: Math.round(Math.min(secs, 3600) / 6) / 10 });
+      seconds: Math.min(secs, 3600), skipped: learn.skips, wrong_notes: learn.wrong, level: learnLvl(), out_of_tune: learn.tuned || 0, content_type: "learn", content_id: TUNE.slug, value: Math.round(Math.min(secs, 3600) / 6) / 10 });
   }
   function learnTarget() { while (learn.i < learn.seq.length && learn.seq[learn.i] < 0) learn.i++; return learn.i < learn.seq.length ? learn.seq[learn.i] : null; }   // tied notes ride along
   function learnNext(skipped) {
     if (skipped) learn.skips++;
-    learn.prev = learn.seq[learn.i]; learn.i++; learn.okRun = learn.badRun = learn.misses = 0; learn.badNote = null; learn.gap = false; learn.since = Date.now();
+    learn.prev = learn.seq[learn.i]; learn.i++; learn.okRun = learn.badRun = learn.offRun = learn.misses = 0; learn.badNote = null; learn.gap = false; learn.since = Date.now();
     var t = learnTarget(); learnPaint();
-    if (t == null) { learnSay("You played every note. Now try it with the metronome.", false); $("learn-skip").hidden = true; ear.off(learnHear); learn.done = true; learnTrack("aam_learn_done"); learnFing(); return; }
+    if (t == null) { learnSay("You played every note. Now try it with the metronome.", false); $("learn-skip").hidden = true; ear.off(learnHear); learn.done = true; learnTrack("aam_learn_done"); learnFing(); learnLvlShow(); return; }
     learnSay(skipped ? "Skipped. Next note: " + noteName(t + EAR_SHIFT) + "." : "Next: " + noteName(t + EAR_SHIFT), false); learnFing();
   }
   function learnHear(r) {
@@ -1547,18 +1599,25 @@ function aamBoot(TUNE) {
     learn.clip = r.clip && !r.ok ? (learn.clip || 0) + 1 : 0;                                          // distorted AND unreadable for a quarter of a second
     if (learn.clip === 6) { learn.said = $("learn-msg").textContent; learnSay("Too loud for the microphone: move it a little further away.", false); }
     else if (!r.clip && learn.said && r.ok) { if (/^Too loud/.test($("learn-msg").textContent)) learnSay(learn.said, false); learn.said = null; }
-    if (!r.heard || r.clarity < 0.5 || (learn.level && r.rms < 0.45 * learn.level)) { learn.gap = true; learn.okRun = 0; learn.badRun = 0; return; }   // silence, breath or a tongued break: the dying end of a note never counts as the next one
+    if (!r.heard || r.clarity < 0.5 || (learn.level && r.rms < 0.45 * learn.level)) { learn.gap = true; learn.okRun = 0; learn.badRun = 0; learn.offRun = 0; return; }   // silence, breath or a tongued break: the dying end of a note never counts as the next one
     if (!r.ok) { learn.okRun = 0; learn.badRun = 0; return; }
     learn.level = learn.level ? learn.level + 0.2 * (r.rms - learn.level) : r.rms;
     var d = 100 * (r.midi - t) - c.off, anyOct = ANY_OCT();
     if (anyOct) d = ((d % 1200) + 1800) % 1200 - 600;     // the right note in any octave
+    var L = LVL[learnLvl()];
     if (Math.abs(d) <= 50) {
-      learn.badRun = 0; learn.okRun++;
+      learn.badRun = 0;
+      if (Math.abs(d) > L.cents) {                        // Strict: the right note, but out of tune. Never a wrong note; say which way after most of a second
+        learn.okRun = 0;
+        if (++learn.offRun === 18) { learn.tuned++; learnSay("Right note, but " + (d < 0 ? "flat: bring it up a little." : "sharp: bring it down a little."), false); }
+        return;
+      }
+      learn.offRun = 0; learn.okRun++;
       var again = learn.prev === t && !learn.gap;         // the same note twice: wait for a new tongue stroke, or a clearly longer hold
-      if (learn.okRun >= 4 && (!again || Date.now() - learn.since > 1100)) learnNext(false);
+      if (learn.okRun >= L.frames && (!again || Date.now() - learn.since > 1100)) learnNext(false);
       return;
     }
-    learn.okRun = 0;
+    learn.okRun = 0; learn.offRun = 0;
     var got = Math.round(r.midi - c.off / 100);
     if ((anyOct ? learn.prev != null && ((got - learn.prev) % 12 + 12) % 12 === 0 : got === learn.prev) && (!learn.gap || Date.now() - learn.since < 700)) return;                     // still holding the note before: not a mistake
     if (got !== learn.badNote) { learn.badNote = got; learn.badRun = 0; }
@@ -1590,8 +1649,8 @@ function aamBoot(TUNE) {
     if (state.playing) stop();
     var go = function () {
       ear.start().then(function () {
-        learn.on = true; learn.key = keyState.key; learn.alts = seq.alts || {}; learn.seq = seq.map(function (m) { return m < 0 ? m : m + keyState.key; }); learn.i = 0; learn.prev = null; learn.okRun = learn.badRun = learn.misses = 0; learn.skips = learn.wrong = 0; learn.t0 = Date.now(); learn.done = false; learn.autoFing = false; learn.gap = true; learn.level = 0; learn.since = Date.now();
-        $("learn-bar").hidden = false; $("learn-skip").hidden = false; $("learn-btn").setAttribute("aria-pressed", "true");
+        learn.on = true; learn.key = keyState.key; learn.alts = seq.alts || {}; learn.seq = seq.map(function (m) { return m < 0 ? m : m + keyState.key; }); learn.i = 0; learn.prev = null; learn.okRun = learn.badRun = learn.offRun = learn.misses = 0; learn.skips = learn.wrong = learn.tuned = 0; learn.t0 = Date.now(); learn.done = false; learn.autoFing = false; learn.gap = true; learn.level = 0; learn.since = Date.now();
+        $("learn-bar").hidden = false; $("learn-skip").hidden = false; $("learn-btn").setAttribute("aria-pressed", "true"); learnLvlShow();
         var t = learnTarget(); learnSay((IS_PIANO ? (learn.hand === "lh" ? "Left hand. " : "Right hand. ") : "") + "Play the note in the blue cloud: " + noteName(t + EAR_SHIFT) + ". Take your time." + (EAR_SHIFT ? " (On this instrument it sounds as " + noteName(t) + " on a piano.)" : ""), false); learnFing(); AAM_TRACK.event("aam_learn_start", { tune: TUNE.slug, tune_title: TUNE.title, instrument: TUNE.instrument || "", notes: learn.seq.filter(function (m) { return m >= 0; }).length }); perShown = 0; drawScore(); ear.off(learnHear); ear.on(learnHear);
       }).catch(function (e) { $("learn-bar").hidden = false; learnSay(micWhy(e), false); $("learn-skip").hidden = true; perShown = 0; drawScore(); });
     };
@@ -1605,6 +1664,14 @@ function aamBoot(TUNE) {
   $("learn-stop").onclick = learnStop;
   $("learn-again").onclick = function () { learnStop(); learnStart(); };
   $("learn-skip").onclick = function () { if (learn.on && learnTarget() != null) learnNext(true); };
+  $("learn-lvl").onclick = function () {                   // the student's own choice of level, kept on this device
+    if (!learn.on || learn.done) return;
+    lvlPick = learnLvl() === "strict" ? "easy" : "strict"; try { localStorage.setItem("aam-lvl", lvlPick); } catch (e) {}
+    learn.okRun = learn.offRun = 0; learnLvlShow();
+    var t = learnTarget();
+    learnSay((lvlPick === "strict" ? "Strict: each note must be in tune and held a little longer." : "Forgiving: a clear note counts, even a little flat or sharp.") + (t != null ? " Next: " + noteName(t + EAR_SHIFT) + "." : ""), false);
+    AAM_TRACK.event("aam_learn_level", { tune: TUNE.slug, instrument: TUNE.instrument || "", how: lvlPick });
+  };
   $("learn-hear").onclick = function () { var t = learnTarget(); if (t != null) ear.beep(t, 1.2); };
   $("learn-fbtn").onclick = function () {
     fingOn = !fingOn; try { localStorage.setItem("aam-fing", fingOn ? "1" : "0"); } catch (e) {}
@@ -2254,7 +2321,7 @@ function aamBoot(TUNE) {
   // hand moves as little as possible, kept between E3 and E5 so it never gets muddy, in Charleston-style rhythms.
   var VOICE = { "Mixolydian": [2, 5, 6, 1], "Phrygian dominant": [2, 5, 6, 1], "Melodic minor": [2, 4, 5, 1], "Locrian": [2, 4, 6, 0] };
   function voicings(c, prev) {
-    var idx = VOICE[c.scale] || [2, 4, 6, 1];                      // degree indexes: 3rd, 5th (13th on dominants), 7th, 9th
+    var idx = c.voice || VOICE[c.scale] || [2, 4, 6, 1];           // degree indexes: 3rd, 5th (13th on dominants), 7th, 9th. A chord can bring its own ("voice": a sus chord plays its 4th)
     var pcs = idx.map(function (d) { return (c.root + c.degs[d]) % 12; });
     var opts = [];
     [[0, 1, 2, 3], [2, 3, 0, 1]].forEach(function (order) {        // A: from the 3rd up; B: from the 7th up
@@ -2285,11 +2352,24 @@ function aamBoot(TUNE) {
   }
   function bandParts(S) {                                      // the bass line and the piano's chords for a style from the BAND table
     var flat = []; TUNE.bars.forEach(function (bar, bi) { var beat = 0; bar.forEach(function (c) { flat.push({ c: c, bar: bi, beat: beat, n: bar.length }); beat += c.beats; }); });
-    var low = function (c, prev) { var r = 33 + ((c.root - 33) % 12 + 12) % 12; if (prev !== null && Math.abs(r + 12 - prev) < Math.abs(r - prev) && r + 12 <= 47) r += 12; return r; };
+    var low = function (c, prev) { var br = c.bass != null ? c.bass : c.root, r = 33 + ((br - 33) % 12 + 12) % 12; if (prev !== null && Math.abs(r + 12 - prev) < Math.abs(r - prev) && r + 12 <= 47) r += 12; return r; };
     var bass = [], comp = [], prev = null, pv = null; S._ant = false;
     if (S.bass === "walk") bass = walkingBass().filter(function (e) { return !e.ghost; }).map(function (e) { return { bar: e.bar, beat: e.beat, midi: e.midi, len: 0.98, vel: 0.72 + (e.beat % 2 === 1 ? 0.07 : 0) }; });
     flat.forEach(function (x, i) {
       var c = x.c, r = low(c, prev), nr = low(flat[(i + 1) % flat.length].c, r), fifth = r + c.degs[4] <= 50 ? r + c.degs[4] : r + c.degs[4] - 12; prev = r;
+      if (S.bass === "soul") {                                 // root, the root again just before beat 3, the fifth, then down to the seventh and a step into the next chord
+        bass.push({ bar: x.bar, beat: x.beat, midi: r, len: 1.4, vel: 0.78 });
+        if (c.beats >= 2) bass.push({ bar: x.bar, beat: x.beat + 1.5, midi: r, len: 0.45, vel: 0.6 });
+        if (c.beats >= 4) {
+          var sev = r + c.degs[6] - 12; if (sev < 28) sev += 12;
+          bass.push({ bar: x.bar, beat: x.beat + 2, midi: fifth, len: 0.9, vel: 0.72 }, { bar: x.bar, beat: x.beat + 3, midi: sev, len: 0.45, vel: 0.64 },
+                    { bar: x.bar, beat: x.beat + 3.5, midi: nr === r ? fifth : nr > r ? nr - 1 : nr + 1, len: 0.45, vel: 0.62 });
+        }
+      }
+      if (S.bass === "waltz") {                                // the root rings through the bar; every second bar steps into the next chord on beat 3
+        if (c.beats >= BPB && i % 2 === 1) bass.push({ bar: x.bar, beat: x.beat, midi: r, len: 1.9, vel: 0.76 }, { bar: x.bar, beat: x.beat + 2, midi: nr === r ? fifth : nr > r ? nr - 1 : nr + 1, len: 0.95, vel: 0.66 });
+        else bass.push({ bar: x.bar, beat: x.beat, midi: r, len: c.beats * 0.95, vel: 0.76 });
+      }
       if (S.bass === "two") {                                  // root, then the fifth; now and then a step into the next chord
         if (c.beats >= 4) {
           var lead = i % 2 === 1;
@@ -2308,7 +2388,7 @@ function aamBoot(TUNE) {
         if (!S._ant) bass.push({ bar: x.bar, beat: x.beat, midi: r, len: Math.min(1.4, c.beats * 0.9), vel: 0.74 });
         S._ant = false;
         if (c.beats >= 4) { bass.push({ bar: x.bar, beat: x.beat + 1.5, midi: fifth, len: 1.4, vel: 0.68 }, { bar: x.bar, beat: x.beat + 3, midi: nr, len: 1.9, vel: 0.76 }); S._ant = true; }
-        else if (x.beat + c.beats >= 4) { bass.push({ bar: x.bar, beat: x.beat + 1, midi: nr, len: 1.9, vel: 0.76 }); S._ant = true; }
+        else if (x.beat + c.beats >= BPB) { bass.push({ bar: x.bar, beat: x.beat + 1, midi: nr, len: 1.9, vel: 0.76 }); S._ant = true; }
         else bass.push({ bar: x.bar, beat: x.beat + 1.5, midi: fifth, len: 0.5, vel: 0.6 });
       }
       var v = voicings(c, pv); pv = v;
@@ -2335,14 +2415,15 @@ function aamBoot(TUNE) {
         })((kb + LEAD) * BAR, TUNE.bars[kb]);
       }
     }
-    if (STYLE === "swing") walkingBass().forEach(function (e) {   // a player's touch: 2 and 4 lean in a little, no two notes quite alike
+    var FOUR = BPB === 4;                                      // the hand-tuned swing and ballad are written in four
+    if (STYLE === "swing" && FOUR) walkingBass().forEach(function (e) {   // a player's touch: 2 and 4 lean in a little, no two notes quite alike
       at((e.bar + LEAD) * BAR + (e.ghost ? swing(e.beat) : e.beat * PPQ), function (time) {
         if (!state.bass || band !== "swing") return;
         if (e.ghost) { if (Math.random() < 0.6) bs(e.midi + keyState.key, secPerBeat() * 0.3, time, 0.36 + jit(0.05)); return; }
         bs(e.midi + keyState.key, secPerBeat() * 0.95, time + Math.random() * 0.006, 0.74 + (e.beat % 2 === 1 ? 0.07 : 0) + jit(0.07));
       });
     });
-    for (var k = 0; k < (STYLE === "swing" ? NB : 0); k++) {
+    for (var k = 0; k < (STYLE === "swing" && FOUR ? NB : 0); k++) {
       var b0 = (k + LEAD) * BAR;
       (function (k) {
         [[0, 0.56, -2], [1, 0.8, 0], [1.5, 0.42, -6], [2, 0.6, -2], [3, 0.8, 0], [3.5, 0.44, -6]].forEach(function (r) {   // ding, ding-a-ding: 2 and 4 the strongest
@@ -2367,7 +2448,7 @@ function aamBoot(TUNE) {
         });
       })(k);
     }
-    if (STYLE === "swing") straightBand().forEach(function (e) {   // bass on 1 and 3, the chord held under the tune
+    if (STYLE === "swing" && FOUR) straightBand().forEach(function (e) {   // bass on 1 and 3, the chord held under the tune
       at((e.bar + LEAD) * BAR + e.beat * PPQ, function (time) {
         if (band !== "ballad") return;
         var d = e.len * secPerBeat();
@@ -2375,7 +2456,7 @@ function aamBoot(TUNE) {
         if (state.comp) e.notes.forEach(function (n, i) { pno(n + keyState.key, d * 0.96, time + i * 0.012 + Math.random() * 0.004, SND ? 0.36 + jit(0.05) + (i === e.notes.length - 1 ? 0.05 : 0) : 0.32, mixGain("comp")); });
       });
     });
-    if (STYLE === "swing") comping().forEach(function (e) {
+    if (STYLE === "swing" && FOUR) comping().forEach(function (e) {
       at((e.bar + LEAD) * BAR + swing(e.beat), function (time) {
         if (!state.comp || band !== "swing") return;
         var d = Math.max(0.15, e.len * secPerBeat());
@@ -2384,7 +2465,7 @@ function aamBoot(TUNE) {
       });
     });
     if (STYLE === "swing") Object.keys(BAND).forEach(function (id) {   // every other style: played from its entry in BAND
-      var S = BAND[id]; if (!S.drums) return;
+      var S = BAND[id]; if (!S.drums || !bandFits(id)) return;
       var P = bandParts(S);
       P.bass.forEach(function (e) {
         at((e.bar + LEAD) * BAR + swing(e.beat, S.sw), function (time) {
@@ -2802,6 +2883,34 @@ function aamLibrary() {
   codeForm($("add-form"), $("add-code"), $("add-err"), function (r) { go(r === "all" ? CAT.pdfs[0].tunes[0] : r.tunes[0]); });
 
   var tocOpen = null, wantPdf = false;                   // wantPdf: the address asked for the booklet's PDF (&pdf=1)
+  var wantTour = false;                                  // &tour=1: show the tour whoever is visiting (how Alex looks at it)
+  // The first-visit tour, for someone who arrives with a free Starter Pack and has no teacher beside them. Once for each device.
+  function tour(force) {
+    try { if (!force && localStorage.getItem("aam-tour")) return; localStorage.setItem("aam-tour", "1"); } catch (e) {}
+    if (root.querySelector(".tour")) return;
+    var seen = function (el) { var r = el && el.getBoundingClientRect(); return !!el && !el.hidden && el.offsetParent !== null && r.width > 0 && r.height > 0; };
+    var steps = [[['[data-r="p-play"]', '[data-r="play"]'], "Tap <b>Play</b> to hear this line. Then play along on your instrument."],
+                 [['[data-r="p-bpm"]', '[data-r="tempo"]'], "Too fast? <b>Slow it down</b> here. Speed it up again when it feels easy."],
+                 [['[data-r="learn-btn"]'], "<b>Learn</b> listens through your microphone and turns each note green when you play it right."],
+                 [['[data-r="title"]'], "Tap the <b>title</b> to see every line in your booklet and jump to any of them."]]
+      .map(function (st) { return [st[0].map(function (q) { return root.querySelector(q); }).filter(seen)[0], st[1]]; }).filter(function (st) { return st[0]; });
+    if (!steps.length) return;
+    var box = document.createElement("div"), k = -1, cur = null; box.className = "tour"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "A quick tour");
+    var end = function (how) { if (cur) cur.classList.remove("tour-on"); if (box.parentNode) box.parentNode.removeChild(box); window.removeEventListener("resize", place); AAM_TRACK.event("aam_tour", { how: how, step: k + 1 }); };
+    function place() {
+      var r = cur.getBoundingClientRect(), w = box.offsetWidth, above = r.top > innerHeight / 2;
+      box.style.left = Math.max(12, Math.min(innerWidth - w - 12, r.left + r.width / 2 - w / 2)) + "px";
+      box.style.top = above ? "" : (r.bottom + 14) + "px"; box.style.bottom = above ? (innerHeight - r.top + 14) + "px" : "";
+    }
+    function show() {
+      if (cur) cur.classList.remove("tour-on");
+      if (++k >= steps.length) return end("done");
+      cur = steps[k][0]; cur.classList.add("tour-on");
+      box.innerHTML = "<p>" + steps[k][1] + '</p><div class="tour-row"><span class="tour-n">' + (k + 1) + " of " + steps.length + '</span><span><button class="tour-skip" data-tour="skip">Skip</button> <button class="tour-next" data-tour="next">' + (k === steps.length - 1 ? "Got it" : "Next") + "</button></span></div>";
+      box.querySelector('[data-tour="skip"]').onclick = function () { end("skip"); }; box.querySelector('[data-tour="next"]').onclick = show; place();
+    }
+    root.appendChild(box); window.addEventListener("resize", place); show();
+  }
   function contents(slug) {                              // a PDF with several exercises: the title opens its contents
     var p = pdfOf(slug), h1 = $("title"); tocOpen = null;
     if (!p || p.tunes.length < 2) return;
@@ -2823,7 +2932,7 @@ function aamLibrary() {
     var i = order.indexOf(slug), foot = "";
     foot += '<div class="toc-nav"><button data-go="' + esc(order[i - 1] || "") + '"' + (i > 0 ? "" : " disabled") + '>‹ Previous</button><button data-go="' + esc(order[i + 1] || "") + '"' + (i < order.length - 1 ? "" : " disabled") + ">Next ›</button></div>";
     var top = "";                                        // the booklet's PDF comes first: nobody should have to look for it
-    if (p.file && !DEMO) top += '<div class="toc-dl"><button data-dl="1">Download the booklet (PDF)<small>' + esc(p.file.edition + " · " + (p.file.size / 1048576).toFixed(1) + " MB") + '</small></button><small class="toc-dl-msg" aria-live="polite"></small></div>';
+    if (p.file && !DEMO) top += '<div class="toc-dl"><button data-dl="1">Download the booklet (PDF)<small>' + esc(p.file.edition + " · " + (p.file.size / 1048576).toFixed(1) + " MB") + '</small></button><small class="toc-dl-msg" aria-live="polite"></small><button class="toc-next" data-next="1">Now play along ›</button><button class="toc-all" data-all="1">See every line in the booklet</button></div>';
     var list = $("toc-list"), q = $("toc-q"), big = order.length >= 12;
     $("toc-title").textContent = p.title; list.innerHTML = html; $("toc-foot").innerHTML = foot; $("toc-top").innerHTML = top;
     $("toc-tools").hidden = !big; $("toc-chips").innerHTML = groups.length >= 3 ? chips : ""; $("toc-chips").hidden = groups.length < 3;
@@ -2855,18 +2964,20 @@ function aamLibrary() {
       };
     });
     var open = function (forPdf) {                         // forPdf: the "download the booklet" link in an email (&pdf=1) lands here
-      var box = $("toc-top").querySelector(".toc-dl"); forPdf = forPdf === true && !!box; viaLink = forPdf;
-      if (box) { box.classList.toggle("hi", forPdf); box.querySelector(".toc-dl-msg").textContent = forPdf ? "Tap the button to save your booklet. Then tap Done to play along." : ""; }
+      var box = $("toc-top").querySelector(".toc-dl"); forPdf = forPdf === true && !!box; viaLink = forPdf; card.classList.toggle("pdf-only", forPdf);
+      if (box) { box.classList.toggle("hi", forPdf); box.querySelector(".toc-dl-msg").textContent = forPdf ? "Save or print your booklet, then play along with every line." : ""; box.querySelector(".toc-next").classList.remove("go"); }
       q.value = ""; filter(); $("toc").hidden = false;
       var cur = list.querySelector('[aria-current="true"]'); if (cur) list.scrollTop = Math.max(0, cur.offsetTop - list.clientHeight / 2 + cur.offsetHeight / 2);   // start at the line you are on
       if (big && window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches) q.focus();   // not on phones: the keyboard would cover the list
     };
-    var dl = $("toc-top").querySelector("[data-dl]"), viaLink = false;
+    var dl = $("toc-top").querySelector("[data-dl]"), viaLink = false, card = $("toc").querySelector(".toc-card");
+    var leave = function () { var was = card.classList.contains("pdf-only"); $("toc").hidden = true; card.classList.remove("pdf-only"); if (was) tour(); };     // from the download card on to the player: show a newcomer around
+    if (dl) { $("toc-top").querySelector("[data-next]").onclick = leave; $("toc-top").querySelector("[data-all]").onclick = function () { card.classList.remove("pdf-only"); $("toc-top").querySelector(".toc-dl").classList.remove("hi"); $("toc-top").querySelector(".toc-dl-msg").textContent = ""; }; }
     if (dl) dl.onclick = function () {
       var msg = $("toc-top").querySelector(".toc-dl-msg"); msg.textContent = "Getting the PDF…"; dl.disabled = true;
       getPdf(p).then(function (blob) {
         var a = document.createElement("a"), url = URL.createObjectURL(blob); a.href = url; a.download = p.file.name; document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(function () { URL.revokeObjectURL(url); }, 60000); msg.textContent = "Downloaded: " + p.file.name; dl.disabled = false; AAM_TRACK.event("aam_pdf_download", { pdf: p.id, edition: p.file.edition, how: viaLink ? "link" : "list" });
+        setTimeout(function () { URL.revokeObjectURL(url); }, 60000); msg.textContent = "Downloaded: " + p.file.name; dl.disabled = false; $("toc-top").querySelector(".toc-next").classList.add("go"); AAM_TRACK.event("aam_pdf_download", { pdf: p.id, edition: p.file.edition, how: viaLink ? "link" : "list" });
       }).catch(function (e) {
         dl.disabled = false;
         msg.textContent = e.message === "nokey" ? "Scan a QR code in your booklet once (or type your code again under \"Add another PDF\"), then download."
@@ -2875,13 +2986,15 @@ function aamLibrary() {
     };
     h1.classList.add("has-toc"); h1.setAttribute("role", "button"); h1.setAttribute("aria-haspopup", "dialog");
     h1.onclick = open; tocOpen = open;
-    $("toc-close").onclick = function () { $("toc").hidden = true; };
-    $("toc").addEventListener("click", function (e) { if (e.target === $("toc")) $("toc").hidden = true; });
+    $("toc-close").onclick = leave;
+    $("toc").onclick = function (e) { if (e.target === $("toc")) leave(); };
   }
   function start(slug) {
     var pd = pdfOf(slug); if (pd && pd.contents) { lib.at = lib.at || {}; lib.at[pd.id] = slug; }   // remember the place in a booklet
     lib.last = slug; save(); menu(slug); if (!DEMO) contents(slug);
+    var newcomer = pd && /starter/.test(pd.id) && !lib.all;      // a free Starter Pack and no teacher's code on this device
     if (wantPdf) { wantPdf = false; if (tocOpen) tocOpen(true); }
+    else if (wantTour || newcomer) { var f = wantTour; wantTour = false; setTimeout(function () { if ($("toc").hidden) tour(f); }, 1600); }
     AAM_TRACK.who = DEMO ? "visitor" : lib.all ? "teacher" : "student";
     if (DEMO) demoChrome(slug);
     var t = CAT.tunes[slug];
@@ -2938,7 +3051,7 @@ function aamLibrary() {
     location.replace("https://" + location.host + location.pathname + location.search + location.hash); return;
   }
   ready = loadSources();
-  var q = new URLSearchParams(location.search), want = (DEMO && DEMO.tune) || q.get("tune") || q.get("t"), code = DEMO ? null : q.get("code") || q.get("c"); wantPdf = !DEMO && q.get("pdf") === "1";   // QR codes use the short t= and c=
+  var q = new URLSearchParams(location.search), want = (DEMO && DEMO.tune) || q.get("tune") || q.get("t"), code = DEMO ? null : q.get("code") || q.get("c"); wantPdf = !DEMO && q.get("pdf") === "1"; wantTour = !DEMO && q.get("tour") === "1";   // QR codes use the short t= and c=
   ready.then(function () { return code ? check(code) : null; }).then(function (r) {
     if (r) { grant(r); keep(code, r); }
     if (!want && r && r !== "all") want = r.tunes[0];

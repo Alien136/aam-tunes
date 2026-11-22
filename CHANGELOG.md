@@ -10,6 +10,14 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+
+### Fixed
+
+### Prevented
+
+## v1.4 · 2026-11-22
+
+### Added
 - Beta (test copy only): the "download the booklet" link (`&pdf=1`) now opens a small card with only the booklet's name, the download button and "Now play along", in place of the full contents list. "See every line in the booklet" opens the list.
 - Beta (test copy only): a first-visit tour of four short notes (Play, tempo, Learn, the title) for someone who arrives with a free Starter Pack and no teacher's code. It shows once for a device, never blocks a tap, and can be skipped. `&tour=1` on a link shows it to anyone.
 - Beta (test copy only): **note flash cards**, the first piece of the theory arm, at `/theory/?beta` (its own page). Free, no code screen. Pick an instrument, a card (name the note, find the piano key, find the saxophone or flute fingering, or find the note on the staff from a key or fingering), a clef and a level (2, 3 or 4 answers; ledger lines; sharps and flats). A 60-second sprint or 20 cards with no timer. Missed notes come back more often; scores stay on the device.
