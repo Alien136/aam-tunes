@@ -523,4 +523,9 @@ Everything needed to carry on from any conversation is in this repository and in
 - Checks: `--only pdf` (22). `AAM_STARTER=<a Starter Pack code>` on the command line adds the real-newcomer check; the code is never stored.
 - 22 Nov: **v1.4 released** (Alex: "ship both"): the download card and the first-visit tour are live. Still test-only: the seven beta band
   styles (each `beta: true`) and the theory cards (`release/cards.html` does not exist, so /theory says "coming soon").
+- 22 Nov, after v1.4 (Alex's notes from his phone): **beta** has a `next-line` chip (made in `contents()`, appended to `.music-row`, hidden on
+  a booklet's last line or a tune with no booklet) and the tour reordered to how a line should be practiced: instrument, Learn, Play,
+  tempo, Next, title. A booklet's lines cannot change instrument (only concert-pitch demo tunes have `inst-btn`), so on a booklet the first
+  note says to reply to the email for a different pack. Idea not built: let a newcomer switch between the alto, tenor and flute Starter
+  Packs from the player; it needs the tenor and flute sign-ups (or their codes in the player, which the code rule forbids).
 

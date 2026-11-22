@@ -214,9 +214,15 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     expect(await page.evaluate(() => document.querySelector(".toc-next").classList.contains("go")), "PDF link: after the download, \"Now play along\" becomes the main button");
     await page.click(".toc-next"); await page.waitForTimeout(400);
     const t1 = await page.evaluate(() => { const t = document.querySelector("#aam-play .tour"), on = document.querySelector("#aam-play .tour-on"), r = t && t.getBoundingClientRect(); return { toc: document.querySelector('[data-r="toc"]').hidden, tour: !!t, on: on && on.dataset.r, fits: !!r && r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight, text: t && t.textContent }; });
-    expect(t1.toc && t1.tour && t1.on === "p-play" && t1.fits && /Play/.test(t1.text), "tour: leaving the download card starts the tour at the Play button, on the screen (" + JSON.stringify(t1).slice(0, 120) + ")");
-    let stepsSeen = 1; for (let k = 0; k < 6 && await page.$("#aam-play .tour"); k++) { await page.click('#aam-play .tour [data-tour="next"]'); await page.waitForTimeout(150); if (await page.$("#aam-play .tour")) stepsSeen++; }
-    expect(stepsSeen >= 3 && !(await page.$("#aam-play .tour")) && !(await page.$("#aam-play .tour-on")), "tour: " + stepsSeen + " steps, then it is gone and nothing stays marked");
+    expect(t1.toc && t1.tour && t1.on === "inst-name" && t1.fits && /written for alto saxophone/.test(t1.text) && /Reply to the email/.test(t1.text), "tour: leaving the download card starts the tour at the instrument, naming it, on the screen (" + JSON.stringify(t1).slice(0, 160) + ")");
+    const order = ["inst-name"]; for (let k = 0; k < 5; k++) { await page.click('#aam-play .tour [data-tour="next"]'); await page.waitForTimeout(150); order.push(await page.evaluate(() => (document.querySelector("#aam-play .tour-on") || { dataset: {} }).dataset.r)); }
+    expect(order.join(" ") === "inst-name learn-btn p-play p-bpm next-line title", "tour: the notes come in practice order: instrument, Learn, Play, tempo, Next, the title (" + order.join(", ") + ")");
+    let stepsSeen = 6; for (let k = 0; k < 6 && await page.$("#aam-play .tour"); k++) { await page.click('#aam-play .tour [data-tour="next"]'); await page.waitForTimeout(150); if (await page.$("#aam-play .tour")) stepsSeen++; }
+    expect(stepsSeen >= 6 && !(await page.$("#aam-play .tour")) && !(await page.$("#aam-play .tour-on")), "tour: " + stepsSeen + " steps, then it is gone and nothing stays marked");
+    const nx = await page.evaluate(() => { const b = document.querySelector('#aam-play [data-r="next-line"]'), r = b.getBoundingClientRect(); return { seen: !b.hidden && r.width > 0 && r.right <= innerWidth && r.top >= 0, t: document.querySelector('#aam-play [data-r="title"]').textContent }; });
+    await page.click('#aam-play [data-r="next-line"]'); await page.waitForTimeout(2500);
+    const t2 = await page.textContent('#aam-play [data-r="title"]');
+    expect(nx.seen && /^1 /.test(nx.t) && /^2 /.test(t2), "next: the Next button beside Learn and Tuner opens the next line of the booklet (" + nx.t.trim() + " -> " + t2.trim() + ")");
     await page.click('[data-r="title"]'); await page.waitForTimeout(300);
     expect(await page.evaluate(() => !document.querySelector(".toc-dl").classList.contains("hi") && !document.querySelector(".toc-card").classList.contains("pdf-only") && !!document.querySelector('[data-r="toc-list"]').offsetParent), "PDF link: opening the list from the title is the ordinary list");
     await page.click('[data-r="toc-close"]'); await page.reload(); await page.waitForTimeout(2500);
