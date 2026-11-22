@@ -122,10 +122,10 @@ def build():
             "line 1 is the lowest line, and space 1 is the lowest space.")
     p.ask(1, "Number the lines from 1 to 5. Start at the bottom."); p.gap(6); p.staff(M + 70, W - 2 * M - 140, 18)
     for i in range(5): c.setStrokeColor(HexColor(INK)); c.setFillColor(white); c.setLineWidth(1.2); c.circle(M + 44, p.base + i * 18, 8, fill=1, stroke=1)
-    p.gap(4 * 18 + 22)
+    p.gap(4 * 18 + 15)
     p.ask(2, "Number the spaces from 1 to 4. Start at the bottom."); p.gap(6); p.staff(M + 70, W - 2 * M - 140, 18)
     for i in range(4): c.setStrokeColor(HexColor(INK)); c.setFillColor(white); c.circle(M + 44, p.base + i * 18 + 9, 7.5, fill=1, stroke=1)
-    p.gap(4 * 18 + 22)
+    p.gap(4 * 18 + 15)
     p.learn("A <b>line note</b> has a line running through its middle. A <b>space note</b> sits between two lines.")
     p.ask(3, "Write <b>L</b> under each line note and <b>S</b> under each space note."); p.gap(8); p.staff(M, W - 2 * M, 17)
     for k, pos in enumerate((2, 5, 0, 7, 4, 1, 8, 3)):
