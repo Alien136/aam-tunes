@@ -503,4 +503,9 @@ Everything needed to carry on from any conversation is in this repository and in
   `LEVEL_TYPE` in build_theory.py holds the type and staff size per level: Level 1 steps up quickly to a mature page.
 - Piano first, US terms only. Finger numbers are NOT in Prep (asked twice, no answer: left out). Not yet read by Alex page by page.
 - Not done: answer key, QR codes to the flash-card decks, publishing (it is a file only), Level 1.
+- Same day, edition 2 after Alex read the draft ("text size is extreme; size it like the Beginner Booklets; fit more on a page; a better
+  cover with a piano"): every page is drawn on a larger sheet and scaled by K = 0.76 (type 11 pt, staff spaces 12 pt). `Page` now FLOWS:
+  blocks call `need(h)`, a section heading waits for its first block, `finish(filler, checks)` adds seeded "More practice" rows until the
+  unit's last page is full and puts the checklist at its foot. New cover (keyboard with E G B lit, the same three notes on a staff) and a
+  contents / how-to-use page. 19 pages. `LEVEL_K` holds the scale for later levels.
 

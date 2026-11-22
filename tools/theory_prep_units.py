@@ -13,10 +13,14 @@ LET = "CDEFGAB"; FIRST = {"treble": 2, "bass": 4}              # the letter on t
 name_of = lambda clef, pos: LET[(FIRST[clef] + pos) % 7]
 
 
+import random
+RNG = random.Random(2026)                                   # the book is the same every time it is built
+
+
 def setup(B):
     """Take the page furniture from build_theory.py."""
-    global Page, INK, ACC, ACC_TEXT, TINT, MUTED, RULE, W, H, M, P, BODY
-    Page, INK, ACC, ACC_TEXT, TINT, MUTED, RULE, W, H, M, P, BODY = B.Page, B.INK, B.ACC, B.ACC_TEXT, B.TINT, B.MUTED, B.RULE, B.W, B.H, B.M, B.P, B.BODY
+    global Page, INK, ACC, ACC_TEXT, TINT, MUTED, RULE, W, H, M, P, BODY, BOTTOM
+    Page, INK, ACC, ACC_TEXT, TINT, MUTED, RULE, W, H, M, P, BODY, BOTTOM = B.Page, B.INK, B.ACC, B.ACC_TEXT, B.TINT, B.MUTED, B.RULE, B.W, B.H, B.M, B.P, B.BODY, B.BOTTOM
 
 
 # ---------------------------------------------------------------- drawing
@@ -76,6 +80,7 @@ def box(p, x, w=50):
 # ---------------------------------------------------------------- exercise shapes
 def ex_name(p, n, text, kind, poss, sp=16, done=0, groups=None):
     """Notes on a staff with a blank under each. groups = sizes of note groups, divided by bar lines (words to spell)."""
+    if not groups and len(poss) < 14: poss = list(poss) + [RNG.choice([q for q in range(9) if q != poss[-1]]) for _ in range(14 - len(poss))]     # a full line on the wider page
     p.ask(n, text); p.gap(8); p.staff(M, W - 2 * M, sp); clef(p, M + 6, kind)
     x0 = M + sp * 4.2; step = (W - M - x0 - 14) / len(poss); edges = []
     if groups:
@@ -138,7 +143,7 @@ def figure(p, rows, h=64):
 
 
 def sums(p, n, text, items):
-    p.ask(n, text); c = p.c; cw = (W - 2 * M) / 2
+    p.ask(n, text, reserve=70 * ((len(items) + 1) // 2)); c = p.c; cw = (W - 2 * M) / 2
     for k, parts in enumerate(items):
         x = M + 30 + (k % 2) * cw; y = p.y - 34 - (k // 2) * 70; free(p, y, 12)
         for j, s in enumerate(parts):
@@ -159,12 +164,11 @@ def build(c, first_page):
     ex_draw(p, 1, "Draw a <b>G</b> on line 2 in every box. Say “G” as you draw each one.", "treble", ["G"] * 6)
     ex_name(p, 2, "These are the five <b>line notes</b>. Name them. The first one is done for you.", "treble", (0, 2, 4, 6, 8, 4, 0, 6, 2, 8), done=1)
     ex_name(p, 3, "These are the four <b>space notes</b>. Name them.", "treble", (1, 3, 5, 7, 5, 1, 7, 3, 5, 1))
-    c.showPage()
-    p = Page(c, "Prep", 3, "Treble notes", n); n += 1
+    p.section("Treble notes")
     ex_name(p, 4, "Lines and spaces together. Name each note.", "treble", (2, 5, 0, 7, 3, 8, 1, 6, 4, 2))
     ex_draw(p, 5, "Draw each note on the staff. Some letters have two places: either one is right.", "treble", list("GBEACFD"))
     ex_name(p, 6, "These notes spell words. Write the letters, then read the words.", "treble", (4, 3, 2, 1, 3, 5, 7, 6, 3, 6, 0, 2, 2), groups=(3, 4, 3, 3))
-    p.gap(6); p.checks(["I can say the line notes E G B D F and the space notes F A C E.", "I can name any note on the treble staff.", "I can draw the note for any letter."])
+    p.finish(fill_name('treble'), ["I can say the line notes E G B D F and the space notes F A C E.", "I can name any note on the treble staff.", "I can draw the note for any letter."])
     c.showPage()
 
     # ============ Unit 4 · the bass clef
@@ -174,12 +178,11 @@ def build(c, first_page):
     ex_draw(p, 1, "Draw an <b>F</b> on line 4 in every box. Say “F” as you draw each one.", "bass", ["F"] * 6)
     ex_name(p, 2, "These are the five <b>line notes</b>. Name them. The first one is done for you.", "bass", (0, 2, 4, 6, 8, 6, 2, 8, 0, 4), done=1)
     ex_name(p, 3, "These are the four <b>space notes</b>. Name them.", "bass", (1, 3, 5, 7, 3, 7, 1, 5, 3, 7))
-    c.showPage()
-    p = Page(c, "Prep", 4, "Bass notes", n); n += 1
+    p.section("Bass notes")
     ex_name(p, 4, "Lines and spaces together. Name each note.", "bass", (4, 1, 6, 3, 8, 0, 5, 2, 7, 4))
     ex_draw(p, 5, "Draw each note on the staff. Some letters have two places: either one is right.", "bass", list("FCGDAEB"))
     ex_name(p, 6, "These notes spell words. Write the letters, then read the words.", "bass", (2, 1, 0, 1, 3, 5, 6, 5, 4, 3, 1, 7, 5), groups=(3, 3, 3, 4))
-    p.gap(6); p.checks(["I can say the line notes G B D F A and the space notes A C E G.", "I can name any note on the bass staff.", "I know which hand usually plays each clef."])
+    p.finish(fill_name('bass'), ["I can say the line notes G B D F A and the space notes A C E G.", "I can name any note on the bass staff.", "I know which hand usually plays each clef."])
     c.showPage()
 
     # ============ Unit 5 · how long notes last
@@ -188,11 +191,10 @@ def build(c, first_page):
     figure(p, [("q", "Quarter note", "1 beat"), ("h", "Half note", "2 beats"), ("w", "Whole note", "4 beats")])
     p.ask(1, "How many beats does each note get? Write the number."); p.gap(8); p.staff(M, W - 2 * M, 16)
     for k, s in enumerate("qhwhqwqhwq"):
-        x = M + 34 + k * 49; note(p, x, 2, s); p.blank(x, p.base - 30, 24)
+        x = M + 44 + k * ((W - 2 * M - 30) / 10); note(p, x, 2, s); p.blank(x, p.base - 30, 24)
     p.gap(4 * 16 + 46)
     ex_draw(p, 2, "Draw each note on line 2. Color in the quarter notes. Add a stem to quarter and half notes.", None, ["Quarter", "Half", "Whole", "Half", "Quarter", "Whole"])
-    c.showPage()
-    p = Page(c, "Prep", 5, "Rests", n); n += 1
+    p.section("Rests")
     p.learn("A <b>rest</b> is a silence. You count it just like a note, but you do not play. The half rest sits on line 3 like a hat. The whole rest hangs from line 4.")
     c.setFillColor(HexColor(TINT)); c.rect(M, p.y - 132, W - 2 * M, 132, fill=1, stroke=0); keep = p.y; p.y -= 16; p.staff(M + 30, W - 2 * M - 60, 15)
     for k, (s, t, sub) in enumerate((("qr", "Quarter rest", "1 beat of silence"), ("hr", "Half rest", "2 beats of silence"), ("wr", "Whole rest", "4 beats of silence"))):
@@ -201,16 +203,15 @@ def build(c, first_page):
     p.y = keep - 132 - 18
     p.ask(4, "How many beats does each note or rest get? Write the number."); p.gap(8); p.staff(M, W - 2 * M, 16)
     for k, s in enumerate(("q", "qr", "h", "hr", "w", "wr", "qr", "h", "hr", "q")):
-        x = M + 34 + k * 49; sym(p, x, s); p.blank(x, p.base - 30, 24)
+        x = M + 44 + k * ((W - 2 * M - 30) / 10); sym(p, x, s); p.blank(x, p.base - 30, 24)
     p.gap(4 * 16 + 46)
     ex_draw(p, 5, "Draw the rest that lasts as long as each note.", None, ["Quarter note", "Half note", "Whole note", "Half note", "Quarter note"])
-    c.showPage()
-    p = Page(c, "Prep", 5, "Adding beats", n); n += 1
+    p.section("Adding beats")
     sums(p, 6, "Add the beats.", [("q", "q"), ("h", "q"), ("h", "h"), ("q", "q", "q")])
     sums(p, 7, "Now with rests. A rest counts just like a note.", [("q", "qr"), ("h", "hr"), ("w", "qr"), ("hr", "q", "q")])
     p.ask(8, "Clap this line and count the beats out loud: “1, 2, 3, 4”. Hold your hands together on the long notes.")
     rhythm(p, [["q", "q", "h"], ["h", "h"], ["q", "q", "q", "q"], ["w"]], counts=4); p.gap(8)
-    p.checks(["I can say how many beats a quarter, half and whole note get.", "I can tell a half rest from a whole rest.", "I can add up beats."])
+    p.finish(fill_beats, ["I can say how many beats a quarter, half and whole note get.", "I can tell a half rest from a whole rest.", "I can add up beats."])
     c.showPage()
 
     # ============ Unit 6 · measures and counting
@@ -223,8 +224,9 @@ def build(c, first_page):
     rhythm(p, [["q", "qr", "q", "q"], ["h", "hr"], ["q", "q", "h"], ["w"]], counts=0)
     p.ask(3, "The bar lines are missing. Count four beats at a time and draw them in.")
     rhythm(p, [["h", "q", "q"], ["q", "q", "q", "q"], ["w"], ["q", "q", "h"]], bars=False)
-    c.showPage()
-    p = Page(c, "Prep", 6, "Three beats in a measure", n); n += 1
+    p.ask(4, "Clap this line and count out loud without stopping. Then play it on any one key of your piano.")
+    rhythm(p, [["q", "q", "q", "q"], ["h", "h"], ["q", "qr", "q", "qr"], ["h", "q", "q"], ["w"]])
+    p.section("Three beats in a measure")
     p.learn("In <b>3/4</b> there are three beats in every measure, so we count 1 2 3. The first beat of a measure is a little stronger than the others.")
     p.ask(4, "Write the counts. Then clap it: beat 1 is the strongest.")
     rhythm(p, [["q", "q", "q"], ["h", "q"], ["q", "h"], ["q", "q", "q"], ["h", "qr"]], top=3, counts=1)
@@ -232,7 +234,7 @@ def build(c, first_page):
     rhythm(p, [["q", "q", "q"], ["h", "q"], ["q", "q", "q"], ["q", "h"], ["h", "q"]], top=3, bars=False)
     p.ask(6, "Write the time signature in the box: 4/4 or 3/4.")
     rhythm(p, [["h", "q"], ["q", "q", "q"], ["q", "h"], ["h", "qr"]], top=None); p.gap(4)
-    p.checks(["I can say what the top number of a time signature means.", "I can count and clap in 4/4 and in 3/4.", "I can put bar lines in the right places."])
+    p.finish(fill_counts, ["I can say what the top number of a time signature means.", "I can count and clap in 4/4 and in 3/4.", "I can put bar lines in the right places."])
     c.showPage()
 
     # ============ Unit 7 · steps and skips
@@ -243,38 +245,39 @@ def build(c, first_page):
     pairs(p, 2, "Does the second note go <b>up</b>, go <b>down</b> or stay the <b>same</b>? Write the word.", ((1, 2), (6, 4), (3, 3), (5, 7), (8, 7), (2, 0)), hint="up")
     p.ask(3, "Draw a note one <b>step up</b> from each note."); p.gap(8); p.staff(M, W - 2 * M, 16); clef(p, M + 6, "treble")
     for k, pos in enumerate((0, 3, 5, 2, 6, 1)):
-        x = M + 92 + k * 72; note(p, x - 14, pos); box(p, x + 18, 32)
-        if k < 5: bar(p, x + 44)
-    c.showPage()
-    p = Page(c, "Prep", 7, "Steps and skips on the piano", n); n += 1
+        x = M + 130 + k * ((W - 2 * M - 110) / 6); note(p, x - 14, pos); box(p, x + 18, 32)
+        if k < 5: bar(p, x + (W - 2 * M - 110) / 12 + 8)
+    p.gap(4 * 16 + 34)
+    p.section("Steps and skips on the piano")
     p.ask(4, "Draw a note one <b>skip down</b> from each note."); p.gap(8); p.staff(M, W - 2 * M, 16); clef(p, M + 6, "treble")
     for k, pos in enumerate((8, 5, 3, 6, 2, 7)):
-        x = M + 92 + k * 72; note(p, x - 14, pos); box(p, x + 18, 32)
-        if k < 5: bar(p, x + 44)
+        x = M + 130 + k * ((W - 2 * M - 110) / 6); note(p, x - 14, pos); box(p, x + 18, 32)
+        if k < 5: bar(p, x + (W - 2 * M - 110) / 12 + 8)
     p.gap(4 * 16 + 34)
-    p.ask(5, "Start on the blue key. Write <b>X</b> on the key a <b>step up</b>, and <b>O</b> on the key a <b>skip up</b>.")
+    p.ask(5, "Start on the blue key. Write <b>X</b> on the key a <b>step up</b>, and <b>O</b> on the key a <b>skip up</b>.", reserve=170)
     for k, s in enumerate((0, 3, 1, 4, 2, 5)):
-        x = M + 12 + (k % 3) * 176; y0 = p.y - (k // 3) * 78; keep = p.y; p.y = y0; p.keyboard(x, 1, 13, 54, shade=s, extra=3); p.y = keep
+        x = M + 30 + (k % 3) * ((W - 2 * M) / 3); y0 = p.y - (k // 3) * 78; keep = p.y; p.y = y0; p.keyboard(x, 1, 13, 54, shade=s, extra=3); p.y = keep
     p.gap(78 * 2 + 4)
     p.ask(6, "Follow the tune. Between each pair of notes write <b>S</b> for step, <b>K</b> for skip or <b>R</b> for repeat."); p.gap(8); p.staff(M, W - 2 * M, 16); clef(p, M + 6, "treble")
     tune = (2, 3, 4, 4, 6, 5, 3, 2, 2, 0)
     for k, pos in enumerate(tune):
-        x = M + 84 + k * 46; note(p, x, pos)
-        if k < len(tune) - 1: p.blank(x + 23, p.base - 30, 22)
+        x = M + 110 + k * ((W - 2 * M - 90) / 10); note(p, x, pos)
+        if k < len(tune) - 1: p.blank(x + (W - 2 * M - 90) / 20, p.base - 30, 22)
     p.gap(4 * 16 + 50)
-    p.checks(["I can tell a step from a skip on the staff.", "I can play a step and a skip on the piano.", "I can say if a tune goes up, goes down or stays the same."])
+    p.finish(fill_pairs, ["I can tell a step from a skip on the staff.", "I can play a step and a skip on the piano.", "I can say if a tune goes up, goes down or stays the same."])
     c.showPage()
 
     # ============ Unit 8 · first words
     p = Page(c, "Prep", 8, "Loud and soft, fast and slow", n); n += 1
     p.learn("Music uses Italian words to say <b>how</b> to play. The words for loud and soft are written under the notes as letters. The words for speed are written above the first measure.")
+    p.need(27 * 7 + 30)
     rows = [("f", "forte", "loud"), ("p", "piano", "soft"), ("mf", "mezzo forte", "medium loud"), ("mp", "mezzo piano", "medium soft"), ("", "Allegro", "fast"), ("", "Andante", "walking speed"), ("", "Adagio", "slow")]
     c.setStrokeColor(HexColor(RULE)); c.setLineWidth(1)
     for k, (s, w, m) in enumerate(rows):
         y = p.y - 20 - k * 27; c.setFillColor(HexColor(INK)); c.setFont("Dyn", 22); c.drawCentredString(M + 40, y - 2, s)
         c.setFont("Pop-B", 14); c.drawString(M + 90, y, w); c.setFont("Pop", 14); c.drawString(M + 260, y, m); c.line(M, y - 9, W - M, y - 9)
     p.gap(27 * len(rows) + 16)
-    p.ask(1, "Draw a line from each sign or word to what it means.")
+    p.ask(1, "Draw a line from each sign or word to what it means.", reserve=190)
     left = ["f", "Adagio", "mp", "Allegro", "p", "Andante", "mf"]; right = ["soft", "fast", "loud", "medium loud", "slow", "medium soft", "walking speed"]
     for k in range(7):
         y = p.y - 16 - k * 24; c.setFillColor(HexColor(INK))
@@ -287,18 +290,57 @@ def build(c, first_page):
     for k in range(4):
         p.blank(W - M - 216 + k * 64, p.y - 22, 44)
         if k < 3: c.setFont("Pop", 12); c.drawCentredString(W - M - 184 + k * 64, p.y - 20, "<")
-    c.showPage()
+    p.gap(40)
 
     # ============ review
-    p = Page(c, "Prep", 8, "Prep review", n); n += 1
-    ex_name(p, 1, "Name each note in the <b>treble clef</b>.", "treble", (2, 7, 0, 5, 3, 8, 1, 6, 4, 2), sp=13)
-    ex_name(p, 2, "Name each note in the <b>bass clef</b>.", "bass", (6, 1, 4, 8, 3, 0, 5, 2, 7, 4), sp=13)
+    p.section("Prep review")
+    ex_name(p, 1, "Name each note in the <b>treble clef</b>.", "treble", (2, 7, 0, 5, 3, 8, 1, 6, 4, 2), sp=16)
+    ex_name(p, 2, "Name each note in the <b>bass clef</b>.", "bass", (6, 1, 4, 8, 3, 0, 5, 2, 7, 4), sp=16)
     p.ask(3, "Write the counts under the notes, then draw the missing bar lines.")
-    rhythm(p, [["q", "q", "h"], ["h", "hr"], ["q", "qr", "q", "q"], ["w"]], counts=0, bars=False, sp=13)
-    pairs(p, 4, "Step, skip or repeat?", ((3, 4), (2, 4), (5, 5), (7, 6), (6, 4), (1, 3)), sp=13)
-    c.setStrokeColor(HexColor(INK)); c.setLineWidth(1.4); c.setFillColor(HexColor(TINT)); c.rect(M, p.y - 66, W - 2 * M, 66, fill=1, stroke=0)
+    rhythm(p, [["q", "q", "h"], ["h", "hr"], ["q", "qr", "q", "q"], ["w"]], counts=0, bars=False, sp=16)
+    pairs(p, 4, "Step, skip or repeat?", ((3, 4), (2, 4), (5, 5), (7, 6), (6, 4), (1, 3)), sp=16)
+    fs = [fill_keys, fill_beats, fill_counts, fill_ls, fill_name("treble"), fill_name("bass")]; k = 0
+    while p.y - BOTTOM - 90 > 168 and k < 10: fs[k % len(fs)](p); k += 1
+    p.y = min(p.y, BOTTOM + 70); c.setStrokeColor(HexColor(INK)); c.setLineWidth(1.4); c.setFillColor(HexColor(TINT)); c.rect(M, p.y - 66, W - 2 * M, 66, fill=1, stroke=0)
     c.setFillColor(HexColor(ACC)); c.rect(M, p.y - 66, 5, 66, fill=1, stroke=0)
     c.setFillColor(HexColor(INK)); c.setFont("Pop-B", 15); c.drawString(M + 20, p.y - 26, "I finished Prep. Next: Level 1.")
     c.setFont("Pop", 11.5); c.drawString(M + 20, p.y - 50, "Student ______________   Teacher ______________   Date _________")
     c.showPage()
     return n
+
+
+# ---------------------------------------------------------------- "more practice": rows that fill the last page of a unit
+def fill_keys(p):
+    p.ask(0, "More practice. Name the blue key.", reserve=90); cw = (W - 2 * M) / 5
+    for k in range(5):
+        x = M + 14 + k * cw; p.keyboard(x, 1, 12, 50, shade=RNG.randrange(10), extra=3); p.blank(x + 60, p.y - 68, 44)
+    p.gap(88)
+
+
+def fill_ls(p):
+    p.ask(0, "More practice. Write <b>L</b> under each line note and <b>S</b> under each space note."); p.gap(8); p.staff(M, W - 2 * M, 16)
+    for k in range(14):
+        x = M + 40 + k * ((W - 2 * M - 40) / 14); note(p, x, RNG.randrange(9)); p.blank(x, p.base - 28, 26)
+    p.gap(4 * 16 + 44)
+
+
+def fill_name(kind):
+    return lambda p: ex_name(p, 0, "More practice. Name each note.", kind, [RNG.randrange(9)])
+
+
+def fill_beats(p):
+    p.ask(0, "More practice. How many beats? Write the number."); p.gap(8); p.staff(M, W - 2 * M, 16)
+    for k in range(12):
+        x = M + 44 + k * ((W - 2 * M - 30) / 12); sym(p, x, RNG.choice(["q", "h", "w", "qr", "hr", "wr"])); p.blank(x, p.base - 30, 24)
+    p.gap(4 * 16 + 46)
+
+
+def fill_counts(p):
+    top = RNG.choice([4, 3]); pats = {4: [["q", "q", "h"], ["h", "q", "q"], ["q", "q", "q", "q"], ["h", "h"], ["q", "qr", "h"], ["w"]], 3: [["q", "q", "q"], ["h", "q"], ["q", "h"], ["h", "qr"]]}[top]
+    p.ask(0, "More practice. Write the counts, then clap and count out loud."); rhythm(p, [RNG.choice(pats) for _ in range(5 if top == 3 else 4)], top=top, counts=0)
+
+
+def fill_pairs(p):
+    items = []
+    for _ in range(8): a = RNG.randrange(1, 8); items.append((a, max(0, min(8, a + RNG.choice([-2, -1, 0, 1, 2])))))
+    pairs(p, 0, "More practice. Step, skip or repeat?", items)
