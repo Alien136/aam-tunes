@@ -511,3 +511,14 @@ Everything needed to carry on from any conversation is in this repository and in
 - Edition 2, second pass (Alex: "going in the right direction, fit maybe 20% more on each page"): K = 0.71 (type about 10.3 pt), tighter gaps
   between blocks, the checklist may dip into the foot margin sooner than go alone to a new page. 18 pages. He likes the new cover and design.
 
+## 2026-11-22 · Beta: download card and first-visit tour (after Alex's own Starter Pack test)
+- Alex signed up on /starter-pack with his own address: the confirmation email, Email 1 and both links work. Still to fix in MailerLite (in
+  the Computer session guide): "Musoc" in the confirmation email's sender name, "newsletter" wording, raw links in Email 1, and Email 1 says
+  the booklet "comes with a band" although all 128 Starter Pack lines are a click (119) or a drone (9): no line has the band.
+- `&pdf=1`: `open(true)` adds `pdf-only` to `.toc-card` (no search, chips, list or foot). `.toc-next` ("Now play along") and the Done button
+  both run `leave()`, which starts the tour. `.toc-all` turns the card back into the ordinary list.
+- `tour(force)`: steps are found on the page as it is (phone bar or desktop controls), shown beside the control with an outline; no backdrop.
+  Shown by itself only when the tune's booklet id contains "starter" and the device has no master code (`newcomer`), or after the download
+  card; localStorage `aam-tour` makes it once per device. Analytics: `aam_tour {how: done|skip, step}`.
+- Checks: `--only pdf` (22). `AAM_STARTER=<a Starter Pack code>` on the command line adds the real-newcomer check; the code is never stored.
+

@@ -10,6 +10,8 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- Beta (test copy only): the "download the booklet" link (`&pdf=1`) now opens a small card with only the booklet's name, the download button and "Now play along", in place of the full contents list. "See every line in the booklet" opens the list.
+- Beta (test copy only): a first-visit tour of four short notes (Play, tempo, Learn, the title) for someone who arrives with a free Starter Pack and no teacher's code. It shows once for a device, never blocks a tap, and can be skipped. `&tour=1` on a link shows it to anyone.
 - Beta (test copy only): **note flash cards**, the first piece of the theory arm, at `/theory/?beta` (its own page). Free, no code screen. Pick an instrument, a card (name the note, find the piano key, find the saxophone or flute fingering, or find the note on the staff from a key or fingering), a clef and a level (2, 3 or 4 answers; ledger lines; sharps and flats). A 60-second sprint or 20 cards with no timer. Missed notes come back more often; scores stay on the device.
 - Beta (test copy only, until Alex has listened): a **Soul Jazz** band style (even eighths, backbeat on 2 and 4, a bass riff) for tunes like Cold Duck Time and Mercy, Mercy, Mercy. Those two tunes open with it in the test copy; students keep Bossa Nova until it is released.
 - Beta (test copy only): the band can play in 3/4. Two styles in three, **Jazz Waltz** (swung) and **Ballad in 3** (straight). A tune in 3/4 is offered only the styles in three, and a tune in 4/4 only the styles in four. Going Home's four exercises play with the band in the test copy; students keep the click until the styles are released.

@@ -204,14 +204,32 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     const page = await ctx0.newPage(); page.on("pageerror", e => expect(false, "script error: " + e.message));
     await page.goto(URL_OF("sax-beginner-alto-count-then-play") + "&pdf=1"); await page.waitForTimeout(2500);
     const st = await page.evaluate(() => { const toc = document.querySelector('[data-r="toc"]'), box = document.querySelector(".toc-dl"), list = document.querySelector('[data-r="toc-list"]'), btn = document.querySelector("[data-dl]");
-      const r = btn && btn.getBoundingClientRect(); return { open: toc && !toc.hidden, hi: !!box && box.classList.contains("hi"), above: !!r && r.bottom <= list.getBoundingClientRect().top + 1, seen: !!r && r.top >= 0 && r.bottom <= innerHeight, label: btn && btn.textContent, url: location.search }; });
+      const r = btn && btn.getBoundingClientRect(); return { open: toc && !toc.hidden, hi: !!box && box.classList.contains("hi"), above: !!r && (list.offsetParent === null ? !document.querySelector('[data-r="toc-q"]').offsetParent : r.bottom <= list.getBoundingClientRect().top + 1), seen: !!r && r.top >= 0 && r.bottom <= innerHeight, label: btn && btn.textContent, url: location.search }; });
     expect(st.open && st.hi, "PDF link: &pdf=1 opens the contents with the download button marked");
-    expect(st.above && st.seen && /Download the booklet \(PDF\)/.test(st.label || ""), "PDF link: the download button is first, above the list, on a phone screen");
+    expect(st.above && st.seen && /Download the booklet \(PDF\)/.test(st.label || ""), "PDF link: the download card shows the button and no list or search, on a phone screen");
     expect(!/pdf=|c=/.test(st.url), "PDF link: the code and the pdf flag leave the address bar");
     const [dl] = await Promise.all([page.waitForEvent("download", { timeout: 25000 }).catch(() => null), page.click("[data-dl]")]);
     expect(!!dl, "PDF link: the button downloads the booklet");
-    await page.click('[data-r="toc-close"]'); await page.click('[data-r="title"]'); await page.waitForTimeout(300);
-    expect(await page.evaluate(() => !document.querySelector(".toc-dl").classList.contains("hi")), "PDF link: opening the list from the title is the ordinary list");
+    await page.waitForTimeout(400);
+    expect(await page.evaluate(() => document.querySelector(".toc-next").classList.contains("go")), "PDF link: after the download, \"Now play along\" becomes the main button");
+    await page.click(".toc-next"); await page.waitForTimeout(400);
+    const t1 = await page.evaluate(() => { const t = document.querySelector("#aam-play .tour"), on = document.querySelector("#aam-play .tour-on"), r = t && t.getBoundingClientRect(); return { toc: document.querySelector('[data-r="toc"]').hidden, tour: !!t, on: on && on.dataset.r, fits: !!r && r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight, text: t && t.textContent }; });
+    expect(t1.toc && t1.tour && t1.on === "p-play" && t1.fits && /Play/.test(t1.text), "tour: leaving the download card starts the tour at the Play button, on the screen (" + JSON.stringify(t1).slice(0, 120) + ")");
+    let stepsSeen = 1; for (let k = 0; k < 6 && await page.$("#aam-play .tour"); k++) { await page.click('#aam-play .tour [data-tour="next"]'); await page.waitForTimeout(150); if (await page.$("#aam-play .tour")) stepsSeen++; }
+    expect(stepsSeen >= 3 && !(await page.$("#aam-play .tour")) && !(await page.$("#aam-play .tour-on")), "tour: " + stepsSeen + " steps, then it is gone and nothing stays marked");
+    await page.click('[data-r="title"]'); await page.waitForTimeout(300);
+    expect(await page.evaluate(() => !document.querySelector(".toc-dl").classList.contains("hi") && !document.querySelector(".toc-card").classList.contains("pdf-only") && !!document.querySelector('[data-r="toc-list"]').offsetParent), "PDF link: opening the list from the title is the ordinary list");
+    await page.click('[data-r="toc-close"]'); await page.reload(); await page.waitForTimeout(2500);
+    expect(!(await page.$("#aam-play .tour")), "tour: it shows once for a device, and never by itself on a teacher's device");
+    await page.goto(URL_OF("sax-beginner-alto-count-then-play") + "&tour=1"); await page.waitForTimeout(3600);
+    expect(!!(await page.$("#aam-play .tour")), "tour: &tour=1 shows it again");
+    await page.click('#aam-play .tour [data-tour="skip"]'); expect(!(await page.$("#aam-play .tour")), "tour: Skip closes it");
+    await page.click('[data-r="p-play"]'); await page.waitForTimeout(600); await page.click('[data-r="p-play"]');
+    if (process.env.AAM_STARTER) {                           // a real newcomer: a Starter Pack code and nothing else (the code is given on the command line, never stored)
+      const c2 = await b.newContext({ ...devices["iPhone 13"] }); await wire(c2); const p2 = await c2.newPage();
+      await p2.goto("https://alexattardmusic.com/play/?t=sax-beginner-alto-count-then-play&c=" + encodeURIComponent(process.env.AAM_STARTER)); await p2.waitForTimeout(4200);
+      expect(!!(await p2.$("#aam-play .tour")), "tour: a newcomer with a Starter Pack code sees it without asking"); await c2.close();
+    }
     await page.context().close();
   }
 
