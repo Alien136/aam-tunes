@@ -585,3 +585,7 @@ Everything needed to carry on from any conversation is in this repository and in
   Before real money depends on it, codes need checking on a server (roadmap step 9).
 - Outside the repository, same day: the Build Kit artifact (v7: `play_export.py` now calls this tool; per-edition codes and slugs;
   sample list from `VOLUME["sample"]`), the CPO scheduled tasks' instructions, the aam-csuite skill and the Playbook rules.
+- 22 Nov (later): Alex said yes to the seven beta band styles in chat, without a sax to hand ("lets say yes to the beta band styles").
+  `beta: true` removed from all seven in the test copy; they go live with the next release. He also said the flute fingerings in the
+  Flute Beginner Booklet look good: that covers the 26 cards of `FINGERINGS` (low C to upper C sharp), which the Free Flute Starter
+  Pack shares. The Flute Welcome Booklet adds the six `HIGH` cards (high D to high G): those are still unchecked.

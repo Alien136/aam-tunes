@@ -10,6 +10,7 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- Seven more band styles, approved by Alex on 22 Nov: Slow Swing, Samba, Afro-Cuban, Shuffle Blues, Soul Jazz, Jazz Waltz and Ballad in 3. They are in the style picker for everyone from the next release; Going Home plays with the band in 3.
 - Blues Études Vol. 1 and Vol. 2 are in the player's library: 8 études each, for alto sax, tenor sax and flute (48 tunes), written for each instrument as the PDF prints them, with the band, and locked by a code per edition (nobody has the codes yet). Made by the new `tools/publish_etudes.py`, which the product bots now use for every étude volume.
 - Beta (test copy only): Learn mode follows lines with long runs of triplets or sixteenth notes. Before, a bar of triplets drifted by a hair and Learn was not offered on 20 of the 48 études.
 - Beta (test copy only): **less on the screen.** A line printed in a booklet no longer shows the key button or "Through the keys" (it is played in the key on the page). The repeats button has left the play bar: the number of repeats is in the settings, with the one-line hint about tapping and looping bars. **My tunes** is a small icon. The "How it works" list is replaced by one button, **Show me around**, which replays the tour.
