@@ -4,7 +4,7 @@
   python3 tools/build_theory.py            writes tools/out/Theory_Prep_sample.pdf
 
 The look (Alex, 21-22 Nov 2026): cut to the chase, never kiddy. A short "Learn" box, then exercises straight away. Black and white
-with one accent color, no cartoons. Prep (age 7) uses large type and a large staff; each level steps down. Piano first. US terms only.
+with one accent color (the website's blue), no cartoons. Prep (age 7) uses large type and a large staff; each level steps down. Piano first. US terms only.
 Everything on these pages is drawn here (keyboards, staves, notes): no music engraver is needed until the clefs arrive in Unit 3."""
 import os
 from reportlab.lib.pagesizes import letter
@@ -16,20 +16,23 @@ from reportlab.platypus import Paragraph
 from reportlab.lib.styles import ParagraphStyle
 
 HERE = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(HERE, "out"); os.makedirs(OUT, exist_ok=True)
-INK, ACC, TINT, MUTED, RULE = "#1B2430", "#D4922A", "#FBF1E1", "#5F6B78", "#C9D1D9"
+INK, ACC, TINT, MUTED, RULE = "#1B2430", "#428AD2", "#EAF2FB", "#5F6B78", "#C9D1D9"      # ACC is the blue of alexattardmusic.com (Alex, 22 Nov)
+ACC_TEXT = "#2466B0"                                   # the same blue, deepened so small labels stay readable in print
 GF, DJ = "/usr/share/fonts/truetype/google-fonts/", "/usr/share/fonts/truetype/dejavu/"
 for n, p in [("Pop-B", GF + "Poppins-Bold.ttf"), ("Pop-M", GF + "Poppins-Medium.ttf"), ("Pop", GF + "Poppins-Regular.ttf"), ("DJ", DJ + "DejaVuSans.ttf"), ("DJ-B", DJ + "DejaVuSans-Bold.ttf")]:
     pdfmetrics.registerFont(TTFont(n, p))
 pdfmetrics.registerFontFamily("Pop", normal="Pop", bold="Pop-B")
 W, H = letter; M = 50
-BODY = 14.5                                            # Prep: large type. Later levels step this down.
+# Type and staff size by level (Alex, 22 Nov): Prep is right for ages 7 to 8 as it is; Level 1 steps up QUICKLY to a mature page.
+LEVEL_TYPE = {"Prep": (14.5, 18), "Level 1": (12, 15), "Level 2": (11, 13), "Level 3": (10.5, 12)}     # (body type in points, staff space); Level 3 onward looks like an adult book
+BODY = LEVEL_TYPE["Prep"][0]
 P = ParagraphStyle("p", fontName="Pop", fontSize=BODY, leading=BODY * 1.42, textColor=HexColor(INK))
 
 
 class Page:
     def __init__(self, c, level, unit, title, n):
         self.c, self.y = c, H - M
-        c.setFillColor(HexColor(ACC)); c.setFont("Pop-B", 10); c.drawString(M, self.y - 8, " ".join((level + "  ·  UNIT " + str(unit)).upper()))
+        c.setFillColor(HexColor(ACC_TEXT)); c.setFont("Pop-B", 10); c.drawString(M, self.y - 8, " ".join((level + "  ·  UNIT " + str(unit)).upper()))
         c.setFillColor(HexColor(INK)); c.setFont("Pop-B", 27); c.drawString(M, self.y - 40, title)
         c.setStrokeColor(HexColor(INK)); c.setLineWidth(1.6); c.line(M, self.y - 52, W - M, self.y - 52)
         c.setFont("Pop", 10); c.setFillColor(HexColor(MUTED)); c.drawString(M, 30, "Alex Attard Music  ·  Theory  ·  " + level); c.drawRightString(W - M, 30, str(n))
@@ -40,7 +43,7 @@ class Page:
         c = self.c; p = Paragraph(text, P); w = W - 2 * M - 32; _, h = p.wrap(w, 400); bh = h + 40
         c.setFillColor(HexColor(TINT)); c.rect(M, self.y - bh, W - 2 * M, bh, fill=1, stroke=0)
         c.setFillColor(HexColor(ACC)); c.rect(M, self.y - bh, 5, bh, fill=1, stroke=0)
-        c.setFont("Pop-B", 10); c.drawString(M + 18, self.y - 18, "L E A R N")
+        c.setFillColor(HexColor(ACC_TEXT)); c.setFont("Pop-B", 10); c.drawString(M + 18, self.y - 18, "L E A R N")
         p.drawOn(c, M + 18, self.y - 28 - h); self.y -= bh + 20
 
     def ask(self, n, text):                                # a numbered instruction
@@ -75,7 +78,7 @@ class Page:
         c = self.c; c.setStrokeColor(HexColor(INK)); c.setLineWidth(1); c.line(x - w / 2, y, x + w / 2, y)
 
     def checks(self, items):
-        c = self.c; c.setStrokeColor(HexColor(INK)); c.setLineWidth(1.4); c.setFont("Pop-B", 10); c.setFillColor(HexColor(ACC)); c.drawString(M, self.y, "C H E C K")
+        c = self.c; c.setStrokeColor(HexColor(INK)); c.setLineWidth(1.4); c.setFont("Pop-B", 10); c.setFillColor(HexColor(ACC_TEXT)); c.drawString(M, self.y, "C H E C K")
         self.y -= 24
         for t in items:
             c.setFillColor(white); c.rect(M, self.y - 3, 15, 15, fill=1, stroke=1); c.setFillColor(HexColor(INK)); c.setFont("Pop", BODY - 1); c.drawString(M + 26, self.y, t); self.y -= 26
@@ -110,7 +113,7 @@ def build():
         p.gap(32)
     p.ask(5, "The first seven keys are named for you. Write the name on every other white key.")
     p.keyboard(kbx(22, 23), 3, 23, 74, extra=1, labels=dict(enumerate("CDEFGAB"))); p.gap(74 + 18)
-    p.ask(6, "Name the orange key.")
+    p.ask(6, "Name the blue key.")
     for k, s in enumerate((0, 3, 4, 8, 6, 2)):
         x = M + 12 + (k % 3) * 176; y0 = p.y - (k // 3) * 84; keep = p.y; p.y = y0; p.keyboard(x, 1, 13, 50, shade=s, extra=3)
         p.blank(x + 65, y0 - 68, 44); p.y = keep
