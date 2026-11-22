@@ -290,12 +290,14 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     }
     await ctx.close();
   }
-  if (want("cards") && fs.existsSync(path.join(ROOT, "theory", "cards.html")) && fs.readFileSync(FILE_OF, "utf8").includes("app=cards") && /var PLAYER_VERSION = "test copy"/.test(fs.readFileSync(FILE_OF, "utf8"))) {
+  if (want("cards") && fs.existsSync(path.join(ROOT, "theory", "cards.html")) && /var PLAYER_VERSION = "test copy"/.test(fs.readFileSync(FILE_OF, "utf8"))) {
     // theory flash cards: the play page steps aside for them; every kind of card draws, answers are counted, a round ends with a score
     const ctx = await b.newContext({ ...devices["iPhone 13"] }); await wire(ctx); const page = await ctx.newPage();
     page.on("pageerror", e => { if (!/not a fault/.test(e.message)) expect(false, "flash cards: script error: " + e.message); });
-    await page.goto("https://alexattardmusic.com/play/?player=test&app=cards"); await page.waitForTimeout(2500);
-    expect(!!(await page.$("#aam-cards")) && !(await page.$("#aam-play")), "flash cards: ?app=cards opens the cards in place of the player, with no code screen");
+    await page.goto("https://alexattardmusic.com/theory/?beta"); await page.waitForTimeout(2500);
+    expect(!!(await page.$("#aam-cards")) && !(await page.$("#aam-play")), "theory page: /theory/?beta opens the test copy of the cards, with no code screen and no player");
+    const fits = await page.evaluate(() => { const q = document.querySelector('#aam-cards [data-c="start"]').getBoundingClientRect(); return q.bottom <= innerHeight && q.top > 0; });
+    expect(fits, "flash cards: the whole setup, Start button included, fits a phone screen without scrolling");
     const pick = (g, id) => page.click('#aam-cards [data-c="' + g + '"] button[data-id="' + id + '"]');
     const NEED = { 1: 2, 2: 3, 3: 4, 4: 4 };
     for (const [inst, mode, clef, level] of [["piano", "name", "both", 1], ["piano", "key", "bass", 2], ["piano", "staff", "treble", 3], ["alto", "fing", "", 4], ["tenor", "staff", "", 2], ["flute", "fing", "", 3], ["flute", "name", "", 4], ["other", "name", "bass", 4]]) {
@@ -309,8 +311,7 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       expect(ok, "flash cards " + inst + " / " + mode + " / level " + level + ": a picture, " + NEED[level] + " different answers, all on the screen " + why);
       await page.click('#aam-cards [data-c="quit"]'); await page.click('#aam-cards [data-c="change"]');
     }
-    await page.goto("https://alexattardmusic.com/theory/?beta"); await page.waitForTimeout(2500);        // the theory page of its own: the same cards, no player on the page
-    expect(!!(await page.$("#aam-cards")) && !(await page.$("#aam-play")), "theory page: /theory/?beta opens the test copy of the cards");
+    await page.goto("https://alexattardmusic.com/theory/?beta"); await page.waitForTimeout(2500);
     if (!fs.existsSync(path.join(ROOT, "release", "cards.html"))) {
       const p2 = await ctx.newPage(); await p2.goto("https://alexattardmusic.com/theory/"); await p2.waitForTimeout(1500);
       expect(/coming soon/i.test(await p2.textContent("body")) && !(await p2.$("#aam-cards")), "theory page: before a release, visitors see \"coming soon\" and not the test copy"); await p2.close();

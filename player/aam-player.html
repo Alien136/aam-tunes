@@ -716,31 +716,6 @@ var TUNE_SOURCES = [
   ["https://raw.githubusercontent.com/Alien136/aam-tunes/main/", "https://cdn.jsdelivr.net/gh/Alien136/aam-tunes@main/"]
 ];
 
-// >>> OTHER APPS ON THIS PAGE. "?app=cards" opens the theory flash cards in place of the player (they are free: no code screen).
-// The test copy loads theory/cards.html; a released player loads release/cards.html, which exists only once the cards have been released.
-if (/[?&]app=cards(&|$)/.test(location.search)) {
-  (function () {
-    var root = document.getElementById("aam-play"), file = PLAYER_VERSION === "test copy" ? "theory/cards.html" : "release/cards.html", src = TUNE_SOURCES[0];
-    root.innerHTML = '<p style="padding:60px 0;text-align:center;color:#5b7083">Loading the flash cards…</p>';
-    (function get(i) {
-      if (i >= src.length) { root.innerHTML = '<p style="padding:60px 0;text-align:center;color:#5b7083">The flash cards could not load.<br>Check your connection, then <a href="" style="color:#0c77ba;font-weight:600">try again</a>.</p>'; return; }
-      fetch(src[i] + file, { cache: "no-cache" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (html) {
-        if (html.indexOf('id="aam-cards"') < 0) throw new Error("not the cards");
-        var t = document.createElement("template"); t.innerHTML = html;
-        var scripts = [].slice.call(t.content.querySelectorAll("script")); scripts.forEach(function (s) { s.parentNode.removeChild(s); });
-        root.parentNode.insertBefore(t.content, root); root.parentNode.removeChild(root);
-        (function next(k) {                                  // its scripts, in order (the notation library is already on the page)
-          if (k >= scripts.length) return;
-          var s = document.createElement("script");
-          if (scripts[k].src) { if (window.ABCJS && /abcjs/.test(scripts[k].src)) return next(k + 1); s.src = scripts[k].src; s.onload = s.onerror = function () { next(k + 1); }; document.head.appendChild(s); }
-          else { s.textContent = scripts[k].textContent; document.body.appendChild(s); next(k + 1); }
-        })(0);
-      }).catch(function () { get(i + 1); });
-    })(0);
-  })();
-  throw new Error("AAM: the flash cards are open, so the player stops here (this is not a fault)");
-}
-
 // The player for one tune. The library code at the bottom picks the tune and calls this once.
 // ---------- usage counts: what gets practiced, for how long and how fast. Anonymous: no names, codes or accounts.
 // Sent to the website's Google Analytics when it has one (gtag or Tag Manager); otherwise nothing is sent.

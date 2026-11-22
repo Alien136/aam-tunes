@@ -491,3 +491,7 @@ Everything needed to carry on from any conversation is in this repository and in
 - Check group `level` in `tools/check_features.js` (16 checks; skipped for a copy of the player without the button, like `style`).
 - NOT judged with a real instrument: 20 cents (who gets Strict) and 30 cents (what Strict accepts) are first guesses. A real
   saxophone's long note may waver more than 20 cents and never be given Strict; Alex to try, then tune the two numbers.
+- 22 Nov: Alex made the /theory page (loader pasted). The `?app=cards` shortcut is gone from the player. Cards setup redone as one row of
+  equal buttons per choice so it fits a phone screen (check: Start is on screen without scrolling). Alex's decisions the same day: the
+  Level 1 blues is the real 12-bar blues with a V-IV turnaround and no ii-V; theory material is piano-focused first; US terms only
+  (quarter, half, whole note), no British terms. See project doc "Theory decisions (2026-11-22)".

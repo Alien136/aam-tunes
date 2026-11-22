@@ -8,19 +8,19 @@
 <style>
 #aam-cards { --bg: #e8f5fe; --surface: #ffffff; --ink: #14171a; --muted: #5b7083; --line: #d6e6f2; --accent: #1da1f2; --accent-text: #0c77ba; --now: #0c77ba;
   --good: #12805c; --good-bg: #e2f5ec; --bad: #b3261e; --bad-bg: #fdeceb; --display: "Poppins", "Segoe UI", system-ui, sans-serif; --body: "Inter", system-ui, sans-serif;
-  background: var(--bg); color: var(--ink); font: 16px/1.5 var(--body); max-width: 560px; margin: 0 auto; padding: 20px 16px 40px; display: grid; gap: 16px; box-sizing: border-box; text-align: left; }
+  background: var(--bg); color: var(--ink); font: 16px/1.5 var(--body); max-width: 560px; margin: 0 auto; padding: 14px 14px 32px; display: grid; gap: 12px; box-sizing: border-box; text-align: left; }
 #aam-cards *, #aam-cards *::before, #aam-cards *::after { box-sizing: border-box; }
 #aam-cards button { all: unset; box-sizing: border-box; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 #aam-cards [hidden] { display: none !important; }
 #aam-cards .eyebrow { font: 600 12px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-text); }
-#aam-cards h1 { font: 700 30px/1.1 var(--display); margin: 6px 0 0; padding: 0; color: var(--ink); letter-spacing: 0; text-transform: none; }
+#aam-cards h1 { font: 700 26px/1.1 var(--display); margin: 4px 0 0; padding: 0; color: var(--ink); letter-spacing: 0; text-transform: none; }
 #aam-cards p { margin: 0; }
 #aam-cards .muted { color: var(--muted); font-size: 14px; }
-#aam-cards .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 16px; min-width: 0; }
-#aam-cards .grp { display: grid; gap: 8px; }
+#aam-cards .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 12px; min-width: 0; }
+#aam-cards .grp { display: grid; gap: 5px; }
 #aam-cards .lbl { font: 600 12px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-#aam-cards .seg { display: flex; flex-wrap: wrap; gap: 8px; }
-#aam-cards .seg button { min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line); background: #fff; font: 600 15px/1.2 var(--body); color: var(--ink); display: inline-flex; align-items: center; text-align: center; }
+#aam-cards .seg { display: grid; grid-template-columns: repeat(var(--k, 3), minmax(0, 1fr)); gap: 6px; }      /* one row of equal buttons for each choice, so the whole setup fits a phone screen */
+#aam-cards .seg button { min-height: 44px; padding: 2px 4px; border-radius: 10px; border: 1px solid var(--line); background: #fff; font: 600 14px/1.15 var(--body); color: var(--ink); display: flex; align-items: center; justify-content: center; text-align: center; }
 #aam-cards .seg button[aria-pressed="true"] { background: var(--now); border-color: var(--now); color: #fff; }
 #aam-cards .seg button:focus-visible, #aam-cards .opt:focus-visible, #aam-cards .go:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 #aam-cards .go { min-height: 54px; border-radius: 12px; background: var(--now); color: #fff; font: 700 17px var(--body); text-align: center; display: grid; place-items: center; padding: 0 20px; }
@@ -65,7 +65,7 @@
   </header>
 
   <section class="panel" data-c="setup">
-    <div class="grp"><div class="lbl">I play</div><div class="seg" data-c="inst"></div></div>
+    <div class="grp"><div class="lbl">Instrument</div><div class="seg" data-c="inst"></div></div>
     <div class="grp"><div class="lbl">Card</div><div class="seg" data-c="mode"></div></div>
     <div class="grp" data-c="clef-grp"><div class="lbl">Clef</div><div class="seg" data-c="clef"></div></div>
     <div class="grp"><div class="lbl">Level</div><div class="seg" data-c="level"></div><p class="muted" data-c="level-note"></p></div>
@@ -93,7 +93,7 @@
     <button class="go ghost" data-c="change">Change the settings</button>
   </section>
 
-  <p class="foot">Free to use. Nothing is recorded but your scores, and they stay on this device.<br><a href="https://alexattardmusic.com/">alexattardmusic.com</a></p>
+  <p class="foot">Your scores stay on this device.</p>
 </div>
 <script>
 /* FINGERINGS:BEGIN (written by tools/export_fingerings.py from tools/build_book.py and tools/beginner_flute.py: do not edit by hand) */
@@ -111,16 +111,17 @@ var FLUTE_FING = {"60":[["C","Cs","L1","L2","L3","R1","R2","R3","T"],"RH pinky: 
   var shuffle = function (a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = rnd(i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
 
   // ---------- what there is to choose
-  var INSTS = [["piano", "Piano"], ["alto", "Alto sax"], ["tenor", "Tenor sax"], ["flute", "Flute"], ["other", "Other"]];
+  var INSTS = [["piano", "Piano"], ["alto", "Alto", "Alto saxophone"], ["tenor", "Tenor", "Tenor saxophone"], ["flute", "Flute"], ["other", "Other", "Another instrument"]];
   var FGS = { alto: { keys: SAX_KEYS, box: SAX_BOX, fing: SAX_FING, split: 6.6 }, tenor: { keys: SAX_KEYS, box: SAX_BOX, fing: SAX_FING, split: 6.6 }, flute: { keys: FLUTE_KEYS, box: FLUTE_BOX, fing: FLUTE_FING, split: 6.4 } };
   var MODES = { name: "Name the note", key: "Find the key", fing: "Find the fingering", staff: "Find it on the staff" };
   var MODES_FOR = { piano: ["name", "key", "staff"], alto: ["name", "fing", "staff"], tenor: ["name", "fing", "staff"], flute: ["name", "fing", "staff"], other: ["name"] };
   var LEVELS = [null,
-    { name: "Easy", n: 2, note: "Notes on the five lines and four spaces. Two answers to choose from.", treble: [64, 77], bass: [43, 57] },
-    { name: "Medium", n: 3, note: "Adds the first notes above and below the staff. Three answers.", treble: [60, 81], bass: [40, 60] },
+    { name: "Easy", n: 2, note: "Notes on the lines and spaces. Two answers.", treble: [64, 77], bass: [43, 57] },
+    { name: "Medium", n: 3, note: "Adds notes just above and below the staff. Three answers.", treble: [60, 81], bass: [40, 60] },
     { name: "Hard", n: 4, note: "More ledger lines. Four answers.", treble: [57, 84], bass: [36, 64] },
     { name: "Expert", n: 4, note: "Sharps and flats too. Four answers.", treble: [57, 84], bass: [36, 64], acc: true }];
   var ROUNDS = [["sprint", "60-second sprint"], ["calm", "20 cards, no timer"]];
+  var MODE_SHORT = { name: "Name the note", key: "Find the key", fing: "Find the fingering", staff: "Find it on the staff" };
 
   // ---------- memory on this device: the last settings, best scores, the notes that go wrong
   var KEY = "aam-cards", mem = { set: { inst: "piano", mode: "name", clef: "treble", level: 1, round: "sprint" }, best: {}, miss: {} };
@@ -200,8 +201,8 @@ var FLUTE_FING = {"60":[["C","Cs","L1","L2","L3","R1","R2","R3","T"],"RH pinky: 
 
   // ---------- the setup screen
   function seg(el, items, cur, pick) {
-    el.innerHTML = "";
-    items.forEach(function (it) { var b = document.createElement("button"); b.type = "button"; b.textContent = it[1]; b.dataset.id = it[0]; b.setAttribute("aria-pressed", String(it[0]) === String(cur)); b.onclick = function () { pick(it[0]); }; el.appendChild(b); });
+    el.innerHTML = ""; el.style.setProperty("--k", items.length);
+    items.forEach(function (it) { var b = document.createElement("button"); b.type = "button"; b.textContent = it[1]; if (it[2]) b.setAttribute("aria-label", it[2]); b.dataset.id = it[0]; b.setAttribute("aria-pressed", String(it[0]) === String(cur)); b.onclick = function () { pick(it[0]); }; el.appendChild(b); });
   }
   var bestKey = function () { return [S.inst, S.mode, FGS[S.inst] ? "treble" : S.clef, S.level, S.round].join("|"); };
   function setup() {
