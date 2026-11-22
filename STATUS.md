@@ -538,4 +538,9 @@ Everything needed to carry on from any conversation is in this repository and in
   twelve seconds with no pitched sound shows "I can't hear a note yet" and `learn-check`, which clears the saved check and opens the full
   two-step one, then returns to Learn. Checks (`--only learn`): fresh device clean, fresh device weak and 25 cents flat, fresh silent room.
   NOT tried on a real instrument and phone yet: Alex to test with his saxophone.
+- 22 Nov, **beta: a clean Learn bar** (Alex: too many buttons). `learn-stop` is always hidden (the `learn-btn` chip shows "Stop" through
+  CSS while pressed); `learn-skip` is hidden at each new note and shown by three misses, an out-of-tune warning on Strict, twenty seconds
+  on one note, or the can't-hear message; `learn-again` and the new `learn-next` (clicks the `next-line` chip) show when the line is done;
+  `learn-lvl` moved to the Band chips row (settings sheet on phones), still shown only while Learn is on. The opening line no longer says
+  what the note sounds as on a piano. Checks: `--only learn` (21). Not built: the two stars and the Unit 1 invitation (not yet approved).
 

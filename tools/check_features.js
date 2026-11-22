@@ -154,6 +154,22 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       const t = await page.evaluate(() => ({ dlg: !document.querySelector('[data-r="tdlg"]').hidden, msg: document.querySelector('[data-r="t-msg"]').textContent, bar: document.querySelector('[data-r="learn-bar"]').hidden }));
       expect(t.dlg && /Step 1 of 2/.test(t.msg) && t.bar, "one-tap Learn: Check microphone opens the full two-step check");
     });
+    // A clean Learn bar: one line and Fingering at the start; Skip only for a note that will not go; Start again and Next line at the end.
+    const stuck = [sil(1.5), tone(hcb[0], 0.55), sil(0.12)]; for (let k = 0; k < 4; k++) stuck.push(tone(63, 0.9), sil(0.3)); hcb.slice(1).forEach(m => stuck.push(tone(m, 0.55), sil(0.12))); stuck.push(sil(3));
+    await withMic(wav("cleanbar", stuck), { ...devices["iPhone 13"] }, async page => {
+      await calibrated(page); await page.goto(URL_OF(HCB)); await page.waitForTimeout(1600); await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(700);
+      const seen = () => page.evaluate(() => [...document.querySelectorAll('#aam-play [data-r="learn-bar"] button')].filter(e => !e.hidden && e.offsetParent).map(e => e.textContent.trim()));
+      const s0 = await seen(), msg0 = await txt(page, "learn-msg"), lbl = await page.evaluate(() => getComputedStyle(document.querySelector('[data-r="learn-btn"]'), "::after").content);
+      expect(s0.join("|") === "Fingering" && /^Play the note in the blue cloud: B\.$/.test(msg0) && /Stop/.test(lbl), "Learn bar: it starts with one short line and only the Fingering button; the Learn button reads Stop (" + s0.join(", ") + " / " + msg0 + ")");
+      let skipAt = null, t0 = Date.now(); while (Date.now() - t0 < 9000 && !skipAt) { await page.waitForTimeout(200); if ((await seen()).includes("Skip note")) skipAt = await txt(page, "learn-msg"); }
+      expect(!!skipAt && /This note is A/.test(skipAt), "Learn bar: Skip note appears after three wrong tries at the same note (" + (skipAt || "never").slice(0, 40) + ")");
+      let end = null; t0 = Date.now(); while (Date.now() - t0 < 14000 && !end) { await page.waitForTimeout(250); if (/every note/.test(await txt(page, "learn-msg"))) end = await seen(); }
+      expect(!!end && end.includes("Start again") && end.includes("Next line ›") && !end.includes("Skip note") && !end.includes("Stop"), "Learn bar: when the line is finished it offers Start again and Next line (" + (end || []).join(", ") + ")");
+      const t1 = await txt(page, "title"); await page.click('[data-r="learn-next"]'); await page.waitForTimeout(2500); const t2 = await txt(page, "title");
+      expect(t1 !== t2 && /^6 /.test(t2.trim()) && await page.evaluate(() => document.querySelector('[data-r="learn-bar"]').hidden), "Learn bar: Next line opens the next line of the booklet and closes Learn (" + t2.trim() + ")");
+      await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(700); await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(300);
+      expect(await page.evaluate(() => document.querySelector('[data-r="learn-bar"]').hidden && document.querySelector('[data-r="learn-btn"]').getAttribute("aria-pressed") === "false"), "Learn bar: tapping the Learn button again (now Stop) stops Learn");
+    });
     const LOW = "sax-beginner-tenor-pinky-push-ups", low = tune(LOW).sections[0].learn.filter(m => m >= 0);
     await withMic(wav("low", played(low, 0.6, 0.12)), {}, async page => { const r = await learnRun(page, LOW, 14000); expect(r.done, "Learn, tenor low notes (down to written low C): the line is finished"); });
     const KEY = "sax-welcome-alto-arpeggios-4ths", kt = tune(KEY), ks = kt.sections[0].rh.slice().sort((a, b) => a[0] - b[0]).map(e => e[1] + (kt.start_key || 0));
