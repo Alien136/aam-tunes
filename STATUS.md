@@ -551,4 +551,9 @@ Everything needed to carry on from any conversation is in this repository and in
   (the music was cut off under the finished message on his iPhone; headless Chromium does not reproduce the cut, so the check
   "after a clean run on a phone" passes with or without the fix: only his phone proves it). (3) `learn-lvl` shows in the settings whenever
   the line has Learn, labelled "Learn level: ...", and can be set before starting.
+- 22 Nov (later): `DEF_REPS = 2` (a tune's own `reps` still wins; "through the keys" still becomes 12). `tuner-btn` is now a chip in the
+  Band row (the settings sheet); its click closes the sheet first. Checks reach it with `tunerOpen(page)`. Alex's wider aim, in his words:
+  "extremely useful but without the clutter"; a review with further candidates (the key button on fixed-instrument lines, repeats, My
+  tunes, the How it works text) was given in chat and is waiting for his choices. Tempo popup idea (Italian terms, a goal linked to the
+  booklet) also discussed, not built.
 

@@ -62,6 +62,7 @@ async function withMic(file, opts, fn) {
     await fn(page);
   } finally { await b.close(); }
 }
+const tunerOpen = async page => { await page.click('[data-r="p-gear"]'); await page.waitForTimeout(250); await page.click('[data-r="tuner-btn"]'); };      // the tuner is in the settings
 const calibrated = page => page.addInitScript(() => { try { localStorage.setItem("aam-ear", JSON.stringify({ floor: 0.01, off: 0, at: 1 })); } catch (e) {} });
 const txt = (page, r) => page.evaluate(r => document.querySelector('[data-r="' + r + '"]').textContent, r);
 async function learnRun(page, slug, ms, fresh) {          // start Learn mode and collect what it says until it finishes. fresh: a device that has never done the microphone check
@@ -80,7 +81,7 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
   const t0 = Date.now(), HCB = "sax-beginner-alto-hot-cross-buns", hcb = tune(HCB).sections[0].learn.filter(m => m >= 0);
 
   if (want("tuner")) await withMic(wav("tuner", [sil(2.4), tone(60, 7, { cents: -20 }), sil(1)]), {}, async page => {
-    await page.goto(URL_OF(HCB)); await page.waitForTimeout(1500); await page.click('[data-r="tuner-btn"]'); await page.waitForTimeout(6500);
+    await page.goto(URL_OF(HCB)); await page.waitForTimeout(1500); await tunerOpen(page); await page.waitForTimeout(6500);
     const note = await txt(page, "t-note"), word = await txt(page, "t-word"), msg = await txt(page, "t-msg"), cents = +(/(\d+) cents/.exec(word) || [0, -1])[1];
     expect(note === "A", "tuner: a piano C reads as A on alto (got " + note + ")");
     expect(/^Flat/.test(word) && cents >= 15 && cents <= 25, "tuner: 20 cents flat is shown as flat by 15 to 25 (got \"" + word + "\")");
@@ -91,7 +92,7 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
   if (want("flute")) await withMic(wav("flute", [sil(2.4), tone(69, 7), sil(1)]), {}, async page => {      // a flute booklet line: the flute's own fingering chart, read at concert pitch
     await page.goto(URL_OF("flute-beginner-hot-cross-buns")); await page.waitForTimeout(1500);
     expect(/Flute/.test(await page.evaluate(() => (document.querySelector(".who") || document.querySelector('[data-r="who"]') || document.body).textContent)), "flute: the page says it is a flute tune");
-    await page.click('[data-r="tuner-btn"]'); await page.waitForTimeout(6500);
+    await tunerOpen(page); await page.waitForTimeout(6500);
     const note = await txt(page, "t-note"), fg = await page.evaluate(() => ({ on: document.querySelectorAll('[data-r="t-fing"] .fg-k.on').length, all: document.querySelectorAll('[data-r="t-fing"] .fg-k').length }));
     expect(note === "A", "flute: a piano A reads as A (got " + note + ")");
     expect(fg.all === 12 && fg.on === 4, "flute: the tuner shows the flute fingering for A: thumb, two fingers and the right pinky (" + JSON.stringify(fg) + ")");
@@ -100,7 +101,7 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
   if (want("mic")) {
     await withMic(wav("dead", [sil(9)], 0), {}, async page => {      // a microphone that is on but sends pure silence (an iPad whose sound engine never woke up)
       await page.addInitScript(() => { window.__ev = []; window.gtag = function (a, n) { if (a === "event") window.__ev.push(n); }; });
-      await page.goto(URL_OF(HCB)); await page.waitForTimeout(1500); await page.click('[data-r="tuner-btn"]'); await page.waitForTimeout(4500);
+      await page.goto(URL_OF(HCB)); await page.waitForTimeout(1500); await tunerOpen(page); await page.waitForTimeout(4500);
       const msg = await txt(page, "t-msg");
       expect(/no sound is reaching the player/.test(msg) && !/Step 2|ready/.test(msg), "microphone check: a silent microphone is reported and never passes as a quiet room (\"" + msg.slice(0, 50) + "\")");
       const ev = await page.evaluate(() => window.__ev);
@@ -110,7 +111,7 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       await page.addInitScript(() => { const g = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices); window.__gum = 0; navigator.mediaDevices.getUserMedia = c => { window.__gum++; return g(c); }; });
       await page.addInitScript(() => { try { localStorage.setItem("aam-ear", JSON.stringify({ floor: 0.01, off: 0, at: 1 })); } catch (e) {} });
       await page.goto(URL_OF(HCB)); await page.waitForTimeout(1500);
-      await page.click('[data-r="tuner-btn"]'); await page.waitForTimeout(900); await page.click('[data-r="t-close"]'); await page.waitForTimeout(150);
+      await tunerOpen(page); await page.waitForTimeout(900); await page.click('[data-r="t-close"]'); await page.waitForTimeout(150);
       await page.click('[data-r="learn-btn"]'); await page.waitForTimeout(1200);
       const st = await page.evaluate(() => ({ gum: window.__gum, bar: !document.querySelector('[data-r="learn-bar"]').hidden }));
       expect(st.gum === 1 && st.bar, "microphone: going from the tuner straight into Learn mode keeps one live microphone (" + JSON.stringify(st) + ")");
@@ -406,7 +407,7 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       for (let i = 0; i < n; i++) { const t = i / SR, f = 440 * Math.pow(2, (midi - 69) / 12 + wide * Math.sin(2 * Math.PI * 1.5 * t) / 1200); ph += 2 * Math.PI * f / SR; let v = 0; for (let k = 0; k < H.length; k++) v += H[k] * Math.sin((k + 1) * ph); x[i] = 0.25 * v / 3 * Math.min(1, t / 0.03) * Math.min(1, (secs - t) / 0.04); } return x; };
     for (const [name, sound, lvl] of [["steady", tone(60, 7), "strict"], ["wavering", waver(60, 7, 28), "easy"]])
       await withMic(wav("lvl-" + name, [sil(2.4), sound, sil(1)]), {}, async page => {      // the first-time microphone check chooses the level
-        await page.goto(URL_OF(HCB)); await page.waitForTimeout(1500); await page.click('[data-r="tuner-btn"]'); await page.waitForTimeout(6500);
+        await page.goto(URL_OF(HCB)); await page.waitForTimeout(1500); await tunerOpen(page); await page.waitForTimeout(6500);
         const c = await page.evaluate(() => JSON.parse(localStorage.getItem("aam-ear") || "{}")), msg = await txt(page, "t-msg");
         expect(/ready/.test(msg) && c.lvl === lvl, "levels: a " + name + " long note in the microphone check sets Learn mode to " + (lvl === "strict" ? "Strict" : "Forgiving") + " (got " + c.lvl + ", spread " + c.spread + " cents)");
         if (lvl === "strict") expect(/Strict/.test(msg), "levels: the check tells the student that Learn mode starts on Strict");

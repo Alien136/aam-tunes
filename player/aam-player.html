@@ -559,6 +559,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
           <button class="chip" data-r="cycle" aria-pressed="false">Through the keys: off</button>
           <button class="chip" data-r="feel" aria-haspopup="dialog">Style: Medium Swing</button>
           <button class="chip" data-r="learn-lvl" hidden>Level: Forgiving</button>
+          <button class="chip" data-r="tuner-btn" aria-haspopup="dialog">Tuner</button>
         </div>
       </div>
 
@@ -609,7 +610,6 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
         <button class="step" data-r="p-faster" aria-label="Faster by 5">+</button>
       </div>
         <button class="p-met" data-r="p-met" aria-haspopup="dialog" aria-pressed="false" aria-label="Metronome"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l4 18H5z"/><path d="M12 16.5L17.5 6"/><circle cx="16.4" cy="8.1" r="1.5"/><path d="M7.2 16.5h9.6"/></svg></button>
-        <button class="p-ic" data-r="tuner-btn" aria-haspopup="dialog" aria-label="Tuner"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 17.5a8.5 8.5 0 0 1 17 0"/><path d="M12 5.5v2M5.6 9.6l1.5 1.3M18.4 9.6l-1.5 1.3"/><path d="M12 17.5l3.6-7"/><circle cx="12" cy="17.5" r="1.6"/></svg></button>
       </div>
       <button class="apply-pill" data-r="apply" hidden>Apply changes</button>
       <button class="play" data-r="p-play" aria-label="Play"><svg viewBox="0 0 24 24" data-r="p-play-ic"><path d="M7 4v16l13-8z"/></svg></button>
@@ -922,8 +922,9 @@ function aamBoot(TUNE) {
   } catch (e) {}
   var feel = BAND[band].sw ? "swing" : "straight";                                       // do the written eighths swing?
   var SW = BAND[band].sw;                                                                // how late an off-beat eighth is, in ticks, in the style playing now
+  var DEF_REPS = 2;                                       // every line plays twice unless its file says otherwise (Alex, 22 Nov: once through is over too soon)
   var state = { tempo: TUNE.tempo_presets[0] || 100, bass: true, drums: true, comp: true, countin: true, ramp: false, demo: "off",
-                mode: "whole", from: 0, a: null, b: null, pending: false, reps: TUNE.reps || 1,
+                mode: "whole", from: 0, a: null, b: null, pending: false, reps: TUNE.reps || DEF_REPS,
                 playing: false, loaded: false, pass: 1, start: 0 };
 
   // ---------- page text
@@ -1468,7 +1469,7 @@ function aamBoot(TUNE) {
     }
     function close() { dlg.hidden = true; if (live) { ear.off(heard); live = false; } phase = ""; after = null; heard.dead = null; }
     openTuner = function (then) { if (state.playing) stop(); after = then || null; dlg.hidden = false; begin(false); AAM_TRACK.event("aam_tuner", { tune: TUNE.slug, instrument: TUNE.instrument || "", first_time: ear.cal() && ear.cal().at ? "no" : "yes" }); };
-    $("tuner-btn").onclick = function () { openTuner(null); };
+    $("tuner-btn").onclick = function () { if (typeof openSheet === "function") openSheet(false); openTuner(null); };      // it lives in the settings now: the sheet closes, the tuner opens
     $("t-close").onclick = close;
     $("t-cal").onclick = function () { begin(true); };
     $("t-go").onclick = function () { var f = after; close(); if (f) f(); };
@@ -2107,10 +2108,10 @@ function aamBoot(TUNE) {
   $("cycle").onclick = function () {
     var i = CYCLES.map(function (x) { return x[0]; }).indexOf(state.cycle);
     state.cycle = CYCLES[(i + 1) % CYCLES.length][0];
-    if (state.cycle && state.reps === 1) state.reps = 12;      // all twelve keys
+    if (state.cycle && state.reps === DEF_REPS) state.reps = 12;      // all twelve keys
     cycleLabel(); applyRange(null);
   };
-  if (state.cycle && state.reps === 1) state.reps = 12;
+  if (state.cycle && state.reps === DEF_REPS) state.reps = 12;
   cycleLabel();
   function label() {
     var s = TUNE.sections.filter(function (x) { return x.id === state.demo; })[0];
