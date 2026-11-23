@@ -12,6 +12,7 @@ moves that block under the new version when Alex says "ship".
 ### Added
 
 ### Fixed
+- Theory flash cards: the box keeps one size whatever instrument or level is picked. The Clef row stays on screen for saxophone and flute (showing Treble, the clef they read), and room is kept for the level note and your best score.
 
 ### Prevented
 

@@ -56,6 +56,7 @@
 #aam-cards .work div { border: 1px solid var(--line); border-radius: 12px; padding: 8px; text-align: center; font: 700 18px var(--display); }
 #aam-cards .foot { text-align: center; font-size: 13px; color: var(--muted); }
 #aam-cards .foot a { color: var(--accent-text); }
+@media (max-width: 540px) { #aam-cards [data-c="level-note"] { min-height: 3em; } }      /* the level note can wrap to two lines on a phone: keep room for two so the box does not change size */
 @media (max-width: 420px) { #aam-cards .opt { font-size: 24px; } #aam-cards .opt .fg { height: 112px; } }
 </style>
 <div id="aam-cards">
@@ -71,7 +72,7 @@
     <div class="grp"><div class="lbl">Level</div><div class="seg" data-c="level"></div><p class="muted" data-c="level-note"></p></div>
     <div class="grp"><div class="lbl">Round</div><div class="seg" data-c="round"></div></div>
     <button class="go" data-c="start">Start</button>
-    <p class="muted" data-c="best" style="text-align:center"></p>
+    <p class="muted" data-c="best" style="text-align:center;min-height:1.5em;margin:0"></p>
   </section>
 
   <section class="panel" data-c="game" hidden>
@@ -209,8 +210,9 @@ var FLUTE_FING = {"60":[["C","Cs","L1","L2","L3","R1","R2","R3","T"],"RH pinky: 
     if (MODES_FOR[S.inst].indexOf(S.mode) < 0) S.mode = "name";
     seg($("inst"), INSTS, S.inst, function (v) { S.inst = v; setup(); });
     seg($("mode"), MODES_FOR[S.inst].map(function (m) { return [m, MODES[m]]; }), S.mode, function (v) { S.mode = v; setup(); });
-    $("clef-grp").hidden = !!FGS[S.inst];
-    seg($("clef"), [["treble", "Treble"], ["bass", "Bass"], ["both", "Both"]], S.clef, function (v) { S.clef = v; setup(); });
+    // the Clef row stays on screen for every instrument, so the box keeps one size (Alex, 23 Nov 2026); saxophones and flute read treble clef only
+    if (FGS[S.inst]) seg($("clef"), [["treble", "Treble", "Treble clef: the clef this instrument reads"]], "treble", function () {});
+    else seg($("clef"), [["treble", "Treble"], ["bass", "Bass"], ["both", "Both"]], S.clef, function (v) { S.clef = v; setup(); });
     seg($("level"), [1, 2, 3, 4].map(function (l) { return [l, LEVELS[l].name]; }), S.level, function (v) { S.level = +v; setup(); });
     $("level-note").textContent = LEVELS[S.level].note;
     seg($("round"), ROUNDS, S.round, function (v) { S.round = v; setup(); });
