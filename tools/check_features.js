@@ -526,7 +526,10 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     expect(!c.wash, "playback: the bar itself is not washed when a note carries the cloud");
     await page.click('[data-r="p-play"]'); await page.waitForTimeout(400);
     await page.click('[data-r="views"] button:nth-child(2)'); await page.waitForTimeout(500); await page.click('[data-r="p-play"]'); await page.waitForTimeout(8500);
-    c = await count(); expect(c.rh === 0 && c.lh === 1, "piano page with an empty right hand: the left hand still has its cloud");
+    c = await count(); const tabs = await page.evaluate(() => [...document.querySelectorAll('[data-r="views"] button')].map(x => x.textContent.trim()));
+    // Until 23 Nov 2026 the second tab here was the blank "Your solo" page (empty right hand, guide tones in the left). Alex removed that page from
+    // every tune, and no tune has a page with an empty right hand now, so this step checks the next page of the study instead.
+    expect(c.rh === 1 && c.lh === 1 && !tabs.some(x => /^(Your solo|Solo)$/.test(x)), "piano page, second tab: a cloud for each hand, and no blank Solo tab (" + c.rh + ", " + c.lh + "; " + tabs.join(", ") + ")");
     await page.context().close();
     const one = await open({ ...devices["iPhone 13"] }, "sax-beginner-alto-cuckoo-duet");
     await one.click('[data-r="p-play"]'); await one.waitForTimeout(9000);

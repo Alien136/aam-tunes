@@ -635,3 +635,9 @@ Everything needed to carry on from any conversation is in this repository and in
 - Next steps for this row, in order: (1) fixes from Alex's first real files; (2) piano: two staves, both hands (`style: "solo"`, `lh`);
   (3) chord symbols (`<harmony>`) so a lead sheet plays with the band; (4) repeats and endings; (5) a MIDI file; (6) the share file
   a teacher can send (the tune JSON as a file, opened with the same button).
+- Same night: three commits from a session with Alex arrived on main while this was being built (styles approved, Sample Solo, the
+  blank Solo page removed). After the rebase `check_features.js --only cloud` failed, on main without this work too: its last step
+  clicked the second tab of `winter-wonderland-piano`, which used to be the blank "Your solo" page (empty right hand). That page no
+  longer exists and no tune has a page with an empty right hand, so the step now plays the study's next page (a cloud for each hand)
+  and checks that no Solo tab is shown. A session that changes the player's tabs should run `node tools/check_features.js` in full.
+- The Build Desk was not updated by that session: at the time of this run it still listed the seven styles as waiting for Alex.

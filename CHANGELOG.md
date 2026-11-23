@@ -33,6 +33,7 @@ moves that block under the new version when Alex says "ship".
 - Beta only: the Learn level (Forgiving or Strict) is in the settings whenever a line has Learn, not only while Learn is running.
 
 ### Prevented
+- The feature check for the blue cloud went red on main on 23 Nov, after the blank Solo page was removed from every tune: one step of the check opened that page (the only page with an empty right hand). Nothing was wrong for a student. The nightly builder found it before pushing, and the step now checks the study's next page and that no blank Solo tab is shown.
 
 ## v1.4 · 2026-11-22
 
