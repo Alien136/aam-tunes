@@ -37,14 +37,6 @@
    ]
   },
   {
-   "id": "f-blues-alto",
-   "title": "F Blues · Alto Sax",
-   "hash": "1d1e36a4f6ec9f6fd6d0893a09d1d5c159d5ca2a64cc0d4d953ddcfafee0f638",
-   "tunes": [
-    "f-blues-alto"
-   ]
-  },
-  {
    "id": "sax-welcome-alto",
    "title": "Saxophone Welcome Booklet · Alto",
    "hash": "a8ecc8f2d8e6a831535eae91ff51ab002429b551a4efd0b0c897edd5cf4ce58d",
@@ -2848,6 +2840,14 @@
    "tunes": [
     "fly-me-to-the-moon-piano"
    ]
+  },
+  {
+   "id": "f-blues-alto",
+   "title": "F Blues · Alto Sax",
+   "hash": "1d1e36a4f6ec9f6fd6d0893a09d1d5c159d5ca2a64cc0d4d953ddcfafee0f638",
+   "tunes": [
+    "f-blues-alto"
+   ]
   }
  ],
  "tunes": {
@@ -2869,7 +2869,7 @@
   },
   "f-blues-alto": {
    "title": "F Blues",
-   "subtitle": "12-bar jazz blues · Alto Sax · arpeggios, patterns and ii–V–I licks"
+   "subtitle": "12-bar jazz blues · Alto Sax · arpeggios, patterns, ii–V–I licks and a sample solo"
   },
   "sax-welcome-alto-blues": {
    "title": "Blues",

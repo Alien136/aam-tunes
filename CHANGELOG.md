@@ -10,6 +10,7 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- F Blues (alto) rebuilt with a Sample Solo (5 pages); the player's Solo tab now holds it. Same link and code.
 - The blank **Solo** tab is gone from every tune, in the live player too (17 tunes carried it). A tune gets a Solo tab back when it is rebuilt with a written Sample Solo; Fly Me to the Moon is the first.
 - Chord & scale studies get a **Sample Solo**: a written chorus with the guide tones (3rd and 7th) in blue on beats 1 and 4, arpeggio notes between them in the first half and scale notes in the second. It replaces the blank "Your Chorus" page in the PDF and is the study's Solo tab in the player. First study: Fly Me to the Moon (piano).
 - Beta (test copy only): the blank "Your solo" page is gone from the player; the Sample Solo's guide tones show in blue.
