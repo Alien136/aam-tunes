@@ -10,6 +10,8 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- Chord & scale studies get a **Sample Solo**: a written chorus with the guide tones (3rd and 7th) in blue on beats 1 and 4, arpeggio notes between them in the first half and scale notes in the second. It replaces the blank "Your Chorus" page in the PDF and is the study's Solo tab in the player. First study: Fly Me to the Moon (piano).
+- Beta (test copy only): the blank "Your solo" page is gone from the player; the Sample Solo's guide tones show in blue.
 - Seven more band styles, approved by Alex on 22 Nov: Slow Swing, Samba, Afro-Cuban, Shuffle Blues, Soul Jazz, Jazz Waltz and Ballad in 3. They are in the style picker for everyone from the next release; Going Home plays with the band in 3.
 - Blues Études Vol. 1 and Vol. 2 are in the player's library: 8 études each, for alto sax, tenor sax and flute (48 tunes), written for each instrument as the PDF prints them, with the band, and locked by a code per edition (nobody has the codes yet). Made by the new `tools/publish_etudes.py`, which the product bots now use for every étude volume.
 - Beta (test copy only): Learn mode follows lines with long runs of triplets or sixteenth notes. Before, a bar of triplets drifted by a hair and Learn was not offered on 20 of the 48 études.

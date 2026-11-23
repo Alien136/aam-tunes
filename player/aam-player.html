@@ -173,6 +173,7 @@
 #aam-play .t-go, #aam-play .t-cal { width: 100%; height: 44px; border-radius: 12px; font: 600 15px var(--body); text-align: center; } #aam-play .t-go { background: var(--accent); color: var(--accent-ink); } #aam-play .t-cal { background: var(--tint); color: var(--ink); }
 #aam-play .t-go[hidden] { display: none; } #aam-play .t-tip:empty { display: none; }
 #aam-play .score .mk-l { color: var(--accent-text); fill: var(--accent-text); }
+#aam-play .score .mk-t { color: var(--accent-text); fill: var(--accent-text); }      /* the Sample Solo's guide tones */
 #aam-play .score .ch-t { font: 500 13.5px "Inter", "Segoe UI Symbol", "Apple Symbols", sans-serif; fill: var(--ink); }
 #aam-play .key { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--muted); }
 #aam-play .key i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
@@ -1259,7 +1260,7 @@ function aamBoot(TUNE) {
   var HIDE = TUNE.hide || [];                                  // an exercise can leave out views it has no use for ("chords", "solo")
   var views = [];
   if (HIDE.indexOf("chords") < 0) views.push({ id: "chords", title: "Chord chart", sm: "Chords" });
-  if (NOTA && HIDE.indexOf("solo") < 0) views.push({ id: "solo", title: "Your solo", sm: "Solo" });
+  // (the blank "Your solo" page is gone: a study's Solo tab is its written Sample Solo, a section like any other. Alex, 23 Nov 2026)
   TUNE.sections.forEach(function (s) { views.push({ id: s.id, title: s.tab || short(s.title), sm: s.tab || nick(short(s.title)) }); });
   if (!views.length) views.push({ id: "chords", title: "Chord chart", sm: "Chords" });
   state.view = views[0].id;                                    // a tune opens on the chord chart; an exercise on its first page
@@ -1922,6 +1923,7 @@ function aamBoot(TUNE) {
     if (notes.length === marks.length) notes.forEach(function (n, i) { if (marks[i] !== ".") n.classList.add("mk-" + marks[i]); });
     var key = sec ? [sec.desc + "."] : ["Improvise or write your own line over the changes. The left hand shows the guide tones (3rds and 7ths)."];
     if (/g/.test(marks)) key.push('<i style="background:#8a99a8"></i>Passing tones in grey');
+    if (/t/.test(marks)) key.push('<i style="background:var(--accent-text)"></i>Guide tones (3rd and 7th) in blue');
     if (/l/.test(marks)) key.push('<i style="background:var(--accent-text)"></i>The ii–V–I licks in blue');
     $("key").innerHTML = key.map(function (k) { return "<span>" + k + "</span>"; }).join("");
     learnPaint();

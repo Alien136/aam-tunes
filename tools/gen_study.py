@@ -355,10 +355,10 @@ def ii_v_i_lesson(kroot, minor, key_ly):
             "  \\layout { #(layout-set-staff-size 20) indent = 0 ragged-right = ##f \\context { \\Score \\omit BarNumber } }\n}")
 
 
-def guide_line(bars):
-    """Your Chorus guide-tone line: one note on beat 1 and one on beat 4 of every bar; the rest stays empty for the student.
+def guide_targets(bars):
+    """The guide tones of a chorus: one note on beat 1 and one on beat 4 of every bar.
     Each change from beat 4 into beat 1 moves by voice leading: the 7th falls a step to the next chord's 3rd, or, on a V-I,
-    the 3rd climbs a half step to the root. Returns per-bar LilyPond (written pitch) with the degree printed above each note."""
+    the 3rd climbs a half step to the root. Returns (arrive, depart): per bar, (Note, degree label) for beat 1 and for beat 4."""
     def tones(c):
         alters, ct = SCALES[c["scale"]]
         r = c["root"]
@@ -398,11 +398,90 @@ def guide_line(bars):
                     best = (cost, (a, da), (b, db))
         depart[i] = best[1]
         arrive[(i + 1) % n] = best[2]
+    return arrive, depart
+
+
+GUIDE_LAB = lambda txt: '^\\markup \\abs-fontsize #8 \\bold \\with-color #' + GUIDE_RGB + ' "' + txt + '"'
+
+
+def guide_line(bars):
+    """The older Your Chorus: the guide tones alone, the beats between left empty for the student ("sample_solo": false)."""
+    arrive, depart = guide_targets(bars)
+    n = len(bars)
     lab = lambda txt: '^\\markup \\abs-fontsize #8 \\bold \\with-color #' + GUIDE_RGB + ' "' + txt + '"'
     out = []
     for i in range(n):
         (a1, l1), (a4, l4) = arrive[i], depart[i]
         out.append("\\guideOn " + a1.ly() + "4" + lab(l1) + " s2 " + a4.ly() + "4" + lab(l4) + " \\guideOff |")
+    return out
+
+
+def sample_solo(bars, seed=""):
+    """The Sample Solo (Alex, 23 Nov 2026): a written chorus that shows how a solo is built from the study's own material.
+    Beat 1 and beat 4 of every bar are the guide tones (blue, as in guide_targets); beats 2 and 3 are filled in black:
+    in the first half of the form from each chord's ARPEGGIO, in the second half from each chord's SCALE. The fill is
+    chosen so the line moves by neighbours and arrives next to the beat-4 guide tone. Returns per-bar LilyPond."""
+    import random
+    arrive, depart = guide_targets(bars)
+    n = len(bars); half = (n + 1) // 2
+    rnd = random.Random("solo:" + seed)
+    LO, HI = 59, 83
+
+    def pool(c, arp):
+        alters, ct = SCALES[c["scale"]]
+        degs = ct if arp else range(1, 8)
+        out = []
+        for d in degs:
+            x = spell_degree(c["root"], d, alters[d - 1])
+            out += [Note(x.letter, x.acc, o) for o in range(2, 7)]
+        return sorted((m for m in out if LO <= m.midi <= HI), key=lambda m: m.midi)
+
+    # beats 2 and 3 as four eighth-note slots: (first slot, length in eighths), or ("r", length) for a rest
+    RHY_ARP = [[(0, 1), (1, 1), (2, 1), (3, 1)], [(0, 1), (1, 1), (2, 2)], [(0, 1), (1, 1), (2, 1), (3, 1)], [("r", 1), (1, 1), (2, 1), (3, 1)],
+               [(0, 1), (1, 1), (2, 1), (3, 1)], [(0, 2), (2, 1), (3, 1)], [(0, 1), (1, 1), (2, 1), (3, 1)], [("r", 2), (2, 1), (3, 1)]]
+    RHY_SC = [[(0, 1), (1, 1), (2, 1), (3, 1)], [(0, 1), (1, 1), (2, 1), (3, 1)], [("r", 1), (1, 1), (2, 1), (3, 1)], [(0, 1), (1, 1), (2, 1), (3, 1)],
+              [(0, 1), (1, 1), (2, 1), (3, 1)], [(0, 1), (1, 1), (2, 2)], [(0, 1), (1, 1), (2, 1), (3, 1)], [("r", 2), (2, 1), (3, 1)]]
+    out = []
+    for i, b in enumerate(bars):
+        arp = i < half
+        (a1, l1), (a4, l4) = arrive[i], depart[i]
+        rhy = (RHY_ARP if arp else RHY_SC)[(i if arp else i - half) % 8]
+
+        def chord_at(slot):                                  # slot 0..3 = the eighths of beats 2 and 3
+            beat, t = 1 + slot // 2, 0
+            for c in b:
+                t += c["beats"]
+                if beat < t: return c
+            return b[-1]
+        slots = [(st, ln) for st, ln in rhy if st != "r"]
+        pools = [pool(chord_at(st), arp) for st, _ in slots]
+        best = [None, None]
+
+        def walk(k, cur, prev, cost, acc):
+            if best[0] is not None and cost >= best[0]: return
+            if k == len(slots):
+                gap = abs(cur - a4.midi)
+                end = 5 if gap == 0 else (0 if gap <= (4 if arp else 2) else 1.2 if gap <= (5 if arp else 4) else 4 + gap * 0.3)
+                if best[0] is None or cost + end < best[0]: best[0], best[1] = cost + end, list(acc)
+                return
+            P = pools[k]
+            up = [m for m in P if m.midi > cur][:2]; down = [m for m in P if m.midi < cur][-2:][::-1]
+            for rank, m in [(0, x) for x in up[:1] + down[:1]] + [(1, x) for x in up[1:] + down[1:]]:
+                c = cost + rank * (1.5 if arp else 1.2) + rnd.random() * 0.35
+                if m.midi == a4.midi: c += 2                                  # do not land on the guide tone early
+                if prev is not None and m.midi == prev: c += 0.9               # no see-saw between two notes
+                if prev is not None and (m.midi - cur) * (cur - prev) < 0: c += 0.3
+                if m.midi < 62 or m.midi > 79: c += 0.6
+                walk(k + 1, m.midi, cur, c, acc + [m])
+        walk(0, a1.midi, None, 0.0, [])
+        fill, it = [], iter(best[1])
+        for st, ln in rhy:
+            d = {1: "8", 2: "4"}[ln]
+            fill.append("r" + d if st == "r" else next(it).ly() + d)
+        mark = ""
+        if i == 0: mark = '_\\markup \\abs-fontsize #8 \\italic "arpeggio notes"'
+        if i == half: mark = '_\\markup \\abs-fontsize #8 \\italic "scale notes"'
+        out.append("\\guideOn " + a1.ly() + "4" + GUIDE_LAB(l1) + mark + " \\guideOff " + " ".join(fill) + " \\guideOn " + a4.ly() + "4" + GUIDE_LAB(l4) + " \\guideOff |")
     return out
 
 
@@ -752,6 +831,7 @@ def build(spec):
     # Section notes: short, one idea per line (bold lead + a few words)
     LH_SAME = ("Left hand:", "same as Section 1.")
     guide = spec.get("yc_guide_tones", True)
+    solo_on = spec.get("sample_solo", True)                  # the Sample Solo replaces the blank Your Chorus (Alex, 23 Nov 2026)
     yc_guide = ("Blue notes:", "guide tones, beat 4 into beat 1. The 7th falls to the next 3rd; on a V–I the 3rd climbs to the root.")
     if piano:
         s1_note = [("Right hand:", "1-3-5-7 of every chord."), ("Left hand:", LH_SHORT[LH_VOICING])]
@@ -765,6 +845,15 @@ def build(spec):
         if pattern_mode:
             s3_note = [("Play:", "1-2-3-5 on two-beat chords (no repeated notes), the full scale on one-bar chords.")]
         s4_note = ([yc_guide] if guide else []) + [("Your line:", "fill the empty beats with chord tones and scale notes, starting from the blue notes.")]
+    if solo_on:
+        nb = len(bars); hb = (nb + 1) // 2
+        s4_note = [("How a solo is built:", "aim at the guide tones, then connect them."),
+                   ("Blue notes:", "the guide tones, on beats 1 and 4. The number says which: 3, 7 or 1."),
+                   ("Beat 4 into beat 1:", "the 7th falls a step to the next chord's 3rd."),
+                   (f"Bars 1–{hb}:", "the black notes are arpeggio notes (Section 1)."),
+                   (f"Bars {hb + 1}–{nb}:", "the black notes are scale notes (Section 3)."),
+                   ("Make it yours:", "keep the blue notes and change the black ones" + (", or drop in a lick." if spec.get("licks") else "."))]
+        if piano: s4_note.append(LH_SAME)
     s3_title = "Pattern Chorus" if pattern_mode else "Scale Chorus"
     if pattern_mode and two_beat_bars * 2 < len(bars):       # e.g. a blues: mostly one-bar chords
         s3_title = "Scale & Pattern Chorus"
@@ -779,6 +868,7 @@ def build(spec):
             lick_sections_after = built
         else:
             lick_sections, yc_num = built, "6"
+    solo = sample_solo(bars, title) if solo_on else None
     lh_midi = ("\\new Staff { \\clef bass " + " ".join(lh) + " " + " ".join(lh) + " }") if piano else ""
     long_form = len(bars) > 16
     brk = "\\pageBreak\n" if long_form else ""
@@ -851,13 +941,13 @@ changes = \\chordmode {{ {changes} }}
 {listen_block(spec) if spec.get("listen_after_s3") else ""}
 
 {lick_sections}
-{brk}{section(yc_num, "Your Chorus", s4_note)}
+{brk}{section(yc_num, "Sample Solo" if solo_on else "Your Chorus", s4_note)}
 \\score {{
   << \\new ChordNames \\changes
-     {music(guide_line(bars) if guide else ["s1 |"] * len(bars), staff_with="" if piano else "\\with { \\override VerticalAxisGroup.default-staff-staff-spacing.basic-distance = #16 }")} >>
+     {music(solo if solo_on else guide_line(bars) if guide else ["s1 |"] * len(bars), split=spec.get("yc_split") if solo_on else None, staff_with="" if piano else "\\with { \\override VerticalAxisGroup.default-staff-staff-spacing.basic-distance = #16 }")} >>
   \\layout {{ {yc_size} \\context {{ \\Score \\override BarNumber.break-visibility = ##(#f #f #t) }} }}
 }}
-\\markup \\column {{ \\vspace #1.2 {ww("Practice tip:", spec.get("practice_tip") or "play Section 1 until the chord tones are automatic, then Section 3. Then write your own line in Section 4 and improvise over the changes, aiming for a chord tone on beats 1 and 3.")} }}
+\\markup \\column {{ \\vspace #1.2 {ww("Practice tip:", spec.get("practice_tip") or ("learn the Sample Solo slowly, then play it again and change the black notes: keep landing on a blue note on beats 1 and 4." if solo_on else "play Section 1 until the chord tones are automatic, then Section 3. Then write your own line in Section 4 and improvise over the changes, aiming for a chord tone on beats 1 and 3."))} }}
 {lick_sections_after}
 
 \\score {{
@@ -865,7 +955,7 @@ changes = \\chordmode {{ {changes} }}
   \\midi {{ \\tempo 4 = 112 }}
 }}
 '''
-    LAST.update(arp=arp, sc=sc, lh=lh if piano else None, bars=bars, pattern_mode=pattern_mode)
+    LAST.update(arp=arp, sc=sc, lh=lh if piano else None, bars=bars, pattern_mode=pattern_mode, solo=solo, solo_num=yc_num)
     return ly
 
 

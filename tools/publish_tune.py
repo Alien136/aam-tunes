@@ -40,6 +40,7 @@ DUR = {"8": .5, "4": 1.0, "2": 2.0, "1": 4.0}
 
 def clean(s):
     s = re.sub(r'\\mark \\markup \\box \\bold "[^"]*"', "", s).replace('\\bar "||"', "").replace("|", " ")
+    s = re.sub(r'[\^_]\\markup \\abs-fontsize #\d+ (?:\\bold |\\italic )*(?:\\with-color #\(rgb-color [^)]*\) )?"[^"]*"', "", s)   # the Sample Solo's printed labels (3, 7, "arpeggio notes")
     return s.replace("\\tweak color #grey \\tweak Accidental.color #grey ", "GREY:")
 
 
@@ -50,12 +51,14 @@ def note_of(m):
 
 def parse_rh(bar):
     """One bar of gen_study's right-hand LilyPond -> notes and rests. Handles the \\transpose c' X { ... } that wraps woodwind licks."""
-    out, lick, dur, tr = [], False, None, None
+    out, lick, dur, tr, guide = [], False, None, None, False
     toks = clean(bar).split(); i = 0
     while i < len(toks):
         tok = toks[i]; i += 1
         if tok == "\\lickOn": lick = True; continue
         if tok == "\\lickOff": lick = False; continue
+        if tok == "\\guideOn": guide = True; continue                                  # the Sample Solo's guide tones (blue)
+        if tok == "\\guideOff": guide = False; continue
         if tok == "\\transpose":
             to = note_of(NOTE.match(toks[i + 1])); i += 3                              # skip: c'  X  {
             tr = (g.LETTERS.index(to.letter) + 7 * (to.octave - 4), to.midi - 60); continue
@@ -66,7 +69,7 @@ def parse_rh(bar):
         if m.group(5): dur = m.group(5)
         n = note_of(m)
         if tr: n = g.transpose(n, tr[0], tr[1])
-        out.append(dict(n=n, dur=DUR[dur], mark="l" if lick else ("g" if m.group(1) else ".")))
+        out.append(dict(n=n, dur=DUR[dur], mark="l" if lick else "t" if guide else ("g" if m.group(1) else ".")))
     assert abs(sum(x["dur"] for x in out) - 4) < 1e-9, bar
     return out
 
@@ -159,6 +162,9 @@ elif L.get("lick_rh") and len(L["lick_rh"]) // n >= 2 and len(L["lick_rh"]) % n 
     for k in range(len(LR) // n):
         s = section("licks" if k == 0 else "licks%d" % (k + 1), "Section 5 · Lick Chorus %d" % (k + 1), "The ii–V–I licks dropped into the form, chorus %d" % (k + 1), LR[k * n:(k + 1) * n], None, bars)
         s["tab"] = "Licks %d" % (k + 1); secs.append(s)
+if L.get("solo") and len(L["solo"]) == n:                    # the Sample Solo takes the place of the blank "Your solo" page (Alex, 23 Nov 2026)
+    s = section("samplesolo", "Section %s · Sample Solo" % L.get("solo_num", "4"), "Blue: the guide tones on beats 1 and 4. First half: arpeggio notes between them. Second half: scale notes", L["solo"], lh, bars)
+    s["tab"] = "Solo"; secs.append(s)
 T = A.tempo
 notation = dict(key=ascii_name(wk) + ("m" if minor else ""), staves="piano" if PIANO else "treble")
 if PIANO: notation["lh"] = secs[0]["abc"]["lh"]
@@ -166,6 +172,7 @@ tune = dict(format="aam-tune/1", slug=SLUG, title=spec["title"], subtitle=A.subt
             instrument=INST, concert_key=ck, native=SEMIS % 12, first_bar=A.first_bar,   # concert_key + native: the player's key and instrument switch works from these
  chart_tempo=T, tempo_presets=sorted({max(60, round(T * 0.68 / 5) * 5), max(70, round(T * 0.84 / 5) * 5), T}),
             form=[[a, b - 1] for a, b in spec.get("form", [])], bars=bars, sections=secs, notation=notation)
+if any(x["id"] == "samplesolo" for x in secs): tune["hide"] = ["solo"]          # older players still have the blank page: leave it out
 norm = re.sub(r"[^A-Z0-9]", "", A.code.upper())
 pdf = dict(id=SLUG, title=A.pdf_title or spec["title"] + " · " + SHORT, hash=hashlib.sha256(("aam:" + norm).encode()).hexdigest(), tunes=[SLUG])
 os.makedirs(os.path.join(A.repo, "tunes"), exist_ok=True)

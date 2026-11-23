@@ -589,3 +589,17 @@ Everything needed to carry on from any conversation is in this repository and in
   `beta: true` removed from all seven in the test copy; they go live with the next release. He also said the flute fingerings in the
   Flute Beginner Booklet look good: that covers the 26 cards of `FINGERINGS` (low C to upper C sharp), which the Free Flute Starter
   Pack shares. The Flute Welcome Booklet adds the six `HIGH` cards (high D to high G): those are still unchecked.
+
+## 2026-11-23 · Sample Solo in the chord & scale studies
+- Alex: the blank Solo page "doesn't make sense"; in its place a written sample solo, guide tones on beats 4 and 1 in blue, the
+  notes between in black, half from arpeggios and half from scales, with text on how a solo is built, and the same solo in the player.
+- `gen_study.py`: `guide_targets(bars)` (the old guide-line logic), `sample_solo(bars, seed)` (beats 2 and 3 are four eighth slots;
+  a small search picks neighbours in the chord's arpeggio or scale and ends beside the beat-4 guide tone; seeded by the title, so a
+  rebuild gives the same solo), section title "Sample Solo", spec keys `sample_solo` (default true; false = the old Your Chorus),
+  `yc_split` (bar where the solo goes to a second page), `yc_staff_size`. `LAST["solo"]`.
+- `publish_tune.py`: section `samplesolo` (tab "Solo", marks "t" for guide tones), `hide: ["solo"]` on the tune.
+- Player, beta: the built-in blank "solo" view is no longer made; `.mk-t` is blue with a legend line. In the live player (v1.4) a
+  republished study already shows the Sample Solo as its Solo tab (the blank page is hidden by `hide`), with the notes all black.
+- Fly Me to the Moon (piano) rebuilt: 9 pages (the solo takes two, `yc_split` 17, staff 22) and republished, same slug and code.
+- Not done: licks inside the sample solo; other studies are not rebuilt; with five tabs on a phone the Solo tab starts off-screen
+  (the strip scrolls). The lead-sheet skill's own copy of gen_study is older than this one: the repository copy wins.
