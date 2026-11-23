@@ -52,4 +52,9 @@ os.makedirs(os.path.join(ROOT, "release"), exist_ok=True)
 open(os.path.join(ROOT, "release", "player.html"), "w", encoding="utf-8").write(out)
 demo = open(os.path.join(ROOT, "player", "demo.html"), encoding="utf-8").read()                 # the public demo card goes out with it
 open(os.path.join(ROOT, "release", "demo.html"), "w", encoding="utf-8").write(demo)
-print("Released:", ver, "-> release/player.html and release/demo.html  (commit and push to make it live)")
+cards = open(os.path.join(ROOT, "theory", "cards.html"), encoding="utf-8").read()            # the theory flash cards go out with it (/theory loads release/cards.html; ?beta loads theory/cards.html)
+assert 'id="aam-cards"' in cards, "theory/cards.html is not the theory app"
+assert cards.count('var CARDS_VERSION = "test copy";') == 1, "CARDS_VERSION line not found"
+cards = cards.replace('var CARDS_VERSION = "test copy";', 'var CARDS_VERSION = "%s";' % ver)
+open(os.path.join(ROOT, "release", "cards.html"), "w", encoding="utf-8").write(cards)
+print("Released:", ver, "-> release/player.html, release/demo.html and release/cards.html  (commit and push to make it live)")
