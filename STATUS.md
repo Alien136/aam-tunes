@@ -641,3 +641,21 @@ Everything needed to carry on from any conversation is in this repository and in
   longer exists and no tune has a page with an empty right hand, so the step now plays the study's next page (a cloud for each hand)
   and checks that no Solo tab is shown. A session that changes the player's tabs should run `node tools/check_features.js` in full.
 - The Build Desk was not updated by that session: at the time of this run it still listed the seven styles as waiting for Alex.
+
+## 2026-11-22 · Score reader, step 1 (`tools/read_score.py`)
+- Alex wants complex printed scores recreated for the player, and in time students uploading PDFs. First job: Tchaikovsky's own
+  piano version of the Nutcracker Pas de deux (Andante maestoso, 75 bars, pages 152-157 of the Complete Works vol. 54 scan).
+- Why: Claude misreads exact pitches in dense scans (bars 12-16 could not be read with confidence by eye). Two engines were tried
+  in the cloud workspace, both run there: homr (`pip install homr`, about 50 s a page) and Audiveris 5.11.0 (the ubuntu24.04 .deb
+  from its GitHub releases, unpacked with `dpkg -x`, run with `-batch -export`; about 2.5 min for six pages; `AAM_AUDIVERIS` points
+  at the launcher). Maven and Gradle hosts are blocked, so Audiveris cannot be built from source there.
+- Findings on those six pages: Audiveris counts the bars right (75) and separates voices and chords well, but reads the sixteenth
+  triplets as plain sixteenths; homr is very good on running pitches (intro arpeggios 66 of 66) and poor on rhythm and voices, and
+  lost count of bars on the last page. Note by note the two agree on 78% (1943 of 2486); 4 bars identical, 14 differ by 1-3 notes.
+  Neither engine's rhythm can be used as it stands.
+- The tool writes, per bar, both readings, their agreement, flags and a picture of the bar cut from the scan (positions from the
+  Audiveris project file), plus `review.html`. Everything goes to `tools/out/scores/` (ignored by git): no score is committed.
+- Next: step 2, Claude writes the verified score from the report (pitches from the engines where they agree, the picture where
+  they differ, rhythm read from the picture and checked by arithmetic), with the doubtful bars listed for Alex; step 3, a publisher
+  for two-hand piano scores into the player; then the upload path (needs a server or a queue: the player is a static page and the
+  engines need minutes of computing per page).
