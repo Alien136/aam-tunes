@@ -10,6 +10,7 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- Theory flash cards: **Clarinet** takes the place of Other (treble clef, Name the note). Fingering cards for clarinet come with the clarinet booklet.
 
 ### Fixed
 

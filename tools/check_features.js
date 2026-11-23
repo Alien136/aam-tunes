@@ -375,7 +375,7 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     expect(fits, "flash cards: the whole setup, Start button included, fits a phone screen without scrolling");
     const pick = (g, id) => page.click('#aam-cards [data-c="' + g + '"] button[data-id="' + id + '"]');
     const NEED = { 1: 2, 2: 3, 3: 4, 4: 4 };
-    for (const [inst, mode, clef, level] of [["piano", "name", "both", 1], ["piano", "key", "bass", 2], ["piano", "staff", "treble", 3], ["alto", "fing", "", 4], ["tenor", "staff", "", 2], ["flute", "fing", "", 3], ["flute", "name", "", 4], ["other", "name", "bass", 4]]) {
+    for (const [inst, mode, clef, level] of [["piano", "name", "both", 1], ["piano", "key", "bass", 2], ["piano", "staff", "treble", 3], ["alto", "fing", "", 4], ["tenor", "staff", "", 2], ["flute", "fing", "", 3], ["flute", "name", "", 4], ["clarinet", "name", "", 4]]) {
       await pick("inst", inst); await pick("mode", mode); if (clef) await pick("clef", clef); await pick("level", level); await pick("round", "calm"); await page.click('#aam-cards [data-c="start"]'); await page.waitForTimeout(250);
       let ok = true, why = "";
       for (let k = 0; k < 6 && ok; k++) {
