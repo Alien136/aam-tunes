@@ -172,7 +172,7 @@ tune = dict(format="aam-tune/1", slug=SLUG, title=spec["title"], subtitle=A.subt
             instrument=INST, concert_key=ck, native=SEMIS % 12, first_bar=A.first_bar,   # concert_key + native: the player's key and instrument switch works from these
  chart_tempo=T, tempo_presets=sorted({max(60, round(T * 0.68 / 5) * 5), max(70, round(T * 0.84 / 5) * 5), T}),
             form=[[a, b - 1] for a, b in spec.get("form", [])], bars=bars, sections=secs, notation=notation)
-if any(x["id"] == "samplesolo" for x in secs): tune["hide"] = ["solo"]          # older players still have the blank page: leave it out
+tune["hide"] = ["solo"]          # the blank "Your solo" page is retired (Alex, 22 Nov 2026); a study's Solo tab is its Sample Solo section, when it has one
 norm = re.sub(r"[^A-Z0-9]", "", A.code.upper())
 pdf = dict(id=SLUG, title=A.pdf_title or spec["title"] + " · " + SHORT, hash=hashlib.sha256(("aam:" + norm).encode()).hexdigest(), tunes=[SLUG])
 os.makedirs(os.path.join(A.repo, "tunes"), exist_ok=True)

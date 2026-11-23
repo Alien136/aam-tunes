@@ -603,3 +603,8 @@ Everything needed to carry on from any conversation is in this repository and in
 - Fly Me to the Moon (piano) rebuilt: 9 pages (the solo takes two, `yc_split` 17, staff 22) and republished, same slug and code.
 - Not done: licks inside the sample solo; other studies are not rebuilt; with five tabs on a phone the Solo tab starts off-screen
   (the strip scrolls). The lead-sheet skill's own copy of gen_study is older than this one: the repository copy wins.
+- 22 Nov (Alex, same day): "remove the solo tab ... over time we can update the songs individually". Done in the data, so the live
+  player (v1.4) shows it at once: `hide` gained "solo" on the 17 tunes that still drew the blank page (studies, the six demo tunes,
+  the booklets' blues lines). `publish_tune.py` now always writes `hide: ["solo"]`. Other generators (`make_demo.py`, `book_player.py`
+  lick items, `study_going_home.py`) do not yet; the beta player no longer has the blank view at all, so after the next release it
+  cannot come back.
