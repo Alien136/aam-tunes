@@ -16,10 +16,13 @@
      piano            Learn mode on a piano page: asks which hand, follows that hand to the end, green notes on its staff
      apply            repeats, key and instrument changes wait for "Apply changes" while the band plays; the page-turn copy has no cloud
      style            the style picker lists the band styles, each one sounds, the choice is remembered, exercises have none
+     mine             My music (test copy only): a MusicXML melody from the device, plain or compressed, becomes a tune that is drawn, kept
+                      on the device and can be removed; a file the player cannot read whole is refused with the reason and nothing is
+                      kept; Analytics never hears the tune's name; a released copy does not show the button
 
    The microphone is a sound file: saxophone-like tones are generated here and fed to the browser as a fake microphone.
 
-   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|mic|flute|learn|level|cloud|contents|pdf|bar|style|apply|etudes|piano|install|demo|cards]
+   Usage:  AAM_CODE=<master code> node tools/check_features.js [--file player/aam-player.html] [--only tuner|mic|flute|learn|level|cloud|contents|pdf|bar|style|apply|etudes|piano|install|demo|cards|mine]
    Needs:  playwright, plus the tone and abcjs packages (tools/node_modules or $AAM_NODE_MODULES). Nothing is fetched from the internet. */
 const fs = require("fs"), path = require("path"), os = require("os");
 const { chromium, devices } = require("playwright");
@@ -611,6 +614,57 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     await ctxA.close();
     const sw = fs.readFileSync(path.join(app, "sw.js"), "utf8");
     expect(/r\.mode === "navigate"/.test(sw) && /"\/play"/.test(sw) && !/respondWith\(fetch\(r\)\)/.test(sw), "install: the offline file only answers the play page and the player's own files");
+  }
+  if (want("mine")) {                                       // My music: a student's own MusicXML file, kept on the device
+    const FX = f => path.join(ROOT, "tools", "tests", "mymusic", f), src = fs.readFileSync(FILE_OF, "utf8"), TEST = /var PLAYER_VERSION = "test copy"/.test(src);
+    const mineOf = page => page.evaluate(() => { const v = JSON.parse(localStorage.getItem("aam-mymusic") || "null"); return v ? v.order.map(s => v.tunes[s]) : []; });
+    if (!src.includes("AAM_MINE")) ok.push("My music: not in this copy of the player (skipped)");
+    else {
+      // a released copy keeps the button hidden until Alex has tried the feature
+      const ctxR = await b.newContext({ viewport: { width: 390, height: 844 } }); await wire(ctxR);
+      await ctxR.route(/release\/player\.html/, r => r.fulfill({ body: src.replace('var PLAYER_VERSION = "test copy"', 'var PLAYER_VERSION = "9.9"'), contentType: "text/plain; charset=utf-8", headers: { "access-control-allow-origin": "*" } }));
+      const pr = await ctxR.newPage(); await pr.goto(URL_OF(HCB)); await pr.waitForTimeout(1700); await pr.click('[data-r="lib-btn"]'); await pr.waitForTimeout(200);
+      expect(await pr.evaluate(() => document.querySelector('[data-r="mine"]').hidden && document.querySelector('[data-r="lib-menu"]').textContent.indexOf("Add another PDF") >= 0), "My music: a released copy of the player does not show \"Add my own music\"");
+      await ctxR.close();
+    }
+    if (src.includes("AAM_MINE") && TEST) {
+      const page = await open({ viewport: { width: 390, height: 844 } }, HCB);
+      await page.addInitScript(() => { window.gtag = function (a, n, p) { if (a === "event") { try { sessionStorage.setItem("__ev", (sessionStorage.getItem("__ev") || "") + JSON.stringify([n, p]) + "\n"); } catch (e) {} } }; });   // kept from page to page
+      await page.click('[data-r="lib-btn"]'); await page.waitForTimeout(200);
+      expect(await page.evaluate(() => { const e = document.querySelector('[data-r="mine-btn"]'); return !!e && e.offsetParent !== null && document.querySelector('[data-r="mine-rm"]').hidden; }), "My music: the test copy shows \"Add my own music\" in the My tunes menu");
+      const REFUSED = [["not-music.xml", /not a MusicXML score/], ["piano-two-staves.musicxml", /two staves/], ["six-eight.musicxml", /in 6\/8/], ["short-bar.musicxml", /Bar 1 adds up to 2 beats, not 4/]];
+      for (const [f, re] of REFUSED) {
+        await page.setInputFiles('[data-r="mine-file"]', FX(f)); await page.waitForTimeout(400);
+        const said = await page.textContent('[data-r="mine-err"]');
+        expect(re.test(said) && (await mineOf(page)).length === 0 && /hot-cross-buns/.test(page.url()), "My music: " + f + " is refused with the reason and nothing is kept (" + said.slice(0, 60) + ")");
+      }
+      await page.setInputFiles('[data-r="mine-file"]', FX("melody-alto.musicxml")); await page.waitForTimeout(2600);
+      const t = (await mineOf(page))[0] || { sections: [{ abc: { rh: [] }, rh: [] }], notation: {} }, sec = t.sections[0];
+      const seen = await page.evaluate(() => ({ title: document.querySelector('[data-r="title"]').textContent.trim(), inst: document.querySelector('[data-r="inst-name"]').textContent.trim(), notes: document.querySelectorAll(".abcjs-note.abcjs-v0").length,
+        learn: (function (e) { return !!e && !e.hidden && e.offsetParent !== null; })(document.querySelector('[data-r="learn-btn"]')), over: document.documentElement.scrollWidth > innerWidth + 1, url: location.search }));
+      expect(/[?&]tune=~[a-z0-9]+/.test(seen.url) && seen.title === "Morning Tune" && seen.inst === "Alto saxophone", "My music: the melody opens as a tune named from the file, for the instrument the part is written for (" + seen.title + ", " + seen.inst + ")");
+      expect(sec.abc.rh.join(" | ") === "z4 A2 | d3e f2 | ed B4- | B2 (3ABc z2 | ^G2 A/B/c/d/ e2 | d4 z2" && t.notation.key === "D" && (t.meter || []).join("/") === "3/4",
+        "My music: pick-up bar, dotted note, tie, triplet, accidental and sixteenths are written as in the file, in D major and 3/4 (" + sec.abc.rh.join(" | ") + ")");
+      expect(sec.rh.length === 17 && sec.rh[0].join() === "2,60,1,90" && sec.rh[6].join() === "7,62,3,90" && sec.rh[7][1] === 60 && Math.abs(sec.rh[8][0] - 10.3333) < 0.001,
+        "My music: the sounds are the alto's concert pitches, the tied note is one long sound and the triplet is three even notes");
+      expect(seen.notes === 18 && seen.learn && !seen.over, "My music: every written note is drawn on a phone screen and Learn is offered (" + seen.notes + " notes)");
+      await page.click('[data-r="p-play"]'); await page.waitForTimeout(11500);
+      expect(await page.evaluate(() => !!document.querySelector(".abcjs-note.lr-now, .score .cloud, .abcjs-note.now")), "My music: playing it moves the cloud onto the notes");
+      await page.click('[data-r="p-play"]'); await page.waitForTimeout(300);
+      await page.reload(); await page.waitForTimeout(1900);
+      expect((await page.textContent('[data-r="title"]')).trim() === "Morning Tune", "My music: the tune is still there after the page is loaded again");
+      await page.click('[data-r="lib-btn"]'); await page.waitForTimeout(200);
+      expect(await page.evaluate(() => /My music/i.test(document.querySelector('[data-r="lib-list"]').textContent) && !!document.querySelector('.lib-tune[aria-current="true"]') && !document.querySelector('[data-r="mine-rm"]').hidden), "My music: it is listed under My music in My tunes, with a way to remove it");
+      await page.setInputFiles('[data-r="mine-file"]', FX("melody-alto.mxl")); await page.waitForTimeout(2600);
+      expect((await page.textContent('[data-r="title"]')).trim() === "Zipped Tune" && (await mineOf(page)).length === 2, "My music: a compressed file (.mxl) is opened the same way");
+      const ev = await page.evaluate(() => sessionStorage.getItem("__ev") || "");
+      expect(/"aam_open",\{"tune":"my-music","tune_title":"My music"/.test(ev) && /"aam_practice",\{"tune":"my-music"/.test(ev) && !/Morning Tune|Zipped Tune|~[a-z0-9]{6}/.test(ev), "My music: Analytics hears \"my-music\" and never the tune's name or its id");
+      page.once("dialog", d => d.accept());
+      await page.click('[data-r="lib-btn"]'); await page.waitForTimeout(200); await page.click('[data-r="mine-rm"]'); await page.waitForTimeout(2200);
+      const left = await mineOf(page);
+      expect(left.length === 1 && left[0].title === "Morning Tune" && (await page.textContent('[data-r="title"]')).trim() !== "Zipped Tune", "My music: Remove takes the tune off the device and opens another one");
+      await page.context().close();
+    }
   }
   if (want("bar")) {                                        // a piano page shows the piano
     const page = await open({ viewport: { width: 390, height: 844 } }, "winter-wonderland-piano");

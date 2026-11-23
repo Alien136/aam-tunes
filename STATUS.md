@@ -608,3 +608,30 @@ Everything needed to carry on from any conversation is in this repository and in
   the booklets' blues lines). `publish_tune.py` now always writes `hide: ["solo"]`. Other generators (`make_demo.py`, `book_player.py`
   lick items, `study_going_home.py`) do not yet; the beta player no longer has the blank view at all, so after the next release it
   cannot come back.
+
+## 2026-11-23 · Beta: My music, first step (a MusicXML melody from the student's own device) (nightly builder)
+- Roadmap row 2.5. Picked by rule 5 (Monday is a booklet night, but two booklets wait at Ready for Alex; row 1.5 waits for Alex's notes).
+- `AAM_MINE` in `player/aam-player.html`, just above `aamLibrary`: `parse(text, fileName)` turns MusicXML (`score-partwise`, the first
+  part) into a tune of today's format, the same shape `tools/publish_exercise.py` writes (`style: "click"`, `keys: "off"`, one tonic chord
+  per bar, `sections[0].abc.rh` one string per bar, `rh` events at sounding pitch, `meter` when not 4/4) plus `mine: true`. `add(file)`
+  reads the file (a `.mxl` is unzipped in the browser with `DecompressionStream("deflate-raw")`), stores the tune and returns its slug.
+- Storage: `localStorage["aam-mymusic"] = { order: [slug], tunes: { slug: tune } }`. Slugs are `~` + six random characters, so they can
+  never meet a slug in `index.json`. `addMine()` in the library puts them on a free shelf with the id `~my`, title "My music", last in
+  the list. Nothing is fetched or sent. `AAM_TRACK` `send` rewrites any event whose `tune` starts with `~` to `my-music` / "My music".
+- Reads: treble clef; 2/4, 3/4, 4/4; one key for the whole piece; notes down to a sixteenth, dots, ties, plain triplets (three equal
+  notes), a pick-up bar (rests fill the front of bar 1; a short last bar is filled at the end); `<transpose>` -9 alto, -21 bari, -14 tenor,
+  -2 clarinet (trumpet or soprano when the part's name says so), 0 flute or piano by name, otherwise no instrument (concert pitch).
+  A chord is read as its top note, grace notes are left out, repeats are not followed: each is said under the music (`desc`).
+- Refuses, with the reason shown under the button and nothing stored: not MusicXML, two staves, `<backup>` (two voices), another clef,
+  another meter, a change of key or meter, a tuplet other than a plain triplet, a note shorter than a sixteenth, a bar that does not
+  add up, more than 200 bars, a file over 3 MB, an unknown transposition.
+- The button ("Add my own music", `mine-btn`, in the My tunes menu under "Add another PDF") shows only when `PLAYER_VERSION` is
+  "test copy". A release copies the whole test copy, so this gate is what keeps it from students: remove it only when Alex says so.
+  A device that already holds tunes still lists and plays them in a released player.
+- Checks: `node tools/check_features.js --only mine` (16), with test scores in `tools/tests/mymusic/` (a melody written for the check,
+  not a published tune). Breaking the Analytics rewrite or the test-copy gate on purpose makes the group fail.
+- NOT verified: a real export from MuseScore, Sibelius, Dorico or Finale (only hand-written test files); the file picker on a real
+  iPhone (`accept=".musicxml,.mxl,.xml"` may grey files out in iOS Files); the sound of it.
+- Next steps for this row, in order: (1) fixes from Alex's first real files; (2) piano: two staves, both hands (`style: "solo"`, `lh`);
+  (3) chord symbols (`<harmony>`) so a lead sheet plays with the band; (4) repeats and endings; (5) a MIDI file; (6) the share file
+  a teacher can send (the tune JSON as a file, opened with the same button).

@@ -187,4 +187,7 @@ He starts the request with one of two phrases. Neither phrase: treat it as Beta.
 Newest first. One line each: what went wrong or was nearly wrong, and the rule that now prevents it. The builder adds a line when a
 night taught something; the release retro prunes lines that have become checks.
 
+- 2026-11-23 · The "main as found" checks take 8 minutes and read the player file on every page, so editing while they run mixes two
+  players in one result. Run them on a clean copy (`git worktree add --detach <dir> HEAD`, `AAM_NODE_MODULES=<repo>/tools/node_modules`),
+  build meanwhile, and remove the worktree before the guard.
 - 2026-11-20 · Start of the loop. Earlier lessons live in `STATUS.md` and the project doc "Player review and next 10 steps".

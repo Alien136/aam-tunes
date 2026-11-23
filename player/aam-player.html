@@ -136,6 +136,10 @@
 #aam-play .lib-add { border-top: 1px solid var(--line); margin-top: 6px; padding: 10px 6px 2px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
 #aam-play .lib-home { display: block; border-top: 1px solid var(--line); margin-top: 10px; padding: 12px 6px 6px; font: 600 14px var(--body); color: var(--accent-text); text-decoration: none; }
 #aam-play .lib-add-t { font: 600 13px var(--body); }
+#aam-play .lib-mine { display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 10px; } #aam-play .lib-mine[hidden], #aam-play .lib-mine-rm[hidden] { display: none; }
+#aam-play .lib-mine-b { height: 40px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); color: var(--accent-text); font: 600 14px var(--body); }
+#aam-play .lib-mine small { font: 500 12px/1.4 var(--body); color: var(--muted); }
+#aam-play .lib-mine-rm { justify-self: start; padding: 4px 0; background: none; color: var(--muted); font: 600 12px var(--body); text-decoration: underline; }
 #aam-play .lib-add form { display: flex; gap: 8px; margin: 0; }
 #aam-play .lib-add input[type=text] { flex: 1 1 0; width: 0; min-width: 0; height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; font: 500 15px var(--body); margin: 0; box-shadow: none; background: var(--surface); color: var(--ink); }
 #aam-play .lib-add .go { flex: none; height: 40px; padding: 0 16px; border-radius: 10px; background: var(--now); color: var(--now-ink); font: 600 14px var(--body); display: inline-flex; align-items: center; }
@@ -504,6 +508,13 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
             <button type="submit" class="go">Add</button>
           </form>
           <div class="err" data-r="add-err" aria-live="polite"></div>
+          <div class="lib-mine" data-r="mine" hidden>
+            <button type="button" class="lib-mine-b" data-r="mine-btn">Add my own music</button>
+            <input type="file" data-r="mine-file" accept=".musicxml,.mxl,.xml" hidden>
+            <small>A MusicXML file from your notation app. One-line melodies for now. It stays on this device.</small>
+            <div class="err" data-r="mine-err" aria-live="polite"></div>
+            <button type="button" class="lib-mine-rm" data-r="mine-rm" hidden>Remove this tune from this device</button>
+          </div>
         </div>
         <a class="lib-home" data-r="home-b" href="/">← Website</a>
       </div>
@@ -763,6 +774,7 @@ var AAM_TRACK = (function () {
   var cur = null;
   function send(name, p) {
     p.player_version = PLAYER_VERSION; p.who = T.who;
+    if (String(p.tune || "").charAt(0) === "~") { p.tune = "my-music"; ["tune_title", "content_group"].forEach(function (k) { if (k in p) p[k] = "My music"; }); if ("content_id" in p) p.content_id = "my-music"; if ("found" in p) p.found = "my-music"; }   // a student's own file (My music): its name stays on the device
     try {
       var w = window; try { if (typeof w.gtag !== "function" && !w.dataLayer && w.parent !== w && (w.parent.gtag || w.parent.dataLayer)) w = w.parent; } catch (e0) {}   // the demo frame uses the page's Analytics
       if (typeof w.gtag === "function") w.gtag("event", name, p);
@@ -2724,6 +2736,196 @@ function aamBoot(TUNE) {
   var label = "\u2190 " + (STUDENT_HOME_LABEL || (STUDENT_HOME === "/" ? "Website" : "Student login"));
   [].slice.call(document.querySelectorAll('#aam-play [data-r="home-a"], #aam-play [data-r="home-b"]')).forEach(function (a) { a.href = STUDENT_HOME; a.textContent = label; });
 })();
+// ---------- My music (test copy only until Alex has tried it): a MusicXML file from the student's own device becomes a tune.
+// Nothing is uploaded. The file is read here, in the browser, and the tune is kept in this browser's own storage ("aam-mymusic").
+// Its slug starts with "~" and is a random id, and Analytics is told only "my-music": never the file's name or title.
+// First step (23 Nov): one-line melodies in treble clef, in 2/4, 3/4 or 4/4. A file it cannot read whole is refused with the reason.
+var AAM_MINE = (function () {
+  var KEY = "aam-mymusic", PDF = "~my";
+  var plain = function (m) { var e = new Error(m); e.plain = true; return e; };
+  function read() { try { var v = JSON.parse(localStorage.getItem(KEY) || "null"); if (v && v.order && v.tunes) return v; } catch (e) {} return { order: [], tunes: {} }; }
+  function write(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) { throw plain("This device has no room left for another tune. Remove one of your own tunes first."); } }
+  // ---- a compressed file (.mxl) is a zip: find the score inside it and unpack it with the browser's own tools
+  function unzip(buf) {
+    var b = new Uint8Array(buf), dv = new DataView(buf), eo = -1, dec = new TextDecoder("utf-8");
+    for (var i = b.length - 22; i >= Math.max(0, b.length - 66000); i--) if (dv.getUint32(i, true) === 0x06054b50) { eo = i; break; }
+    if (eo < 0) throw plain("That compressed file could not be opened. Export it again as MusicXML.");
+    var n = dv.getUint16(eo + 10, true), p = dv.getUint32(eo + 16, true), files = [];
+    for (var k = 0; k < n && dv.getUint32(p, true) === 0x02014b50; k++) {
+      var nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true);
+      files.push({ name: dec.decode(b.subarray(p + 46, p + 46 + nl)), method: dv.getUint16(p + 10, true), size: dv.getUint32(p + 20, true), at: dv.getUint32(p + 42, true) });
+      p += 46 + nl + el + cl;
+    }
+    var get = function (f) {
+      var o = f.at, data = b.subarray(o + 30 + dv.getUint16(o + 26, true) + dv.getUint16(o + 28, true)).subarray(0, f.size);
+      if (f.method === 0) return Promise.resolve(dec.decode(data));
+      if (f.method !== 8 || !window.DecompressionStream) return Promise.reject(plain("This browser cannot open a compressed file (.mxl). Export it as uncompressed MusicXML (.musicxml)."));
+      return new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).text();
+    };
+    var named = function (nm) { return files.filter(function (f) { return f.name === nm; })[0]; };
+    var box = named("META-INF/container.xml");
+    return (box ? get(box) : Promise.resolve("")).then(function (c) {
+      var m = /full-path="([^"]+)"/.exec(c), f = (m && named(m[1])) || files.filter(function (x) { return /\.(musicxml|xml)$/i.test(x.name) && !/^META-INF\//.test(x.name); })[0];
+      if (!f) throw plain("There is no score inside that compressed file. Export it again as MusicXML.");
+      return get(f);
+    });
+  }
+  // ---- MusicXML -> a tune in the player's own format (the same shape tools/publish_exercise.py writes)
+  var STEP = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }, FLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+  var MAJ = ["Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#", "C#"], MIN = ["Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#", "C#", "G#", "D#", "A#"];
+  var LEN16 = { 1: "/", 2: "", 3: "3/2", 4: "2", 6: "3", 7: "7/2", 8: "4", 12: "6", 14: "7", 16: "8" };     // sixteenths -> the length written after a note (the unit is an eighth)
+  var TRIP = { "16th": "/", eighth: "", quarter: "2" };
+  function parse(text, fileName) {
+    var doc = new DOMParser().parseFromString(text, "application/xml");
+    if (doc.querySelector("parsererror") || !doc.querySelector("score-partwise")) throw plain("That is not a MusicXML score. In your notation app choose Export, then MusicXML.");
+    var part = doc.querySelector("score-partwise > part"); if (!part) throw plain("That score has no music in it.");
+    var one = function (el, sel) { var e = el && el.querySelector(sel); return e ? e.textContent.trim() : ""; };
+    var nparts = doc.querySelectorAll("score-partwise > part").length;
+    var pname = one(doc, 'score-part[id="' + part.getAttribute("id") + '"] > part-name') + " " + one(doc, 'score-part[id="' + part.getAttribute("id") + '"] instrument-name');
+    if (part.querySelector("staves") && +one(part, "staves") > 1 || part.querySelector("note > staff") && [].some.call(part.querySelectorAll("note > staff"), function (s) { return s.textContent.trim() !== "1"; }))
+      throw plain("That score has two staves (a piano part). For now the player reads one-line melodies; piano scores are the next step.");
+    if (part.querySelector("backup")) throw plain("That part has two voices on one staff. For now the player reads one melody line at a time.");
+    var div = 1, bpb = 0, fifths = null, minor = false, chrom = 0, tempo = 0, notes = [], warn = [];
+    var bars = [], abc = [], marks = [], ev = [], held = null, grace = 0, stacked = 0;
+    var measures = [].slice.call(part.children).filter(function (m) { return m.tagName === "measure"; });
+    if (measures.length > 200) throw plain("That score is " + measures.length + " bars long. The longest the player takes is 200.");
+    var ks = {}, prev = {}, cur = {}, alt = {};
+    var spell = function (step, a, oct) {                    // an accidental is written when it differs from the key or from earlier in the bar, and is restated in the next bar
+      var k = ks[step] || 0, id = step + oct, pre = "";
+      if (a !== (id in cur ? cur[id] : k) || (step in prev && prev[step] !== a && !(id in cur))) pre = { "-2": "__", "-1": "_", "0": "=", "1": "^", "2": "^^" }[a];
+      cur[id] = a; if (a !== k) alt[step] = a;
+      var o = oct - 3; return pre + (o <= 1 ? step + new Array(2 - o).join(",") : step.toLowerCase() + new Array(o - 1).join("'"));
+    };
+    var rests = function (beats) {                           // a stretch of silence as rests, longest first
+      var s = [], left = Math.round(beats * 4); [16, 12, 8, 6, 4, 3, 2, 1].forEach(function (v) { while (left >= v) { s.push("z" + LEN16[v]); left -= v; } }); return s.join(" ");
+    };
+    measures.forEach(function (m, mi) {
+      var no = m.getAttribute("number") || (mi + 1), t = 0, s = "", mk = "", items = [], trip = 0, last = null;
+      prev = alt; cur = {}; alt = {};
+      [].forEach.call(m.children, function (el) {
+        if (el.tagName === "attributes") {
+          if (el.querySelector("divisions")) div = +one(el, "divisions") || 1;
+          var k = el.querySelector("key");
+          if (k) {
+            var f = +one(k, "fifths"), mn = one(k, "mode") === "minor";
+            if (fifths !== null && f !== fifths) throw plain("The key changes at bar " + no + ". For now the player reads music that stays in one key.");
+            if (isNaN(f) || f < -7 || f > 7) throw plain("The key signature at bar " + no + " is one the player cannot read.");
+            fifths = f; minor = mn; ks = {};
+            "FCGDAEB".slice(0, Math.max(f, 0)).split("").forEach(function (l) { ks[l] = 1; }); "BEADGCF".slice(0, Math.max(-f, 0)).split("").forEach(function (l) { ks[l] = -1; });
+          }
+          var tm = el.querySelector("time");
+          if (tm) {
+            var nb = +one(tm, "beats"), bt = +one(tm, "beat-type");
+            if (bt !== 4 || [2, 3, 4].indexOf(nb) < 0) throw plain("This music is in " + one(tm, "beats") + "/" + one(tm, "beat-type") + ". For now the player reads 2/4, 3/4 and 4/4.");
+            if (bpb && nb !== bpb) throw plain("The time signature changes at bar " + no + ". For now the player reads music that stays in one meter.");
+            bpb = nb;
+          }
+          var cl = el.querySelector("clef > sign"); if (cl && cl.textContent.trim() !== "G") throw plain("This part is not in treble clef. For now the player reads treble clef.");
+          var tr = el.querySelector("transpose"); if (tr) chrom = (+one(tr, "chromatic") || 0) + 12 * (+one(tr, "octave-change") || 0);
+        } else if (el.tagName === "direction" || el.tagName === "sound") {
+          var so = el.tagName === "sound" ? el : el.querySelector("sound[tempo]"), pm = one(el, "metronome > per-minute");
+          if (!tempo && so && +so.getAttribute("tempo")) tempo = +so.getAttribute("tempo");
+          if (!tempo && pm && +pm && one(el, "metronome > beat-unit") === "quarter" && !el.querySelector("metronome > beat-unit-dot")) tempo = +pm;
+        } else if (el.tagName === "forward") {
+          items.push({ rest: true, d: (+one(el, "duration") || 0) / div });
+        } else if (el.tagName === "note") {
+          if (el.querySelector("grace")) { grace++; return; }
+          if (el.querySelector("cue")) return;
+          var isRest = !!el.querySelector("rest"), d = (+one(el, "duration") || 0) / div, it = { rest: isRest, d: d };
+          if (!isRest) {
+            var st = one(el, "pitch > step"), a = Math.round(+one(el, "pitch > alter") || 0), oc = +one(el, "pitch > octave");
+            if (!(st in STEP) || isNaN(oc) || a < -2 || a > 2) throw plain("Bar " + no + " has a note the player cannot read (an unpitched or percussion note).");
+            it.step = st; it.alt = a; it.oct = oc; it.midi = 12 * (oc + 1) + STEP[st] + a;
+            it.tie = [].some.call(el.querySelectorAll("tie"), function (x) { return x.getAttribute("type") === "start"; });
+          }
+          var tmod = el.querySelector("time-modification");
+          if (tmod) {
+            if (one(tmod, "actual-notes") !== "3" || one(tmod, "normal-notes") !== "2" || !(one(el, "type") in TRIP) || el.querySelector("dot")) throw plain("Bar " + no + " has a tuplet the player cannot read yet. Plain triplets are fine.");
+            it.trip = one(el, "type");
+          }
+          if (el.querySelector("chord")) {                    // a chord: the melody is its top note
+            stacked++; if (last && !last.rest && !isRest && it.midi > last.midi) { it.d = last.d; it.trip = last.trip; items[items.length - 1] = it; last = it; }
+            return;
+          }
+          items.push(it); last = it;
+        }
+      });
+      if (!bpb) throw plain("This score does not say what its time signature is.");
+      if (fifths === null) { fifths = 0; }
+      var total = items.reduce(function (x, i) { return x + i.d; }, 0), pad = 0, tail = 0;
+      if (Math.abs(total - bpb) > 0.01) {
+        if (total < bpb - 0.01 && mi === 0) pad = bpb - total;                                    // a pick-up bar: rests fill the front of it
+        else if (total < bpb - 0.01 && mi === measures.length - 1) tail = bpb - total;            // the short last bar that answers a pick-up
+        else throw plain("Bar " + no + " adds up to " + (Math.round(total * 100) / 100) + " beats, not " + bpb + ". Check that bar in your notation app.");
+        if (Math.abs(Math.round((pad + tail) * 4) - (pad + tail) * 4) > 0.01) throw plain("Bar " + no + " is a pick-up of a length the player cannot read.");
+      }
+      if (pad) { s = rests(pad) + " "; t = pad; }
+      for (var i = 0; i < items.length; i++) {
+        var it = items[i], onBeat = Math.abs(t - Math.round(t)) < 0.01;
+        if (it.trip && !trip) {                               // three notes of a triplet, written together
+          var g = items.slice(i, i + 3);
+          if (g.length < 3 || g.some(function (x) { return x.trip !== it.trip; })) throw plain("Bar " + no + " has a triplet the player cannot read yet (three equal notes are fine).");
+          s += (s && !/ $/.test(s) ? " " : "") + "(3"; trip = 3;
+        } else if (!trip && s && !/ $/.test(s) && (onBeat || it.d >= 1 || it.rest)) s += " ";      // notes are beamed beat by beat
+        var len;
+        if (trip) len = TRIP[it.trip];
+        else { var q = it.d * 4; len = LEN16[Math.round(q)]; if (len === undefined || Math.abs(q - Math.round(q)) > 0.01) throw plain("Bar " + no + " has a note length the player cannot read yet (shorter than a sixteenth note, or a double dot)."); }
+        if (it.rest) { s += "z" + len; held = null; }
+        else {
+          s += spell(it.step, it.alt, it.oct) + len + (it.tie ? "-" : ""); mk += ".";
+          var snd = it.midi + chrom;
+          if (held && held[1] === snd) held[2] = Math.round((held[2] + it.d) * 1e4) / 1e4;         // the second half of a tie: one long sound
+          else { held = [Math.round((bars.length * bpb + t) * 1e4) / 1e4, snd, Math.round(it.d * 1e4) / 1e4, 90]; ev.push(held); }
+          if (!it.tie) held = null;
+        }
+        if (trip && !--trip) s += " ";
+        t += it.d;
+      }
+      if (tail) s += " " + rests(tail);
+      abc.push(s.replace(/\s+/g, " ").trim() || "z" + LEN16[bpb * 4]); marks.push(mk); bars.push(null);
+    });
+    if (!ev.length) throw plain("That score has no notes in it.");
+    var low = Math.min.apply(null, ev.map(function (e) { return e[1] - chrom; })), high = Math.max.apply(null, ev.map(function (e) { return e[1] - chrom; }));
+    if (low < 52 || high > 96) throw plain("These notes go too far off the treble staff for the player to show them clearly.");
+    var c = chrom, nm = pname.toLowerCase(), inst = c === -9 ? "alto" : c === -21 ? "bari" : c === -14 ? "tenor" : c === -2 ? (/trumpet|cornet/.test(nm) ? "trumpet" : /sopran/.test(nm) ? "soprano" : "clarinet")
+      : c === 0 ? (/flute/.test(nm) ? "flute" : /piano|keyboard/.test(nm) ? "piano" : "") : null;
+    if (inst === null) throw plain("This part is written for a transposing instrument the player does not know yet. Saxophones, clarinet, trumpet, flute and concert-pitch parts are fine.");
+    var wpc = ((fifths * 7) % 12 + 12 + (minor ? 9 : 0)) % 12, cpc = ((wpc + c) % 12 + 12) % 12;
+    var chord = { sym: FLAT[cpc] + (minor ? "m" : ""), beats: bpb, root: cpc, degs: minor ? [0, 2, 3, 5, 7, 8, 10] : [0, 2, 4, 5, 7, 9, 11], scale: minor ? "Aeolian (natural minor)" : "Ionian (major)" };
+    var title = (one(doc, "work > work-title") || one(doc, "movement-title") || one(doc, "credit > credit-words") || String(fileName || "").replace(/\.[a-z]+$/i, "") || "My tune").replace(/\s+/g, " ").slice(0, 60);
+    var T = Math.max(40, Math.min(200, Math.round(tempo) || 80));
+    if (nparts > 1) notes.push("This score has " + nparts + " parts. The player took the first one.");
+    if (part.querySelector("repeat, ending")) notes.push("Repeats are not followed yet: the music plays straight through.");
+    if (stacked) notes.push("Chords were read as their top note.");
+    if (grace) notes.push("Grace notes were left out.");
+    var tune = { format: "aam-tune/1", slug: "", mine: true, title: title, subtitle: bars.length + " bars · " + bpb + "/4", concert_key: chord.sym, native: ((-c) % 12 + 12) % 12, style: "click", keys: "off",
+      hide: ["chords", "solo", "names"], hear: true, first_bar: 1, chart_tempo: T, tempo_presets: [Math.max(40, Math.round(T * 0.6)), Math.max(40, Math.round(T * 0.8)), T], form: [],
+      bars: bars.map(function () { return [chord]; }),
+      sections: [{ id: "notes", title: "Notes", tab: "Notes", desc: "Your own music, kept on this device", rh: ev, lh: [], abc: { rh: abc, marks: marks } }],
+      notation: { key: (minor ? MIN : MAJ)[fifths + 7] + (minor ? "m" : ""), staves: "treble" } };
+    if (notes.length) tune.sections[0].desc += ". " + notes.join(" ").replace(/\.$/, "");      // what was left out is said under the music
+    if (inst) tune.instrument = inst;
+    if (bpb !== 4) tune.meter = [bpb, 4];
+    return { tune: tune, notes: notes };
+  }
+  return {
+    PDF: PDF, read: read, parse: parse,
+    is: function (slug) { return String(slug || "").charAt(0) === "~"; },
+    add: function (file) {                                   // -> Promise of { slug, notes }
+      if (file.size > 3 * 1048576) return Promise.reject(plain("That file is too large to be a single piece of music."));
+      return file.arrayBuffer().then(function (buf) {
+        var b = new Uint8Array(buf);
+        return b[0] === 0x50 && b[1] === 0x4b ? unzip(buf) : new TextDecoder("utf-8").decode(b);
+      }).then(function (text) {
+        var r = parse(text, file.name), v = read(), slug;
+        do { slug = "~" + Math.random().toString(36).slice(2, 8); } while (v.tunes[slug]);
+        r.tune.slug = slug; v.tunes[slug] = r.tune; v.order.push(slug); write(v);
+        return { slug: slug, notes: r.notes, bars: r.tune.bars.length };
+      });
+    },
+    remove: function (slug) { var v = read(); delete v.tunes[slug]; v.order = v.order.filter(function (s) { return s !== slug; }); write(v); }
+  };
+})();
 // ---------- the library: which tunes this device has unlocked, the code screen, and the My tunes menu
 // (runs once the whole page has loaded, so the Catalog widget can sit above or below the Player widget)
 function aamLibrary() {
@@ -2898,6 +3100,13 @@ function aamLibrary() {
     $("i-close").onclick = function () { dlg.hidden = true; };
     dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.hidden = true; });
   })();
+  function addMine() {                                    // the student's own imported tunes: a free shelf at the end, on this device only
+    if (DEMO) return;
+    var v = AAM_MINE.read(), order = v.order.filter(function (s) { return v.tunes[s] && v.tunes[s].bars; });
+    CAT.pdfs = CAT.pdfs.filter(function (p) { return p.id !== AAM_MINE.PDF; });
+    order.forEach(function (s) { CAT.tunes[s] = v.tunes[s]; });
+    if (order.length) CAT.pdfs.push({ id: AAM_MINE.PDF, title: "My music", hash: "", free: true, tunes: order });
+  }
   var go = function (slug) { if (DEMO) { try { window.parent.aamDemoGo(slug); } catch (e) {} return; } location.href = urlFor(slug); };
 
   function menu(current) {
@@ -2916,10 +3125,32 @@ function aamLibrary() {
       });
     });
     $("lib-list").innerHTML = html || '<div class="lib-pdf">No tunes yet</div>';
+    var rm = $("mine-rm"); if (rm) { rm.hidden = !AAM_MINE.is(current); rm.dataset.slug = current || ""; }
     [].forEach.call(root.querySelectorAll(".lib-tune"), function (b) { b.onclick = function () { if (b.dataset.slug !== current) go(b.dataset.slug); else open(false); }; });
   }
   function open(on) { $("lib-menu").hidden = !on; $("lib-btn").setAttribute("aria-expanded", on ? "true" : "false"); if (on) $("add-err").textContent = ""; }
   $("lib-btn").onclick = function (e) { e.stopPropagation(); open($("lib-menu").hidden); };
+  (function () {                                          // My music: in the test copy only, until Alex has tried it with real files
+    var box = $("mine"), file = $("mine-file"), err = $("mine-err"), rm = $("mine-rm");
+    if (!box || DEMO || !canStore || PLAYER_VERSION !== "test copy") return;
+    box.hidden = false;
+    $("mine-btn").onclick = function () { err.textContent = ""; file.value = ""; file.click(); };
+    file.onchange = function () {
+      var f = file.files && file.files[0]; if (!f) return;
+      err.textContent = "Reading…";
+      AAM_MINE.add(f).then(function (r) {
+        AAM_TRACK.event("aam_my_music", { how: /\.mxl$/i.test(f.name) ? "mxl" : "musicxml", bars: r.bars });
+        addMine(); go(r.slug);
+      }).catch(function (e) { err.textContent = e && e.plain ? e.message : "That file could not be read (" + ((e && e.message) || e) + ")."; });
+    };
+    rm.onclick = function () {
+      var slug = rm.dataset.slug; if (!slug || !window.confirm("Remove this tune from this device? The file you added it from is not touched.")) return;
+      try { AAM_MINE.remove(slug); } catch (e) {}
+      addMine(); lib.last = null; save();
+      var to = (myPdfs()[0] || { tunes: [] }).tunes[0];
+      if (to) go(to); else location.href = location.pathname + (TESTQ ? "?" + TESTQ.slice(1) : "");
+    };
+  })();
   document.addEventListener("click", function (e) { if (!$("lib").contains(e.target)) open(false); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") open(false); });
   function codeForm(form, input, err, onOk) {
@@ -3117,7 +3348,7 @@ function aamLibrary() {
   }
   ready = loadSources();
   var q = new URLSearchParams(location.search), want = (DEMO && DEMO.tune) || q.get("tune") || q.get("t"), code = DEMO ? null : q.get("code") || q.get("c"); wantPdf = !DEMO && q.get("pdf") === "1"; wantTour = !DEMO && q.get("tour") === "1";   // QR codes use the short t= and c=
-  ready.then(function () { return code ? check(code) : null; }).then(function (r) {
+  ready.then(function () { addMine(); return code ? check(code) : null; }).then(function (r) {
     if (r) { grant(r); keep(code, r); }
     if (!want && r && r !== "all") want = r.tunes[0];
     if (!want) want = lib.last && mine(lib.last) ? lib.last : (myPdfs()[0] || {}).tunes ? myPdfs()[0].tunes[0] : null;
