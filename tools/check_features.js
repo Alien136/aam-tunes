@@ -341,6 +341,10 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     expect(!ids.some(id => /^waltz/.test(id)), "style: a tune in 4/4 is not offered a waltz");
     const WALTZ = "going-home-alto-arpeggios", html = await page.content();
     const TESTCOPY = /var PLAYER_VERSION = "test copy"/.test(html), isBeta = id => new RegExp("\\b" + id + ":\\s*\\{ name: \"[^\"]+\", beta: true").test(html);
+    if (html.includes('jballad:')) {                          // Jazz Ballad (24 Nov): offered in the test copy; in a released copy only once its beta flag is gone
+      const wantJB = TESTCOPY || !isBeta("jballad");
+      expect(ids.includes("jballad") === wantJB, "jazz ballad: " + (wantJB ? "in" : "not in") + " the style picker of a 4/4 band tune (" + ids.join(", ") + ")");
+    }
     if (html.includes('soul:')) {                             // "band_new": a tune moves to a new style only where that style is released (beta styles: the test copy)
       await page.goto(URL_OF("cold-duck-time-alto")); await page.waitForTimeout(2200);
       const want = TESTCOPY || !isBeta("soul") ? "Soul Jazz" : "Bossa Nova", got = await page.textContent('[data-r="style-btn"]');

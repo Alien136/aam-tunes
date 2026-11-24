@@ -659,3 +659,19 @@ Everything needed to carry on from any conversation is in this repository and in
   they differ, rhythm read from the picture and checked by arithmetic), with the doubtful bars listed for Alex; step 3, a publisher
   for two-hand piano scores into the player; then the upload path (needs a server or a queue: the player is a static page and the
   engines need minutes of computing per page).
+
+## 2026-11-24 · Beta: Jazz Ballad band style (nightly builder)
+- Roadmap row 1.5, picked by rule 3 (Tuesday: top Player row; none In progress, 1.5 is the top Queued one).
+- `BAND.jballad` ("Jazz Ballad", group Jazz, `beta: true`): `sw` triplet swing like Medium Swing; bass rule `two` (root on 1, fifth on 3, every
+  second bar a step into the next chord on 4); drums: ride at about half the Two-Feel's loudness with the skip notes left to chance, hi-hat
+  on 2 and 4, a feathered kick on 1 and 3, soft snare notes on 2 and 4 (and sometimes the "and" of 3) standing in for brush strokes, studio
+  kit only; comping: whole-bar chords, or a chord on 1 and a second on the "and" of 3, or a short push on 4.
+- Sources opened: Piano With Jonny, "How to Play a Two-Feel Bass Line on Piano" (half notes, root on 1, a chord tone on 3, a quarter note
+  into the next root); MusicRadar / Computer Music, "How to program a jazzy beat using brushed drum samples" (pedalled hi-hat on 2 and 4, a
+  very quiet kick on every beat); Drumeo, "A Drummer's Guide To Jazz" (triplet-based eighths, brushes used on ballads); BYU Percussion,
+  "Brushes" (ballads: both hands stir the drum). None of them gives a tempo or a ballad comping rule: the piano part is a judgement call.
+- The kit has no brushes (`sounds/v2` is a stick kit). A real brush sweep waits for the sound-set row (3.6).
+- It sits last in `BAND` on purpose (after `soul`): the ballad check counts sounds in a fixed window and is sensitive to picker order.
+- Check: `style` group, "jazz ballad: in / not in the style picker" (in the test copy; in a released copy only once `beta` is gone). Broken on
+  purpose (style moved to an unknown group): the group fails. The generic "each style sounds" step covers its sound.
+- NOT judged by ear. Alex listens in beta (any 4/4 band tune, style button under the title, Jazz Ballad), then remove `beta: true`.

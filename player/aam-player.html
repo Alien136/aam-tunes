@@ -842,7 +842,7 @@ function aamBoot(TUNE) {
   // played by the one generic scheduler (bandParts / the block after comping() in scheduleMusic). To add a style: add an entry here.
   //   sw     ticks an off-beat eighth is late (PPQ / 6 = triplet swing, 0 = even eighths)
   //   drums  one list per bar, cycled: [sound, beat, loudness, classic-kit dB (null = studio sounds only), chance (default 1)]
-  //   bass   "walk" | "two" | "bossa" | "tumbao" | "boogie"   (rules in bandParts)
+  //   bass   "walk" | "two" | "bossa" | "tumbao" | "boogie" | "soul" | "waltz"   (rules in bandParts)
   //                              comp   one list per bar for a chord that lasts the bar, cycled: [beat, length]
   //   half   the same for a chord that lasts half a bar   kit    extra drum sounds this style needs loaded
   //   beta   true = in the picker of the test copy only. Remove it when Alex has listened and said yes.
@@ -918,7 +918,19 @@ function aamBoot(TUNE) {
                       [["hhc", 0, 0.5, null], ["hhc", 0.5, 0.34, null], ["hhc", 1, 0.48, null], ["hhc", 1.5, 0.34, null], ["hhc", 2, 0.5, null], ["hhc", 2.5, 0.34, null], ["hhc", 3, 0.48, null], ["hhc", 3.5, 0.36, null],
                        ["hh", 1, 0.6, -3], ["hh", 3, 0.6, -3], ["kick", 0, 0.62, -9], ["kick", 1.5, 0.46, -13], ["kick", 2, 0.5, -11], ["snare", 1, 0.66, null], ["snare", 3, 0.7, null], ["snare", 3.5, 0.3, null, 0.3]]],
               comp: [[[1.5, 0.4], [2.5, 0.4]], [[0, 0.5], [1.5, 0.4], [3.5, 0.4]]],
-              half: [[[0, 0.45], [1.5, 0.4]]] }
+              half: [[[0, 0.45], [1.5, 0.4]]] },
+    // Jazz Ballad (beta, 24 Nov): a slow swing ballad. Sources checked: Piano With Jonny, "How to Play a Two-Feel Bass Line" (half notes,
+    // root on 1, a chord tone on 3, now and then a quarter note into the next root) and MusicRadar / Computer Music, "How to program a
+    // jazzy beat using brushed drum samples" (pedalled hi-hat on 2 and 4, a very quiet kick on every beat, the snare carrying the time);
+    // Drumeo, "A Drummer's Guide To Jazz" (triplet-based eighths; brushes are used for ballads). The kit has no brushes yet (row 3.6), so
+    // the brush strokes on 2 and 4 are very soft snare notes, studio sounds only, and the ride is barely there.
+    jballad: { name: "Jazz Ballad", beta: true, group: "Jazz", sw: Math.round(PPQ / 6), note: "Slow and soft: bass in two, quiet cymbal, long held chords",
+              bass: "two",
+              drums: [[["ride", 0, 0.3, -12], ["ride", 1, 0.38, -10], ["ride", 1.5, 0.22, -15, 0.5], ["ride", 2, 0.3, -12], ["ride", 3, 0.38, -10], ["ride", 3.5, 0.22, -15, 0.7],
+                       ["hh", 1, 0.5, -7], ["hh", 3, 0.5, -7], ["kick", 0, 0.24, -20], ["kick", 2, 0.22, -20],
+                       ["snare", 1, 0.2, null], ["snare", 3, 0.22, null], ["snare", 2.5, 0.14, null, 0.25]]],
+              comp: [[[0, 3.8]], [[0, 2.4], [2.5, 1.4]], [[0, 3.8]], [[0, 1.6], [3, 0.95]]],
+              half: [[[0, 1.9]], [[0, 1.4]]] }
   };
   var bandFits = function (id) { return !!BAND[id] && (BAND[id].m || 4) === BPB; };          // a style and a tune must count the same number of beats
   var BAND_GROUPS = ["Jazz", "Latin", "Blues", "Pop"];
