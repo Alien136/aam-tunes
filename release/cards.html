@@ -106,16 +106,17 @@ var FLUTE_BOX = [-2.1, 2.5, -0.95, 13.35];
 var FLUTE_FING = {"60":[["C","Cs","L1","L2","L3","R1","R2","R3","T"],"RH pinky: both low keys"],"61":[["Cs","L1","L2","L3","R1","R2","R3","T"],"RH pinky: low C♯ key"],"62":[["L1","L2","L3","R1","R2","R3","T"],"RH pinky up"],"63":[["Eb","L1","L2","L3","R1","R2","R3","T"],""],"64":[["Eb","L1","L2","L3","R1","R2","T"],""],"65":[["Eb","L1","L2","L3","R1","T"],""],"66":[["Eb","L1","L2","L3","R3","T"],"RH ring finger"],"67":[["Eb","L1","L2","L3","T"],""],"68":[["Eb","Gs","L1","L2","L3","T"],"LH pinky: G♯ key"],"69":[["Eb","L1","L2","T"],""],"70":[["Eb","L1","R1","T"],"B plus RH index"],"71":[["Eb","L1","T"],""],"72":[["Eb","L1"],"Thumb off"],"73":[["Eb"],"Only the RH pinky"],"74":[["L2","L3","R1","R2","R3","T"],"LH index up, pinky up"],"75":[["Eb","L2","L3","R1","R2","R3","T"],"LH index up"],"76":[["Eb","L1","L2","L3","R1","R2","T"],""],"77":[["Eb","L1","L2","L3","R1","T"],""],"78":[["Eb","L1","L2","L3","R3","T"],"RH ring finger"],"79":[["Eb","L1","L2","L3","T"],""],"80":[["Eb","Gs","L1","L2","L3","T"],"LH pinky: G♯ key"],"81":[["Eb","L1","L2","T"],""],"82":[["Eb","L1","R1","T"],"B plus RH index"],"83":[["Eb","L1","T"],""],"84":[["Eb","L1"],"Thumb off"],"85":[["Eb"],"Only the RH pinky"],"86":[["Eb","L2","L3","T"],"LH 2 and 3, no right-hand fingers"],"87":[["Eb","Gs","L1","L2","L3","R1","R2","R3","T"],"Every finger, plus the G♯ key"],"88":[["Eb","L1","L2","R1","R2","T"],""],"89":[["Eb","L1","L3","R1","T"],"LH middle finger up"],"90":[["Eb","L1","L3","R3","T"],"LH middle finger up"],"91":[["Eb","L1","L2","L3"],"Thumb off"]};
 /* FINGERINGS:END */
 (function () {
-  var CARDS_VERSION = "v1.5.1 · 2026-11-23 09:55 UTC (after 189f1c7)";                          // stamped when a version is released
+  var CARDS_VERSION = "v1.5.2 · 2026-11-24 00:31 UTC (after 7178009)";                          // stamped when a version is released
   var root = document.getElementById("aam-cards"), $ = function (k) { return root.querySelector('[data-c="' + k + '"]'); };
   var rnd = function (n) { return Math.floor(Math.random() * n); };
   var shuffle = function (a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = rnd(i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
 
   // ---------- what there is to choose
-  var INSTS = [["piano", "Piano"], ["alto", "Alto", "Alto saxophone"], ["tenor", "Tenor", "Tenor saxophone"], ["flute", "Flute"], ["other", "Other", "Another instrument"]];
+  var INSTS = [["piano", "Piano"], ["alto", "Alto", "Alto saxophone"], ["tenor", "Tenor", "Tenor saxophone"], ["flute", "Flute"], ["clarinet", "Clarinet", "B♭ clarinet"]];      // Clarinet took the place of Other (Alex, 23 Nov 2026); its fingering cards come with the clarinet booklet
+  var TREBLE_ONLY = { alto: 1, tenor: 1, flute: 1, clarinet: 1 };
   var FGS = { alto: { keys: SAX_KEYS, box: SAX_BOX, fing: SAX_FING, split: 6.6 }, tenor: { keys: SAX_KEYS, box: SAX_BOX, fing: SAX_FING, split: 6.6 }, flute: { keys: FLUTE_KEYS, box: FLUTE_BOX, fing: FLUTE_FING, split: 6.4 } };
   var MODES = { name: "Name the note", key: "Find the key", fing: "Find the fingering", staff: "Find it on the staff" };
-  var MODES_FOR = { piano: ["name", "key", "staff"], alto: ["name", "fing", "staff"], tenor: ["name", "fing", "staff"], flute: ["name", "fing", "staff"], other: ["name"] };
+  var MODES_FOR = { piano: ["name", "key", "staff"], alto: ["name", "fing", "staff"], tenor: ["name", "fing", "staff"], flute: ["name", "fing", "staff"], clarinet: ["name"] };
   var LEVELS = [null,
     { name: "Easy", n: 2, note: "Notes on the lines and spaces. Two answers.", treble: [64, 77], bass: [43, 57] },
     { name: "Medium", n: 3, note: "Adds notes just above and below the staff. Three answers.", treble: [60, 81], bass: [40, 60] },
@@ -129,6 +130,7 @@ var FLUTE_FING = {"60":[["C","Cs","L1","L2","L3","R1","R2","R3","T"],"RH pinky: 
   try { var m0 = JSON.parse(localStorage.getItem(KEY) || "null"); if (m0 && m0.set) { mem.set = Object.assign(mem.set, m0.set); mem.best = m0.best || {}; mem.miss = m0.miss || {}; } } catch (e) {}
   var save = function () { try { localStorage.setItem(KEY, JSON.stringify(mem)); } catch (e) {} };
   var S = mem.set;
+  if (!MODES_FOR[S.inst]) S.inst = "piano";                 // a device that last used an instrument no longer offered (Other) starts on Piano
   var track = function (name, p) {                          // an anonymous count, when the website has Analytics
     try { p.cards_version = CARDS_VERSION; if (typeof window.gtag === "function") window.gtag("event", name, p); else if (window.dataLayer && window.dataLayer.push) window.dataLayer.push(Object.assign({ event: name }, p)); } catch (e) {}
   };
@@ -141,7 +143,7 @@ var FLUTE_FING = {"60":[["C","Cs","L1","L2","L3","R1","R2","R3","T"],"RH pinky: 
   var abcOf = function (n) { var b = n.m - n.a, o = Math.floor(b / 12) - 1, L = LET[b % 12], acc = n.a > 0 ? "^" : n.a < 0 ? "_" : ""; return acc + (o >= 5 ? L.toLowerCase() + Array(o - 4).join("'") : L + Array(5 - o).join(",")); };
   var idOf = function (n) { return n.clef + ":" + n.m + ":" + n.a; };
   function pool() {                                         // every note this round can ask
-    var L = LEVELS[S.level], fg = FGS[S.inst], clefs = fg ? ["treble"] : S.clef === "both" ? ["treble", "bass"] : [S.clef], out = [];
+    var L = LEVELS[S.level], fg = FGS[S.inst], clefs = TREBLE_ONLY[S.inst] ? ["treble"] : S.clef === "both" ? ["treble", "bass"] : [S.clef], out = [];
     clefs.forEach(function (clef) {
       for (var m = L[clef][0]; m <= L[clef][1]; m++) {
         if (fg && S.mode !== "name" && !fg.fing[m]) continue;                 // a fingering card needs a fingering
@@ -205,13 +207,13 @@ var FLUTE_FING = {"60":[["C","Cs","L1","L2","L3","R1","R2","R3","T"],"RH pinky: 
     el.innerHTML = ""; el.style.setProperty("--k", items.length);
     items.forEach(function (it) { var b = document.createElement("button"); b.type = "button"; b.textContent = it[1]; if (it[2]) b.setAttribute("aria-label", it[2]); b.dataset.id = it[0]; b.setAttribute("aria-pressed", String(it[0]) === String(cur)); b.onclick = function () { pick(it[0]); }; el.appendChild(b); });
   }
-  var bestKey = function () { return [S.inst, S.mode, FGS[S.inst] ? "treble" : S.clef, S.level, S.round].join("|"); };
+  var bestKey = function () { return [S.inst, S.mode, TREBLE_ONLY[S.inst] ? "treble" : S.clef, S.level, S.round].join("|"); };
   function setup() {
     if (MODES_FOR[S.inst].indexOf(S.mode) < 0) S.mode = "name";
     seg($("inst"), INSTS, S.inst, function (v) { S.inst = v; setup(); });
     seg($("mode"), MODES_FOR[S.inst].map(function (m) { return [m, MODES[m]]; }), S.mode, function (v) { S.mode = v; setup(); });
     // the Clef row stays on screen for every instrument, so the box keeps one size (Alex, 23 Nov 2026); saxophones and flute read treble clef only
-    if (FGS[S.inst]) seg($("clef"), [["treble", "Treble", "Treble clef: the clef this instrument reads"]], "treble", function () {});
+    if (TREBLE_ONLY[S.inst]) seg($("clef"), [["treble", "Treble", "Treble clef: the clef this instrument reads"]], "treble", function () {});
     else seg($("clef"), [["treble", "Treble"], ["bass", "Bass"], ["both", "Both"]], S.clef, function (v) { S.clef = v; setup(); });
     seg($("level"), [1, 2, 3, 4].map(function (l) { return [l, LEVELS[l].name]; }), S.level, function (v) { S.level = +v; setup(); });
     $("level-note").textContent = LEVELS[S.level].note;

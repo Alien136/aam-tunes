@@ -10,6 +10,14 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+
+### Fixed
+
+### Prevented
+
+## v1.5.2 · 2026-11-24
+
+### Added
 - Theory flash cards: **Clarinet** takes the place of Other (treble clef, Name the note). Fingering cards for clarinet come with the clarinet booklet.
 - Beta (test copy only, until Alex has listened): a **Jazz Ballad** band style in the Jazz group: the bass in two (half notes, now and then a step into the next chord), a very quiet ride cymbal, hi-hat on 2 and 4, soft snare strokes on 2 and 4 standing in for brushes, and long held piano chords, with swung (triplet) eighths. Pick it from the style button under the title of any band tune in 4/4.
 
