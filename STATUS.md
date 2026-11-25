@@ -675,3 +675,26 @@ Everything needed to carry on from any conversation is in this repository and in
 - Check: `style` group, "jazz ballad: in / not in the style picker" (in the test copy; in a released copy only once `beta` is gone). Broken on
   purpose (style moved to an unknown group): the group fails. The generic "each style sounds" step covers its sound.
 - NOT judged by ear. Alex listens in beta (any 4/4 band tune, style button under the title, Jazz Ballad), then remove `beta: true`.
+
+## 2026-11-25 · Beta: Gospel Shuffle band style, a 12/8 feel (nightly builder)
+- Roadmap row 1.5, picked by rule 5 (Wednesday is a booklet night, but two booklets wait at Ready for Alex, so no new booklet; the one Player
+  row In progress is 1.5, and its next step was Gospel Shuffle).
+- `BAND.gospel` ("Gospel Shuffle", group Blues, `beta: true`, `kit: ["hhc"]`): the first style whose grid uses thirds of a beat. `swing()` places
+  any beat fraction exactly (only .5 gets `sw`), so `1/3`, `2/3`, `5/3` ... are written as JavaScript fractions in the grid, the comping and the
+  bass. `sw` is triplet swing (PPQ / 6) so the written "Hear it" line swings in the same triplets.
+- Drums: closed hi-hat on all twelve triplets (the beat loudest, the third triplet a little louder than the second), kick on 1 and 3 with a
+  chance pick-up into 3 (bar 1) or into 4 (bar 2), snare on 2 and 4, and now and then a ghost on the last triplet of bar 2.
+- New bass rule `gospel` in `bandParts`: root on 1, the root again on the last triplet of 2, the fifth on 3, the sixth on 4, and the last
+  triplet of 4 a step into the next chord's root. A two-beat chord: root, then that step on its last triplet.
+- Comping: bar A holds chords on 1 and 3 and rolls triplet chords on 2 and 4 (with the backbeat); bar B holds 1 and 3 with a triplet pick-up
+  before each. Off-beat chords are a little louder (the generic scheduler's "push" rule), which here falls on the triplets.
+- Sources opened: The Drum Ninja, "Learn How To Play Blues Drums" (twelve eighths on hi-hat or ride, kick 1 and 3, snare 2 and 4, about 50 bpm);
+  Premier Guitar, Joe Gore, "Your Triplet-Beat Cheat Sheet" (hi-hat on the 12 eighths, kick on the four main beats); PianoGroove, "12/8 Grooves
+  & Rhythms" (eighth-note triplet chords over a repeating bass) and "Slow Blues Bass Lines" (5th, 6th and 7th to outline the 12/8 pulse);
+  Soundbrenner, "Slow blues shuffle" (40 to 70 bpm; it describes a long-short cymbal instead: the sources differ, the twelve-note hi-hat was
+  chosen because it is what "12/8 feel" asks for). None gives a gospel bass rule note by note: the pick-up and the step are a judgement call.
+- It sits last in `BAND` (after `jballad`) for the same reason Jazz Ballad does: the ballad check is sensitive to picker order.
+- Check: `style` group, "gospel shuffle: in / not in the style picker". Broken on purpose (group renamed to one the picker does not know):
+  the group fails. The generic "each style sounds" and "name fits on a phone" steps cover its sound and its name.
+- NOT judged by ear. Alex listens in beta, then remove `beta: true`. A real 12/8 tune (a meter the band does not read yet) is not needed: the
+  style plays a 4/4 tune with each beat felt in three.

@@ -10,6 +10,7 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- Beta (test copy only, until Alex has listened): a **Gospel Shuffle** band style in the Blues group, a slow 12/8 feel: every beat split in three on the hi-hat, kick on 1 and 3, snare on 2 and 4, rolling triplet chords on the piano, a bass that answers with a pick-up on the last triplet and steps into the next chord. The written line swings in the same triplets. Pick it from the style button under the title of any band tune in 4/4, and slow the tempo to about 50 to 70.
 
 ### Fixed
 

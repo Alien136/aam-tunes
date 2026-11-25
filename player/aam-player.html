@@ -842,7 +842,7 @@ function aamBoot(TUNE) {
   // played by the one generic scheduler (bandParts / the block after comping() in scheduleMusic). To add a style: add an entry here.
   //   sw     ticks an off-beat eighth is late (PPQ / 6 = triplet swing, 0 = even eighths)
   //   drums  one list per bar, cycled: [sound, beat, loudness, classic-kit dB (null = studio sounds only), chance (default 1)]
-  //   bass   "walk" | "two" | "bossa" | "tumbao" | "boogie" | "soul" | "waltz"   (rules in bandParts)
+  //   bass   "walk" | "two" | "bossa" | "tumbao" | "boogie" | "soul" | "waltz" | "gospel"   (rules in bandParts)
   //                              comp   one list per bar for a chord that lasts the bar, cycled: [beat, length]
   //   half   the same for a chord that lasts half a bar   kit    extra drum sounds this style needs loaded
   //   beta   true = in the picker of the test copy only. Remove it when Alex has listened and said yes.
@@ -930,7 +930,23 @@ function aamBoot(TUNE) {
                        ["hh", 1, 0.5, -7], ["hh", 3, 0.5, -7], ["kick", 0, 0.24, -20], ["kick", 2, 0.22, -20],
                        ["snare", 1, 0.2, null], ["snare", 3, 0.22, null], ["snare", 2.5, 0.14, null, 0.25]]],
               comp: [[[0, 3.8]], [[0, 2.4], [2.5, 1.4]], [[0, 3.8]], [[0, 1.6], [3, 0.95]]],
-              half: [[[0, 1.9]], [[0, 1.4]]] }
+              half: [[[0, 1.9]], [[0, 1.4]]] },
+    // Gospel Shuffle (beta, 25 Nov): a slow 12/8 feel, every beat split in three. Sources checked: The Drum Ninja, "Learn How To Play Blues
+    // Drums" (12/8: all twelve eighths on the hi-hat or ride, bass drum on 1 and 3, snare on 2 and 4, practised at about 50 bpm); Premier
+    // Guitar, Joe Gore, "Your Triplet-Beat Cheat Sheet" (a hi-hat plays the 12 eighth notes, the kick marks the four main beats); PianoGroove,
+    // "12/8 Grooves & Rhythms" (eighth-note triplet chords in the right hand over a repeating bass) and "Slow Blues Bass Lines" (root, then
+    // the 5th, 6th and 7th to outline the 12/8 pulse); Soundbrenner, "Slow blues shuffle" (about 40 to 70 bpm). Triplet positions are written
+    // as thirds of a beat; the "sw" swings the written line in the same triplets.
+    gospel: { name: "Gospel Shuffle", beta: true, group: "Blues", sw: Math.round(PPQ / 6), note: "Slow 12/8: every triplet on the hi-hat, backbeat on 2 and 4, rolling chords", kit: ["hhc"],
+              bass: "gospel",
+              drums: [[["hhc", 0, 0.52, null], ["hhc", 1/3, 0.3, null], ["hhc", 2/3, 0.36, null], ["hhc", 1, 0.48, null], ["hhc", 4/3, 0.3, null], ["hhc", 5/3, 0.36, null],
+                       ["hhc", 2, 0.52, null], ["hhc", 7/3, 0.3, null], ["hhc", 8/3, 0.36, null], ["hhc", 3, 0.48, null], ["hhc", 10/3, 0.3, null], ["hhc", 11/3, 0.36, null],
+                       ["kick", 0, 0.6, -9], ["kick", 2, 0.54, -10], ["kick", 5/3, 0.36, -14, 0.35], ["snare", 1, 0.62, null], ["snare", 3, 0.68, null]],
+                      [["hhc", 0, 0.52, null], ["hhc", 1/3, 0.3, null], ["hhc", 2/3, 0.36, null], ["hhc", 1, 0.48, null], ["hhc", 4/3, 0.3, null], ["hhc", 5/3, 0.36, null],
+                       ["hhc", 2, 0.52, null], ["hhc", 7/3, 0.3, null], ["hhc", 8/3, 0.36, null], ["hhc", 3, 0.48, null], ["hhc", 10/3, 0.3, null], ["hhc", 11/3, 0.36, null],
+                       ["kick", 0, 0.6, -9], ["kick", 2, 0.54, -10], ["kick", 8/3, 0.36, -14, 0.35], ["snare", 1, 0.62, null], ["snare", 3, 0.68, null], ["snare", 11/3, 0.24, null, 0.3]]],
+              comp: [[[0, 0.95], [1, 0.3], [4/3, 0.3], [5/3, 0.3], [2, 0.95], [3, 0.3], [10/3, 0.3], [11/3, 0.3]], [[0, 1.6], [5/3, 0.3], [2, 1.6], [11/3, 0.3]]],
+              half: [[[0, 0.95], [1, 0.3], [4/3, 0.3], [5/3, 0.3]], [[0, 1.6], [5/3, 0.3]]] }
   };
   var bandFits = function (id) { return !!BAND[id] && (BAND[id].m || 4) === BPB; };          // a style and a tune must count the same number of beats
   var BAND_GROUPS = ["Jazz", "Latin", "Blues", "Pop"];
@@ -2457,6 +2473,14 @@ function aamBoot(TUNE) {
       }
       if (S.bass === "boogie") {                               // root, third, fifth, sixth: one to a beat
         [0, 2, 4, 5].slice(0, c.beats >= 4 ? 4 : 2).forEach(function (d, q) { var n = r + c.degs[c.beats >= 4 ? d : (q ? 4 : 0)]; bass.push({ bar: x.bar, beat: x.beat + q * (c.beats >= 4 ? 1 : 1), midi: n > 52 ? n - 12 : n, len: 0.9, vel: 0.74 + (q % 2 ? 0.05 : 0) }); });
+      }
+      if (S.bass === "gospel") {                               // 12/8: the root, a pick-up on the last triplet of 2, the fifth on 3, the sixth on 4, and the last triplet steps into the next chord
+        var six = r + c.degs[5]; if (six > 52) six -= 12;
+        var into = nr === r ? fifth : nr > r ? nr - 1 : nr + 1;
+        if (c.beats >= 4) bass.push({ bar: x.bar, beat: x.beat, midi: r, len: 1.55, vel: 0.78 }, { bar: x.bar, beat: x.beat + 5/3, midi: r, len: 0.3, vel: 0.56 },
+                                    { bar: x.bar, beat: x.beat + 2, midi: fifth, len: 0.95, vel: 0.72 }, { bar: x.bar, beat: x.beat + 3, midi: six, len: 0.6, vel: 0.66 },
+                                    { bar: x.bar, beat: x.beat + 11/3, midi: into, len: 0.3, vel: 0.6 });
+        else bass.push({ bar: x.bar, beat: x.beat, midi: r, len: Math.max(0.5, c.beats - 0.45), vel: 0.76 }, { bar: x.bar, beat: x.beat + c.beats - 1/3, midi: into, len: 0.3, vel: 0.58 });
       }
       if (S.bass === "tumbao") {                               // the bass plays on the "and" of 2 and on 4, and that 4 already belongs to the next chord
         if (!S._ant) bass.push({ bar: x.bar, beat: x.beat, midi: r, len: Math.min(1.4, c.beats * 0.9), vel: 0.74 });

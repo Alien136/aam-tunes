@@ -345,6 +345,10 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       const wantJB = TESTCOPY || !isBeta("jballad");
       expect(ids.includes("jballad") === wantJB, "jazz ballad: " + (wantJB ? "in" : "not in") + " the style picker of a 4/4 band tune (" + ids.join(", ") + ")");
     }
+    if (html.includes('gospel:')) {                           // Gospel Shuffle (25 Nov): a 12/8 feel; offered in the test copy; in a released copy only once its beta flag is gone
+      const wantGS = TESTCOPY || !isBeta("gospel");
+      expect(ids.includes("gospel") === wantGS, "gospel shuffle: " + (wantGS ? "in" : "not in") + " the style picker of a 4/4 band tune (" + ids.join(", ") + ")");
+    }
     if (html.includes('soul:')) {                             // "band_new": a tune moves to a new style only where that style is released (beta styles: the test copy)
       await page.goto(URL_OF("cold-duck-time-alto")); await page.waitForTimeout(2200);
       const want = TESTCOPY || !isBeta("soul") ? "Soul Jazz" : "Bossa Nova", got = await page.textContent('[data-r="style-btn"]');
