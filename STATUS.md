@@ -698,3 +698,16 @@ Everything needed to carry on from any conversation is in this repository and in
   the group fails. The generic "each style sounds" and "name fits on a phone" steps cover its sound and its name.
 - NOT judged by ear. Alex listens in beta, then remove `beta: true`. A real 12/8 tune (a meter the band does not read yet) is not needed: the
   style plays a 4/4 tune with each beat felt in three.
+
+## 2026-11-26 · Sound set v3, step 1: sources and licences (nightly builder)
+- Roadmap row 3.6. Row 1.5 (band styles) has nothing left to build without Alex: both named styles are in beta and its last step is
+  "tune the styles from Alex's notes", and there are no notes yet. It was set to Ready for Alex and the next Player row was taken:
+  1.6 waits for the clarinet fingering chart, 3.5 (Jazz Waltz) has been live since v1.5 although its row still says Queued, so 3.6.
+- `sounds/v3-sources.md` is the result: what was opened, the licence as each page words it, what is chosen, what is ruled out and
+  why, and the next steps in order. No sound file was downloaded or added; the player is unchanged.
+- Settled: electric bass = Karoryfer Growlybass (CC0); percussion = FreePats World and Rare Percussion (CC0; no cowbell, guiro or timbales).
+- Not settled: the pop kit (Naked Drums, CC BY 4.0, is first choice: its licence file is still to be read), the electric piano
+  (Greg Sullivan E-Pianos, CC BY 3.0, instruments unknown), cowbell / guiro / timbales (VCSL is CC0 but its contents were not seen).
+- Ruled out: the two jRhodes sets and the Rickenbacker bass (non-commercial), AVL Drumkits and Salamander Drumkit (share-alike).
+- Reading other GitHub repositories' pages was refused for most addresses tonight (only the SFZ Instruments site pages and two
+  repository front pages opened). The next step starts by testing whether the workspace can download the Growlybass release.
