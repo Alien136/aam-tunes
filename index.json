@@ -2352,6 +2352,54 @@
    ]
   },
   {
+   "id": "flute-christmas",
+   "title": "Christmas Tunes for Flute",
+   "hash": "0eb8f3c4072b66397db48ae884d201d2b14174381dee4c93db0ac835edb9d6a5",
+   "tunes": [
+    "flute-christmas-jingle-bells",
+    "flute-christmas-jolly-old-saint-nicholas",
+    "flute-christmas-away-in-a-manger",
+    "flute-christmas-silent-night",
+    "flute-christmas-we-wish-you-a-merry-christmas",
+    "flute-christmas-deck-the-halls",
+    "flute-christmas-joy-to-the-world",
+    "flute-christmas-o-come-all-ye-faithful"
+   ],
+   "contents": [
+    {
+     "title": "Eight Christmas tunes",
+     "items": [
+      "flute-christmas-jingle-bells",
+      "flute-christmas-jolly-old-saint-nicholas",
+      "flute-christmas-away-in-a-manger",
+      "flute-christmas-silent-night",
+      "flute-christmas-we-wish-you-a-merry-christmas",
+      "flute-christmas-deck-the-halls",
+      "flute-christmas-joy-to-the-world",
+      "flute-christmas-o-come-all-ye-faithful"
+     ]
+    }
+   ],
+   "file": {
+    "branch": "pdf",
+    "path": "flute-christmas-20261126035433.bin",
+    "name": "Flute_Christmas_Tunes.pdf",
+    "edition": "Edition 1 · November 2026",
+    "size": 1021026,
+    "iv": "00308db40e4738ea73322a2c",
+    "keys": [
+     {
+      "iv": "04bc1ba5f93129dcebe3aa55",
+      "ct": "ade91c0f4688701308fb5285613b75f3446cb80ad5be90bea83948b8beb7c037a2b225927f0fe7ec3549470939bffa16"
+     },
+     {
+      "iv": "144f6cbb81f798cfa5ae4591",
+      "ct": "097a1807432abb52e3e7e34fcd359a4daecf21aa17523c1c3cde1a3a50ee12a0905984c4059d7ff2f3c567560ad0e7b9"
+     }
+    ]
+   }
+  },
+  {
    "id": "demo",
    "title": "Free demo",
    "free": true,
@@ -5094,6 +5142,38 @@
   "be2-8-flute": {
    "title": "Étude 8: Fast Company",
    "subtitle": "Blues Études Vol. 2 · Flute · in the style of Cannonball Adderley"
+  },
+  "flute-christmas-jingle-bells": {
+   "title": "1 · Jingle Bells",
+   "subtitle": "Christmas Tunes for Flute"
+  },
+  "flute-christmas-jolly-old-saint-nicholas": {
+   "title": "2 · Jolly Old Saint Nicholas",
+   "subtitle": "Christmas Tunes for Flute"
+  },
+  "flute-christmas-away-in-a-manger": {
+   "title": "3 · Away in a Manger",
+   "subtitle": "Christmas Tunes for Flute"
+  },
+  "flute-christmas-silent-night": {
+   "title": "4 · Silent Night",
+   "subtitle": "Christmas Tunes for Flute"
+  },
+  "flute-christmas-we-wish-you-a-merry-christmas": {
+   "title": "5 · We Wish You a Merry Christmas",
+   "subtitle": "Christmas Tunes for Flute"
+  },
+  "flute-christmas-deck-the-halls": {
+   "title": "6 · Deck the Halls",
+   "subtitle": "Christmas Tunes for Flute"
+  },
+  "flute-christmas-joy-to-the-world": {
+   "title": "7 · Joy to the World",
+   "subtitle": "Christmas Tunes for Flute"
+  },
+  "flute-christmas-o-come-all-ye-faithful": {
+   "title": "8 · O Come, All Ye Faithful",
+   "subtitle": "Christmas Tunes for Flute"
   }
  }
 }

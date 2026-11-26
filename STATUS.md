@@ -711,3 +711,12 @@ Everything needed to carry on from any conversation is in this repository and in
 - Ruled out: the two jRhodes sets and the Rickenbacker bass (non-commercial), AVL Drumkits and Salamander Drumkit (share-alike).
 - Reading other GitHub repositories' pages was refused for most addresses tonight (only the SFZ Instruments site pages and two
   repository front pages opened). The next step starts by testing whether the workspace can download the Growlybass release.
+
+## 2026-11-26 · Christmas Tunes for Flute, first edition (at Alex's request)
+- New book: `python3 tools/build_christmas.py` writes `tools/out/Flute_Christmas_Tunes.pdf` (11 pages: cover, What's Inside, eight tunes one to a page, a fingering chart of the notes used). Shelf `flute-christmas`, eight tunes `flute-christmas-<name>`; the code is in the project doc only.
+- Tunes, easiest first: Jingle Bells (G), Jolly Old Saint Nicholas (C), Away in a Manger (G), Silent Night (D, in 3/4), We Wish You a Merry Christmas (G), Deck the Halls (F), Joy to the World (D), O Come, All Ye Faithful (G). All inside the Flute Beginner Booklet's notes (low D to upper G).
+- Each page: the notes the tune needs with fingerings, chord symbols, a practice tip, a QR code. The music takes the largest staff size that fits, then the lines are opened up to fill the page.
+- In the player: style "click" with a piano part in `lh` (bass note and chords from the chord symbols, hand labels Flute / Piano), like the Beginner Booklet's finale. Learn mode and the cloud work as on any single-line tune.
+- Sources: melodies checked against "A Collection of Christmas Carols" (B. Bloomfield, public domain, github.com/bbloomf/christmas-carols) and the Mutopia Project; each tune's `src` says which. Wikipedia could not be reached this session.
+- **Not checked against notation:** the Jingle Bells chorus. The 1857 print has a different chorus from the one sung today; the book has today's, written from memory. Its verse follows the 1857 print, which differs slightly from the common sung version in bars 7 and 14.
+- Ours and unplayed: the keys, the easy rhythms (note lengths doubled in Jingle Bells, Jolly Old Saint Nicholas, Joy to the World), every chord and the piano part. Alex to play them through.
