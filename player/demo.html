@@ -22,7 +22,8 @@
     #aam-demo-modal .win { position: relative; width: min(1180px, 100%); height: min(760px, 100%); }
     #aam-demo-modal iframe { display: block; width: 100%; height: 100%; border: 0; border-radius: 16px; background: #e8f5fe; box-shadow: 0 24px 60px rgba(0, 0, 0, .4); }
     #aam-demo-modal .x { position: absolute; top: -14px; right: -14px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: #fff; color: #0f1419; font: 700 18px/36px system-ui, sans-serif; text-align: center; padding: 0; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, .3); }
-    @media (max-width: 620px) { div.aam-demo iframe { height: min(640px, 88vh); border-radius: 14px; } }
+    /* on a phone the band opens in the page and is exactly one screen tall, so the title and the play button are both in view */
+    @media (max-width: 899px) { div.aam-demo iframe { height: 86vh; height: calc(100svh - 20px); max-height: 760px; border-radius: 14px; } div.aam-demo { scroll-margin-top: 10px; } }
     /* on a phone the band takes the whole screen, with one bar on top to go back to the page: nothing of the page can sit over its buttons */
     #aam-demo-modal.full { display: block; padding: 0; background: #e8f5fe; }
     #aam-demo-modal.full .win { display: flex; flex-direction: column; width: 100%; height: 100vh; height: 100dvh; }
@@ -34,8 +35,14 @@
     #aam-demo-modal .intro { height: 100%; border: 0; box-shadow: 0 24px 60px rgba(0, 0, 0, .4); }
     #aam-demo-modal:not(.full) .win.note { width: min(560px, 100%); height: auto; max-height: 100%; }
     .intro .in { max-width: 520px; margin: 0 auto; }
+    /* a host page's own styles for p and button must not reach the note */
+    div.aam-demo .intro p, #aam-demo-modal .intro p { font-size: 15.5px !important; line-height: 1.45 !important; max-width: none !important; }
+    div.aam-demo .intro p.sm, #aam-demo-modal .intro p.sm { font-size: 13px !important; }
+    div.aam-demo .intro button.go, #aam-demo-modal .intro button.go { display: block !important; width: 100% !important; height: auto !important; min-height: 52px !important; padding: 0 20px !important; border-radius: 999px !important; line-height: 52px !important; font-size: 17px !important; box-shadow: none !important; white-space: nowrap !important; }
+    @media (max-width: 899px) { .aam-demo .intro { padding: 18px 18px 18px; } .aam-demo .intro .h { font-size: 21px; margin-bottom: 8px; } .aam-demo .intro p { font-size: 15px; line-height: 1.45; margin-bottom: 10px; }
+      .aam-demo .intro li { padding: 9px 0; font-size: 14.5px; line-height: 1.4; } .aam-demo .intro .sm { font-size: 13px; margin-bottom: 12px; } }
     .intro .k { display: block; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #0f6fb5; margin: 0 0 6px; }
-    .intro h2 { margin: 0 0 10px; padding: 0; font: 700 24px/1.2 "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; color: #0f1419; letter-spacing: normal; text-transform: none; }
+    .intro .h { margin: 0 0 10px; padding: 0; font: 700 24px/1.2 "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; color: #0f1419; letter-spacing: normal; text-transform: none; }
     .intro p { margin: 0 0 16px; padding: 0; font-size: 16px; line-height: 1.5; color: #334155; }
     .intro ol { list-style: none; margin: 0 0 16px; padding: 0; }
     .intro li { display: flex; gap: 12px; align-items: flex-start; margin: 0; padding: 12px 0; border-top: 1px solid #e3eef7; font-size: 15.5px; line-height: 1.45; color: #334155; }
@@ -68,12 +75,16 @@
     '(function n(i){if(i>=s.length)return;var e=document.createElement("script");if(s[i].src){e.src=s[i].src;e.onload=e.onerror=function(){n(i+1)};document.head.appendChild(e)}else{e.textContent=s[i].textContent;document.body.appendChild(e);n(i+1)}})(0)}' +
     'g(0).then(run,function(){b.textContent="The demo could not load. Check your connection and try again."})})();';
   var active = null;                                         // the card whose band is open
+  function watch(box) {                                      // while the band fills the screen the page can put its own pinned bars away: html.aam-demo-on
+    if (box.aamWatch || !("IntersectionObserver" in window)) return; box.aamWatch = 1;
+    new IntersectionObserver(function (es) { document.documentElement.classList.toggle("aam-demo-on", es[0].intersectionRatio > .6); }, { threshold: [0, .6, 1] }).observe(box);
+  }
   function mount(el, box, note) {                            // put the note or the band where it opens: a window over the page, or the card itself
     var modal = document.getElementById("aam-demo-modal"), spot = modal ? modal.querySelector(".win") : box, old = spot.querySelector("iframe, .intro");
     if (modal) modal.querySelector(".win").classList.toggle("note", !!note);
-    if (old) { old.parentNode.replaceChild(el, old); return; }                // the band after the note, or another tune: same place
+    if (old) { old.parentNode.replaceChild(el, old); if (!modal && window.innerWidth < 900) setTimeout(function () { try { box.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {} }, 60); return; }                // the band after the note, or another tune: same place
     var phone = window.innerWidth < 900;
-    if (phone || box.clientWidth < 720) {                                      // a phone, or a narrow column on a big screen: open over the page
+    if (!phone && box.clientWidth < 720) {                                      // a phone, or a narrow column on a big screen: open over the page
       modal = document.createElement("div"); modal.id = "aam-demo-modal"; if (phone) modal.className = "full";
       modal.innerHTML = '<div class="win' + (note ? " note" : "") + '"><button class="x" type="button" aria-label="Close the demo">' + (phone ? "‹ Back to the page" : "×") + "</button></div>";
       document.body.appendChild(modal); modal.querySelector(".win").appendChild(el);   // on the page itself, so no column can clip it
@@ -84,7 +95,8 @@
       return;
     }
     box.replaceChild(el, box.querySelector(".poster"));
-    try { box.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) {}
+    try { box.scrollIntoView({ behavior: "smooth", block: phone ? "start" : "center" }); } catch (e) {}
+    watch(box);
   }
   function frame(slug, box, tour) {
     box = box || active; if (!box) return; active = box;
@@ -98,7 +110,7 @@
   function intro(box) {                                      // first, one note: what a student gets and the order to practice in (Alex, 26 Nov)
     active = box;
     var n = document.createElement("div"); n.className = "intro";
-    n.innerHTML = '<div class="in"><span class="k">How my students practice</span><h2>Every lesson ends with a practice PDF that opens in this player.</h2>' +
+    n.innerHTML = '<div class="in"><span class="k">How my students practice</span><div class="h" role="heading" aria-level="2">Every lesson ends with a practice PDF that opens in this player.</div>' +
       "<p>After each lesson the student gets a custom PDF. Every exercise on it opens right here, so practicing at home is one tap away. This is the order to practice in:</p>" +
       "<ol><li><i>1</i><span><b>Learn the notes</b>The player listens to the instrument and waits for each right note.</span></li>" +
       "<li><i>2</i><span><b>Play along</b>Know the notes? Press play and the band keeps time with you.</span></li>" +

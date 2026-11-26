@@ -515,10 +515,10 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     await page.goto("https://alexattardmusic.com/lessons/?player=test"); await page.click("#aam-demo .poster");
     const note = await page.evaluate(() => { const i = document.querySelector(".intro"); return i ? i.textContent : ""; });
     expect(/Learn the notes/.test(note) && /Play along/.test(note) && /Speed up/.test(note), "demo card: it opens with the note on how students practice (learn, play along, speed up)");
-    await page.click(".intro .go"); await page.waitForSelector("#aam-demo-modal iframe"); await page.waitForTimeout(4200);
+    await page.click(".intro .go"); await page.waitForSelector("#aam-demo iframe"); await page.waitForTimeout(4200);
     const f = page.frames().find(x => x !== page.mainFrame());
-    const fits = await page.evaluate(() => { const m = document.getElementById("aam-demo-modal"), r = m.getBoundingClientRect(), fr = m.querySelector("iframe").getBoundingClientRect(); return m.classList.contains("full") && r.top === 0 && Math.abs(r.height - innerHeight) < 2 && fr.bottom <= innerHeight + 1 && fr.width === innerWidth && document.documentElement.scrollWidth <= innerWidth; });
-    expect(fits, "demo card on a phone: the player fills the screen exactly, with nothing of the page over it");
+    const fits = await page.evaluate(() => { const fr = document.querySelector("#aam-demo iframe").getBoundingClientRect(); return !document.getElementById("aam-demo-modal") && fr.top >= 0 && fr.bottom <= innerHeight + 1 && fr.height > innerHeight * .8 && document.documentElement.scrollWidth <= innerWidth && document.documentElement.classList.contains("aam-demo-on"); });
+    expect(fits, "demo card on a phone: the player opens in the page, one screen tall and all in view, and tells the page it is on screen");
     const playSeen = await f.evaluate(() => { return ['p-play', 'play'].some(n => { const b = document.querySelector('[data-r="' + n + '"]'); if (!b) return false; const r = b.getBoundingClientRect(); return r.width > 0 && r.bottom <= innerHeight && r.top > 0; }); });
     expect(playSeen, "demo card on a phone: the play button is on screen");
     expect(await f.evaluate(() => !!document.querySelector(".tour")), "demo card: the tour starts after the note"); await f.click('.tour [data-tour="skip"]');
