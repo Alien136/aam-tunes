@@ -23,6 +23,27 @@
     #aam-demo-modal iframe { display: block; width: 100%; height: 100%; border: 0; border-radius: 16px; background: #e8f5fe; box-shadow: 0 24px 60px rgba(0, 0, 0, .4); }
     #aam-demo-modal .x { position: absolute; top: -14px; right: -14px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: #fff; color: #0f1419; font: 700 18px/36px system-ui, sans-serif; text-align: center; padding: 0; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, .3); }
     @media (max-width: 620px) { div.aam-demo iframe { height: min(640px, 88vh); border-radius: 14px; } }
+    /* on a phone the band takes the whole screen, with one bar on top to go back to the page: nothing of the page can sit over its buttons */
+    #aam-demo-modal.full { display: block; padding: 0; background: #e8f5fe; }
+    #aam-demo-modal.full .win { display: flex; flex-direction: column; width: 100%; height: 100vh; height: 100dvh; }
+    #aam-demo-modal.full iframe, #aam-demo-modal.full .intro { flex: 1 1 auto; min-height: 0; height: auto; border-radius: 0; box-shadow: none; }
+    #aam-demo-modal.full .x { position: static; flex: none; width: 100%; height: 44px; border-radius: 0; background: #0f1419; color: #fff; font: 600 15px/44px "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; text-align: left; padding: 0 16px; box-shadow: none; }
+    /* the note before the band opens: how a student uses the player */
+    .aam-demo .intro, #aam-demo-modal .intro { box-sizing: border-box; display: block; width: 100%; overflow: auto; padding: 26px 24px 24px; border: 1px solid #cfe6f7; border-radius: 16px; background: #fff; color: #0f1419;
+      font: 400 16px/1.5 "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; text-align: left; letter-spacing: normal; text-transform: none; }
+    #aam-demo-modal .intro { height: 100%; border: 0; box-shadow: 0 24px 60px rgba(0, 0, 0, .4); }
+    #aam-demo-modal:not(.full) .win.note { width: min(560px, 100%); height: auto; max-height: 100%; }
+    .intro .in { max-width: 520px; margin: 0 auto; }
+    .intro .k { display: block; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #0f6fb5; margin: 0 0 6px; }
+    .intro h2 { margin: 0 0 10px; padding: 0; font: 700 24px/1.2 "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; color: #0f1419; letter-spacing: normal; text-transform: none; }
+    .intro p { margin: 0 0 16px; padding: 0; font-size: 16px; line-height: 1.5; color: #334155; }
+    .intro ol { list-style: none; margin: 0 0 16px; padding: 0; }
+    .intro li { display: flex; gap: 12px; align-items: flex-start; margin: 0; padding: 12px 0; border-top: 1px solid #e3eef7; font-size: 15.5px; line-height: 1.45; color: #334155; }
+    .intro li b { display: block; color: #0f1419; font-weight: 700; }
+    .intro li i { flex: none; width: 28px; height: 28px; border-radius: 50%; background: #1d9bf0; color: #fff; font: 700 14px/28px "Inter", system-ui, sans-serif; text-align: center; font-style: normal; }
+    .intro .sm { font-size: 13.5px; color: #536471; margin: 0 0 18px; }
+    .intro .go { display: block; width: 100%; min-height: 52px; margin: 0; padding: 0 20px; border: 0; border-radius: 999px; background: #1d9bf0; color: #fff; font: 700 17px/52px "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; text-align: center; cursor: pointer; box-shadow: 0 6px 16px rgba(29, 155, 240, .35); letter-spacing: normal; text-transform: none; }
+    .intro .go:hover, .intro .go:focus-visible { background: #0f8be0; color: #fff; outline: none; }
   </style>
   <button class="poster" type="button" aria-label="Try the play-along band">
     <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></span>
@@ -47,26 +68,45 @@
     '(function n(i){if(i>=s.length)return;var e=document.createElement("script");if(s[i].src){e.src=s[i].src;e.onload=e.onerror=function(){n(i+1)};document.head.appendChild(e)}else{e.textContent=s[i].textContent;document.body.appendChild(e);n(i+1)}})(0)}' +
     'g(0).then(run,function(){b.textContent="The demo could not load. Check your connection and try again."})})();';
   var active = null;                                         // the card whose band is open
-  function frame(slug, box) {
-    box = box || active; if (!box) return; active = box;
-    var c = { cta: cfg.cta, cta_label: cfg.cta_label, test: cfg.test, tune: slug || null };
-    var doc = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base target="_top"></head><body style="margin:0;background:#e8f5fe">' +
-      '<div id="aam-boot" style="height:100vh;display:grid;place-items:center;font:500 15px system-ui,sans-serif;color:#536471">Loading the band…</div>' +
-      "<script>window.AAM_DEMO=" + JSON.stringify(c).replace(/</g, "\\u003c") + ";<\/script><script>" + LOADER + "<\/script></body></html>";
-    var f = document.createElement("iframe"); f.title = "Play-along demo"; f.setAttribute("allow", "autoplay"); f.srcdoc = doc;
-    var modal = document.getElementById("aam-demo-modal"), old = (modal || box).querySelector("iframe");
-    if (old) { old.parentNode.replaceChild(f, old); return; }                 // another tune: same place
-    if (window.innerWidth >= 900 && box.clientWidth < 720) {                  // a narrow column on a big screen: open over the page
-      modal = document.createElement("div"); modal.id = "aam-demo-modal";
-      modal.innerHTML = '<div class="win"><button class="x" type="button" aria-label="Close the demo">×</button></div>';
-      document.body.appendChild(modal); modal.querySelector(".win").appendChild(f);   // on the page itself, so no column can clip it
-      var close = function () { if (modal.parentNode) modal.parentNode.removeChild(modal); document.removeEventListener("keydown", esc); };
+  function mount(el, box, note) {                            // put the note or the band where it opens: a window over the page, or the card itself
+    var modal = document.getElementById("aam-demo-modal"), spot = modal ? modal.querySelector(".win") : box, old = spot.querySelector("iframe, .intro");
+    if (modal) modal.querySelector(".win").classList.toggle("note", !!note);
+    if (old) { old.parentNode.replaceChild(el, old); return; }                // the band after the note, or another tune: same place
+    var phone = window.innerWidth < 900;
+    if (phone || box.clientWidth < 720) {                                      // a phone, or a narrow column on a big screen: open over the page
+      modal = document.createElement("div"); modal.id = "aam-demo-modal"; if (phone) modal.className = "full";
+      modal.innerHTML = '<div class="win' + (note ? " note" : "") + '"><button class="x" type="button" aria-label="Close the demo">' + (phone ? "‹ Back to the page" : "×") + "</button></div>";
+      document.body.appendChild(modal); modal.querySelector(".win").appendChild(el);   // on the page itself, so no column can clip it
+      var html = document.documentElement, was = html.style.overflow; html.style.overflow = "hidden";             // the page behind stays still
+      var close = function () { if (modal.parentNode) modal.parentNode.removeChild(modal); html.style.overflow = was; document.removeEventListener("keydown", esc); };
       var esc = function (e) { if (e.key === "Escape") close(); };
       modal.querySelector(".x").onclick = close; modal.addEventListener("click", function (e) { if (e.target === modal) close(); }); document.addEventListener("keydown", esc);
       return;
     }
-    box.replaceChild(f, box.querySelector(".poster"));
+    box.replaceChild(el, box.querySelector(".poster"));
     try { box.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) {}
+  }
+  function frame(slug, box, tour) {
+    box = box || active; if (!box) return; active = box;
+    var c = { cta: cfg.cta, cta_label: cfg.cta_label, test: cfg.test, tune: slug || null, tour: !!tour };
+    var doc = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base target="_top"></head><body style="margin:0;background:#e8f5fe">' +
+      '<div id="aam-boot" style="height:100vh;display:grid;place-items:center;font:500 15px system-ui,sans-serif;color:#536471">Loading the band…</div>' +
+      "<script>window.AAM_DEMO=" + JSON.stringify(c).replace(/</g, "\\u003c") + ";<\/script><script>" + LOADER + "<\/script></body></html>";
+    var f = document.createElement("iframe"); f.title = "Play-along demo"; f.setAttribute("allow", "autoplay"); f.srcdoc = doc;
+    mount(f, box, false);
+  }
+  function intro(box) {                                      // first, one note: what a student gets and the order to practice in (Alex, 26 Nov)
+    active = box;
+    var n = document.createElement("div"); n.className = "intro";
+    n.innerHTML = '<div class="in"><span class="k">How my students practice</span><h2>Every lesson ends with a practice PDF that opens in this player.</h2>' +
+      "<p>After each lesson the student gets a custom PDF. Every exercise on it opens right here, so practicing at home is one tap away. This is the order to practice in:</p>" +
+      "<ol><li><i>1</i><span><b>Learn the notes</b>The player listens to the instrument and waits for each right note.</span></li>" +
+      "<li><i>2</i><span><b>Play along</b>Know the notes? Press play and the band keeps time with you.</span></li>" +
+      "<li><i>3</i><span><b>Speed up</b>Start slow, then raise the tempo a little each day.</span></li></ol>" +
+      '<p class="sm">This free demo has the play-along and the tempo. Learn mode comes with the lesson PDFs.</p>' +
+      '<button class="go" type="button">Start playing</button></div>';
+    n.querySelector(".go").onclick = function () { track("aam_demo_intro", {}); frame(null, box, true); };
+    mount(n, box, true);
   }
   window.aamDemoGo = function (slug) { track("aam_demo_tune", { tune: slug }); frame(slug); };   // the frame asks for another tune
   // A page may hold the loader more than once (Elementor pages often keep one layout for computers and another for phones).
@@ -78,7 +118,7 @@
     b.parentNode.replaceChild(c, b); boxes.push(c);
   });
   boxes.forEach(function (box) {
-    box.querySelector(".poster").onclick = function () { track("aam_demo_start", {}); frame(null, box); };
+    box.querySelector(".poster").onclick = function () { track("aam_demo_start", {}); intro(box); };
   });
 })();
 </script>

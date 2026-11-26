@@ -512,8 +512,16 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     const ctxD = await b.newContext({ ...devices["iPhone 13"] }); await wire(ctxD);
     await ctxD.addInitScript(() => { window.__ev = []; window.gtag = function (a, n, p) { if (a === "event") window.__ev.push(n + (p && p.instrument ? ":" + p.instrument + ":" + (p.where || "") : "")); }; });
     const page = await ctxD.newPage(); page.on("pageerror", e => expect(false, "script error: " + e.message));
-    await page.goto("https://alexattardmusic.com/lessons/?player=test"); await page.click("#aam-demo .poster"); await page.waitForSelector("#aam-demo iframe"); await page.waitForTimeout(3500);
+    await page.goto("https://alexattardmusic.com/lessons/?player=test"); await page.click("#aam-demo .poster");
+    const note = await page.evaluate(() => { const i = document.querySelector(".intro"); return i ? i.textContent : ""; });
+    expect(/Learn the notes/.test(note) && /Play along/.test(note) && /Speed up/.test(note), "demo card: it opens with the note on how students practice (learn, play along, speed up)");
+    await page.click(".intro .go"); await page.waitForSelector("#aam-demo-modal iframe"); await page.waitForTimeout(4200);
     const f = page.frames().find(x => x !== page.mainFrame());
+    const fits = await page.evaluate(() => { const m = document.getElementById("aam-demo-modal"), r = m.getBoundingClientRect(), fr = m.querySelector("iframe").getBoundingClientRect(); return m.classList.contains("full") && r.top === 0 && Math.abs(r.height - innerHeight) < 2 && fr.bottom <= innerHeight + 1 && fr.width === innerWidth && document.documentElement.scrollWidth <= innerWidth; });
+    expect(fits, "demo card on a phone: the player fills the screen exactly, with nothing of the page over it");
+    const playSeen = await f.evaluate(() => { return ['p-play', 'play'].some(n => { const b = document.querySelector('[data-r="' + n + '"]'); if (!b) return false; const r = b.getBoundingClientRect(); return r.width > 0 && r.bottom <= innerHeight && r.top > 0; }); });
+    expect(playSeen, "demo card on a phone: the play button is on screen");
+    expect(await f.evaluate(() => !!document.querySelector(".tour")), "demo card: the tour starts after the note"); await f.click('.tour [data-tour="skip"]');
     const inBar = await f.evaluate(() => { const p = document.querySelector('[data-r="inst-btn"]'); return !!p && !!p.closest(".demo-bar") && p.getBoundingClientRect().width > 40 && !document.querySelector(".demo-inst select") && !document.querySelector('[data-r="gate"]:not([hidden])'); });
     expect(inBar, "demo card: the instrument button sits in the demo's bar, and the tune opened");
     await f.click('[data-r="inst-btn"]'); await page.waitForTimeout(300); await f.click('[data-r="p-insts"] button[data-as="clarinet"]'); await page.waitForTimeout(900);

@@ -3221,7 +3221,7 @@ function aamLibrary() {
                  [['[data-r="p-play"]', '[data-r="play"]'], "Know the notes? Tap <b>Play</b> and play along in time."],
                  [['[data-r="p-bpm"]', '[data-r="tempo"]'], "Start <b>slow</b>. Raise the speed a little each day until it feels easy."],
                  [['[data-r="next-line"]'], "Finished this line? Tap <b>Next</b> for the next one in your booklet."],
-                 [['[data-r="title"]'], "Or tap the <b>title</b> to see the whole list and jump to any line, by number or by name."]]
+                 [DEMO ? ['.demo-chips'] : ['[data-r="title"]'], DEMO ? "Tap a tune here to try another one." : "Or tap the <b>title</b> to see the whole list and jump to any line, by number or by name."]]
       .map(function (st) { return [st[0].map(first).filter(Boolean)[0], st[1]]; }).filter(function (st) { return st[0]; });
     if (!steps.length) return;
     var box = document.createElement("div"), k = -1, cur = null; box.className = "tour"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "A quick tour");
@@ -3329,6 +3329,7 @@ function aamLibrary() {
     else if (wantTour || newcomer) { var f = wantTour; wantTour = false; setTimeout(function () { if ($("toc").hidden) tour(f); }, 1600); }
     AAM_TRACK.who = DEMO ? "visitor" : lib.all ? "teacher" : "student";
     if (DEMO) demoChrome(slug);
+    if (DEMO && DEMO.tour) setTimeout(function () { tour(); }, 1500);      // the demo card asked for the tour: once per device, after its own "how my students practice" note
     var t = CAT.tunes[slug];
     if (t.bars) { aamBoot(t); return; }
     getJSON(t._src, "tunes/" + t._file + ".json").then(function (full) {
