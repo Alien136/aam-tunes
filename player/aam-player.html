@@ -3375,6 +3375,7 @@ function aamLibrary() {
     tidy(); setTimeout(tidy, 400); setTimeout(tidy, 1500);
     if (window.ResizeObserver) { var ro = new ResizeObserver(function () { tidy(); }); ro.observe(chips); ro.observe(bar); [].forEach.call(chips.children, function (b) { ro.observe(b); }); }   // the row gets narrower when the instrument button fills in, and the names change width when the font arrives (Alex's iPhone, 27 Nov: a name was left cut in half)
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(tidy);
+    var tidyEvery = setInterval(function () { if (!bar.isConnected) { clearInterval(tidyEvery); return; } tidy(); }, 600);      // belt and braces: whatever moved the row, it is put right within a moment
     var cta = document.createElement("a"); cta.className = "demo-cta"; cta.target = "_top"; cta.href = DEMO.cta || "/contact/"; cta.textContent = DEMO.cta_label || "Book a free trial lesson";
     cta.onclick = function () { AAM_TRACK.event("aam_demo_cta", { tune: slug, where: "header" }); };
     head.appendChild(cta);
