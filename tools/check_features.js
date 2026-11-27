@@ -532,6 +532,7 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     expect(got.name === "Clarinet" && got.key === "G", "demo card: choosing clarinet rewrites the page for a B♭ instrument (key " + got.key + ")");
     expect(got.ev.includes("aam_instrument:clarinet:demo"), "demo card: Analytics hears which instrument was chosen, and that it was in the demo (" + got.ev.filter(x => /instrument/.test(x)).join(", ") + ")");
     await f.click(".demo-chips button:nth-child(2)"); await page.waitForTimeout(2500);
+    expect(await page.frames().find(x => x !== page.mainFrame()).evaluate(() => !document.querySelector(".tour")), "demo card: the tour does not start again when another tune is opened");
     const f2 = page.frames().find(x => x !== page.mainFrame());
     expect((await f2.textContent('[data-r="inst-name"]')) === "Clarinet", "demo card: the next tune opens written for the same instrument");
     await ctxD.close();

@@ -3335,7 +3335,7 @@ function aamLibrary() {
     else if (wantTour || newcomer) { var f = wantTour; wantTour = false; setTimeout(function () { if ($("toc").hidden) tour(f); }, 1600); }
     AAM_TRACK.who = DEMO ? "visitor" : lib.all ? "teacher" : "student";
     if (DEMO) demoChrome(slug);
-    if (DEMO && DEMO.tour) setTimeout(function () { tour(); }, 1500);      // the demo card asked for the tour: once per device, after its own "how my students practice" note
+    if (DEMO && DEMO.tour && !window.AAM_DEMO_TOURED) { window.AAM_DEMO_TOURED = 1; setTimeout(function () { tour(true); }, 1500); }      // the demo card asked for the tour: every time the card is opened from its "how my students practice" note (a visitor, not a student: Alex, 27 Nov), but not again on each tune
     var t = CAT.tunes[slug];
     if (t.bars) { aamBoot(t); return; }
     getJSON(t._src, "tunes/" + t._file + ".json").then(function (full) {
