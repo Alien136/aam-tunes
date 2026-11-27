@@ -10,6 +10,7 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- **Blues Études Vol. 3 (Cool & West Coast)** in the library: 8 études for alto, tenor and flute (24 tunes, `be3-1-alto` … `be3-8-flute`), with a 2-étude free sample per edition. Locked by each edition's code, so nothing changes for students until Alex gives a code out.
 - Beta (test copy only, until Alex has listened): a **Gospel Shuffle** band style in the Blues group, a slow 12/8 feel: every beat split in three on the hi-hat, kick on 1 and 3, snare on 2 and 4, rolling triplet chords on the piano, a bass that answers with a pick-up on the last triplet and steps into the next chord. The written line swings in the same triplets. Pick it from the style button under the title of any band tune in 4/4, and slow the tempo to about 50 to 70.
 
 ### Fixed

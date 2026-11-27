@@ -2896,6 +2896,150 @@
    "tunes": [
     "f-blues-alto"
    ]
+  },
+  {
+   "id": "be3-alto",
+   "title": "Blues Études Vol. 3 · Alto Sax",
+   "hash": "20fe822474b2d9176a5b720b441a0d10b42cd41debb65f716f8a99cfb3f7de76",
+   "tunes": [
+    "be3-1-alto",
+    "be3-2-alto",
+    "be3-3-alto",
+    "be3-4-alto",
+    "be3-5-alto",
+    "be3-6-alto",
+    "be3-7-alto",
+    "be3-8-alto"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be3-1-alto",
+      "be3-2-alto",
+      "be3-3-alto",
+      "be3-4-alto",
+      "be3-5-alto",
+      "be3-6-alto",
+      "be3-7-alto",
+      "be3-8-alto"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be3-alto-sample",
+   "title": "Blues Études Vol. 3 · Free Sample · Alto Sax",
+   "hash": "73a3d5286054cd8dcd11d6d6bedd4888c6243d2abe6ffdb505519701ce0ac40a",
+   "tunes": [
+    "be3-1-alto",
+    "be3-4-alto"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be3-1-alto",
+      "be3-4-alto"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be3-tenor",
+   "title": "Blues Études Vol. 3 · Tenor Sax",
+   "hash": "9b7bae5592bb7a309fec0222822ddb9304bc09dc03801d1f3ffd4c414624ee86",
+   "tunes": [
+    "be3-1-tenor",
+    "be3-2-tenor",
+    "be3-3-tenor",
+    "be3-4-tenor",
+    "be3-5-tenor",
+    "be3-6-tenor",
+    "be3-7-tenor",
+    "be3-8-tenor"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be3-1-tenor",
+      "be3-2-tenor",
+      "be3-3-tenor",
+      "be3-4-tenor",
+      "be3-5-tenor",
+      "be3-6-tenor",
+      "be3-7-tenor",
+      "be3-8-tenor"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be3-tenor-sample",
+   "title": "Blues Études Vol. 3 · Free Sample · Tenor Sax",
+   "hash": "4d125939dd0a13581c4a6328c847a909c5dbf6f288ba44067bbd6beaacded4ce",
+   "tunes": [
+    "be3-1-tenor",
+    "be3-4-tenor"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be3-1-tenor",
+      "be3-4-tenor"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be3-flute",
+   "title": "Blues Études Vol. 3 · Flute",
+   "hash": "9444a7a0d57a68bc06df7f8be11dbdf53e078bbca5f54531c3c02256b5725537",
+   "tunes": [
+    "be3-1-flute",
+    "be3-2-flute",
+    "be3-3-flute",
+    "be3-4-flute",
+    "be3-5-flute",
+    "be3-6-flute",
+    "be3-7-flute",
+    "be3-8-flute"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be3-1-flute",
+      "be3-2-flute",
+      "be3-3-flute",
+      "be3-4-flute",
+      "be3-5-flute",
+      "be3-6-flute",
+      "be3-7-flute",
+      "be3-8-flute"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be3-flute-sample",
+   "title": "Blues Études Vol. 3 · Free Sample · Flute",
+   "hash": "55720656a441155b236e8b00b2daf972fbe063b4fef28c324f04ff7aa8b1eb59",
+   "tunes": [
+    "be3-1-flute",
+    "be3-4-flute"
+   ],
+   "contents": [
+    {
+     "title": "",
+     "items": [
+      "be3-1-flute",
+      "be3-4-flute"
+     ]
+    }
+   ]
   }
  ],
  "tunes": {
@@ -5174,6 +5318,102 @@
   "flute-christmas-o-come-all-ye-faithful": {
    "title": "8 · O Come, All Ye Faithful",
    "subtitle": "Christmas Tunes for Flute"
+  },
+  "be3-1-alto": {
+   "title": "Étude 1: Dry Wit",
+   "subtitle": "Blues Études Vol. 3 · Alto Sax · in the style of Paul Desmond"
+  },
+  "be3-2-alto": {
+   "title": "Étude 2: Sharp Corners",
+   "subtitle": "Blues Études Vol. 3 · Alto Sax · in the style of Art Pepper"
+  },
+  "be3-3-alto": {
+   "title": "Étude 3: Odd Groupings",
+   "subtitle": "Blues Études Vol. 3 · Alto Sax · in the style of Lee Konitz"
+  },
+  "be3-4-alto": {
+   "title": "Étude 4: Featherweight",
+   "subtitle": "Blues Études Vol. 3 · Alto Sax · in the style of Stan Getz"
+  },
+  "be3-5-alto": {
+   "title": "Étude 5: Easy Drive",
+   "subtitle": "Blues Études Vol. 3 · Alto Sax · in the style of Zoot Sims"
+  },
+  "be3-6-alto": {
+   "title": "Étude 6: Pacific Line",
+   "subtitle": "Blues Études Vol. 3 · Alto Sax · in the style of Bud Shank"
+  },
+  "be3-7-alto": {
+   "title": "Étude 7: Counterline",
+   "subtitle": "Blues Études Vol. 3 · Alto Sax · in the style of Gerry Mulligan"
+  },
+  "be3-8-alto": {
+   "title": "Étude 8: Prairie Blues",
+   "subtitle": "Blues Études Vol. 3 · Alto Sax · in the style of Jimmy Giuffre"
+  },
+  "be3-1-tenor": {
+   "title": "Étude 1: Dry Wit",
+   "subtitle": "Blues Études Vol. 3 · Tenor Sax · in the style of Paul Desmond"
+  },
+  "be3-2-tenor": {
+   "title": "Étude 2: Sharp Corners",
+   "subtitle": "Blues Études Vol. 3 · Tenor Sax · in the style of Art Pepper"
+  },
+  "be3-3-tenor": {
+   "title": "Étude 3: Odd Groupings",
+   "subtitle": "Blues Études Vol. 3 · Tenor Sax · in the style of Lee Konitz"
+  },
+  "be3-4-tenor": {
+   "title": "Étude 4: Featherweight",
+   "subtitle": "Blues Études Vol. 3 · Tenor Sax · in the style of Stan Getz"
+  },
+  "be3-5-tenor": {
+   "title": "Étude 5: Easy Drive",
+   "subtitle": "Blues Études Vol. 3 · Tenor Sax · in the style of Zoot Sims"
+  },
+  "be3-6-tenor": {
+   "title": "Étude 6: Pacific Line",
+   "subtitle": "Blues Études Vol. 3 · Tenor Sax · in the style of Bud Shank"
+  },
+  "be3-7-tenor": {
+   "title": "Étude 7: Counterline",
+   "subtitle": "Blues Études Vol. 3 · Tenor Sax · in the style of Gerry Mulligan"
+  },
+  "be3-8-tenor": {
+   "title": "Étude 8: Prairie Blues",
+   "subtitle": "Blues Études Vol. 3 · Tenor Sax · in the style of Jimmy Giuffre"
+  },
+  "be3-1-flute": {
+   "title": "Étude 1: Dry Wit",
+   "subtitle": "Blues Études Vol. 3 · Flute · in the style of Paul Desmond"
+  },
+  "be3-2-flute": {
+   "title": "Étude 2: Sharp Corners",
+   "subtitle": "Blues Études Vol. 3 · Flute · in the style of Art Pepper"
+  },
+  "be3-3-flute": {
+   "title": "Étude 3: Odd Groupings",
+   "subtitle": "Blues Études Vol. 3 · Flute · in the style of Lee Konitz"
+  },
+  "be3-4-flute": {
+   "title": "Étude 4: Featherweight",
+   "subtitle": "Blues Études Vol. 3 · Flute · in the style of Stan Getz"
+  },
+  "be3-5-flute": {
+   "title": "Étude 5: Easy Drive",
+   "subtitle": "Blues Études Vol. 3 · Flute · in the style of Zoot Sims"
+  },
+  "be3-6-flute": {
+   "title": "Étude 6: Pacific Line",
+   "subtitle": "Blues Études Vol. 3 · Flute · in the style of Bud Shank"
+  },
+  "be3-7-flute": {
+   "title": "Étude 7: Counterline",
+   "subtitle": "Blues Études Vol. 3 · Flute · in the style of Gerry Mulligan"
+  },
+  "be3-8-flute": {
+   "title": "Étude 8: Prairie Blues",
+   "subtitle": "Blues Études Vol. 3 · Flute · in the style of Jimmy Giuffre"
   }
  }
 }
