@@ -11,12 +11,16 @@ PC = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
 KEYSIG = {"F": {"B": -1}, "Bb": {"B": -1, "E": -1}}
 QUAL = {"6": ([0, 2, 4, 5, 7, 9, 9], "Major (6th)"),          # 7th slot holds the 6th, so the piano plays a 6/9 chord under a tonic melody note
         "maj7": ([0, 2, 4, 5, 7, 9, 11], "Ionian (major)"), "": ([0, 2, 4, 5, 7, 9, 11], "Ionian (major)"),
-        "7": ([0, 2, 4, 5, 7, 9, 10], "Mixolydian"), "m7": ([0, 2, 3, 5, 7, 9, 10], "Dorian")}
+        "7": ([0, 2, 4, 5, 7, 9, 10], "Mixolydian"), "m7": ([0, 2, 3, 5, 7, 9, 10], "Dorian"), "m": ([0, 2, 3, 5, 7, 9, 10], "Dorian")}
+TRIAD = [0, 2, 4, 0]          # the piano's four notes for a plain chord: root, 3rd, 5th and the root again. The demo songs use plain major and minor
+                              # chords (Alex, 27 Nov: "Ode to Joy with 7th chords does not sound good"); only the blues riff keeps its 7ths
 
 def chord(sym, beats):
     m = re.match(r"^([A-G])([b#]?)(.*)$", sym); root = (PC[m.group(1)] + {"b": -1, "#": 1, "": 0}[m.group(2)]) % 12
     degs, scale = QUAL[m.group(3)]
-    return {"sym": sym, "beats": beats, "root": root, "degs": degs, "scale": scale}
+    c = {"sym": sym, "beats": beats, "root": root, "degs": degs, "scale": scale}
+    if m.group(3) in ("", "m"): c["voice"] = TRIAD
+    return c
 
 def notes(bar, key, at):
     """One ABC bar -> [[start beat, midi, beats, 90], ...] and the number of notes."""
@@ -46,7 +50,7 @@ def tune(slug, title, sub, key, tempos, bars, chords, desc, style=None, hide=Non
          "sections": [{"id": "melody", "title": tab, "tab": tab, "desc": desc, "rh": rh, "lh": [], "abc": {"rh": bars, "marks": marks}}],
          "notation": {"key": key, "staves": "treble"}, "open_on": "melody", "demo": True}
     if style: t["style"] = style
-    if hide: t["hide"] = hide
+    t["hide"] = hide or ["solo"]          # the blank Solo tab is hidden on every tune
     if reps: t["reps"] = reps
     if feel: t["feel"] = feel
     json.dump(t, open(os.path.join(ROOT, "tunes", slug + ".json"), "w"), ensure_ascii=False)
@@ -54,24 +58,24 @@ def tune(slug, title, sub, key, tempos, bars, chords, desc, style=None, hide=Non
 
 A = ["d2 d2 e2 f2", "f2 e2 d2 c2", "B2 B2 c2 d2"]
 ode = A + ["d3 c c4"] + A + ["c3 B B4", "c2 c2 d2 B2", "c2 de d2 B2", "c2 de d2 c2", "B2 c2 F4"] + A + ["c3 B B4"]
-ode_ch = ["Bb6", "F7", "Bb6", "Cm7/F7", "Bb6", "F7", "Bb6", "F7/Bb6", "F7/Bb6", "F7/Bb6", "F7/Bb6", "C7/F7", "Bb6", "F7", "Bb6", "F7/Bb6"]
+ode_ch = ["Bb", "F", "Bb", "Cm/F", "Bb", "F", "Bb", "F/Bb", "F/Bb", "F/Bb", "F/Bb", "C/F", "Bb", "F", "Bb", "F/Bb"]
 
 saints = ["z2 F2 A2 B2", "c8", "z2 F2 A2 B2", "c8", "z2 F2 A2 B2", "c4 A4", "F4 A4", "G8",
           "z2 A2 A2 G2", "F6 F2", "A4 c4", "c2 B6", "z4 A2 B2", "c4 A4", "F4 G4", "F8"]
-saints_ch = ["F6", "F6", "F6", "F6", "F6", "F6", "F6", "C7", "C7", "F6", "F7", "Bb6", "F6", "F6/D7", "Gm7/C7", "F6"]
+saints_ch = ["F", "F", "F", "F", "F", "F", "F", "C", "C", "F", "F", "Bb", "F", "F/Dm", "Gm/C", "F"]
 
 J = ["A2 A2 A4", "A2 A2 A4", "A2 c2 F3 G", "A8", "B2 B2 B3 B", "B2 A2 A2 AA"]
 jingle = J + ["A2 G2 G2 A2", "G4 c4"] + J + ["c2 c2 B2 G2", "F8"]
-jingle_ch = ["F6", "F6", "F6", "F6/F7", "Bb6", "F6", "G7", "C7", "F6", "F6", "F6", "F6/F7", "Bb6", "F6", "C7", "F6"]
+jingle_ch = ["F", "F", "F", "F", "Bb", "F", "G", "C", "F", "F", "F", "F", "Bb", "F", "C", "F"]
 
 T1 = ["F2 F2 c2 c2", "d2 d2 c4", "B2 B2 A2 A2", "G2 G2 F4"]; T2 = ["c2 c2 B2 B2", "A2 A2 G4"]
 twinkle = T1 + T2 + T2 + T1
-twinkle_ch = ["F6", "Bb6/F6", "Bb6/F6", "C7/F6"] + ["F6/Bb6", "F6/C7"] * 2 + ["F6", "Bb6/F6", "Bb6/F6", "C7/F6"]
+twinkle_ch = ["F", "Bb/F", "Bb/F", "C/F"] + ["F/Bb", "F/C"] * 2 + ["F", "Bb/F", "Bb/F", "C/F"]
 
 auld = ["z6 F2",
         "B3 B B2 d2", "c3 B c2 d2", "B3 B d2 f2", "g6 g2", "f3 d d2 B2", "c3 B c2 d2", "B3 G G2 F2", "B6 g2",
         "f3 d d2 B2", "c3 B c2 g2", "f3 d d2 f2", "g6 b2", "f3 d d2 B2", "c3 B c2 d2", "B3 G G2 F2", "B8"]
-auld_ch = ["F7"] + ["Bb6", "F7", "Bb6/Bb7", "Eb6", "Bb6", "F7", "Cm7/F7", "Bb6"] * 2
+auld_ch = ["F"] + ["Bb", "F", "Bb", "Eb", "Bb", "F", "Cm/F", "Bb"] * 2
 
 made = [
   tune("demo-jingle-bells", "Jingle Bells", "James Pierpont, 1857 · free demo", "F", [140, 100, 176], jingle, jingle_ch, "The chorus, with a band behind you", feel="straight"),
