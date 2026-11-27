@@ -187,6 +187,11 @@ He starts the request with one of two phrases. Neither phrase: treat it as Beta.
 Newest first. One line each: what went wrong or was nearly wrong, and the rule that now prevents it. The builder adds a line when a
 night taught something; the release retro prunes lines that have become checks.
 
+- 2026-11-27 · The demo card was changed on 26 Nov with only `check_features.js --only demo` run; the demo walk in `check_release.js`
+  runs only in a full run (no `--only`) and was left failing on main. After any change to `player/demo.html` or `player/demo-loader.html`,
+  run the full `node tools/check_release.js`, and update its demo walk in the same commit when the card's steps change.
+- 2026-11-27 · The checks need `AAM_CODE` in the background shell too; without it they exit at once with "Set AAM_CODE" and the night
+  loses the time. Read the first lines of both logs a few seconds after starting them.
 - 2026-11-23 · The "main as found" checks take 8 minutes and read the player file on every page, so editing while they run mixes two
   players in one result. Run them on a clean copy (`git worktree add --detach <dir> HEAD`, `AAM_NODE_MODULES=<repo>/tools/node_modules`),
   build meanwhile, and remove the worktree before the guard.

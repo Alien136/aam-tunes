@@ -720,3 +720,19 @@ Everything needed to carry on from any conversation is in this repository and in
 - Sources: melodies checked against "A Collection of Christmas Carols" (B. Bloomfield, public domain, github.com/bbloomf/christmas-carols) and the Mutopia Project; each tune's `src` says which. Wikipedia could not be reached this session.
 - **Not checked against notation:** the Jingle Bells chorus. The 1857 print has a different chorus from the one sung today; the book has today's, written from memory. Its verse follows the 1857 print, which differs slightly from the common sung version in bars 7 and 14.
 - Ours and unplayed: the keys, the easy rhythms (note lengths doubled in Jingle Bells, Jolly Old Saint Nicholas, Joy to the World), every chord and the piano part. Alex to play them through.
+
+## 2026-11-27 · A failing check on main: the release check's demo-card walk (nightly builder)
+- Picked by rule 2. Main as found: `check_features.js` clear (213), `check_release.js` 2 problems: "laptop demo card" and "phone demo card",
+  both "did not work: page.waitForSelector: Timeout". Cause: the 26 Nov demo commits put a note ("How my students practice", button
+  "Start playing") between the poster and the band and updated `check_features.js`, but not the demo walk in `check_release.js`.
+- Fix, in `tools/check_release.js` only: after the poster, wait for the note or the band; tap `.intro .go` when it is there (an older
+  copy of the card has none); the band's frame is looked for in the card or in the window over the page (`#aam-demo-modal`).
+- The demo itself was not changed. Lesson added to BUILDER.md.
+- **Parked, not on main: Sound set v3, step 2 (electric bass).** It was built and partly checked tonight before the failing check came
+  to light (the first as-found run had no master code and exited at once). One job a night, so it is not on main: it is on the branch
+  `builder/ebass-step2`, one commit on top of tonight's main: `sounds/v3/` (84 electric bass files from Karoryfer Growlybass, CC0, and
+  their list), the `v3` block in `tools/build_sounds.py`, the player's on-demand loader (`ebass: true` on a style, or `&bass=electric`
+  in the test copy), five "electric bass" lines in the `style` check group (the group passed, 41 of 41; the full checks were NOT run
+  on it), and its own STATUS / CHANGELOG / README text. Next Player night on row 3.6: `git merge --ff-only origin/builder/ebass-step2`
+  (or cherry-pick it), fix the date and "picked by" line of its STATUS section, run both full checks and the guard, push to main,
+  then delete the branch. Do not rebuild it from scratch.

@@ -15,6 +15,7 @@ moves that block under the new version when Alex says "ship".
 ### Fixed
 
 ### Prevented
+- The release check's walk through the public demo card (tap the card, the band opens, it plays, nothing is cut off) was failing on main as found on 27 Nov: since 26 Nov the card opens with a note on how students practice, and the check still expected the band straight away. A release review would have stopped on it, and until then nothing was checking that the demo opens and plays at laptop and phone size. The check now taps "Start playing" first. Nothing was wrong with the demo itself.
 
 ## v1.5.2 · 2026-11-24
 

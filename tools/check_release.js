@@ -98,7 +98,9 @@ function inspect() {
       try {
         await page.goto("https://alexattardmusic.com/lessons/");
         await page.click("#aam-demo .poster", { timeout: 15000 });
-        const frame = async () => { await page.waitForSelector("#aam-demo iframe"); const f = page.frames().find(x => x !== page.mainFrame()); await f.waitForSelector("#aam-play.is-open .demo-chips", { timeout: 20000 }); await page.waitForTimeout(500); return f; };
+        await page.waitForSelector(".intro .go, #aam-demo iframe, #aam-demo-modal iframe", { timeout: 15000 });
+        const go = await page.$(".intro .go"); if (go) await go.click();      // since 26 Nov the card opens with a note on how students practice; "Start playing" brings the band. An older copy has no note
+        const frame = async () => { await page.waitForSelector("#aam-demo iframe, #aam-demo-modal iframe"); const f = page.frames().find(x => x !== page.mainFrame()); await f.waitForSelector("#aam-play.is-open .demo-chips", { timeout: 20000 }); await page.waitForTimeout(500); return f; };
         let f = await frame();
         if (await f.$$eval(".demo-chips button", b => b.length) < 5) note("tune buttons missing");
         (await f.evaluate(inspect)).forEach(note);
