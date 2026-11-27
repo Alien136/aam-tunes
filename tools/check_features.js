@@ -514,6 +514,7 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     const page = await ctxD.newPage(); page.on("pageerror", e => expect(false, "script error: " + e.message));
     await page.goto("https://alexattardmusic.com/lessons/?player=test"); await page.click("#aam-demo .poster");
     const note = await page.evaluate(() => { const i = document.querySelector(".intro"); return i ? i.textContent : ""; });
+    expect(await page.evaluate(() => { const im = document.querySelector(".intro img.shot"); return !!im && im.complete && im.naturalWidth > 300; }), "demo card: the note shows a picture of Learn mode");
     expect(/Learn the notes/.test(note) && /Play along/.test(note) && /Speed up/.test(note), "demo card: it opens with the note on how students practice (learn, play along, speed up)");
     await page.click(".intro .go"); await page.waitForSelector("#aam-demo iframe"); await page.waitForTimeout(4200);
     const f = page.frames().find(x => x !== page.mainFrame());
@@ -522,6 +523,8 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
     const playSeen = await f.evaluate(() => { return ['p-play', 'play'].some(n => { const b = document.querySelector('[data-r="' + n + '"]'); if (!b) return false; const r = b.getBoundingClientRect(); return r.width > 0 && r.bottom <= innerHeight && r.top > 0; }); });
     expect(playSeen, "demo card on a phone: the play button is on screen");
     expect(await f.evaluate(() => !!document.querySelector(".tour")), "demo card: the tour starts after the note"); await f.click('.tour [data-tour="skip"]');
+    const chips = await f.evaluate(() => { const c = document.querySelector(".demo-chips"), r = c.getBoundingClientRect(), more = document.querySelector(".demo-more"); const cut = [...c.children].filter(b => { const x = b.getBoundingClientRect(); return !b.classList.contains("part") && (x.left < r.left - 1 || x.right > r.right + 1); }).length; return { cut, whole: [...c.children].filter(b => !b.classList.contains("part")).length, more: !more.hidden }; });
+    expect(chips.cut === 0 && chips.whole >= 1 && chips.more, "demo card on a phone: tune names in the top row show whole or not at all, with an arrow for more (" + chips.whole + " shown)");
     const inBar = await f.evaluate(() => { const p = document.querySelector('[data-r="inst-btn"]'); return !!p && !!p.closest(".demo-bar") && p.getBoundingClientRect().width > 40 && !document.querySelector(".demo-inst select") && !document.querySelector('[data-r="gate"]:not([hidden])'); });
     expect(inBar, "demo card: the instrument button sits in the demo's bar, and the tune opened");
     await f.click('[data-r="inst-btn"]'); await page.waitForTimeout(300); await f.click('[data-r="p-insts"] button[data-as="clarinet"]'); await page.waitForTimeout(900);
