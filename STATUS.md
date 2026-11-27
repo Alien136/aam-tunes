@@ -736,3 +736,22 @@ Everything needed to carry on from any conversation is in this repository and in
   on it), and its own STATUS / CHANGELOG / README text. Next Player night on row 3.6: `git merge --ff-only origin/builder/ebass-step2`
   (or cherry-pick it), fix the date and "picked by" line of its STATUS section, run both full checks and the guard, push to main,
   then delete the branch. Do not rebuild it from scratch.
+
+## 2026-11-27 · Sound set v3, step 2: the electric bass (nightly builder)
+- Roadmap row 3.6. Built on 27 Nov and parked on this branch (that night's one job was a failing check); see the section above. Fix this line's date and rule when it is merged.
+- `sounds/v3/`: `manifest.json` (`version: 3`, `ebass: { notes, layers: 3, rr: 2 }`, its credit) and 84 files `e-<midi>-<layer>-<take>.mp3`
+  from Karoryfer Growlybass (CC0). `<midi>` is the sounding pitch, like the upright's `b-` files. `sounds/v2/` is unchanged.
+- `tools/build_sounds.py v3 <Growlybass folder>` builds it (no argument: v2 as before). It measures each sample's pitch first: the
+  library names its files an octave above the sound, and a wrong table would have put the whole bass an octave out.
+- Player (test copy): `sndFetch(file, json, set)` and `sndLoad(files, set)` take a second folder name; `sndNote("e", ...)` plays the
+  electric bass; `bs()` uses it when `wantsEbass()` (the style's BAND entry has `ebass: true`, or the test copy was opened with
+  `&bass=electric`) and it has arrived, else the upright. `ebassLoad()` fetches `v3/manifest.json`, then one take per note, then the
+  rest, once per page; its credit is added to the sounds credit. `SOUND_EBASS` is read at the top of the file because the address is
+  tidied before the tune opens. `EGAIN = 1.4` (+3 dB) is a guess.
+- To give a style the electric bass (row 3.7): add `ebass: true` to its BAND entry. Nothing else.
+- Checks: `style` group, five "electric bass" lines: the files the list names exist with a CC0 credit; a plain tune fetches nothing
+  from `sounds/v3`; a released copy ignores `&bass=electric`; the test copy with it fetches the folder, plays at least four bass notes
+  on it in nine seconds (counted as the one-channel sounds 3.5 s long, which only the electric bass has: keep that length unique) and
+  shows its credit. Broken on purpose (the "test copy only" condition removed): "a released copy ignores" fails.
+- NOT judged by ear. Next: step 3, percussion from the FreePats pack (conga, bongos, claves, shaker, tambourine) into `sounds/v3`
+  with a `perc` block, on the pattern of the drums.

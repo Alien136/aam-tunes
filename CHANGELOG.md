@@ -10,6 +10,7 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- Beta (test copy only): the band has an **electric bass** on file (a Squier Jazz Bass, free to use, 14 notes in three loudness layers and two takes). No style uses it yet: it is there for the Pop, Funk, Salsa and Reggae styles to come, and the player fetches it only when a style asks, so nothing extra is downloaded by anyone today. To hear it, Alex adds `&bass=electric` to a band tune's link in the test copy: every style then plays its bass line on the electric bass. A released player ignores that.
 - Beta (test copy only, until Alex has listened): a **Gospel Shuffle** band style in the Blues group, a slow 12/8 feel: every beat split in three on the hi-hat, kick on 1 and 3, snare on 2 and 4, rolling triplet chords on the piano, a bass that answers with a pick-up on the last triplet and steps into the next chord. The written line swings in the same triplets. Pick it from the style button under the title of any band tune in 4/4, and slow the tempo to about 50 to 70.
 
 ### Fixed

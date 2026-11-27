@@ -1,0 +1,33 @@
+{
+ "version": 3,
+ "ebass": {
+  "notes": [
+   25,
+   28,
+   30,
+   33,
+   36,
+   39,
+   42,
+   45,
+   48,
+   51,
+   54,
+   57,
+   60,
+   63
+  ],
+  "layers": 3,
+  "rr": 2
+ },
+ "credits": [
+  {
+   "what": "Electric bass",
+   "name": "Growlybass",
+   "by": "Karoryfer Samples",
+   "licence": "CC0 1.0",
+   "url": "https://github.com/sfzinstruments/karoryfer.growlybass",
+   "changes": "three of four layers, two of four takes, trimmed, MP3"
+  }
+ ]
+}

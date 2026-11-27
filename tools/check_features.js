@@ -349,6 +349,29 @@ const want = k => !ONLY || ONLY === k, WRONG = /^(You played \S+\. This note|Rig
       const wantGS = TESTCOPY || !isBeta("gospel");
       expect(ids.includes("gospel") === wantGS, "gospel shuffle: " + (wantGS ? "in" : "not in") + " the style picker of a 4/4 band tune (" + ids.join(", ") + ")");
     }
+    if (html.includes("ebassLoad")) {                         // the electric bass (27 Nov): a second sound folder, sounds/v3, fetched only when a style asks for it
+      const V3 = path.join(ROOT, "sounds", "v3"), man = fs.existsSync(path.join(V3, "manifest.json")) ? JSON.parse(fs.readFileSync(path.join(V3, "manifest.json"), "utf8")) : null, miss = [];
+      if (man && man.ebass) for (const m of man.ebass.notes) for (let l = 1; l <= man.ebass.layers; l++) for (let r = 1; r <= man.ebass.rr; r++) if (!fs.existsSync(path.join(V3, "e-" + m + "-" + l + "-" + r + ".mp3"))) miss.push("e-" + m + "-" + l + "-" + r);
+      expect(!!(man && man.ebass && man.ebass.notes.length >= 12) && !miss.length && (man.credits || []).some(c => /CC0/.test(c.licence)), "electric bass: every sound the v3 list names is in sounds/v3, with its credit (" + (man ? miss.length + " missing" : "no list") + ")");
+      const run = async (released, extra) => {              // play a band tune for a while: what was fetched from sounds/v3, and how many electric bass notes sounded (they are the only one-channel sounds 3.5 s long)
+        const c = await b.newContext({ ...devices["iPhone 13"] }); await wire(c);
+        if (released) await c.route(/release\/player\.html/, r => r.fulfill({ body: html0.replace('var PLAYER_VERSION = "test copy"', 'var PLAYER_VERSION = "9.9"'), contentType: "text/plain; charset=utf-8", headers: { "access-control-allow-origin": "*" } }));
+        const p = await c.newPage(), got = []; p.on("request", r => { if (/\/sounds\/v3\//.test(r.url())) got.push(r.url().replace(/.*\//, "")); }); p.on("pageerror", e => expect(false, "script error: " + e.message));
+        await p.addInitScript(() => { window.__eb = 0; const o = AudioBufferSourceNode.prototype.start; AudioBufferSourceNode.prototype.start = function () { const u = this.buffer; if (u && u.numberOfChannels === 1 && u.duration > 3.3 && u.duration < 3.7) window.__eb++; return o.apply(this, arguments); }; });
+        await p.goto(URL_OF(TEN) + extra); await p.waitForTimeout(2200); await p.click('[data-r="p-play"]'); await p.waitForTimeout(9000);
+        const out = { got, notes: await p.evaluate(() => window.__eb), credit: await p.evaluate(() => document.querySelector('[data-r="snd-credit"]').textContent) };
+        await c.close(); return out;
+      };
+      const html0 = fs.readFileSync(FILE_OF, "utf8"), plain = await run(false, ""), rel = await run(true, "&bass=electric");
+      expect(plain.got.length === 0 && plain.notes === 0, "electric bass: a tune whose style does not ask for it fetches nothing from sounds/v3 (" + plain.got.length + " files, " + plain.notes + " notes)");
+      expect(rel.got.length === 0 && rel.notes === 0, "electric bass: a released copy ignores ?bass=electric (" + rel.got.length + " files, " + rel.notes + " notes)");
+      if (TESTCOPY) {
+        const el = await run(false, "&bass=electric");
+        expect(el.got.includes("manifest.json") && el.got.filter(f => /^e-\d+-\d-\d\.mp3$/.test(f)).length >= 14, "electric bass: the test copy with ?bass=electric fetches it from sounds/v3 (" + el.got.length + " files)");
+        expect(el.notes >= 4, "electric bass: the test copy with ?bass=electric plays the bass line on it (" + el.notes + " notes in 9 s)");
+        expect(/Growlybass/.test(el.credit) && /Salamander/.test(el.credit), "electric bass: its credit joins the sounds credit (" + el.credit.slice(-60) + ")");
+      }
+    }
     if (html.includes('soul:')) {                             // "band_new": a tune moves to a new style only where that style is released (beta styles: the test copy)
       await page.goto(URL_OF("cold-duck-time-alto")); await page.waitForTimeout(2200);
       const want = TESTCOPY || !isBeta("soul") ? "Soul Jazz" : "Bossa Nova", got = await page.textContent('[data-r="style-btn"]');

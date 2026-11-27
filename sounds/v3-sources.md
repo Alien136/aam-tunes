@@ -39,7 +39,21 @@ avoided: our trimmed MP3s are modified samples and would have to carry the same 
 | SM Drums | Labelled "Public Domain" with no licence text, 2.2 GB on Google Drive: no licence to point to. |
 | G1, L1 (TKDrums), Standard Bass (Unreal Instruments) | "Freemium" / "Custom": no free licence stated. |
 
+## Done: the electric bass (27 Nov 2026)
+
+- The Growlybass zip downloaded from the address above (167,454,256 bytes, SHA-256 `b92dca75494fa39d6e8d8b8addaabfe70c5aaa59b5f9a0f624be6de51a2374bc`).
+- Its `LICENSE` file is the full text of "CC0 1.0 Universal". Its `readme.txt`: "Sample library of a Squier Jazz Bass", "All samples
+  recorded direct, using both pickups and all knobs on 10", "Royalty-free for all commercial and non-commercial use", "Copyright 2014
+  Karoryfer Lecolds". The readme does not say fingers or pick; it has pick-scrape samples, which were not used.
+- What is in it: sustained notes in four layers (pp, p, f, ff) and four takes, staccato notes, release noises and scrapes; 14 pitches,
+  about every third semitone. The files are named an octave above what sounds (`a2` is the open A string, 55 Hz) and `db2` is the E
+  string tuned down to C#. The build measures every pitch and stops if one is not where the table says.
+- Used: sustained notes only, layers p / f / ff, takes 1 and 2, 3.5 seconds each, mono, MP3: 84 files, 2.4 MB, in `sounds/v3/`.
+- Not judged by ear: its loudness against the upright (the player adds 3 dB, a guess) and whether p / f / ff are the right three layers.
+
 ## Next steps, in order
+
+(Step 1 is done, see above. Next is step 2.)
 
 1. Electric bass first, alone: it is small, CC0 and settled. Download the Growlybass zip, read its README and licence file, add a
    `v3` block to `tools/build_sounds.py` on the pattern of the upright bass (every third note, three layers, two takes), write
