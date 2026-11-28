@@ -267,9 +267,15 @@
 #aam-play .demo-cta { flex: none; display: inline-flex; align-items: center; height: 40px; padding: 0 16px; border-radius: 999px; background: #e0475b; color: #fff; font: 600 14px var(--body); text-decoration: none; white-space: nowrap; }
 #aam-play .demo-cta:hover { filter: brightness(1.06); }
 #aam-play .demo-bar { flex: none; display: flex; align-items: center; gap: 10px; margin: 0 0 8px; min-width: 0; }
-#aam-play .demo-chips { flex: 1 1 auto; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px 0; }
+#aam-play .demo-chips { position: relative; flex: 1 1 auto; min-width: 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px 0; scroll-snap-type: x mandatory; scroll-behavior: smooth; overscroll-behavior-x: contain; }
 #aam-play .demo-chips::-webkit-scrollbar { display: none; }
 #aam-play .demo-chips button { flex: none; height: 34px; padding: 0 13px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 500 13.5px var(--body); white-space: nowrap; cursor: pointer; }
+#aam-play .demo-chips button { scroll-snap-align: start; transition: opacity .15s; }
+#aam-play .demo-chips button.part { opacity: 0; pointer-events: none; }          /* a tune name is shown whole or not at all (Alex, 27 Nov) */
+#aam-play .demo-chips.has-more { padding-right: 30px; }
+#aam-play .demo-more { position: relative; z-index: 1; flex: none; display: grid; place-items: center; width: 26px; height: 34px; margin-left: -36px; padding: 0 0 2px; border: 0; border-radius: 8px; background: none; color: var(--accent-text); font: 600 24px/1 var(--body); cursor: pointer; }
+@media (max-width: 520px) { #aam-play .demo-chips button { height: 32px; padding: 0 11px; font-size: 13px; } #aam-play .demo-bar { gap: 8px; } }
+#aam-play .demo-more[hidden] { display: none; }
 #aam-play .demo-chips button[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 #aam-play .demo-inst { flex: none; display: inline-flex; align-items: center; gap: 6px; font: 500 13px var(--body); color: var(--muted, #536471); white-space: nowrap; }
 #aam-play .demo-inst select { height: 34px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 13.5px var(--body); padding: 0 10px; }
@@ -745,7 +751,7 @@ html.aam-full, html.aam-full body { overflow: hidden !important; }
 
 <script>
 // >>> SETTINGS
-var PLAYER_VERSION = "v1.5.2 · 2026-11-24 00:31 UTC (after 7178009)";    // stamped by tools/release.py when a version is released
+var PLAYER_VERSION = "v1.6 · 2026-11-28 01:32 UTC (after 021ca4e)";    // stamped by tools/release.py when a version is released
 var STUDENT_HOME = "https://alexattardmusic.com/student-login/";              // where the "back" link goes: put the address of your student login page here, e.g. "/student-login/"
 var STUDENT_HOME_LABEL = "Student home";         // what the link says. Leave "" for "Student login" (or "Website" while the address above is "/")
 var SAMPLE_BASE = "https://alexattardmusic.com/wp-content/uploads/2026/11/";    // folder with p36.mp3 ... d-ride.mp3 (keep the final "/")
@@ -842,7 +848,7 @@ function aamBoot(TUNE) {
   // played by the one generic scheduler (bandParts / the block after comping() in scheduleMusic). To add a style: add an entry here.
   //   sw     ticks an off-beat eighth is late (PPQ / 6 = triplet swing, 0 = even eighths)
   //   drums  one list per bar, cycled: [sound, beat, loudness, classic-kit dB (null = studio sounds only), chance (default 1)]
-  //   bass   "walk" | "two" | "bossa" | "tumbao" | "boogie"   (rules in bandParts)
+  //   bass   "walk" | "two" | "bossa" | "tumbao" | "boogie" | "soul" | "waltz" | "gospel"   (rules in bandParts)
   //                              comp   one list per bar for a chord that lasts the bar, cycled: [beat, length]
   //   half   the same for a chord that lasts half a bar   kit    extra drum sounds this style needs loaded
   //   beta   true = in the picker of the test copy only. Remove it when Alex has listened and said yes.
@@ -918,7 +924,35 @@ function aamBoot(TUNE) {
                       [["hhc", 0, 0.5, null], ["hhc", 0.5, 0.34, null], ["hhc", 1, 0.48, null], ["hhc", 1.5, 0.34, null], ["hhc", 2, 0.5, null], ["hhc", 2.5, 0.34, null], ["hhc", 3, 0.48, null], ["hhc", 3.5, 0.36, null],
                        ["hh", 1, 0.6, -3], ["hh", 3, 0.6, -3], ["kick", 0, 0.62, -9], ["kick", 1.5, 0.46, -13], ["kick", 2, 0.5, -11], ["snare", 1, 0.66, null], ["snare", 3, 0.7, null], ["snare", 3.5, 0.3, null, 0.3]]],
               comp: [[[1.5, 0.4], [2.5, 0.4]], [[0, 0.5], [1.5, 0.4], [3.5, 0.4]]],
-              half: [[[0, 0.45], [1.5, 0.4]]] }
+              half: [[[0, 0.45], [1.5, 0.4]]] },
+    // Jazz Ballad (beta, 24 Nov): a slow swing ballad. Sources checked: Piano With Jonny, "How to Play a Two-Feel Bass Line" (half notes,
+    // root on 1, a chord tone on 3, now and then a quarter note into the next root) and MusicRadar / Computer Music, "How to program a
+    // jazzy beat using brushed drum samples" (pedalled hi-hat on 2 and 4, a very quiet kick on every beat, the snare carrying the time);
+    // Drumeo, "A Drummer's Guide To Jazz" (triplet-based eighths; brushes are used for ballads). The kit has no brushes yet (row 3.6), so
+    // the brush strokes on 2 and 4 are very soft snare notes, studio sounds only, and the ride is barely there.
+    jballad: { name: "Jazz Ballad", beta: true, group: "Jazz", sw: Math.round(PPQ / 6), note: "Slow and soft: bass in two, quiet cymbal, long held chords",
+              bass: "two",
+              drums: [[["ride", 0, 0.3, -12], ["ride", 1, 0.38, -10], ["ride", 1.5, 0.22, -15, 0.5], ["ride", 2, 0.3, -12], ["ride", 3, 0.38, -10], ["ride", 3.5, 0.22, -15, 0.7],
+                       ["hh", 1, 0.5, -7], ["hh", 3, 0.5, -7], ["kick", 0, 0.24, -20], ["kick", 2, 0.22, -20],
+                       ["snare", 1, 0.2, null], ["snare", 3, 0.22, null], ["snare", 2.5, 0.14, null, 0.25]]],
+              comp: [[[0, 3.8]], [[0, 2.4], [2.5, 1.4]], [[0, 3.8]], [[0, 1.6], [3, 0.95]]],
+              half: [[[0, 1.9]], [[0, 1.4]]] },
+    // Gospel Shuffle (beta, 25 Nov): a slow 12/8 feel, every beat split in three. Sources checked: The Drum Ninja, "Learn How To Play Blues
+    // Drums" (12/8: all twelve eighths on the hi-hat or ride, bass drum on 1 and 3, snare on 2 and 4, practised at about 50 bpm); Premier
+    // Guitar, Joe Gore, "Your Triplet-Beat Cheat Sheet" (a hi-hat plays the 12 eighth notes, the kick marks the four main beats); PianoGroove,
+    // "12/8 Grooves & Rhythms" (eighth-note triplet chords in the right hand over a repeating bass) and "Slow Blues Bass Lines" (root, then
+    // the 5th, 6th and 7th to outline the 12/8 pulse); Soundbrenner, "Slow blues shuffle" (about 40 to 70 bpm). Triplet positions are written
+    // as thirds of a beat; the "sw" swings the written line in the same triplets.
+    gospel: { name: "Gospel Shuffle", beta: true, group: "Blues", sw: Math.round(PPQ / 6), note: "Slow 12/8: every triplet on the hi-hat, backbeat on 2 and 4, rolling chords", kit: ["hhc"],
+              bass: "gospel",
+              drums: [[["hhc", 0, 0.52, null], ["hhc", 1/3, 0.3, null], ["hhc", 2/3, 0.36, null], ["hhc", 1, 0.48, null], ["hhc", 4/3, 0.3, null], ["hhc", 5/3, 0.36, null],
+                       ["hhc", 2, 0.52, null], ["hhc", 7/3, 0.3, null], ["hhc", 8/3, 0.36, null], ["hhc", 3, 0.48, null], ["hhc", 10/3, 0.3, null], ["hhc", 11/3, 0.36, null],
+                       ["kick", 0, 0.6, -9], ["kick", 2, 0.54, -10], ["kick", 5/3, 0.36, -14, 0.35], ["snare", 1, 0.62, null], ["snare", 3, 0.68, null]],
+                      [["hhc", 0, 0.52, null], ["hhc", 1/3, 0.3, null], ["hhc", 2/3, 0.36, null], ["hhc", 1, 0.48, null], ["hhc", 4/3, 0.3, null], ["hhc", 5/3, 0.36, null],
+                       ["hhc", 2, 0.52, null], ["hhc", 7/3, 0.3, null], ["hhc", 8/3, 0.36, null], ["hhc", 3, 0.48, null], ["hhc", 10/3, 0.3, null], ["hhc", 11/3, 0.36, null],
+                       ["kick", 0, 0.6, -9], ["kick", 2, 0.54, -10], ["kick", 8/3, 0.36, -14, 0.35], ["snare", 1, 0.62, null], ["snare", 3, 0.68, null], ["snare", 11/3, 0.24, null, 0.3]]],
+              comp: [[[0, 0.95], [1, 0.3], [4/3, 0.3], [5/3, 0.3], [2, 0.95], [3, 0.3], [10/3, 0.3], [11/3, 0.3]], [[0, 1.6], [5/3, 0.3], [2, 1.6], [11/3, 0.3]]],
+              half: [[[0, 0.95], [1, 0.3], [4/3, 0.3], [5/3, 0.3]], [[0, 1.6], [5/3, 0.3]]] }
   };
   var bandFits = function (id) { return !!BAND[id] && (BAND[id].m || 4) === BPB; };          // a style and a tune must count the same number of beats
   var BAND_GROUPS = ["Jazz", "Latin", "Blues", "Pop"];
@@ -2446,6 +2480,14 @@ function aamBoot(TUNE) {
       if (S.bass === "boogie") {                               // root, third, fifth, sixth: one to a beat
         [0, 2, 4, 5].slice(0, c.beats >= 4 ? 4 : 2).forEach(function (d, q) { var n = r + c.degs[c.beats >= 4 ? d : (q ? 4 : 0)]; bass.push({ bar: x.bar, beat: x.beat + q * (c.beats >= 4 ? 1 : 1), midi: n > 52 ? n - 12 : n, len: 0.9, vel: 0.74 + (q % 2 ? 0.05 : 0) }); });
       }
+      if (S.bass === "gospel") {                               // 12/8: the root, a pick-up on the last triplet of 2, the fifth on 3, the sixth on 4, and the last triplet steps into the next chord
+        var six = r + c.degs[5]; if (six > 52) six -= 12;
+        var into = nr === r ? fifth : nr > r ? nr - 1 : nr + 1;
+        if (c.beats >= 4) bass.push({ bar: x.bar, beat: x.beat, midi: r, len: 1.55, vel: 0.78 }, { bar: x.bar, beat: x.beat + 5/3, midi: r, len: 0.3, vel: 0.56 },
+                                    { bar: x.bar, beat: x.beat + 2, midi: fifth, len: 0.95, vel: 0.72 }, { bar: x.bar, beat: x.beat + 3, midi: six, len: 0.6, vel: 0.66 },
+                                    { bar: x.bar, beat: x.beat + 11/3, midi: into, len: 0.3, vel: 0.6 });
+        else bass.push({ bar: x.bar, beat: x.beat, midi: r, len: Math.max(0.5, c.beats - 0.45), vel: 0.76 }, { bar: x.bar, beat: x.beat + c.beats - 1/3, midi: into, len: 0.3, vel: 0.58 });
+      }
       if (S.bass === "tumbao") {                               // the bass plays on the "and" of 2 and on 4, and that 4 already belongs to the next chord
         if (!S._ant) bass.push({ bar: x.bar, beat: x.beat, midi: r, len: Math.min(1.4, c.beats * 0.9), vel: 0.74 });
         S._ant = false;
@@ -3185,7 +3227,7 @@ function aamLibrary() {
                  [['[data-r="p-play"]', '[data-r="play"]'], "Know the notes? Tap <b>Play</b> and play along in time."],
                  [['[data-r="p-bpm"]', '[data-r="tempo"]'], "Start <b>slow</b>. Raise the speed a little each day until it feels easy."],
                  [['[data-r="next-line"]'], "Finished this line? Tap <b>Next</b> for the next one in your booklet."],
-                 [['[data-r="title"]'], "Or tap the <b>title</b> to see the whole list and jump to any line, by number or by name."]]
+                 [DEMO ? ['.demo-chips'] : ['[data-r="title"]'], DEMO ? "Tap a tune here to try another one." : "Or tap the <b>title</b> to see the whole list and jump to any line, by number or by name."]]
       .map(function (st) { return [st[0].map(first).filter(Boolean)[0], st[1]]; }).filter(function (st) { return st[0]; });
     if (!steps.length) return;
     var box = document.createElement("div"), k = -1, cur = null; box.className = "tour"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "A quick tour");
@@ -3293,6 +3335,7 @@ function aamLibrary() {
     else if (wantTour || newcomer) { var f = wantTour; wantTour = false; setTimeout(function () { if ($("toc").hidden) tour(f); }, 1600); }
     AAM_TRACK.who = DEMO ? "visitor" : lib.all ? "teacher" : "student";
     if (DEMO) demoChrome(slug);
+    if (DEMO && DEMO.tour && !window.AAM_DEMO_TOURED) { window.AAM_DEMO_TOURED = 1; setTimeout(function () { tour(true); }, 1500); }      // the demo card asked for the tour: every time the card is opened from its "how my students practice" note (a visitor, not a student: Alex, 27 Nov), but not again on each tune
     var t = CAT.tunes[slug];
     if (t.bars) { aamBoot(t); return; }
     getJSON(t._src, "tunes/" + t._file + ".json").then(function (full) {
@@ -3309,10 +3352,30 @@ function aamLibrary() {
     root.classList.add("is-demo");
     var bar = document.createElement("div"); bar.className = "demo-bar";
     bar.innerHTML = '<div class="demo-chips">' + p.tunes.map(function (s) { var t = CAT.tunes[s]; return t ? '<button data-slug="' + esc(s) + '"' + (s === slug ? ' aria-current="true"' : "") + ">" + esc(short(t)) + "</button>" : ""; }).join("") + "</div>" +
-      '<span class="demo-inst">I play </span>';              // the instrument button (built with the page text of each tune) sits here
+      '<button class="demo-more" type="button" aria-label="More tunes" hidden>\u203a</button><span class="demo-inst">I play </span>';              // the instrument button (built with the page text of each tune) sits here
     var head = root.querySelector(".head"); head.parentNode.insertBefore(bar, head.nextSibling);
     [].forEach.call(bar.querySelectorAll("[data-slug]"), function (b) { b.onclick = function () { if (b.dataset.slug !== slug) go(b.dataset.slug); }; });
     var ipill = root.querySelector('[data-r="inst-btn"]'); if (ipill) bar.querySelector(".demo-inst").appendChild(ipill);
+    var chips = bar.querySelector(".demo-chips"), more = bar.querySelector(".demo-more"), tidyT = 0;
+    function chipsEnd() { return chips.scrollLeft + chips.clientWidth >= chips.scrollWidth - 2; }
+    function tidy() {                                      // only whole tune names show; the round button brings the next ones (or goes back to the first)
+      var over = chips.scrollWidth - (chips.classList.contains("has-more") ? 30 : 0) > chips.clientWidth + 2; chips.classList.toggle("has-more", over); more.hidden = !over;
+      var c = chips.getBoundingClientRect(), lim = c.right - (over ? 28 : 0);        // the round button sits over the right end of the row
+      [].forEach.call(chips.children, function (b) { var r = b.getBoundingClientRect(), full = r.left >= c.left - 1 && r.right <= lim + 1; b.classList.toggle("part", !full); b.tabIndex = full ? 0 : -1; });
+      more.textContent = chipsEnd() ? "\u2039" : "\u203a"; more.setAttribute("aria-label", chipsEnd() ? "Back to the first tune" : "More tunes");
+    }
+    more.onclick = function () {
+      if (chipsEnd()) { chips.scrollTo({ left: 0, behavior: "smooth" }); return; }
+      var c = chips.getBoundingClientRect(), nx = [].filter.call(chips.children, function (b) { return b.getBoundingClientRect().right > c.right - 27; })[0];
+      if (nx) chips.scrollTo({ left: nx.offsetLeft, behavior: "smooth" });
+    };
+    chips.addEventListener("scroll", function () { cancelAnimationFrame(tidyT); tidyT = requestAnimationFrame(tidy); }, { passive: true });
+    window.addEventListener("resize", tidy);
+    var curChip = chips.querySelector('[aria-current="true"]'); if (curChip && curChip.offsetLeft + curChip.offsetWidth > chips.clientWidth - 30) { chips.style.scrollBehavior = "auto"; chips.scrollLeft = curChip.offsetLeft; chips.style.scrollBehavior = ""; }
+    tidy(); setTimeout(tidy, 400); setTimeout(tidy, 1500);
+    if (window.ResizeObserver) { var ro = new ResizeObserver(function () { tidy(); }); ro.observe(chips); ro.observe(bar); [].forEach.call(chips.children, function (b) { ro.observe(b); }); }   // the row gets narrower when the instrument button fills in, and the names change width when the font arrives (Alex's iPhone, 27 Nov: a name was left cut in half)
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(tidy);
+    var tidyEvery = setInterval(function () { if (!bar.isConnected) { clearInterval(tidyEvery); return; } tidy(); }, 600);      // belt and braces: whatever moved the row, it is put right within a moment
     var cta = document.createElement("a"); cta.className = "demo-cta"; cta.target = "_top"; cta.href = DEMO.cta || "/contact/"; cta.textContent = DEMO.cta_label || "Book a free trial lesson";
     cta.onclick = function () { AAM_TRACK.event("aam_demo_cta", { tune: slug, where: "header" }); };
     head.appendChild(cta);
