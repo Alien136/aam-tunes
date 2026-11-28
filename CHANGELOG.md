@@ -10,6 +10,7 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- **Blues Études Vol. 2**, Étude 8 (Fast Company): the fast runs in bars 13, 16, 18, 20 and 23 now show jazz articulation (short slurs into the beat, accents on the top notes) in place of one long slur, as in the rebuilt PDF. Notes and rhythm are unchanged; three tunes republished (`be2-8-alto`, `be2-8-tenor`, `be2-8-flute`), still locked by each edition's code.
 - **The public demo card opens with a note, "How my students practice"**: every lesson ends with a practice PDF that opens in the player; learn the notes, play along, speed up. It shows a real picture of Learn mode on a saxophone line (played notes green, the next note in the blue cloud, its fingering beside it).
 - **On a phone the demo opens inside the page, exactly one screen tall**, so the title and the play button are both in view; on a computer it opens in a window over the page. While it is on screen it tells the page (`html.aam-demo-on`), so a page can put its own pinned buttons away.
 - **The demo's guide starts every time the card is opened from the note** (a visitor, not a student), ends on "tap a tune here to try another one", and does not start again on each tune. Students' once-per-device tour is unchanged.
