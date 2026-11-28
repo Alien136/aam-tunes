@@ -736,3 +736,27 @@ Everything needed to carry on from any conversation is in this repository and in
   on it), and its own STATUS / CHANGELOG / README text. Next Player night on row 3.6: `git merge --ff-only origin/builder/ebass-step2`
   (or cherry-pick it), fix the date and "picked by" line of its STATUS section, run both full checks and the guard, push to main,
   then delete the branch. Do not rebuild it from scratch.
+
+## 2026-11-28 · Saturday style pass: room between the Scale Choices entries on the Welcome Booklet's Blues page
+- Picked by rule 3 (Saturday). Main as found was green. Finding 1 of the 21 Nov list, first half.
+- Rendered and looked at page by page tonight: the Welcome Booklet only (alto 27 pages; tenor and flute Blues pages). The Beginner
+  Booklets, the Starter Packs, Christmas Tunes and Graded Repertoire were NOT rendered tonight (their builds were stopped to keep the
+  machine for the Welcome rebuilds and the as-found checks): next Saturday starts with them.
+- The cause: in the booklet the Scale Choices entries are set in DejaVu Sans at 11 pt on a narrower page than a lead-sheet study,
+  so four of the five wrap onto two lines, and `gen_study.py` put only 0.25 of a staff space between entries: less than the
+  line spacing inside an entry, so a wrapped line read as part of the next entry.
+- Fix at the source: `gen_study.build()` takes a new optional spec key `s2_gap` (default 0.25, so every lead-sheet study is
+  unchanged: `example_blues_alto_spec.json` gives a byte-identical .ly before and after). `blues_pages()` in `tools/build_book.py`
+  sets `s2_gap` 0.6 and gives Section 1 a top gap of 0.4 instead of 1.2 (it follows the page's own intro), which is where the room
+  comes from.
+- New guard in `build_book.py`: the build stops if the Blues is not exactly two pages. It fired tonight: gap 0.7 fits the alto
+  edition and makes three pages in tenor and flute. LilyPond decides the page break from its own estimate of the text heights, so
+  the limit differs by key; closer staves (`system_spacing`) do not help. Flute is the tightest edition: test it first.
+- After: alto compared page by page with the build as found (70 dpi, every pixel): only page 23 differs. Tenor (27 pages) and flute
+  (29) page counts unchanged; their Blues pages looked at.
+- NOT republished. Saxophone Welcome alto and tenor are released: they wait for Alex's answer on republishing (Needs Alex), with
+  the Beginner Booklet's page 28. The Flute Welcome Booklet is a draft: republish it with the next change to it, or when Alex says.
+- Still open from finding 1: the Blues' second page has no page header. New, same page: on the scale staff the labels sit against
+  each other and the chord names ("Phrygian dominant" runs into "Dorian" in alto and tenor; "Mixolydian" sits on the staff's chord
+  line). Take that one next Saturday (in `gen_study.py`: the labels are TextScripts at the Section 2 text size; a smaller label or
+  one bar per label line would clear it, and it changes the studies too, so rebuild a study to compare).

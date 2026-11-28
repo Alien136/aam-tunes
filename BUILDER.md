@@ -187,6 +187,9 @@ He starts the request with one of two phrases. Neither phrase: treat it as Beta.
 Newest first. One line each: what went wrong or was nearly wrong, and the rule that now prevents it. The builder adds a line when a
 night taught something; the release retro prunes lines that have become checks.
 
+- 2026-11-28 · A spacing change that fitted the alto Welcome Booklet made a third Blues page in tenor and flute. A layout change in a
+  generator is tried in every edition before it is called done (flute is the tightest Welcome edition), and a Saturday pass builds one
+  book at a time: two builds at once, beside the as-found checks, take longer than the night has.
 - 2026-11-27 · The demo card was changed on 26 Nov with only `check_features.js --only demo` run; the demo walk in `check_release.js`
   runs only in a full run (no `--only`) and was left failing on main. After any change to `player/demo.html` or `player/demo-loader.html`,
   run the full `node tools/check_release.js`, and update its demo walk in the same commit when the card's steps change.

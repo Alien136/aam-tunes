@@ -812,6 +812,7 @@ def blues_pages():
     import json, re
     import gen_study
     spec = {"title": "Blues", "concert_key": "F", "instrument": EDITION, "tempo_text": "Medium Swing", "blues": True,
+            "s2_gap": 0.6,                 # the booklet's wider type wraps the scale notes onto two lines: a clear gap between the entries, so a wrapped line never sits against the next entry
             "bars": [["F7"], ["Bb7"], ["F7"], ["Cm7", "F7"], ["Bb7"], ["Bb7"], ["F7"], ["Am7b5", "D7b9"],
                      ["Gm7"], ["C7"], ["F7", "D7b9"], ["Gm7", "C7"]]}
     ly = gen_study.build(spec)
@@ -827,7 +828,7 @@ def blues_pages():
                      ("A 12-bar jazz blues in F, the key a band plays it in. " if FLUTE else "A 12-bar jazz blues, written in " + key + " for your saxophone (concert F, the key a band plays it in). ") +
                      "First learn the chord tones, then the scale for each chord, then write your own line over the changes.")
     first = ly.index("\\markup \\column {")
-    ly = ly[:first] + head + ly[first:]
+    ly = ly[:first] + head + ly[first:].replace("\\vspace #1.2", "\\vspace #0.4", 1)   # Section 1 follows the page's own intro: it does not need a section's full top gap (the room goes to the Scale Choices entries)
     ly = re.sub(r"\\score \{\n  << \\new Staff .*?\\midi .*?\}\n\}\n", "", ly, flags=re.S)
     return ly
 
@@ -1189,7 +1190,10 @@ def main():
                                                            "major", pat_fours_split, MAJOR, PARTS_TXT["fours"], split=6))))
     sections.append(("ii–V–I Licks", run_ly("licks", licks_page())))
     key = {"alto": "D", "tenor": "G"}.get(EDITION, "F")
-    sections.append((f"Blues in {key}", run_ly(f"blues_{EDITION}", blues_pages())))
+    blues_pdf = run_ly(f"blues_{EDITION}", blues_pages())
+    if len(PdfReader(blues_pdf).pages) != 2:                # the blues is two facing pages; a wider text gap or a longer note must not push a line onto a third
+        sys.exit("Blues pages: %d pages, expected 2. Lower s2_gap in blues_pages() or shorten the text." % len(PdfReader(blues_pdf).pages))
+    sections.append((f"Blues in {key}", blues_pdf))
     sections.append(("Fingering Chart", f"{OUT}/fingering.pdf"))
     # table of contents with real page numbers (cover = 1, practice pages = 2-3)
     toc, pg = [("How to Use This Book", 3), ("Your Practice Routine", 4)], 5

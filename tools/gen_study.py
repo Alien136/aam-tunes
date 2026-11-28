@@ -10,6 +10,7 @@ Spec keys:
   bars: list of bars in 4/4, each a list of 1 chord (whole bar) or 2 chords (two beats each), concert pitch.
   recordings: optional list of {"artist", "album", "year", "note"}, printed as a "Listen" list after Section 2.
   staff_size, text_size (pt), s2_text_size (pt), s2_staff_size: optional sizes; fit_study.py sets the first three.
+  s2_gap: optional space between the Scale Choices entries (default 0.25); raise it where the entries wrap onto two lines.
   lh_voicing (piano): "guide" (default: 3rd + 7th, lower note C3-Ab3) | "root7" (root + 7th, root G2-F#3).
   original_tune: {"composer", "similar_tune", "why"} for an original chart with no findable recordings: the Listen
     section says so and presents the recordings as versions of similar_tune.
@@ -921,7 +922,7 @@ changes = \\chordmode {{ {changes} }}
 }}
 
 {brk2}{section("2", "Scale Choices", [("One scale per chord.", "Black notes are chord tones, grey notes pass between them.")], S2_TEXT_PT)}
-\\markup \\column {{ {" \\vspace #0.25 ".join(expl)} }}
+\\markup \\column {{ {f" \\vspace #{spec.get('s2_gap', 0.25)} ".join(expl)} }}
 \\markup \\vspace #0.6
 \\score {{
   << \\new ChordNames \\chordmode {{ {" ".join(ref_chords)} }}
