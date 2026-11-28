@@ -10,6 +10,11 @@ moves that block under the new version when Alex says "ship".
 ## Unreleased
 
 ### Added
+- **The public demo card opens with a note, "How my students practice"**: every lesson ends with a practice PDF that opens in the player; learn the notes, play along, speed up. It shows a real picture of Learn mode on a saxophone line (played notes green, the next note in the blue cloud, its fingering beside it).
+- **On a phone the demo opens inside the page, exactly one screen tall**, so the title and the play button are both in view; on a computer it opens in a window over the page. While it is on screen it tells the page (`html.aam-demo-on`), so a page can put its own pinned buttons away.
+- **The demo's guide starts every time the card is opened from the note** (a visitor, not a student), ends on "tap a tune here to try another one", and does not start again on each tune. Students' once-per-device tour is unchanged.
+- **Tune names in the demo's top row show whole or not at all**, with an arrow that brings the next ones and returns to the first. The row re-checks itself whenever its width changes.
+- **The five demo songs use plain major and minor chords** (live since 27 Nov; the blues riff keeps its 7ths).
 - **Blues Études Vol. 3 (Cool & West Coast)** in the library: 8 études for alto, tenor and flute (24 tunes, `be3-1-alto` … `be3-8-flute`), with a 2-étude free sample per edition. Locked by each edition's code, so nothing changes for students until Alex gives a code out.
 - Beta (test copy only, until Alex has listened): a **Gospel Shuffle** band style in the Blues group, a slow 12/8 feel: every beat split in three on the hi-hat, kick on 1 and 3, snare on 2 and 4, rolling triplet chords on the piano, a bass that answers with a pick-up on the last triplet and steps into the next chord. The written line swings in the same triplets. Pick it from the style button under the title of any band tune in 4/4, and slow the tempo to about 50 to 70.
 
